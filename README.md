@@ -26,43 +26,9 @@ In 1969, composer [**Alvin Lucier**](https://en.wikipedia.org/wiki/Alvin_Lucier)
 
 ---
 
-## Overview
+## The Discovery
 
-The process proceeds by iterative forward-pass feedback: a prompt's **activation tensor** (the full residual stream at the model's final layer) is extracted, L2-normalised, and re-injected directly into the model's input layer, bypassing the normal text interface entirely. Repeated over ~100 iterations, the semantic content of the initial prompt dissolves and **dominant attractor states emerge** — stable token configurations the model gravitates toward, revealing its *naked inner voice*.
-
-> **Core finding:** GPT-2 Small contains **five attractor basins** — `prolet` (35%), `Divine` (27%), `Anarch` (21%), `till` (15%), `solidarity` (2%) — whose tokens cluster semantically around political philosophy, theology, and collective action. These are the thematic fingerprints of its Reddit 2018 training data, made visible without access to that data.
-
-See [TECHNICAL.md](docs/TECHNICAL.md) for the formal specification, or [UNDERSTANDING.md](docs/UNDERSTANDING.md) for an accessible explanation of the mechanism.
-
-![3D PCA trajectory of semantic dissolution](ActivationTensorResonance/images/topology.png)
-
----
-
-## How It Works
-
-1. Feed a prompt into GPT-2 Small
-2. Extract the **entire internal activation tensor** across all token positions from the final layer's output
-3. L2-normalise the tensor (energy conservation — prevents numerical explosion)
-4. Re-inject that tensor as the input to the next forward pass, overwriting the token embeddings
-5. Repeat ~100 times
-6. Observe what the model converges to
-
-```
-Prompt → Tokenise → Embed → [Layer 0 ... Layer 11] → Extract residual tensor
-                      ↑                                        |
-                      └──────── Normalise & Re-inject ─────────┘
-                                    (repeat 100×)
-```
-
-This is a **nonlinear analogue of power iteration**: where classical power iteration converges to the dominant eigenvector of a linear operator, ATR converges to fixed points of the full transformer forward map, which includes LayerNorm, softmax attention, GeLU MLPs, and residual connections. The mathematical correspondence with Lucier's acoustic process is detailed in [ISOMORPHISM.md](docs/ISOMORPHISM.md).
-
----
-
-## Results
-
-### Phase 1: Exploratory Discovery (5 prompts)
-
-The Body without Organs is a Marxist.
+*The Body without Organs is a Marxist.*
 
 Five diverse prompts were tested — a question, a factual statement, a grammatical pattern, nonsense, and a command:
 
@@ -82,7 +48,9 @@ Each descent is a journey that tells a story:
 [iter 2] ash → [5] Canad → [10] Ag → [20] FT → [50] capit → [100] injustice → [250] Rousse → [500] prolet
 ```
 
-It was a genuine surprise to watch the seemingly boundless possibility of language rapidly crushed into just 5 single last words. Four of the five prompts — the question, the facts, the nonsense, and the command — followed an almost identical trajectory. Mapping the suggestions:
+It was a genuine surprise to watch the seemingly boundless possibility of language so rapidly crushed into just 5 single last words. Four of the five initial prompts — the question, the facts, the nonsense, and the command — followed an almost identical path into the same basin of attraction.
+
+Mapping the suggestions:
 
 **Geography** [Canad(a)] → **Finance** [Ag, FT, capit(al)] → **Political Philosophy** [injustice, Rousse(au), prolet(ariat)]
 
@@ -111,6 +79,36 @@ The fifth prompt — *"The cat sat on the mat"* — diverged to a separate resti
 ```
 
 This syntactic structure found its own basin: suggesting mythological language and a diversity of subject interests within the training data.
+
+---
+
+## How It Works
+
+1. Feed a prompt into GPT-2 Small
+2. Extract the **entire internal activation tensor** across all token positions from the final layer's output
+3. L2-normalise the tensor (energy conservation — prevents numerical explosion)
+4. Re-inject that tensor as the input to the next forward pass, overwriting the token embeddings
+5. Repeat ~100 times
+6. Observe what the model converges to
+
+```
+Prompt → Tokenise → Embed → [Layer 0 ... Layer 11] → Extract residual tensor
+                      ↑                                        |
+                      └──────── Normalise & Re-inject ─────────┘
+                                    (repeat 100×)
+```
+
+This is a **nonlinear analogue of power iteration**: where classical power iteration converges to the dominant eigenvector of a linear operator, ATR converges to fixed points of the full transformer forward map, which includes LayerNorm, softmax attention, GeLU MLPs, and residual connections. The mathematical correspondence with Lucier's acoustic process is detailed in [ISOMORPHISM.md](docs/ISOMORPHISM.md).
+
+> **Core finding:** GPT-2 Small contains **five attractor basins** — `prolet` (35%), `Divine` (27%), `Anarch` (21%), `till` (15%), `solidarity` (2%) — whose tokens cluster semantically around political philosophy, theology, and collective action. These are the thematic fingerprints of its Reddit 2018 training data, made visible without access to that data.
+
+See [TECHNICAL.md](docs/TECHNICAL.md) for the formal specification, or [UNDERSTANDING.md](docs/UNDERSTANDING.md) for an accessible explanation of the mechanism.
+
+![3D PCA trajectory of semantic dissolution](ActivationTensorResonance/images/topology.png)
+
+---
+
+## Validation
 
 ### Phase 2: Reproducibility Gate ✅
 
@@ -279,4 +277,3 @@ pip install torch transformer-lens plotly scikit-learn ipywidgets kaleido
 - Nanda, N. & Bloom, J. (2022). [TransformerLens](https://github.com/TransformerLensOrg/TransformerLens).
 
 ---
-
