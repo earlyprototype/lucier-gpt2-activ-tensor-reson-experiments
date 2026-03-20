@@ -94,6 +94,17 @@ Turns out GPT-2 Small was trained exclusively on WebText — a corpus of 40GB of
 
 No joke.
 
+## Reproducibility
+
+The experiment was re-run with identical parameters (Stage 0 gate). **All five terminal basins reproduced** — four prompts converged to `prolet`, the cat/mat prompt converged to `Divine`. The attractor landscape is stable.
+
+However, the intermediate dissolution pathways are similar but not identical between runs. Possible causes include:
+- GPU floating-point non-determinism (CUDA operations are not guaranteed deterministic by default)
+- Sensitivity to initial conditions characteristic of nonlinear dynamical systems
+- Chaotic intermediate dynamics that still converge to stable fixed points
+
+This remains an open question — distinguishing between these would require running on CPU with fixed seeds.
+
 
 ### The Comforting Outlier
 
@@ -156,7 +167,7 @@ The validation notebooks test this prediction with 12 new prompts.
 1. **Single model, single architecture.** These results are specific to GPT-2 Small.
 2. **Nonlinear system.** The full transformer stack (LayerNorm, attention, MLP) makes this a complex nonlinear dynamical system, not pure power iteration.
 3. **BPE artefacts.** `prolet`, `Rousse`, `capit` are subword tokens. Interpret cautiously.
-4. **N=1.** The reproducibility gate has not yet been run.
+4. **~~N=1.~~** ~~The reproducibility gate has not yet been run.~~ **N=2. Reproducibility confirmed.** Terminal basins reproduced; intermediate paths show sensitivity (see Reproducibility section above).
 
 
 
