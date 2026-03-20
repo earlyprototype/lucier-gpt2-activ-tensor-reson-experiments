@@ -98,7 +98,7 @@ The fifth prompt — *"The cat sat on the mat"* — diverged to a separate resti
 
 This syntactic structure found its own basin: suggesting mythological language and a diversity of subject interests within the training data.
 
-> **Core finding:** GPT-2 Small contains **five attractor basins** — `prolet` (35%), `Divine` (27%), `Anarch` (21%), `till` (15%), `solidarity` (2%) — whose tokens cluster semantically around political philosophy, theology, and collective action. These are the thematic fingerprints of its Reddit 2018 training data, made visible without access to that data.
+> **Core finding:** GPT-2 Small contains **five attractor basins** — `prolet` (35%), `Divine` (27%), `Anarch` (21%), `till` (15%), `solidarity` (2%) — whose tokens cluster semantically around political philosophy, theology, and collective action. These are the thematic fingerprints of its Reddit 2018 training data, **made visible without access to that data**.
 
 ---
 
