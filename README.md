@@ -40,6 +40,7 @@ Five diverse prompts were tested:
 - a command ["Calculate the sum of all prime numbers below"]
 
 ## The Results
+The Body without Organs is a Marxist.
 
 **Four out of five** of the input prompts converged through the same dissolution trajectory to a common terminal state: the BPE subword `prolet` — a fragment: a suggestion.
 
@@ -55,7 +56,6 @@ The dissolution path traces a route through what starts to look like recognisabl
 ```
 'I am sitting in a room different from the one you are in now' →[iteration 2 ] **ash** → [iteration 5] **Canad** → [iteration 10] **Ag** → [iteration 20] **FT** → [iteration 50] **capit** → [iteration 100] **injustice** → [iteration 250] **Rousse** → [iteration 500] **prolet**
 ```
-
 
 **Prompt 2: Factual declarative**
 ```
@@ -83,14 +83,11 @@ Is **prolet** a fragment of **proletariat**?
 *Money → Capital → injustice → Rousseau → proletariat*
 
 
-Is GPT-2 a Marxist?
-
----
-
 ### The Femminus Route
 Looking closer at the path of the maths prompt, we can see it passes through `Femminus Fem Fem Fem` at iteration 5 — the model routes a mathematical prompt through this terminology on its way to political philosophy. 
 
-### The Training Data
+
+### Voice
 What's going on here? These initially nonsensical-seeming outputs are starting to feel all a bit familiar. A bit pre-covid culture war familiar. This experiment might just, implausibly, have revealed something fundamental about the architecture of this model, and ultimately, how it "thinks". 
 
 Turns out GPT-2 Small was trained exclusively on WebText — a corpus of 40GB of text scraped from Reddit-curated outbound links circa 2018 [(Radford et al., 2019)](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf).
@@ -161,6 +158,8 @@ The validation notebooks test this prediction with 12 new prompts.
 3. **BPE artefacts.** `prolet`, `Rousse`, `capit` are subword tokens. Interpret cautiously.
 4. **N=1.** The reproducibility gate has not yet been run.
 
+
+
 ## References
 
 - Radford, A., Wu, J., et al. (2019). *Language Models are Unsupervised Multitask Learners.* OpenAI. [PDF](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf)
@@ -169,4 +168,4 @@ The validation notebooks test this prediction with 12 new prompts.
 
 ---
 
-*Or, to put it in the language of Deleuze: the Body without Organs is a Marxist.*
+
