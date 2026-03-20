@@ -100,6 +100,8 @@ This syntactic structure found its own basin: suggesting mythological language a
 
 > **Core finding:** GPT-2 Small contains **five attractor basins** — `prolet` (35%), `Divine` (27%), `Anarch` (21%), `till` (15%), `solidarity` (2%) — whose tokens cluster semantically around political philosophy, theology, and collective action. These are the thematic fingerprints of its Reddit 2018 training data, made visible without access to that data.
 
+---
+
 ![Sentence dissolution — the five prompts dissolving into their attractors](ActivationTensorResonance/images/dissolution1.png)
 
 ![Dissolution continued](ActivationTensorResonance/images/dissolution2.png)
