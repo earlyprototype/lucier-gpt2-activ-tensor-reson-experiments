@@ -26,7 +26,7 @@ In 1969, composer [**Alvin Lucier**](https://en.wikipedia.org/wiki/Alvin_Lucier)
 
 ---
 
-## How It Works
+## How ATR Works
 
 1. Feed a prompt into GPT-2 Small
 2. Extract the **entire internal activation tensor** across all token positions from the final layer's output
