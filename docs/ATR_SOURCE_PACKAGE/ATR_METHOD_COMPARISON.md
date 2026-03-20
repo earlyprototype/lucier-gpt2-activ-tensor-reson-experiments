@@ -73,7 +73,7 @@
 
 ### What ATR Adds
 
-ATR is comfortable positioned to compliment and add value to existing analyses. It answers a question no other method asks:
+ATR is comfortably positioned to potentially compliment and add value to existing analyses. It answers a question no other method asks:
 
 > **"What are the dominant modes of the model's weight geometry, independent of any input?"**
 
