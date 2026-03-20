@@ -132,6 +132,8 @@ The experiment was re-run with identical parameters. **All five terminal basins 
 
 All five basin tokens cluster semantically in the embedding space (W_E neighbourhood analysis confirms this — see [Session 01 Review](docs/ATR_SOURCE_PACKAGE/SESSION_01_SUPERVISORY_REVIEW.md)). The all-warm cross-similarity matrix (no negative correlations) indicates the basins occupy a compact subspace — the thematic centre of mass of the training corpus.
 
+![Cross-similarity matrix of basin tokens — all-warm, no negative correlations](docs/supervisor/token%20similarity.png)
+
 ![Basin distribution across 125 prompts](B_AttractorDominance/output_stage1/basin_distribution.png)
 
 ![3D topology of convergence trajectories](B_AttractorDominance/output_stage1/topology_3d.png)
