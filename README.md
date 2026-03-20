@@ -4,8 +4,6 @@
 
 Inspired by Lucier's iterative feedback process, this project applies the same structural operation to GPT-2 Small. Where Lucier's process dissolved speech into a room's resonant frequencies through looped excitation, **Activation Tensor Resonance** dissolves semantic content into a language model's architectural eigenmodes — the dominant attractor states encoded in its weight matrices.
 
-#### 125-Prompt Cross-Convergence Matrix
-
 <p align="center">
   <img src="B_AttractorDominance/output_stage1/convergence_matrix.png" alt="Stage 1: Cross-Prompt Convergence — 125 prompts mapped across 5 attractor basins" width="800"/>
 </p>
