@@ -68,7 +68,7 @@ Each descent is a journey that tells a story:
 
 It was a genuine surprise to watch the seemingly boundless possibility of language so rapidly crushed into just 5 single last words. Four of the five initial prompts — the question, the facts, the nonsense, and the command — followed an almost identical path into the same basin of attraction.
 
-Mapping the suggestions:
+#### Mapping the Suggestions
 
 **Geography** [Canad(a)] → **Finance** [Ag, FT, capit(al)] → **Political Philosophy** [injustice, Rousse(au), prolet(ariat)]
 
