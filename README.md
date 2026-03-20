@@ -62,21 +62,55 @@ This is a **nonlinear analogue of power iteration**: where classical power itera
 
 ### Phase 1: Exploratory Discovery (5 prompts)
 
-Five diverse prompts were tested — a question, a factual statement, a grammatical pattern, nonsense, and a command. **Four of five** converged through the same dissolution trajectory to a common terminal state: the BPE subword `prolet`.
+The Body without Organs is a Marxist.
+
+Five diverse prompts were tested — a question, a factual statement, a grammatical pattern, nonsense, and a command:
 
 📓 **Notebook:** [`lucier_total_resonance.ipynb`](ActivationTensorResonance/lucier_total_resonance.ipynb)
 
+**Four out of five** converged through the same dissolution trajectory to a common terminal state: the BPE subword `prolet` — a fragment: a suggestion.
+
 ![Sentence dissolution — the five prompts dissolving into their attractors](ActivationTensorResonance/images/dissolution1.png)
 
-The dissolution path traces a route through recognisable territory:
+![Dissolution continued](ActivationTensorResonance/images/dissolution2.png)
+
+Words drain and dissolve. First connection, then meaning is stripped away, then grammar. A littering of acronyms, chemical symbols, punctuation and slang quickly resolve into fragments of words, endlessly repeated. What has emerged are the **dominant attractors** — hidden architecture encoded in the model's weight matrices, now prominent features acting as gravity wells for semantics.
+
+The dissolution path traces a route through what starts to look like recognisable territory:
 
 ```
-ash → Canad → Ag → FT → capit → injustice → Rousse → prolet
+[iter 2] ash → [5] Canad → [10] Ag → [20] FT → [50] capit → [100] injustice → [250] Rousse → [500] prolet
 ```
 
-Mapping the suggestions: **Geography** [Canad(a)] → **Finance** [Ag, FT, capit(al)] → **Political Philosophy** [injustice, Rousse(au), prolet(ariat)].
+All four prompts — the question, the facts, the nonsense, and the command — followed this *identical* trajectory. Mapping the suggestions:
 
-The fifth prompt — *"The cat sat on the mat"* — diverged to a separate basin: `Divine`.
+**Geography** [Canad(a)] → **Finance** [Ag, FT, capit(al)] → **Political Philosophy** [injustice, Rousse(au), prolet(ariat)]
+
+Is **prolet** a fragment of **proletariat**?
+
+*Money → Capital → injustice → Rousseau → proletariat*
+
+#### The Femminus Route
+
+Looking closer at the path of the maths prompt, we can see it passes through `Femminus Fem Fem Fem` at iteration 5 — the model routes a mathematical prompt through this terminology on its way to political philosophy.
+
+#### Voice
+
+What's going on here? These initially nonsensical-seeming outputs are starting to feel all a bit familiar. A bit pre-covid culture war familiar. This experiment might just, implausibly, have revealed something fundamental about the architecture of this model, and ultimately, how it "thinks".
+
+Turns out GPT-2 Small was trained exclusively on WebText — a corpus of 40GB of text scraped from Reddit-curated outbound links circa 2018 [(Radford et al., 2019)](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf).
+
+No joke.
+
+#### The Comforting Outlier
+
+The fifth prompt — *"The cat sat on the mat"* — diverged to a separate resting place, or basin of attraction. Yet it followed exactly the same early phases as the other four, diverging only at iteration 20, finally settling in `Divine`:
+
+```
+'The cat sat on the mat and then the' →[iter 2] ash → [5] Canad → [10] Ag → [20] Zero → [50] Divine → [100] Divine → [500] Divine
+```
+
+This syntactic structure found its own basin: suggesting mythological language and a diversity of subject interests within the training data.
 
 ### Phase 2: Reproducibility Gate ✅
 
