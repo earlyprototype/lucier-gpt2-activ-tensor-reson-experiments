@@ -2,6 +2,10 @@
 
 ### *Mapping the Attractor Landscape of GPT-2 Small's Weight Geometry*
 
+Inspired by Lucier's iterative feedback process, this project applies the same structural operation to GPT-2 Small. Where Lucier's process dissolved speech into a room's resonant frequencies through looped excitation, **Activation Tensor Resonance** dissolves semantic content into a language model's architectural eigenmodes — the dominant attractor states encoded in its weight matrices.
+
+#### 125-Prompt Cross-Convergence Matrix
+
 <p align="center">
   <img src="B_AttractorDominance/output_stage1/convergence_matrix.png" alt="Stage 1: Cross-Prompt Convergence — 125 prompts mapped across 5 attractor basins" width="800"/>
 </p>
@@ -25,8 +29,6 @@ In 1969, composer [**Alvin Lucier**](https://en.wikipedia.org/wiki/Alvin_Lucier)
 ---
 
 ## Overview
-
-Inspired by Lucier's iterative feedback process, this project applies the same structural operation to GPT-2 Small. Where Lucier's process dissolved speech into a room's resonant frequencies through looped excitation, **Activation Tensor Resonance** dissolves semantic content into a language model's architectural eigenmodes — the dominant attractor states encoded in its weight matrices.
 
 The process proceeds by iterative forward-pass feedback: a prompt's **activation tensor** (the full residual stream at the model's final layer) is extracted, L2-normalised, and re-injected directly into the model's input layer, bypassing the normal text interface entirely. Repeated over ~100 iterations, the semantic content of the initial prompt dissolves and **dominant attractor states emerge** — stable token configurations the model gravitates toward, revealing its *naked inner voice*.
 
