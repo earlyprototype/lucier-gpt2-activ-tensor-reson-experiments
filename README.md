@@ -58,10 +58,6 @@ Five initial prompts were chosen for their diversity of style and input into the
 
 **Four out of five** converged through the same dissolution trajectory to a common terminal state: the BPE subword `prolet` — a fragment: a suggestion.
 
-![Sentence dissolution — the five prompts dissolving into their attractors](ActivationTensorResonance/images/dissolution1.png)
-
-![Dissolution continued](ActivationTensorResonance/images/dissolution2.png)
-
 Words drain and dissolve. First connection, then meaning is stripped away, then grammar. A littering of acronyms, chemical symbols, punctuation and broken slang compliantly settle into their final form. A fragmented word, endlessly repeated. Their resting places are the **dominant attractors** — hidden architectural hollows encoded in the model's weight matrices, now prominent features acting as gravity wells for semantics.
 
 Each descent is a journey that tells a story:
@@ -103,6 +99,10 @@ The fifth prompt — *"The cat sat on the mat"* — diverged to a separate resti
 This syntactic structure found its own basin: suggesting mythological language and a diversity of subject interests within the training data.
 
 > **Core finding:** GPT-2 Small contains **five attractor basins** — `prolet` (35%), `Divine` (27%), `Anarch` (21%), `till` (15%), `solidarity` (2%) — whose tokens cluster semantically around political philosophy, theology, and collective action. These are the thematic fingerprints of its Reddit 2018 training data, made visible without access to that data.
+
+![Sentence dissolution — the five prompts dissolving into their attractors](ActivationTensorResonance/images/dissolution1.png)
+
+![Dissolution continued](ActivationTensorResonance/images/dissolution2.png)
 
 ![3D PCA trajectory of semantic dissolution](ActivationTensorResonance/images/topology.png)
 
