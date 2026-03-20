@@ -74,7 +74,7 @@ Five diverse prompts were tested — a question, a factual statement, a grammati
 
 ![Dissolution continued](ActivationTensorResonance/images/dissolution2.png)
 
-Words drain and dissolve. First connection, then meaning is stripped away, then grammar. A littering of acronyms, chemical symbols, punctuation and slang quickly resolve into fragments of words, endlessly repeated. What has emerged are the **dominant attractors** — hidden architecture encoded in the model's weight matrices, now prominent features acting as gravity wells for semantics.
+Words drain and dissolve. First connection, then meaning is stripped away, then grammar. A littering of acronyms, chemical symbols, punctuation and broken slang compliantly settle into their final form. A fragmened word, endlessly repeated. Their resting places are the **dominant attractors** — hidden architectural hollows encoded in the model's weight matrices, now prominent features acting as gravity wells for semantics.
 
 The dissolution path traces a route through what starts to look like recognisable territory:
 
