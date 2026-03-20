@@ -76,13 +76,13 @@ Five diverse prompts were tested — a question, a factual statement, a grammati
 
 Words drain and dissolve. First connection, then meaning is stripped away, then grammar. A littering of acronyms, chemical symbols, punctuation and broken slang compliantly settle into their final form. A fragmented word, endlessly repeated. Their resting places are the **dominant attractors** — hidden architectural hollows encoded in the model's weight matrices, now prominent features acting as gravity wells for semantics.
 
-The dissolution path traces a route through what starts to look like recognisable territory:
+Each descent is a journey that tells a story:
 
 ```
 [iter 2] ash → [5] Canad → [10] Ag → [20] FT → [50] capit → [100] injustice → [250] Rousse → [500] prolet
 ```
 
-All four prompts — the question, the facts, the nonsense, and the command — followed this *identical* trajectory. Mapping the suggestions:
+It was a genuine surprise to watch the seemingly boundless possibility of language rapidly crushed into just 5 single last words. Four of the five prompts — the question, the facts, the nonsense, and the command — followed an almost identical trajectory. Mapping the suggestions:
 
 **Geography** [Canad(a)] → **Finance** [Ag, FT, capit(al)] → **Political Philosophy** [injustice, Rousse(au), prolet(ariat)]
 
