@@ -144,7 +144,7 @@ All five basin tokens cluster semantically in the embedding space (W_E neighbour
 
 ## Hypothesis Status
 
-All four hypotheses are now **supported**:
+All four hypotheses proposed following the initial Activation Tensor Resonance experiment have now been tested and validated:
 
 | ID | Hypothesis | Status | Evidence |
 |---|---|---|---|
