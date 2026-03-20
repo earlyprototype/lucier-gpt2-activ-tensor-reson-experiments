@@ -10,9 +10,23 @@
 
 ---
 
+## The Inspiration
+
+<p align="center">
+  <img src="docs/lucier_room.png" alt="A sparse room with a reel-to-reel tape recorder and microphone — evoking Alvin Lucier's experimental setup" width="600"/>
+</p>
+
+In 1969, composer [**Alvin Lucier**](https://en.wikipedia.org/wiki/Alvin_Lucier) created [***I Am Sitting in a Room***](https://en.wikipedia.org/wiki/I_Am_Sitting_in_a_Room) — a process piece where he recorded himself speaking, played the recording back into the room, re-recorded the result, and repeated. With each iteration, the speech dissolved into the room's resonant frequencies. The words vanished. The architecture spoke.
+
+> *"I am sitting in a room different from the one you are in now. I am recording the sound of my speaking voice..."*
+
+🎬 [**Watch the original performance on YouTube**](https://www.youtube.com/watch?v=v9XJWBZBzq4) — Lucier's sound check and performance of the piece.
+
+---
+
 ## Overview
 
-Inspired by Alvin Lucier's *I Am Sitting in a Room* (1969), this project applies an analogous iterative feedback process to GPT-2 Small. Where Lucier's process dissolved speech into a room's resonant frequencies through looped excitation, **Activation Tensor Resonance** dissolves semantic content into a language model's architectural eigenmodes — the dominant attractor states encoded in its weight matrices.
+Inspired by Lucier's iterative feedback process, this project applies the same structural operation to GPT-2 Small. Where Lucier's process dissolved speech into a room's resonant frequencies through looped excitation, **Activation Tensor Resonance** dissolves semantic content into a language model's architectural eigenmodes — the dominant attractor states encoded in its weight matrices.
 
 The process proceeds by iterative forward-pass feedback: a prompt's **activation tensor** (the full residual stream at the model's final layer) is extracted, L2-normalised, and re-injected directly into the model's input layer, bypassing the normal text interface entirely. Repeated over ~100 iterations, the semantic content of the initial prompt dissolves and **dominant attractor states emerge** — stable token configurations the model gravitates toward, revealing its *naked inner voice*.
 
@@ -227,7 +241,7 @@ pip install torch transformer-lens plotly scikit-learn ipywidgets kaleido
 ## References
 
 - Radford, A., Wu, J., et al. (2019). *Language Models are Unsupervised Multitask Learners.* OpenAI. [PDF](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf)
-- Lucier, A. (1969). *I Am Sitting in a Room.* Lovely Music.
+- Lucier, A. (1969). [*I Am Sitting in a Room.*](https://en.wikipedia.org/wiki/I_Am_Sitting_in_a_Room) Lovely Music. [YouTube performance](https://www.youtube.com/watch?v=v9XJWBZBzq4).
 - Nanda, N. & Bloom, J. (2022). [TransformerLens](https://github.com/TransformerLensOrg/TransformerLens).
 
 ---
