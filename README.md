@@ -170,7 +170,7 @@ All four hypotheses proposed following the initial Activation Tensor Resonance e
 
 ## Why This Matters
 
-ATR reveals **training data bias geometrically, without access to the training data**. By iterating until input influence is exhausted, the method exposes the weight geometry's dominant modes — the thematic centre of mass of whatever the model was trained on.
+ATR reveals **training data bias geometrically, without access to the training data**. By iterating until input influence is exhausted, the method exposes the weight geometry's dominant modes — the thematic centres of mass of whatever the model was trained on.
 
 This positions ATR as a potential tool for:
 - **AI Safety** — auditing training data bias without data access
