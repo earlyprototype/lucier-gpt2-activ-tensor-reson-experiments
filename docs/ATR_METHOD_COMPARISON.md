@@ -96,7 +96,7 @@ This is the bias question. Other methods tell you what the model does with a spe
 
 ---
 
-## 3. ICHEC Compute Programme
+## 3. Compute Programme
 
 ### 3a. Research Programme: Cross-Model ATR Landscape Mapping
 
@@ -133,7 +133,7 @@ This is the bias question. Other methods tell you what the model does with a spe
 | Pythia training dynamics | Basin evolution across checkpoints | Developmental biology of LLMs |
 | Open-source ATR toolkit | Python package + notebooks | Community contribution |
 
-### 3e. Why This Fits ICHEC
+### 3e. Why HPC
 
 - **Low total compute** — 170–500 GPU-hours is modest by HPC standards
 - **High ratio of output to compute** — each ATR run produces rich, interpretable data
@@ -161,13 +161,13 @@ This is the bias question. Other methods tell you what the model does with a spe
 - [ ] Basin-sorted convergence matrix
 - [ ] Automated ATR pipeline (parameterisable model, prompt set, output directory)
 
-### Short-Term (Pre-ICHEC)
+### Short-Term (Pre-HPC)
 - [ ] ATR on GPT-2 Medium/Large (validate scaling locally)
 - [ ] Standardised output format (JSON schema for basin profiles)
 - [ ] Comparison metrics (basin count, depth, distribution entropy)
 - [ ] Prior art survey + position paper draft
 
-### Medium-Term (ICHEC Programme)
+### Medium-Term (HPC Programme)
 - [ ] Phases 1–5 as described above
 - [ ] Cross-model analysis pipeline
 - [ ] Publication-ready visualisations

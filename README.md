@@ -261,13 +261,13 @@ pip install torch transformer-lens plotly scikit-learn ipywidgets kaleido
 | [JOURNEY_MAP.md](docs/JOURNEY_MAP.md) | Complete project timeline, discoveries, glossary, open questions |
 | [ATR Method Comparison](docs/ATR_METHOD_COMPARISON.md) | ATR positioned against logit lens, SAEs, activation patching, etc. |
 | [Session 01 — Supervisory Review](docs/ATR_SOURCE_PACKAGE/SESSION_01_SUPERVISORY_REVIEW.md) | W_E neighbourhood analysis, phase transition discovery |
-| [Session 02 — Results Discussion](docs/ATR_SOURCE_PACKAGE/SESSION_02_RESULTS_DISCUSSION.md) | ATR naming, bias theory, ICHEC scaling programme |
+| [Session 02 — Results Discussion](docs/ATR_SOURCE_PACKAGE/SESSION_02_RESULTS_DISCUSSION.md) | ATR naming, bias theory, scaling programme |
 
 ---
 
 ## Caveats
 
-1. **Single model, single architecture.** All results are specific to GPT-2 Small (124M params). Cross-model validation is planned (see [ATR Method Comparison § ICHEC Programme](docs/ATR_METHOD_COMPARISON.md)).
+1. **Single model, single architecture.** All results are specific to GPT-2 Small (124M params). Cross-model validation is planned (see [ATR Method Comparison](docs/ATR_METHOD_COMPARISON.md)).
 2. **Nonlinear system.** The full transformer stack (LayerNorm, attention, MLP) makes this a complex nonlinear dynamical system, not pure power iteration.
 3. **BPE artefacts.** `prolet`, `Anarch`, `capit` are subword tokens. Interpret with appropriate caution.
 4. **N=2 for reproducibility.** Terminal basins reproduced across two runs; intermediate paths show floating-point sensitivity.

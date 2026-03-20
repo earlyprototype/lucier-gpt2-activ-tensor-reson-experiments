@@ -42,7 +42,7 @@
   - **`capit` correction:** Clusters as capitulation/surrender, NOT capitalism
   - **Phase transition discovered:** structural → semantic, transition at `capit`
   - **All-warm cross-similarity:** All 14 tokens positively correlated (0.18–0.47) — compact subspace
-- **Session 02:** Mixing Time analogy formalised. Bias interpretation. ATR named. Cross-model programme sketched. ICHEC compute access identified.
+- **Session 02:** Mixing Time analogy formalised. Bias interpretation. ATR named. Cross-model programme sketched.
 
 ---
 
