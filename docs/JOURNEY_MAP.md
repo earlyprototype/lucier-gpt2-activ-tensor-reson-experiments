@@ -30,9 +30,10 @@
 - **Prompt Library:** 125 prompts across 7 categories (Complex, Narrative, Simple, Chemical, Acronyms, Vulgarity, Wild)
 
 ### Phase 3: Validation Execution
-- **EXP_009d0 (Reproducibility):** ✅ PASSED. All 5 terminal basins identical. Intermediate paths show floating-point sensitivity but always converge to same fixed points.
-- **EXP_009d1 (Attractor Dominance, 125 prompts):** ✅ Complete.
+- **EXP_009d0 (Determinism check):** Same-machine repeatability supported. All 5 terminal basins identical across N=2 runs. Intermediate paths show floating-point sensitivity but always converge to same fixed points. Independent re-implementation has not been attempted.
+- **EXP_009d1 (Attractor Dominance, 125 prompts):** Complete.
   - 5 basins discovered: `prolet` (35.2%), `Divine` (27.2%), `Anarch` (20.8%), `till` (15.2%), `solidarity` (1.6%)
+  - Per-prompt prediction was poor (~25% match); structural finding (basins exist, these are their shares) supported, predictive finding not.
   - `stage1_results.pt` saved (6.5MB) — complete activation trajectories for all 125 prompts
 
 ### Phase 4: Supervisory Analysis (Today — 2026-03-20)
@@ -59,8 +60,8 @@
 | 7 | `capit` = capitulation, not capitalism | Session 01 | Nearest neighbours: surrender, succumb, acquiesce |
 | 8 | Dissolution has a structural→semantic phase transition | Session 01 | Early tokens generic (BPE/typographic), late tokens semantic |
 | 9 | All attractor tokens occupy same compact subspace (all-warm matrix) | Session 01 | Cross-similarity 0.18–0.47, no negative values |
-| 10 | The all-warm property reveals inherent training corpus bias | Session 02 | Geometric manifestation: weight geometry's dominant modes = training data themes |
-| 11 | All models must have basins (Brouwer fixed-point theorem) | Session 02 | Continuous map on compact set (LayerNorm bounds) |
+| 10 | The all-warm property is consistent with a compact "thematic-centre-of-mass" interpretation (proposed; pending statistical validation and cross-model evidence) | Session 02 | All 91 off-diagonal pairs of basin/waypoint tokens positively correlated in W_E (0.18–0.47) |
+| 11 | All normalised transformers must have basins (Brouwer fixed-point theorem) | Session 02 | Continuous map on compact set (LayerNorm bounds) — existence guaranteed; count and shape are empirical questions |
 
 ---
 
@@ -68,10 +69,10 @@
 
 | ID | Hypothesis | Status | Evidence |
 |---|---|---|---|
-| H0 | Results are deterministic | ✅ PASSED | EXP_009d0 |
-| H1 | `prolet` is the dominant basin | ✅ Supported | 35.2% of 125 prompts |
-| H2 | `Divine` is a genuine secondary basin | ✅ Supported | 27.2% + 3 more basins |
-| H3 | Intermediate tokens reflect training corpus topology | ✅ Supported | 4/5 basins semantic in W_E |
+| H0 | Results are deterministic | Repeatability supported | EXP_009d0 — N=2 same-machine runs produce identical terminal basins. Independent re-implementation pending. |
+| H1 | `prolet` is the dominant basin | Supported (structural) | 35.2% of 125 prompts. Per-prompt prediction was poor (~25%); the basin landscape is finer-grained than initially supposed. |
+| H2 | `Divine` is a genuine secondary basin | Supported with revision | 27.2% + 3 additional basins discovered (`Anarch`, `till`, `solidarity`) |
+| H3 | Intermediate tokens reflect training corpus topology | Supported, statistical validation pending | 4/5 basins show semantic clustering in W_E rather than BPE-substring clustering. Null-model and permutation tests have not yet been run. |
 
 ---
 
@@ -88,11 +89,9 @@
 | **BPE/Tokenisation** | Byte Pair Encoding | Why attractors appear as fragments (`prolet`, not `proletariat`) |
 | **Mechanistic Interp.** | Activation patching, probing, SAEs | Adjacent methods ATR complements |
 | **Mechanistic Interp.** | Logit Lens / Tuned Lens | Per-layer prediction; ATR reveals per-model global structure |
-| **Prior Art** | Slonski Q-vector dichotomy | Binary polarisation in W_Q — may be coarser version of ATR basins |
+| **Prior Art** | Slonski Q-vector dichotomy | Binary polarisation in W_Q — may be coarser version of ATR basins (untested prediction) |
 | **Prior Art** | Turner et al. — Representation Engineering | Activation steering (single-pass); ATR iterates to convergence |
 | **Prior Art** | Shumailov et al. — Model Collapse | Text-level self-feeding; ATR is activation-level (lossless) |
-| **AI Safety** | Training data bias detection | ATR reveals training bias geometrically, without training data access |
-| **EU Regulation** | AI Act — bias auditing | ATR as potential compliance tool for model bias assessment |
 | **Philosophy** | Deleuze — Body without Organs | The undifferentiated substrate (weight geometry before prompt input) |
 | **Dev. Biology** | Levin — TAME (morphogenesis) | Attractor basins as body plan of the model |
 
