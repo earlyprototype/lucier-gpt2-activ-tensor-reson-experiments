@@ -2,13 +2,15 @@
 
 ### *Mapping the Attractor Landscape of GPT-2 Small's Weight Geometry*
 
+> **Status:** Exploratory research project. Single-model evidence base. Statistical validation pending. The empirical findings are stable and reproducible on the same machine; the interpretive frame proposed below is hypothesis-shaped rather than data-shaped, and the cross-model evidence that would test it has not yet been produced.
+
 Inspired by Alvin Lucier's iconic, iterative feedback composition *I Am Sitting in a Room*, this project applies an analogous operation to GPT-2 Small. Where Lucier's process dissolved speech into a room's resonant frequencies through looped excitation, **Activation Tensor Resonance** dissolves semantic content into a language model's architectural eigenmodes — the dominant attractor states encoded in its weight matrices.
 
 <p align="center">
   <img src="B_AttractorDominance/output_stage1/convergence_matrix.png" alt="Stage 1: Cross-Prompt Convergence — 125 prompts mapped across 5 attractor basins" width="800"/>
 </p>
 
-<p align="center"><em>Cross-prompt convergence matrix (125 prompts × cosine similarity). The block structure reveals five distinct attractor basins in GPT-2 Small's weight geometry.</em></p>
+<p align="center"><em>Cross-prompt convergence matrix (125 prompts × cosine similarity). Block structure indicates five distinct attractor basins.</em></p>
 
 ---
 
@@ -42,7 +44,7 @@ Prompt → Tokenise → Embed → [Layer 0 ... Layer 11] → Extract residual te
                                     (repeat 100×)
 ```
 
-This is a **nonlinear analogue of power iteration**: where classical power iteration converges to the dominant eigenvector of a linear operator, ATR converges to fixed points of the full transformer forward map, which includes LayerNorm, softmax attention, GeLU MLPs, and residual connections. The mathematical correspondence with Lucier's acoustic process is detailed in [ISOMORPHISM.md](docs/ISOMORPHISM.md).
+This is a **nonlinear analogue of power iteration**. Where classical power iteration converges to the dominant eigenvector of a linear operator, ATR converges to fixed points of the full transformer forward map, which includes LayerNorm, softmax attention, GeLU MLPs, and residual connections. The mathematical correspondence with Lucier's acoustic process is detailed in [ISOMORPHISM.md](docs/ISOMORPHISM.md). Note that the spectral-theorem guarantee that holds for Lucier's linear case does *not* hold here — the nonlinear system can have multiple fixed points with distinct basins of attraction, which is precisely what this experiment maps.
 
 See [TECHNICAL.md](docs/TECHNICAL.md) for the formal specification, or [UNDERSTANDING.md](docs/UNDERSTANDING.md) for an accessible explanation of the mechanism.
 
@@ -98,7 +100,7 @@ The fifth prompt — *"The cat sat on the mat"* — diverged to a separate resti
 
 This syntactic structure found its own basin: suggesting mythological language and a diversity of subject interests within the training data.
 
-> **Core finding:** GPT-2 Small contains **five attractor basins** — `prolet` (35%), `Divine` (27%), `Anarch` (21%), `till` (15%), `solidarity` (2%) — whose tokens cluster semantically around political philosophy, theology, and collective action. These are the thematic fingerprints of its Reddit 2018 training data, **made visible without access to that data**.
+> **Empirical finding (single model):** GPT-2 Small contains five attractor basins — `prolet` (35%), `Divine` (27%), `Anarch` (21%), `till` (15%), `solidarity` (2%) — whose tokens cluster semantically in the embedding matrix around political philosophy, theology, and collective action. These basins are stable across same-machine repeated runs. Whether they reflect the training corpus's thematic centre of mass (the proposed interpretation), or arise from architectural properties independent of training data, has not yet been disentangled.
 
 ---
 
@@ -112,27 +114,31 @@ This syntactic structure found its own basin: suggesting mythological language a
 
 ## Validation
 
-### Phase 2: Reproducibility Gate ✅
+### Phase 2: Determinism Check
 
-📓 **Notebook:** [`00_reproducibility_gate.ipynb`](B_Reporduceability/00_reproducibility_gate.ipynb)
+📓 **Notebook:** [`00_reproducibility_gate.ipynb`](B_Reporduceability/00_reproducibility_gate.ipynb) *(currently in `.gitignore`; will be committed alongside the next round of experiments)*
 
-The experiment was re-run with identical parameters. **All five terminal basins reproduced.** Intermediate dissolution pathways show sensitivity to floating-point non-determinism (expected for iterative nonlinear maps), but always converge to identical fixed points.
+The experiment was re-run with identical parameters on the same machine. **All five terminal basins reproduced.** Intermediate dissolution pathways show sensitivity to floating-point non-determinism (expected for iterative nonlinear maps), but converge to identical fixed points.
 
-### Phase 3: Attractor Dominance (125 prompts) ✅
+This establishes **repeatability** in the technical sense (same machine, same seeds, same code → same result). Independent re-implementation on different hardware or by another investigator has not been attempted; the stronger sense of "reproducibility" remains pending.
+
+### Phase 3: Attractor Dominance (125 prompts)
 
 📓 **Notebook:** [`01_attractor_dominance.ipynb`](B_AttractorDominance/01_attractor_dominance.ipynb)
 
-125 prompts across 7 categories (Complex, Narrative, Simple, Chemical, Acronyms, Vulgarity, Wild) were swept through the ATR process. The attractor landscape proved far richer than the initial 2-basin observation:
+125 prompts across 7 categories (Complex, Narrative, Simple, Chemical, Acronyms, Vulgarity, Wild) were swept through the ATR process. The attractor landscape proved richer than the initial 2-basin observation:
 
 | Basin | Count | % | Semantic Cluster |
 |:---|:---:|:---:|:---|
 | **`prolet`** | 44 | 35.2% | Political philosophy (proletariat) |
 | **`Divine`** | 34 | 27.2% | Theology / mythology |
 | **`Anarch`** | 26 | 20.8% | Political (anarchism) |
-| **`till`** | 19 | 15.2% | Temporal / persistence |
+| **`till`** | 19 | 15.2% | Temporal / functional |
 | **`solidarity`** | 2 | 1.6% | Collective action |
 
-All five basin tokens cluster semantically in the embedding space (W_E neighbourhood analysis confirms this — see [Session 01 Review](docs/ATR_SOURCE_PACKAGE/SESSION_01_SUPERVISORY_REVIEW.md)). The all-warm cross-similarity matrix (no negative correlations) indicates the basins occupy a compact subspace — the thematic centre of mass of the training corpus.
+**Per-prompt prediction was poor.** Pre-registered predictions were correct for ~25% of the 125 prompts. The structural finding — that basins exist and that these are their shares — is supported by the data. The predictive finding — that prompt category determines which basin a prompt converges to — is not. The basin landscape is finer-grained than the initial framing supposed, and the input-to-basin mapping is not yet predictable from the categories tried.
+
+Four of five basin tokens (`prolet`, `Divine`, `Anarch`, `solidarity`) cluster semantically in the embedding space (W_E neighbourhood analysis confirms this — see [Session 01 Review](docs/supervisor/SESSION_01_SUPERVISORY_REVIEW.md)). The fifth (`till`) is functional/temporal, an outlier from the semantic-clustering pattern. The cross-similarity matrix between basin and waypoint tokens shows positive correlation across all 91 off-diagonal pairs (range 0.18–0.47); a permutation test against random token sets is pending.
 
 ![Cross-similarity matrix of basin tokens — all-warm, no negative correlations](docs/supervisor/token%20similarity.png)
 
@@ -144,14 +150,16 @@ All five basin tokens cluster semantically in the embedding space (W_E neighbour
 
 ## Hypothesis Status
 
-All four hypotheses proposed following the initial Activation Tensor Resonance experiment have now been tested and validated:
+Four hypotheses were proposed at the outset of Stage 1. The 125-prompt sweep and the embedding-neighbourhood analysis evaluate each:
 
 | ID | Hypothesis | Status | Evidence |
 |---|---|---|---|
-| H0 | Results are deterministic | ✅ PASSED | [Reproducibility gate](B_Reporduceability/00_reproducibility_gate.ipynb) — N=2 identical terminal basins |
-| H1 | `prolet` is the dominant basin | ✅ Supported | 35.2% of 125 prompts ([Stage 1 results](B_AttractorDominance/output_stage1/hypothesis_assessment.md)) |
-| H2 | `Divine` is a genuine secondary basin | ✅ Supported | 27.2% + 3 additional basins discovered |
-| H3 | Intermediate tokens reflect training corpus topology | ✅ Supported | 4/5 basins show semantic clustering in W_E |
+| H0 | Results are deterministic | **Repeatability supported** | [Determinism check](B_Reporduceability/00_reproducibility_gate.ipynb) — N=2 same-machine runs produce identical terminal basins |
+| H1 | `prolet` is the dominant basin | **Supported (structural)** | 35.2% of 125 prompts; per-prompt prediction was poor (see above) |
+| H2 | `Divine` is a genuine secondary basin | **Supported with revision** | 27.2% + 3 additional basins discovered (`Anarch`, `till`, `solidarity`) |
+| H3 | Intermediate tokens reflect training corpus topology | **Supported, statistical validation pending** | 4/5 basin tokens show semantic clustering in W_E rather than BPE-substring clustering; null-model and permutation tests have not yet been run |
+
+The supervisor's session reviews ([Session 01](docs/supervisor/SESSION_01_SUPERVISORY_REVIEW.md), [Session 02](docs/supervisor/SESSION_02_RESULTS_DISCUSSION.md)) cover the experimental design, results, and the outstanding statistical validation work in detail.
 
 ---
 
@@ -168,16 +176,15 @@ All four hypotheses proposed following the initial Activation Tensor Resonance e
 
 ---
 
-## Why This Matters
+## Proposed Interpretation (Hypothesis-Shaped)
 
-ATR reveals **training data bias geometrically, without access to the training data**. By iterating until input influence is exhausted, the method exposes the weight geometry's dominant modes — the thematic centres of mass of whatever the model was trained on.
+The interpretation this project pursues — and which remains pending validation — is that the attractor basins correspond to dominant modes of the model's weight geometry, and that those modes are shaped by the training corpus's thematic centre of mass. On GPT-2 Small (trained on WebText, ~40GB of Reddit-curated content circa 2018), the basin tokens read as a thematic fingerprint of that corpus.
 
-This positions ATR as a potential tool for:
-- **AI Safety** — auditing training data bias without data access
-- **EU AI Act compliance** — model bias assessment for regulatory purposes
-- **Mechanistic interpretability** — complementing existing methods (activation patching, SAEs, linear probes) with a global, model-level characterisation
+If this generalises across models and architectures, ATR would offer a candidate **bias-characterisation technique that does not require training-data access** — iterate any open-weight model, examine the attractor basins, infer thematic structure of the training corpus from the geometry alone.
 
-ATR is uniquely efficient: no labelled data, no training, no fine-tuning. A single run takes seconds on a consumer GPU. See [ATR Method Comparison](docs/ATR_SOURCE_PACKAGE/ATR_METHOD_COMPARISON.md) for a detailed positioning against the mechanistic interpretability landscape.
+This is a **research hypothesis**, not an established capability. Single-model evidence supports the *existence and shape* of basins on GPT-2 Small. The generalising claim — that basins on different models trained on different corpora will exhibit predictably different thematic content — has not yet been tested. The cross-model scaling programme described in [ATR_METHOD_COMPARISON.md](docs/ATR_METHOD_COMPARISON.md) sets out the experimental work that would either support or refute this.
+
+In the meantime, ATR fits in the mechanistic-interpretability landscape as a **complementary global-characterisation technique** alongside per-prompt methods (logit lens, activation patching) and feature-decomposition methods (SAEs). It is unusually cheap — no labelled data, no training, no fine-tuning, seconds per run on a consumer GPU — but reveals static weight geometry rather than dynamic computation.
 
 ---
 
@@ -191,11 +198,11 @@ ATR is uniquely efficient: no labelled data, no training, no fine-tuning. A sing
 │   ├── lucier_total_resonance.ipynb             ← The original experiment (5 prompts)
 │   └── images/                                  ← Exploratory visualisations
 │
-├── B_Reporduceability/                          ← Phase 2: Reproducibility gate
-│   └── 00_reproducibility_gate.ipynb            ← Stage 0: determinism check ✅
+├── B_Reporduceability/                          ← Phase 2: Determinism check
+│   └── 00_reproducibility_gate.ipynb            ← Same-machine repeatability
 │
 ├── B_AttractorDominance/                        ← Phase 3: 125-prompt sweep
-│   ├── 01_attractor_dominance.ipynb             ← Stage 1: attractor landscape mapping ✅
+│   ├── 01_attractor_dominance.ipynb             ← Stage 1: attractor landscape mapping
 │   ├── prompt_library.py                        ← Prompt definitions
 │   └── output_stage1/                           ← Raw results + analysis
 │       ├── stage1_results.pt                    ← Full activation trajectories (6.5MB)
@@ -206,39 +213,32 @@ ATR is uniquely efficient: no labelled data, no training, no fine-tuning. A sing
 │       └── dissolution_pathways.md              ← Intermediate token sequences
 │
 ├── ActivationTensorResonance_Layer/             ← Future: per-layer resonance
-│   └── layer_resonance.ipynb                    ← Which layer drives the attractor?
-│
 ├── ActivationTensorResonance_Head/              ← Future: per-head resonance
-│   └── head_resonance.ipynb                     ← Each attention head's eigenvoice
-│
 ├── archive/                                     ← Earlier notebook versions
-│   ├── EXP_009d0_Reproducibility.ipynb
-│   └── EXP_009d1_Attractor_Dominance.ipynb
-│
 └── docs/                                        ← Documentation & analysis
     ├── TECHNICAL.md                             ← Formal method specification
     ├── UNDERSTANDING.md                         ← Accessible mechanism explanation
     ├── ISOMORPHISM.md                           ← Lucier ↔ ATR mathematical correspondence
     ├── VALIDATION_PLAN.md                       ← Hypothesis testing design
-    ├── JOURNEY_MAP.md                           ← Complete project timeline & discoveries
-    ├── ATR_METHOD_COMPARISON.md                 ← ATR vs mech. interp. landscape
-    └── ATR_SOURCE_PACKAGE/                      ← Complete reference package
+    ├── JOURNEY_MAP.md                           ← Project timeline & glossary
+    ├── ATR_METHOD_COMPARISON.md                 ← ATR vs mech interp landscape
+    └── supervisor/
         ├── SESSION_01_SUPERVISORY_REVIEW.md     ← W_E neighbourhood analysis
-        └── SESSION_02_RESULTS_DISCUSSION.md     ← ATR naming, bias theory, scaling plan
+        └── SESSION_02_RESULTS_DISCUSSION.md     ← Bias theory, scaling plan
 ```
 
 ---
 
 ## Notebooks — Quick Reference
 
-| Notebook | Location | Purpose | Status |
-|:---|:---|:---|:---:|
-| [`lucier_total_resonance.ipynb`](ActivationTensorResonance/lucier_total_resonance.ipynb) | `ActivationTensorResonance/` | Original exploratory experiment (5 prompts, 500 iterations) | ✅ |
-| [`00_reproducibility_gate.ipynb`](B_Reporduceability/00_reproducibility_gate.ipynb) | `B_Reporduceability/` | Reproducibility validation (Stage 0 gate) | ✅ |
-| [`01_attractor_dominance.ipynb`](B_AttractorDominance/01_attractor_dominance.ipynb) | `B_AttractorDominance/` | 125-prompt attractor landscape mapping (Stages 1–3) | ✅ |
-| [`layer_resonance.ipynb`](ActivationTensorResonance_Layer/layer_resonance.ipynb) | `ActivationTensorResonance_Layer/` | Per-layer resonance analysis | 🔮 Future |
-| [`head_resonance.ipynb`](ActivationTensorResonance_Head/head_resonance.ipynb) | `ActivationTensorResonance_Head/` | Per-head eigenvoice extraction | 🔮 Future |
-| [`01_token_id_extraction.ipynb`](docs/supervisor/01_token_id_extraction.ipynb) | `docs/supervisor/` | Token ID extraction utilities | 🔧 Utility |
+| Notebook | Location | Purpose |
+|:---|:---|:---|
+| [`lucier_total_resonance.ipynb`](ActivationTensorResonance/lucier_total_resonance.ipynb) | `ActivationTensorResonance/` | Original exploratory experiment (5 prompts, 500 iterations) |
+| [`00_reproducibility_gate.ipynb`](B_Reporduceability/00_reproducibility_gate.ipynb) | `B_Reporduceability/` | Same-machine repeatability check |
+| [`01_attractor_dominance.ipynb`](B_AttractorDominance/01_attractor_dominance.ipynb) | `B_AttractorDominance/` | 125-prompt attractor landscape mapping |
+| [`layer_resonance.ipynb`](ActivationTensorResonance_Layer/layer_resonance.ipynb) | `ActivationTensorResonance_Layer/` | Per-layer resonance — planned, not yet run |
+| [`head_resonance.ipynb`](ActivationTensorResonance_Head/head_resonance.ipynb) | `ActivationTensorResonance_Head/` | Per-head resonance — planned, not yet run |
+| [`01_token_id_extraction.ipynb`](docs/supervisor/01_token_id_extraction.ipynb) | `docs/supervisor/` | Token ID extraction utilities |
 
 ---
 
@@ -250,6 +250,19 @@ pip install torch transformer-lens plotly scikit-learn ipywidgets kaleido
 
 ---
 
+## Caveats and Pending Work
+
+1. **Single model, single architecture.** All results are specific to GPT-2 Small (124M params). Cross-model validation is the most important pending experimental programme.
+2. **No null-model control yet.** Iterating on random unit-norm `[T, 768]` tensors (no real prompt) has not been tested. This is the single most important pending experiment — it would distinguish "technique reveals weight-geometry attractors" from "prompt structure contributes to convergence." The result either way is publishable; running it is in the immediate queue.
+3. **Repeatability, not reproducibility.** N=2 same-machine runs produce identical terminal basins; independent re-implementation has not been attempted.
+4. **Per-prompt prediction was poor.** ~25% of pre-registered predictions matched terminal basins. The structural claims (basins exist; these are their shares) are supported; the predictive claims (which prompt goes where) are not.
+5. **Hook-position arbitrariness.** Extraction at `blocks.11.hook_resid_post` and injection at `blocks.0.hook_resid_pre` treats the entire 12-layer stack as the "room." Alternative cuts have not been explored.
+6. **L2-normalisation choice.** Per-iteration global L2 rescaling preserves initial energy. Alternative schemes (per-position, per-dimension, LayerNorm-style) have not been tested.
+7. **BPE artefacts.** `prolet`, `Anarch`, `capit` are subword tokens. The W_E neighbourhood test rules out BPE-substring clustering as the explanation for the basin-tokens being what they are; this is positive evidence, not the absence of a concern.
+8. **Statistical validation pending.** Random-baseline comparison for the embedding-neighbourhood semantic-coherence claim, and a permutation test for the all-warm cross-similarity matrix, are designed but not yet run.
+
+---
+
 ## Key Documents
 
 | Document | Purpose |
@@ -258,19 +271,10 @@ pip install torch transformer-lens plotly scikit-learn ipywidgets kaleido
 | [UNDERSTANDING.md](docs/UNDERSTANDING.md) | Accessible explanation — what's being fed back and why |
 | [ISOMORPHISM.md](docs/ISOMORPHISM.md) | Mathematical correspondence: Lucier's room ↔ transformer weight matrices |
 | [VALIDATION_PLAN.md](docs/VALIDATION_PLAN.md) | Hypothesis testing design — Stages 0–3 |
-| [JOURNEY_MAP.md](docs/JOURNEY_MAP.md) | Complete project timeline, discoveries, glossary, open questions |
-| [ATR Method Comparison](docs/ATR_METHOD_COMPARISON.md) | ATR positioned against logit lens, SAEs, activation patching, etc. |
-| [Session 01 — Supervisory Review](docs/ATR_SOURCE_PACKAGE/SESSION_01_SUPERVISORY_REVIEW.md) | W_E neighbourhood analysis, phase transition discovery |
-| [Session 02 — Results Discussion](docs/ATR_SOURCE_PACKAGE/SESSION_02_RESULTS_DISCUSSION.md) | ATR naming, bias theory, scaling programme |
-
----
-
-## Caveats
-
-1. **Single model, single architecture.** All results are specific to GPT-2 Small (124M params). Cross-model validation is planned (see [ATR Method Comparison](docs/ATR_METHOD_COMPARISON.md)).
-2. **Nonlinear system.** The full transformer stack (LayerNorm, attention, MLP) makes this a complex nonlinear dynamical system, not pure power iteration.
-3. **BPE artefacts.** `prolet`, `Anarch`, `capit` are subword tokens. Interpret with appropriate caution.
-4. **N=2 for reproducibility.** Terminal basins reproduced across two runs; intermediate paths show floating-point sensitivity.
+| [JOURNEY_MAP.md](docs/JOURNEY_MAP.md) | Project timeline, discoveries, glossary, open questions |
+| [ATR Method Comparison](docs/ATR_METHOD_COMPARISON.md) | ATR positioned against logit lens, SAEs, activation patching |
+| [Session 01 — Supervisory Review](docs/supervisor/SESSION_01_SUPERVISORY_REVIEW.md) | W_E neighbourhood analysis, phase transition |
+| [Session 02 — Results Discussion](docs/supervisor/SESSION_02_RESULTS_DISCUSSION.md) | ATR positioning, bias theory, scaling programme |
 
 ---
 
