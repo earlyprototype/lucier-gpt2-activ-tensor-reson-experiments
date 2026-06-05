@@ -221,11 +221,15 @@ def pathway_layout(paths, terminals):
             a, b = paths[pids[i]], paths[pids[j]]
             diff = sum(wk for wk, ta, tb in zip(w, a, b) if ta != tb)
             D[i, j] = D[j, i] = diff
-    D /= D.max()
+    max_d = D.max()
+    if max_d > 0:
+        D /= max_d
     xy = MDS(n_components=2, dissimilarity="precomputed", random_state=7,
              normalized_stress="auto").fit_transform(D)
     xy -= xy.mean(0)
-    xy /= np.abs(xy).max()
+    max_xy = np.abs(xy).max()
+    if max_xy > 0:
+        xy /= max_xy
     xy *= 2.6
     basins = np.array([terminals[p][1] for p in pids])
     return pids, xy, basins

@@ -156,8 +156,11 @@ def per_iter_stats(paths):
                 cnt[t] += 1
             if t in BASINS:
                 counts[k][t] += 1
-        tok, c = cnt.most_common(1)[0]
-        modal.append(tok); unison.append(c / total)
+        if cnt:
+            tok, c = cnt.most_common(1)[0]
+            modal.append(tok); unison.append(c / total)
+        else:
+            modal.append(""); unison.append(0.0)
     return counts, total, modal, unison
 
 
@@ -238,7 +241,8 @@ def anim2_evolve(paths):
 
             # smoothly interpolate the iteration readout between sparse readings
             it_val = round(ITERS[lo] * (1 - f) + ITERS[hi] * f)
-            node = int(round(s)); tok = _pretty(modal[node])
+            # use the same lo/hi/f logic for modal token to stay consistent
+            tok = _pretty(modal[lo] if f < 0.5 else modal[hi])
             title.set_text(f"The wells forming  ·  iteration {it_val:>3} / 100")
             say.set_text(f'the room says:  “{tok}”')
             w.append_data(_frame(fig))
