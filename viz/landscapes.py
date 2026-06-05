@@ -111,47 +111,60 @@ def style_3d(ax):
 # --------------------------------------------------------------------------
 # #1  Basin-population wells (exact counts)
 # --------------------------------------------------------------------------
-def build_population_surface(terminals, g=320):
-    """Return X, Y, Z, facecolors, well-positions, counts for the population wells."""
-    counts = {b: 0 for b in BASINS}
-    for _, term in terminals.values():
-        counts[term] += 1
-    total = sum(counts.values())
+# fixed well positions: dominant basin in centre, the rest around a ring
+WELL_POS = {
+    "prolet":     (0.0,  0.0),
+    "Divine":     (1.7,  0.9),
+    "Anarch":     (-1.7, 0.9),
+    "till":       (1.2, -1.7),
+    "solidarity": (-1.6,-1.4),
+}
 
-    # place the 5 wells: dominant in centre, others around a ring
-    pos = {
-        "prolet":     (0.0,  0.0),
-        "Divine":     (1.7,  0.9),
-        "Anarch":     (-1.7, 0.9),
-        "till":       (1.2, -1.7),
-        "solidarity": (-1.6,-1.4),
-    }
+
+def make_wells(depths, g=320, gmax=0.36):
+    """Build X, Y, Z, facecolors from a {basin: depth} mapping (depth in [0, ~0.4]).
+
+    Used both for the static final surface and for the evolving animation, so a
+    flat plain (all depths 0) smoothly grows into the five basins.
+    """
     xs = np.linspace(-3.2, 3.2, g)
     ys = np.linspace(-3.0, 3.0, g)
     X, Y = np.meshgrid(xs, ys)
     Z = np.zeros_like(X)
-    Cidx = np.full(X.shape, -1)        # which basin owns each cell (for colour)
+    Cidx = np.full(X.shape, -1)
     nearest_depth = np.zeros_like(X)
     for bi, b in enumerate(BASINS):
-        cx, cy = pos[b]
-        depth = counts[b] / total      # depth proportional to share of inputs
-        width = 0.55 + 0.5 * depth      # bigger basins a touch wider
+        cx, cy = WELL_POS[b]
+        depth = depths.get(b, 0.0)
+        width = 0.55 + 0.5 * depth
         well = depth * np.exp(-(((X - cx) ** 2 + (Y - cy) ** 2) / (2 * width ** 2)))
         Z -= well
         owns = well > nearest_depth
         Cidx[owns] = bi
         nearest_depth[owns] = well[owns]
 
-    # colour the surface by owning basin, brightened in the deep wells
     facecolors = np.zeros(X.shape + (4,))
+    base = np.array([0.10, 0.11, 0.16, 1.0])      # the undifferentiated plain
+    facecolors[...] = base
     for bi, b in enumerate(BASINS):
         rgba = np.array(matplotlib.colors.to_rgba(BASIN_COLOR[b]))
         facecolors[Cidx == bi] = rgba
-    # darken toward the rim, glow at the bottom
-    glow = (nearest_depth / (nearest_depth.max() + 1e-9))[..., None]
+    glow = (nearest_depth / gmax)[..., None]
+    glow = np.clip(glow, 0, 1)
     facecolors[..., :3] = facecolors[..., :3] * (0.30 + 0.70 * glow[..., 0, None])
     facecolors[..., 3] = 1.0
-    return X, Y, Z, facecolors, pos, counts
+    return X, Y, Z, facecolors
+
+
+def build_population_surface(terminals, g=320):
+    """Return X, Y, Z, facecolors, well-positions, counts for the final wells."""
+    counts = {b: 0 for b in BASINS}
+    for _, term in terminals.values():
+        counts[term] += 1
+    total = sum(counts.values())
+    depths = {b: counts[b] / total for b in BASINS}
+    X, Y, Z, facecolors = make_wells(depths, g=g)
+    return X, Y, Z, facecolors, WELL_POS, counts
 
 
 def fig1_population_wells(terminals):

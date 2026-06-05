@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 from landscapes import (
     parse_terminal_basins, parse_pathways,
     build_population_surface, build_velocity_surface,
-    style_3d, BASIN_COLOR, BASINS, OUT,
+    make_wells, WELL_POS, style_3d, BASIN_COLOR, BASINS, ITERS, OUT,
 )
 
 FPS = 30
@@ -134,10 +134,129 @@ def anim3_flow(paths, terminals, n=240):
     return path
 
 
+# --------------------------------------------------------------------------
+# anim2 : the wells carving out in real time as the iterations run
+# --------------------------------------------------------------------------
+def _pretty(tok):
+    return {"↵": "newline", "―": "—", "": "·"}.get(tok, tok)
+
+
+def per_iter_stats(paths):
+    """For each scheduled iteration return: basin commit counts, the modal
+    top-token (what the 'room' is muttering) and its unison fraction."""
+    from collections import Counter
+    n = len(ITERS); total = len(paths)
+    counts = [{b: 0 for b in BASINS} for _ in range(n)]
+    modal, unison = [], []
+    for k in range(n):
+        cnt = Counter()
+        for toks in paths.values():
+            t = toks[k]
+            if t:
+                cnt[t] += 1
+            if t in BASINS:
+                counts[k][t] += 1
+        tok, c = cnt.most_common(1)[0]
+        modal.append(tok); unison.append(c / total)
+    return counts, total, modal, unison
+
+
+def anim2_evolve(paths):
+    """Grow the five wells from a flat plain through the real iteration schedule.
+
+    We DWELL on the transit phase (iters 0..20) because that is where the
+    tension lives: the prompts lose their words, fall silent, then chant a
+    meaningless fragment in unison. That unison drives a standing-wave ripple
+    on the surface (resonance building) -- which only collapses into the five
+    wells once the basins commit at iters 50..100."""
+    counts, total, modal, unison = per_iter_stats(paths)
+    depth_keys = [{b: counts[k][b] / total for b in BASINS} for k in range(len(ITERS))]
+    committed = [sum(counts[k].values()) / total for k in range(len(ITERS))]
+    n_seg = len(ITERS) - 1                          # 7 segments, s in [0..7]
+
+    # Build the per-frame s-timeline: long dwells early, plus a held beat at
+    # iter 20 (the calm before the crystallisation).
+    s_tl = []
+    def hold(sv, n): s_tl.extend([sv] * n)
+    def ramp(a, b, n): s_tl.extend(a + (i / n) * (b - a) for i in range(n))
+    hold(0.0, 30)                                   # sit in the churn at iter 0
+    seg_frames = [34, 28, 32, 38, 40, 46, 52]       # dwell heavily on 0..20
+    for k in range(n_seg):
+        ramp(k, k + 1, seg_frames[k])
+        if k == 4:                                  # arrived at iter 20
+            hold(5.0, 40)                           # the held breath before the snap
+    hold(float(n_seg), 50)                          # rest on the final wells
+    frames = len(s_tl)
+
+    def lerp_node(arr, s):
+        lo = int(np.floor(s)); hi = min(lo + 1, n_seg); f = s - lo
+        return arr[lo] * (1 - f) + arr[hi] * f
+
+    fig = plt.figure(figsize=(9, 8))
+    ax = fig.add_subplot(111, projection="3d")
+    title = fig.text(0.5, 0.93, "", color="#e8eaf0", fontsize=14, ha="center")
+    say = fig.text(0.5, 0.86, "", color="#cfd4e2", fontsize=15, ha="center",
+                   fontstyle="italic")
+    sub = fig.text(0.5, 0.075,
+                   "depth = prompts committed to a basin  ·  ripple = unison of the "
+                   "transit chant  ·  70-prompt subset",
+                   color="#7d8295", fontsize=9, ha="center")
+
+    path = OUT / "anim2_wells_evolve.mp4"
+    with imageio.get_writer(path, fps=FPS, codec="libx264", quality=8,
+                            macro_block_size=16) as w:
+        for i, s in enumerate(s_tl):
+            lo = int(np.floor(s)); hi = min(lo + 1, n_seg); f = ease(s - lo)
+            depths = {b: depth_keys[lo][b] * (1 - f) + depth_keys[hi][b] * f
+                      for b in BASINS}
+            X, Y, Z, fc = make_wells(depths, g=220)
+
+            # standing-wave churn: amplitude = unison * (1 - committed)
+            u = lerp_node(unison, s); cm = lerp_node(committed, s)
+            amp = 0.085 * u * (1 - cm)
+            ph = i * 0.30
+            churn = (np.sin(1.7 * X + ph) * np.sin(1.3 * Y - 0.7 * ph)
+                     + 0.6 * np.sin(2.6 * X - 1.1 * ph) * np.sin(2.1 * Y + ph))
+            Z = Z + amp * churn
+            # make the crests glow cyan so the resonance reads on the dark plain
+            strength = amp / 0.085
+            cr = np.clip(churn, 0, None)
+            cr = (cr / (cr.max() + 1e-9))[..., None]
+            tint = np.array([0.35, 0.65, 1.0])      # cool resonance light
+            fc = fc.copy()
+            fc[..., :3] = np.clip(fc[..., :3] + 0.60 * strength * cr * tint, 0, 1)
+
+            ax.clear()
+            ax.plot_surface(X, Y, Z, facecolors=fc, rstride=2, cstride=2,
+                            linewidth=0, antialiased=True, shade=False)
+            style_3d(ax)
+            ax.set_zlim(-0.42, 0.16)
+            ax.view_init(elev=40, azim=-55 + 18 * (i / (frames - 1)))
+
+            node = int(round(s)); it = ITERS[node]; tok = _pretty(modal[node])
+            title.set_text(f"The wells forming  ·  iteration {it:>3} / 100")
+            tcol = BASIN_COLOR.get(modal[node], "#cfd4e2")
+            say.set_text(f'the room says:  “{tok}”')
+            say.set_color(tcol)
+            for b in BASINS:
+                cx, cy = WELL_POS[b]; d = depths[b]; c = round(d * total)
+                if d > 0.012:
+                    ax.text(cx, cy, -d - 0.025, f"{b}\n{c}",
+                            color=BASIN_COLOR[b], ha="center", va="top",
+                            fontsize=9, fontweight="bold")
+            w.append_data(_frame(fig))
+    plt.close(fig)
+    return path
+
+
 if __name__ == "__main__":
+    import sys
     terminals = parse_terminal_basins()
     paths = parse_pathways()
-    p1 = anim1_reveal(terminals)
-    print("->", p1)
-    p3 = anim3_flow(paths, terminals)
-    print("->", p3)
+    which = sys.argv[1:] or ["1", "2", "3"]
+    if "1" in which:
+        print("->", anim1_reveal(terminals))
+    if "2" in which:
+        print("->", anim2_evolve(paths))
+    if "3" in which:
+        print("->", anim3_flow(paths, terminals))
