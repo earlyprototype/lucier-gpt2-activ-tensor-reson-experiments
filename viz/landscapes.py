@@ -111,7 +111,8 @@ def style_3d(ax):
 # --------------------------------------------------------------------------
 # #1  Basin-population wells (exact counts)
 # --------------------------------------------------------------------------
-def fig1_population_wells(terminals):
+def build_population_surface(terminals, g=320):
+    """Return X, Y, Z, facecolors, well-positions, counts for the population wells."""
     counts = {b: 0 for b in BASINS}
     for _, term in terminals.values():
         counts[term] += 1
@@ -125,7 +126,6 @@ def fig1_population_wells(terminals):
         "till":       (1.2, -1.7),
         "solidarity": (-1.6,-1.4),
     }
-    g = 320
     xs = np.linspace(-3.2, 3.2, g)
     ys = np.linspace(-3.0, 3.0, g)
     X, Y = np.meshgrid(xs, ys)
@@ -146,12 +146,17 @@ def fig1_population_wells(terminals):
     facecolors = np.zeros(X.shape + (4,))
     for bi, b in enumerate(BASINS):
         rgba = np.array(matplotlib.colors.to_rgba(BASIN_COLOR[b]))
-        mask = Cidx == bi
-        facecolors[mask] = rgba
+        facecolors[Cidx == bi] = rgba
     # darken toward the rim, glow at the bottom
     glow = (nearest_depth / (nearest_depth.max() + 1e-9))[..., None]
     facecolors[..., :3] = facecolors[..., :3] * (0.30 + 0.70 * glow[..., 0, None])
     facecolors[..., 3] = 1.0
+    return X, Y, Z, facecolors, pos, counts
+
+
+def fig1_population_wells(terminals):
+    X, Y, Z, facecolors, pos, counts = build_population_surface(terminals)
+    total = sum(counts.values())
 
     fig = plt.figure(figsize=(15, 7))
     for k, (elev, azim, tag) in enumerate(
@@ -265,7 +270,12 @@ def fig2_density_terrain(paths, terminals):
 # --------------------------------------------------------------------------
 # #3  Dynamical velocity field
 # --------------------------------------------------------------------------
-def fig3_velocity_field(paths, terminals):
+VEL_CMAP = LinearSegmentedColormap.from_list(
+    "vel", ["#0a1f3c", "#1f6f8b", "#7ad7ff", "#ffd24a", "#ff5d73"])
+
+
+def build_velocity_surface(paths, terminals, g=260):
+    """Return X, Y, Z, xs, ys, facecolors, prompt xy, basins, velocities."""
     pids, xy, basins = pathway_layout(paths, terminals)
     # per-prompt residual "velocity": fraction of late steps where the token is
     # still changing -> 0 means locked into its fixed point (a well bottom).
@@ -276,7 +286,6 @@ def fig3_velocity_field(paths, terminals):
         vel.append(changes / 4.0)
     vel = np.array(vel)
 
-    g = 260
     xs = np.linspace(-3.4, 3.4, g)
     ys = np.linspace(-3.4, 3.4, g)
     X, Y = np.meshgrid(xs, ys)
@@ -289,10 +298,13 @@ def fig3_velocity_field(paths, terminals):
     Z = gaussian_filter(Z, 3.0)
     Z -= Z.min()
 
-    cmap = LinearSegmentedColormap.from_list(
-        "vel", ["#0a1f3c", "#1f6f8b", "#7ad7ff", "#ffd24a", "#ff5d73"])
     norm = (Z - Z.min()) / (Z.max() - Z.min() + 1e-9)
-    facecolors = cmap(norm)
+    facecolors = VEL_CMAP(norm)
+    return X, Y, Z, xs, ys, facecolors, xy, basins, vel
+
+
+def fig3_velocity_field(paths, terminals):
+    X, Y, Z, xs, ys, facecolors, xy, basins, vel = build_velocity_surface(paths, terminals)
 
     fig = plt.figure(figsize=(9, 8))
     ax = fig.add_subplot(111, projection="3d")
