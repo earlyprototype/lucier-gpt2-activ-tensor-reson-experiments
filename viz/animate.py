@@ -174,6 +174,9 @@ def anim2_evolve(paths):
     committed = [sum(counts[k].values()) / total for k in range(len(ITERS))]
     n_seg = len(ITERS) - 1                          # 7 segments, s in [0..7]
 
+    CYAN = np.array([0.35, 0.65, 1.0])              # one palette for the whole piece
+    INK = "#cfd4e2"                                 # uniform label/caption colour
+
     # Build the per-frame s-timeline: long dwells early, plus a held beat at
     # iter 20 (the calm before the crystallisation).
     s_tl = []
@@ -195,7 +198,7 @@ def anim2_evolve(paths):
     fig = plt.figure(figsize=(9, 8))
     ax = fig.add_subplot(111, projection="3d")
     title = fig.text(0.5, 0.93, "", color="#e8eaf0", fontsize=14, ha="center")
-    say = fig.text(0.5, 0.86, "", color="#cfd4e2", fontsize=15, ha="center",
+    say = fig.text(0.5, 0.86, "", color=INK, fontsize=15, ha="center",
                    fontstyle="italic")
     sub = fig.text(0.5, 0.075,
                    "depth = prompts committed to a basin  ·  ripple = unison of the "
@@ -209,7 +212,7 @@ def anim2_evolve(paths):
             lo = int(np.floor(s)); hi = min(lo + 1, n_seg); f = ease(s - lo)
             depths = {b: depth_keys[lo][b] * (1 - f) + depth_keys[hi][b] * f
                       for b in BASINS}
-            X, Y, Z, fc = make_wells(depths, g=220)
+            X, Y, Z, fc = make_wells(depths, g=220, mono=CYAN)
 
             # standing-wave churn: amplitude = unison * (1 - committed)
             u = lerp_node(unison, s); cm = lerp_node(committed, s)
@@ -218,13 +221,12 @@ def anim2_evolve(paths):
             churn = (np.sin(1.7 * X + ph) * np.sin(1.3 * Y - 0.7 * ph)
                      + 0.6 * np.sin(2.6 * X - 1.1 * ph) * np.sin(2.1 * Y + ph))
             Z = Z + amp * churn
-            # make the crests glow cyan so the resonance reads on the dark plain
+            # make the crests glow in the SAME cyan so the resonance reads on the plain
             strength = amp / 0.085
             cr = np.clip(churn, 0, None)
             cr = (cr / (cr.max() + 1e-9))[..., None]
-            tint = np.array([0.35, 0.65, 1.0])      # cool resonance light
             fc = fc.copy()
-            fc[..., :3] = np.clip(fc[..., :3] + 0.60 * strength * cr * tint, 0, 1)
+            fc[..., :3] = np.clip(fc[..., :3] + 0.60 * strength * cr * CYAN, 0, 1)
 
             ax.clear()
             ax.plot_surface(X, Y, Z, facecolors=fc, rstride=2, cstride=2,
@@ -235,14 +237,12 @@ def anim2_evolve(paths):
 
             node = int(round(s)); it = ITERS[node]; tok = _pretty(modal[node])
             title.set_text(f"The wells forming  ·  iteration {it:>3} / 100")
-            tcol = BASIN_COLOR.get(modal[node], "#cfd4e2")
             say.set_text(f'the room says:  “{tok}”')
-            say.set_color(tcol)
             for b in BASINS:
                 cx, cy = WELL_POS[b]; d = depths[b]; c = round(d * total)
                 if d > 0.012:
                     ax.text(cx, cy, -d - 0.025, f"{b}\n{c}",
-                            color=BASIN_COLOR[b], ha="center", va="top",
+                            color=INK, ha="center", va="top",
                             fontsize=9, fontweight="bold")
             w.append_data(_frame(fig))
     plt.close(fig)

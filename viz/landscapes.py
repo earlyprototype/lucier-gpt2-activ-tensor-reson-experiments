@@ -121,11 +121,15 @@ WELL_POS = {
 }
 
 
-def make_wells(depths, g=320, gmax=0.36):
+def make_wells(depths, g=320, gmax=0.36, mono=None):
     """Build X, Y, Z, facecolors from a {basin: depth} mapping (depth in [0, ~0.4]).
 
     Used both for the static final surface and for the evolving animation, so a
     flat plain (all depths 0) smoothly grows into the five basins.
+
+    If `mono` (an RGB add-vector) is given, the wells are coloured in a single
+    hue by depth instead of one colour per basin -- keeping one coherent palette
+    across the whole process.
     """
     xs = np.linspace(-3.2, 3.2, g)
     ys = np.linspace(-3.0, 3.0, g)
@@ -146,12 +150,14 @@ def make_wells(depths, g=320, gmax=0.36):
     facecolors = np.zeros(X.shape + (4,))
     base = np.array([0.10, 0.11, 0.16, 1.0])      # the undifferentiated plain
     facecolors[...] = base
-    for bi, b in enumerate(BASINS):
-        rgba = np.array(matplotlib.colors.to_rgba(BASIN_COLOR[b]))
-        facecolors[Cidx == bi] = rgba
-    glow = (nearest_depth / gmax)[..., None]
-    glow = np.clip(glow, 0, 1)
-    facecolors[..., :3] = facecolors[..., :3] * (0.30 + 0.70 * glow[..., 0, None])
+    glow = np.clip((nearest_depth / gmax), 0, 1)[..., None]
+    if mono is not None:
+        facecolors[..., :3] = np.clip(base[:3] + glow[..., 0, None] * np.asarray(mono), 0, 1)
+    else:
+        for bi, b in enumerate(BASINS):
+            rgba = np.array(matplotlib.colors.to_rgba(BASIN_COLOR[b]))
+            facecolors[Cidx == bi] = rgba
+        facecolors[..., :3] = facecolors[..., :3] * (0.30 + 0.70 * glow[..., 0, None])
     facecolors[..., 3] = 1.0
     return X, Y, Z, facecolors
 
