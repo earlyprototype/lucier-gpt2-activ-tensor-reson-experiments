@@ -183,7 +183,8 @@ def anim2_evolve(paths):
     def hold(sv, n): s_tl.extend([sv] * n)
     def ramp(a, b, n): s_tl.extend(a + (i / n) * (b - a) for i in range(n))
     hold(0.0, 30)                                   # sit in the churn at iter 0
-    seg_frames = [34, 28, 32, 38, 40, 46, 52]       # dwell heavily on 0..20
+    # dwell early; let the late carving (segments 5,6) breathe at the same rate
+    seg_frames = [30, 24, 28, 32, 36, 64, 72]
     for k in range(n_seg):
         ramp(k, k + 1, seg_frames[k])
         if k == 4:                                  # arrived at iter 20
@@ -235,15 +236,11 @@ def anim2_evolve(paths):
             ax.set_zlim(-0.42, 0.16)
             ax.view_init(elev=40, azim=-55 + 18 * (i / (frames - 1)))
 
-            node = int(round(s)); it = ITERS[node]; tok = _pretty(modal[node])
-            title.set_text(f"The wells forming  ·  iteration {it:>3} / 100")
+            # smoothly interpolate the iteration readout between sparse readings
+            it_val = round(ITERS[lo] * (1 - f) + ITERS[hi] * f)
+            node = int(round(s)); tok = _pretty(modal[node])
+            title.set_text(f"The wells forming  ·  iteration {it_val:>3} / 100")
             say.set_text(f'the room says:  “{tok}”')
-            for b in BASINS:
-                cx, cy = WELL_POS[b]; d = depths[b]; c = round(d * total)
-                if d > 0.012:
-                    ax.text(cx, cy, -d - 0.025, f"{b}\n{c}",
-                            color=INK, ha="center", va="top",
-                            fontsize=9, fontweight="bold")
             w.append_data(_frame(fig))
     plt.close(fig)
     return path
