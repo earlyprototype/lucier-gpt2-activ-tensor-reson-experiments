@@ -257,7 +257,10 @@ def anim2_gallery(paths, speed=4):
     """The installation cut. No text. Everything at 1/4 speed (4x frames so the
     motion stays smooth). The wells form, the camera drops to a direct side-on
     profile and turns a slow 360, then the WHOLE piece plays in reverse -- a
-    palindrome that loops seamlessly for ever."""
+    palindrome that loops seamlessly for ever.
+
+    Rendered as an atomic, resumable PNG sequence so an interrupted run (these
+    containers can pause) just continues where it left off."""
     counts, total, modal, unison = per_iter_stats(paths)
     depth_keys = [{b: counts[k][b] / total for b in BASINS} for k in range(len(ITERS))]
     committed = [sum(counts[k].values()) / total for k in range(len(ITERS))]
@@ -280,13 +283,20 @@ def anim2_gallery(paths, speed=4):
         lo = int(np.floor(s)); hi = min(lo + 1, n_seg); ff = s - lo
         return arr[lo] * (1 - ff) + arr[hi] * ff
 
-    # the final, fully-formed surface (committed -> no churn): built once, reused
     Xf, Yf, Zf, fcf = make_wells(depth_keys[-1], g=220, mono=CYAN)
-    az_end = -55 + 18                                   # azimuth at end of forming
-    transition = 9 * speed                              # drop to side-on
-    spin = 112 * speed                                  # slow 360
+    az_end = -55 + 18
+    transition = 8 * speed
+    spin = 100 * speed
     side_elev = 3.0
 
+    # one ordered list of forward frames: ("form", i) | ("trans", j) | ("spin", j)
+    spec = ([("form", i) for i in range(ev)]
+            + [("trans", j) for j in range(transition)]
+            + [("spin", j) for j in range(spin)])
+    Nf = len(spec)
+
+    fdir = OUT / "_frames"
+    fdir.mkdir(exist_ok=True)
     fig = plt.figure(figsize=(9, 8))
     ax = fig.add_subplot(111, projection="3d")
 
@@ -294,23 +304,23 @@ def anim2_gallery(paths, speed=4):
         ax.clear()
         ax.plot_surface(X, Y, Z, facecolors=fc, rstride=2, cstride=2,
                         linewidth=0, antialiased=True, shade=False)
-        ax.set_axis_off()                              # pure surface on black
+        ax.set_axis_off()
         ax.set_zlim(-0.42, 0.16)
         ax.view_init(elev=elev, azim=azim)
 
-    fwd = OUT / "_forward.mp4"
-    total_fwd = ev + transition + spin
-    with imageio.get_writer(fwd, fps=30, codec="libx264", quality=9,
-                            macro_block_size=16) as w:
-        # 1) the wells forming
-        for i, s in enumerate(s_tl):
+    for idx, (kind, a) in enumerate(spec):
+        fp = fdir / f"{idx:05d}.png"
+        if fp.exists():
+            continue
+        if kind == "form":
+            i = a; s = s_tl[i]
             lo = int(np.floor(s)); hi = min(lo + 1, n_seg); f = ease(s - lo)
             depths = {b: depth_keys[lo][b] * (1 - f) + depth_keys[hi][b] * f
                       for b in BASINS}
             X, Y, Z, fc = make_wells(depths, g=220, mono=CYAN)
             u = lerp_node(unison, s); cm = lerp_node(committed, s)
             amp = 0.085 * u * (1 - cm)
-            ph = i * 0.30 / speed                       # ripple also 1/4 speed
+            ph = i * 0.30 / speed
             churn = (np.sin(1.7 * X + ph) * np.sin(1.3 * Y - 0.7 * ph)
                      + 0.6 * np.sin(2.6 * X - 1.1 * ph) * np.sin(2.1 * Y + ph))
             Z = Z + amp * churn
@@ -319,36 +329,27 @@ def anim2_gallery(paths, speed=4):
             fc = fc.copy()
             fc[..., :3] = np.clip(fc[..., :3] + 0.60 * strength * cr * CYAN, 0, 1)
             draw(X, Y, Z, fc, 40, -55 + 18 * (i / (ev - 1)))
-            w.append_data(_frame(fig))
-            if i % 100 == 0:
-                print(f"forming {i}/{ev}", flush=True)
-        # 2) drop to a direct side-on profile
-        for j in range(transition):
-            t = ease((j + 1) / transition)
+        elif kind == "trans":
+            t = ease((a + 1) / transition)
             draw(Xf, Yf, Zf, fcf, 40 + (side_elev - 40) * t, az_end)
-            w.append_data(_frame(fig))
-        # 3) slow 360 turn, side-on
-        for j in range(spin):
-            draw(Xf, Yf, Zf, fcf, side_elev, az_end + 360 * ((j + 1) / spin))
-            w.append_data(_frame(fig))
-            if j % 100 == 0:
-                print(f"spin {j}/{spin}", flush=True)
+        else:  # spin
+            draw(Xf, Yf, Zf, fcf, side_elev, az_end + 360 * ((a + 1) / spin))
+        tmp = fdir / f"{idx:05d}.tmp.png"
+        imageio.imwrite(tmp, _frame(fig))
+        tmp.replace(fp)                                 # atomic
+        if idx % 100 == 0:
+            print(f"frame {idx}/{Nf}", flush=True)
     plt.close(fig)
-    print(f"forward rendered: {total_fwd} frames", flush=True)
+    print(f"forward frames ready: {Nf}", flush=True)
 
-    # 4) palindrome: forward, then forward reversed (skip duplicate end/start)
+    # palindrome: forward, then forward reversed (skip duplicate end/start)
     out = OUT / "anim2_wells_loop.mp4"
-    r = imageio.get_reader(fwd)
-    N = r.count_frames()
+    order = list(range(Nf)) + list(range(Nf - 2, 0, -1))
     with imageio.get_writer(out, fps=30, codec="libx264", quality=9,
                             macro_block_size=16) as w:
-        for i in range(N):
-            w.append_data(r.get_data(i))
-        for i in range(N - 2, 0, -1):
-            w.append_data(r.get_data(i))
-    r.close()
-    fwd.unlink(missing_ok=True)
-    print(f"LOOP done: {out} ({2 * N - 2} frames)", flush=True)
+        for idx in order:
+            w.append_data(imageio.imread(fdir / f"{idx:05d}.png"))
+    print(f"LOOP done: {out} ({len(order)} frames)", flush=True)
     return out
 
 
