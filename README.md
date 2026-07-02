@@ -116,7 +116,7 @@ This syntactic structure found its own basin: suggesting mythological language a
 
 ### Phase 2: Determinism Check
 
-📓 **Notebook:** [`00_reproducibility_gate.ipynb`](B_Reporduceability/00_reproducibility_gate.ipynb) *(currently in `.gitignore`; will be committed alongside the next round of experiments)*
+📓 **Notebook:** `00_reproducibility_gate.ipynb` *(local artifact — not included in repo; will be committed alongside the next round of experiments)*. Archived predecessor performing the same determinism check: [`EXP_009d0_Reproducibility.ipynb`](archive/EXP_009d0_Reproducibility.ipynb).
 
 The experiment was re-run with identical parameters on the same machine. **All five terminal basins reproduced.** Intermediate dissolution pathways show sensitivity to floating-point non-determinism (expected for iterative nonlinear maps), but converge to identical fixed points.
 
@@ -154,7 +154,7 @@ Four hypotheses were proposed at the outset of Stage 1. The 125-prompt sweep and
 
 | ID | Hypothesis | Status | Evidence |
 |---|---|---|---|
-| H0 | Results are deterministic | **Repeatability supported** | [Determinism check](B_Reporduceability/00_reproducibility_gate.ipynb) — N=2 same-machine runs produce identical terminal basins |
+| H0 | Results are deterministic | **Repeatability supported** | [Determinism check (archived)](archive/EXP_009d0_Reproducibility.ipynb) — N=2 same-machine runs produce identical terminal basins |
 | H1 | `prolet` is the dominant basin | **Supported (structural)** | 35.2% of 125 prompts; per-prompt prediction was poor (see above) |
 | H2 | `Divine` is a genuine secondary basin | **Supported with revision** | 27.2% + 3 additional basins discovered (`Anarch`, `till`, `solidarity`) |
 | H3 | Intermediate tokens reflect training corpus topology | **Supported, statistical validation pending** | 4/5 basin tokens show semantic clustering in W_E rather than BPE-substring clustering; null-model and permutation tests have not yet been run |
@@ -234,7 +234,7 @@ In the meantime, ATR fits in the mechanistic-interpretability landscape as a **c
 | Notebook | Location | Purpose |
 |:---|:---|:---|
 | [`lucier_total_resonance.ipynb`](ActivationTensorResonance/lucier_total_resonance.ipynb) | `ActivationTensorResonance/` | Original exploratory experiment (5 prompts, 500 iterations) |
-| [`00_reproducibility_gate.ipynb`](B_Reporduceability/00_reproducibility_gate.ipynb) | `B_Reporduceability/` | Same-machine repeatability check |
+| [`EXP_009d0_Reproducibility.ipynb`](archive/EXP_009d0_Reproducibility.ipynb) *(archived; `00_reproducibility_gate.ipynb` successor is a local artifact, not yet committed)* | `archive/` | Same-machine repeatability check |
 | [`01_attractor_dominance.ipynb`](B_AttractorDominance/01_attractor_dominance.ipynb) | `B_AttractorDominance/` | 125-prompt attractor landscape mapping |
 | [`layer_resonance.ipynb`](ActivationTensorResonance_Layer/layer_resonance.ipynb) | `ActivationTensorResonance_Layer/` | Per-layer resonance — planned, not yet run |
 | [`head_resonance.ipynb`](ActivationTensorResonance_Head/head_resonance.ipynb) | `ActivationTensorResonance_Head/` | Per-head resonance — planned, not yet run |
