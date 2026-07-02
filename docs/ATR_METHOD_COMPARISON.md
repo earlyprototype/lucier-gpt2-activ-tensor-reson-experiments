@@ -139,7 +139,6 @@ This is the bias question. Other methods tell you what the model does with a spe
 - **Low total compute** — 170–500 GPU-hours is modest by HPC standards
 - **High ratio of output to compute** — each ATR run produces rich, interpretable data per unit of GPU time
 - **Novel research territory** — cross-model attractor-landscape comparison has not been published; results either way (basins generalise predictably, basins generalise but unpredictably, or basins fail to generalise) are publishable findings
-- **FactoryXChange EDIH scope alignment** — within the EDIH's interpretability and trustworthy-AI remit
 - **Methodological cleanness** — fully deterministic at the same-machine level, no training required, reproducible in principle
 - **Conditional safety relevance** — *if* the central hypothesis (basin profiles reflect training-corpus thematic structure) generalises across models, ATR could offer a route to bias characterisation without training-data access. The cross-model programme is what would test this; the relevance is conditional on that test, not established by the GPT-2 Small results alone.
 
