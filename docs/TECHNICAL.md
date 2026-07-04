@@ -115,6 +115,8 @@ Framework:       TransformerLens (Nanda & Bloom, 2022)
 | RNN fixed-point analysis | Maps attractor dynamics of recurrent systems | Transformers are feedforward; we impose recurrence via re-injection |
 | Singular value decomposition of W_OV | Identifies dominant directions of weight matrices | Static analysis; our method probes the *nonlinear* composite operator |
 
+A direct empirical comparison between the last two rows above — the per-head resonant state actually observed under iterative re-injection versus the dominant singular vector predicted by static SVD of `W_OV` — is scaffolded in `ActivationTensorResonance_Spectral/spectral_resonance.ipynb`. It has not been run; see the main README's Hypothesis Status (H4) and Caveats and Pending Work.
+
 ## Repeatability
 
 Terminal attractors (`prolet` × 4, `Divine` × 1) are stable across N=2 same-machine runs. Intermediate dissolution pathways show sensitivity to floating-point non-determinism (expected for iterative nonlinear maps), but converge to identical fixed points. Full determinism would require CPU execution with fixed seeds. Independent re-implementation on different hardware or by another investigator has not been attempted; "reproducibility" in the strict sense remains pending.

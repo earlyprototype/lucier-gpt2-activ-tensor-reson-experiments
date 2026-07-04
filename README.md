@@ -48,6 +48,8 @@ This is a **nonlinear analogue of power iteration**. Where classical power itera
 
 See [TECHNICAL.md](docs/TECHNICAL.md) for the formal specification, or [UNDERSTANDING.md](docs/UNDERSTANDING.md) for an accessible explanation of the mechanism.
 
+A per-head empirical test of the power-iteration correspondence above — comparing observed resonant states to the SVD-predicted dominant singular vector of each head's weight matrix — is scaffolded in [`spectral_resonance.ipynb`](ActivationTensorResonance_Spectral/spectral_resonance.ipynb) (not yet run; see Hypothesis H4 and the Notebooks — Quick Reference table below).
+
 ---
 
 ## Key Findings
@@ -158,6 +160,7 @@ Four hypotheses were proposed at the outset of Stage 1. The 125-prompt sweep and
 | H1 | `prolet` is the dominant basin | **Supported (structural)** | 35.2% of 125 prompts; per-prompt prediction was poor (see above) |
 | H2 | `Divine` is a genuine secondary basin | **Supported with revision** | 27.2% + 3 additional basins discovered (`Anarch`, `till`, `solidarity`) |
 | H3 | Intermediate tokens reflect training corpus topology | **Supported, statistical validation pending** | 4/5 basin tokens show semantic clustering in W_E rather than BPE-substring clustering; null-model and permutation tests have not yet been run |
+| H4 | Per-head resonance is equivalent to linear power iteration on that head's `W_OV` matrix (empirical resonant state has cosine similarity > 0.9 to the dominant SVD singular vector) | **Untested — protocol scaffolded, not yet run** | [`spectral_resonance.ipynb`](ActivationTensorResonance_Spectral/spectral_resonance.ipynb) |
 
 The supervisor's session reviews ([Session 01](docs/supervisor/SESSION_01_SUPERVISORY_REVIEW.md), [Session 02](docs/supervisor/SESSION_02_RESULTS_DISCUSSION.md)) cover the experimental design, results, and the outstanding statistical validation work in detail.
 
@@ -214,6 +217,7 @@ In the meantime, ATR fits in the mechanistic-interpretability landscape as a **c
 │
 ├── ActivationTensorResonance_Layer/             ← Future: per-layer resonance
 ├── ActivationTensorResonance_Head/              ← Future: per-head resonance
+├── ActivationTensorResonance_Spectral/          ← Future: SVD-predicted resonance (H4)
 ├── archive/                                     ← Earlier notebook versions
 └── docs/                                        ← Documentation & analysis
     ├── TECHNICAL.md                             ← Formal method specification
@@ -238,6 +242,7 @@ In the meantime, ATR fits in the mechanistic-interpretability landscape as a **c
 | [`01_attractor_dominance.ipynb`](B_AttractorDominance/01_attractor_dominance.ipynb) | `B_AttractorDominance/` | 125-prompt attractor landscape mapping |
 | [`layer_resonance.ipynb`](ActivationTensorResonance_Layer/layer_resonance.ipynb) | `ActivationTensorResonance_Layer/` | Per-layer resonance — planned, not yet run |
 | [`head_resonance.ipynb`](ActivationTensorResonance_Head/head_resonance.ipynb) | `ActivationTensorResonance_Head/` | Per-head resonance — planned, not yet run |
+| [`spectral_resonance.ipynb`](ActivationTensorResonance_Spectral/spectral_resonance.ipynb) | `ActivationTensorResonance_Spectral/` | SVD prediction of per-head resonant states (H4) — planned, not yet run |
 | [`01_token_id_extraction.ipynb`](docs/supervisor/01_token_id_extraction.ipynb) | `docs/supervisor/` | Token ID extraction utilities |
 
 ---
@@ -245,7 +250,7 @@ In the meantime, ATR fits in the mechanistic-interpretability landscape as a **c
 ## Requirements
 
 ```bash
-pip install torch transformer-lens plotly scikit-learn ipywidgets kaleido
+pip install torch transformer-lens plotly scikit-learn ipywidgets kaleido tqdm
 ```
 
 ---
@@ -260,6 +265,7 @@ pip install torch transformer-lens plotly scikit-learn ipywidgets kaleido
 6. **L2-normalisation choice.** Per-iteration global L2 rescaling preserves initial energy. Alternative schemes (per-position, per-dimension, LayerNorm-style) have not been tested.
 7. **BPE artefacts.** `prolet`, `Anarch`, `capit` are subword tokens. The W_E neighbourhood test rules out BPE-substring clustering as the explanation for the basin-tokens being what they are; this is positive evidence, not the absence of a concern.
 8. **Statistical validation pending.** Random-baseline comparison for the embedding-neighbourhood semantic-coherence claim, and a permutation test for the all-warm cross-similarity matrix, are designed but not yet run.
+9. **Layer, head, and spectral decomposition are scaffolded but not executed.** `layer_resonance.ipynb`, `head_resonance.ipynb`, and `spectral_resonance.ipynb` contain code and, for the spectral case, a pre-registered hypothesis (H4) — but none have been run. Their presence in this repo is not evidence of anything; see the Notebooks — Quick Reference table.
 
 ---
 

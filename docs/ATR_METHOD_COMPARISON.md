@@ -160,6 +160,7 @@ This is the bias question. Other methods tell you what the model does with a spe
 - [ ] T_mix_LLM measurement
 - [ ] Basin-sorted convergence matrix
 - [ ] Automated ATR pipeline (parameterisable model, prompt set, output directory)
+- [ ] SVD/spectral-gap prediction of per-head resonant states vs. observed convergence (scaffolded in `spectral_resonance.ipynb`; not yet run)
 
 ### Short-Term (Pre-HPC)
 - [ ] ATR on GPT-2 Medium/Large (validate scaling locally)
