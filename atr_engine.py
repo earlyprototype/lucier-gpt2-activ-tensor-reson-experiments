@@ -238,5 +238,96 @@ def run_atr_loop(model, prompt, layer_start, layer_end, max_iter, schedule, verb
         
         prev_last = last_vec.clone()
         prev_mean = mean_vec.clone()
-    
+
     return snapshots
+
+
+def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
+                  threshold=0.999, patience=3, check_every=10, check_start=100,
+                  verbose=False):
+    """Convergence-gated ATR loop (early-stop variant of run_atr_loop).
+
+    Iterates the full-tensor re-injection until the tensor stops moving, then
+    classifies the terminal basin *at lock-in* rather than at a fixed horizon.
+    Lock-in = ``cos_sim_mean`` (consecutive-iteration mean-vector similarity)
+    stays above ``threshold`` for ``patience`` consecutive checks, checked every
+    ``check_every`` iterations once ``check_start`` is passed. If lock-in never
+    occurs, runs to ``max_iter`` and classifies there.
+
+    Lean by design (one readout decode, at the end) so a 125-prompt × 1000-iter
+    sweep stays forward-pass-bound.
+
+    Returns a dict:
+        terminal_token, terminal_token_id, terminal_prob,
+        lock_in_iter (None if never locked), converged (bool),
+        n_iters (iterations actually run), final_cos_sim_mean,
+        top_logit_margin, entropy.
+    """
+    hook_point_read = f"blocks.{layer_end}.hook_resid_post"
+    hook_point_write = f"blocks.{layer_start}.hook_resid_pre"
+
+    with torch.no_grad():
+        _, cache = model.run_with_cache(
+            prompt, names_filter=lambda n: n == hook_point_read
+        )
+    current_tensor = cache[hook_point_read][0].clone()
+    initial_norm = current_tensor.norm().item()
+    prev_mean = current_tensor.mean(dim=0).clone()
+
+    consecutive = 0
+    lock_in_iter = None
+    final_cos = 1.0
+    i = 0
+
+    for i in range(1, max_iter + 1):
+        current_norm = current_tensor.norm().item()
+        if current_norm > 0:
+            current_tensor = current_tensor * (initial_norm / current_norm)
+
+        inject_tensor = current_tensor.clone()
+
+        def injection_hook(resid, hook, tensor=inject_tensor):
+            resid[0, :, :] = tensor
+            return resid
+
+        model.add_hook(hook_point_write, injection_hook)
+        try:
+            with torch.no_grad():
+                _, cache = model.run_with_cache(
+                    prompt, names_filter=lambda n: n == hook_point_read
+                )
+        finally:
+            model.reset_hooks()
+
+        current_tensor = cache[hook_point_read][0].clone()
+        mean_vec = current_tensor.mean(dim=0).clone()
+
+        if i >= check_start and i % check_every == 0:
+            cos = F.cosine_similarity(
+                mean_vec.unsqueeze(0), prev_mean.unsqueeze(0)
+            ).item()
+            final_cos = cos
+            consecutive = consecutive + 1 if cos > threshold else 0
+            if verbose:
+                print(f"    iter {i:>4}: cos_mean={cos:.5f} streak={consecutive}")
+            if consecutive >= patience:
+                lock_in_iter = i
+                prev_mean = mean_vec
+                break
+
+        prev_mean = mean_vec
+
+    last_vec = current_tensor[-1, :].clone()
+    top = get_top_tokens(model, last_vec, k=1)[0]
+    detail = get_readout_detail(model, last_vec)
+    return {
+        "terminal_token": top[0],
+        "terminal_token_id": detail["top_token_ids"][0],
+        "terminal_prob": top[1],
+        "lock_in_iter": lock_in_iter,
+        "converged": lock_in_iter is not None,
+        "n_iters": i,
+        "final_cos_sim_mean": final_cos,
+        "top_logit_margin": detail["top_logit_margin"],
+        "entropy": detail["entropy"],
+    }

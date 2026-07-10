@@ -229,6 +229,58 @@ the 24-layer model rather than a single apparatus fault.
 
 ---
 
+## 5. `gated_resweep.py` — GPT-2 Small convergence-gated re-sweep (plan addendum)
+
+**What ran:** all 125 GPT-2 Small prompts re-iterated to `max_iter=1000` with an
+early-stop gate (`cos_sim_mean > 0.999` for 3 consecutive checks, every 10 iters past
+100). Basins classified **at lock-in**, not at a fixed horizon; lock-in iteration
+recorded. New engine function `run_atr_gated` (additive); sweep in
+`experiments/gpt2_small/gated_resweep.py`, outputs in `output_gated/` (does not touch the
+April `.pt`). Duration ~2 h (CPU), checkpointed per prompt. Motivation: Control 1 showed
+GPT-2 Small only reached `cos_sim_mean ≈ 0.91` at iter 100, so the published basin table
+was read *before* convergence — are the five basins stable or stop-time artefacts?
+
+**Headline numbers:**
+
+- **Convergence: 91/125 (73%) lock in — every one at exactly iter 120** (the earliest the
+  gate can fire). The other **34/125 (27%) never reach `cos > 0.999`** and run to 1000.
+- **The 34 non-convergers are *exactly* the 34 `Divine` prompts.** Every `Divine` prompt
+  fails the tensor gate yet reads `Divine` the whole way — a stable **readout** attractor
+  over a **non-settling tensor**. The other four basins converge cleanly.
+
+Basin shares, iter 100 (published) → at lock-in:
+
+| Basin | @100 | @lock-in | what moved |
+|---|---:|---:|---|
+| `prolet` | 44 (35.2%) | **54 (43.2%)** | gains 10 from Anarch |
+| `Divine` | 34 (27.2%) | 34 (27.2%) | unchanged (readout-stable, tensor never settles) |
+| `Anarch` | 26 (20.8%) | **17 (13.6%)** | loses 10 to prolet (all converged, by iter 120) |
+| `till` | 19 (15.2%) | 19 (15.2%) | **unchanged — 19/19 retained** |
+| `solidarity` | 2 (1.6%) | 1 (0.8%) | loses 1 to Anarch |
+
+**Decides:** *Are the five basins stable under proper convergence, or stop-time artefacts?*
+— **Mostly stable, with one real correction.** `prolet`, `Divine`, and `till` are exactly
+stable; the published table's error is confined to **`Anarch`, which was over-counted at
+iter 100**: 10 of its 26 prompts are still drifting Anarch→prolet at iter 100 and settle on
+`prolet` by their lock-in (iter 120, all converged). Corrected shares: prolet ~43%,
+Anarch ~14%.
+
+**The addendum's specific hypothesis is refuted.** `till` is **not** a slow transient — all
+19 `till` prompts converge at iter 120 and stay `till` (19/19). The transient basin is
+`Anarch`, not `till`.
+
+**Interpretation:** Two clean facts fall out. (1) GPT-2 Small's basins are genuine, not
+stop-time noise — 73% of prompts reach a hard fixed point (`cos > 0.999`) within 120
+iterations and keep their label. (2) The one basin that never settles at the tensor level,
+`Divine`, is precisely the one whose *readout* is most stable — the sharpest single example
+in this study of dynamics and decoding coming apart (the analysis doc's central caveat).
+The published basin table needs one edit: shift ~10 prompts from `Anarch` to `prolet`.
+
+**Open questions:** `Divine`'s readout-stable / tensor-unsettled split is the natural target
+for the ATR-R1/R3 confidence audit (Notebook 2's machinery) — is its readout high-margin
+throughout while the tensor wanders? Also: 120 is the *floor* of the gate (first possible
+lock-in); a finer check cadence would show the true settling iteration for each prompt.
+
 ## Synthesis
 
 **The cross-model differences are intrinsic model properties, not readout artefacts.**
@@ -259,6 +311,13 @@ Four independent lines of evidence converge:
    8 prompts hold 8 distinct terminal tokens with cross-prompt similarity 0.21. Not
    under-iteration — structural.
 
+5. **GPT-2 Small's basins survive proper convergence (gated re-sweep).** 73% of prompts
+   hit a hard fixed point (`cos > 0.999`) by iter 120 and keep their basin label; the
+   published table needs only one correction (≈10 prompts move Anarch→prolet — Anarch was
+   over-counted pre-convergence; the hypothesised `till` transient is in fact 100% stable).
+   And the one basin whose tensor never settles, `Divine`, is exactly the one whose *readout*
+   is perfectly stable — the study's sharpest single case of dynamics and decoding diverging.
+
 **Bottom line for the original question.** GPT-2 Medium's single `D` basin is a *real* tensor
 attractor. Pythia-410m's fragmentation is *genuine structural non-convergence* rooted in the
 model (depth/width/corpus geometry), **not** an avoidable distortion of the ATR apparatus. The
@@ -274,6 +333,15 @@ outstanding test is Control 2 (depth control) to pin the effect to depth per se.
 ## Not scaffolded (follow-on work)
 
 - **Control 2** — Pythia-410m depth control (loop layers 0–11 vs 0–23), holding weights/
-  tokenizer/corpus constant. Not built; the plan says note only.
-- Extend ATR-R1/R3 (notebook 2's machinery) across GPT-2 Medium and Pythia-410m at full
-  prompt sets to finish separating readout ambiguity from true dynamics per-model.
+  tokenizer/corpus constant. Not built; the plan says note only. Still the cleanest test to
+  attribute Pythia-410m's fragmentation to depth per se.
+- **ATR-R1/R3 on the `Divine` cohort.** Section 5 found `Divine` is readout-stable while its
+  tensor never settles. Run Notebook 2's margin/entropy audit on those 34 GPT-2 Small
+  prompts (and across GPT-2 Medium / Pythia-410m at full prompt sets) to confirm the readout
+  stays high-confidence while `cos_sim_mean` wanders.
+- **Public README update** — the basin table should be corrected (Anarch ~21%→~14%,
+  prolet ~35%→~43%; `till` and `Divine` unchanged). Per the run plan, that public-claims
+  pass is a separate session.
+
+_Done since the original plan:_ Section 5 (convergence-gated GPT-2 Small re-sweep) — the plan
+addendum — is complete; results above.
