@@ -54,3 +54,24 @@ If a notebook's plumbing is broken (stale paths from the restructure), fix minim
 - open questions.
 
 End state: four executed notebooks with outputs, the summary, everything committed and pushed to `cross-model`. The synthesis pass (updating the public README's scientific claims) happens in a separate session afterwards — do not attempt it here.
+
+---
+
+## Addendum (added after diagnostics 1–2): GPT-2 Small convergence-gated re-sweep
+
+**Motivation:** Control 1 showed gpt2-small mean cos_sim = 0.91 (σ 0.15) at iter 100 —
+the published basin table was classified before convergence. Original 5-prompt run
+showed token movement to ~iter 500.
+
+### 5. GPT-2 Small, 125 prompts, convergence-gated
+- Re-run the gpt2_small attractor sweep with `MAX_ITERATIONS = 1000` and an
+  **early-stop gate**: stop a prompt when `cos_sim_mean > 0.999` for 3 consecutive
+  checks (check every 10 iters past 100). Classify terminal basin **at lock-in**,
+  not at a fixed horizon. Record lock-in iteration per prompt.
+- Adapt `atr_engine.py` minimally (early-stop param); do not touch the saved April `.pt`s —
+  write to `experiments/gpt2_small/output_gated/`.
+- **Decides:** are the five published basins (prolet 35.2 / Divine 27.2 / Anarch 20.8 /
+  till 15.2 / solidarity 1.6) stable under proper convergence, or stop-time artefacts?
+  Specific hypothesis to test: `till` is a slow transient whose share collapses.
+- Run only AFTER notebooks 3 & 4 complete (CPU contention). Append results to
+  `RESULTS_SUMMARY.md` as section 5 and update the Synthesis.
