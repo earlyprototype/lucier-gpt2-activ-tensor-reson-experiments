@@ -5,7 +5,7 @@
 Inspired by Alvin Lucier's iconic, iterative feedback composition *I Am Sitting in a Room*, this project applies an analogous operation to GPT-2 Small. Where Lucier's process dissolved speech into a room's resonant frequencies through looped excitation, **Activation Tensor Resonance** dissolves semantic content into a language model's architectural eigenmodes — the dominant attractor states encoded in its weight matrices.
 
 <p align="center">
-  <img src="B_AttractorDominance/output_stage1/convergence_matrix.png" alt="Stage 1: Cross-Prompt Convergence — 125 prompts mapped across 5 attractor basins" width="800"/>
+  <img src="experiments/gpt2_small/output/convergence_matrix.png" alt="Stage 1: Cross-Prompt Convergence — 125 prompts mapped across 5 attractor basins" width="800"/>
 </p>
 
 <p align="center"><em>Cross-prompt convergence matrix (125 prompts × cosine similarity). The block structure reveals five distinct attractor basins in GPT-2 Small's weight geometry.</em></p>
@@ -15,7 +15,7 @@ Inspired by Alvin Lucier's iconic, iterative feedback composition *I Am Sitting 
 ## The Inspiration
 
 <p align="center">
-  <img src="docs/lucier_room.png" alt="A sparse room with a reel-to-reel tape recorder and microphone — evoking Alvin Lucier's experimental setup" width="600"/>
+  <img src="docs/assets/lucier_room.png" alt="A sparse room with a reel-to-reel tape recorder and microphone — evoking Alvin Lucier's experimental setup" width="600"/>
 </p>
 
 In 1969, composer [**Alvin Lucier**](https://en.wikipedia.org/wiki/Alvin_Lucier) created [***I Am Sitting in a Room***](https://en.wikipedia.org/wiki/I_Am_Sitting_in_a_Room) — a process piece where he recorded himself speaking, played the recording back into the room, re-recorded the result, and repeated. With each iteration, the speech dissolved into the room's resonant frequencies. The words vanished. The architecture spoke.
@@ -54,7 +54,7 @@ See [TECHNICAL.md](docs/TECHNICAL.md) for the formal specification, or [UNDERSTA
 
 Five initial prompts were chosen for their diversity of style and input into the model.
 
-📓 **Notebook:** [`lucier_total_resonance.ipynb`](ActivationTensorResonance/lucier_total_resonance.ipynb)
+📓 **Notebook:** [`lucier_total_resonance.ipynb`](experiments/gpt2_small/lucier_total_resonance.ipynb)
 
 **Four out of five** converged through the same dissolution trajectory to a common terminal state: the BPE subword `prolet` — a fragment: a suggestion.
 
@@ -102,11 +102,11 @@ This syntactic structure found its own basin: suggesting mythological language a
 
 ---
 
-![Sentence dissolution — the five prompts dissolving into their attractors](ActivationTensorResonance/images/dissolution1.png)
+![Sentence dissolution — the five prompts dissolving into their attractors](docs/assets/dissolution1.png)
 
-![Dissolution continued](ActivationTensorResonance/images/dissolution2.png)
+![Dissolution continued](docs/assets/dissolution2.png)
 
-![3D PCA trajectory of semantic dissolution](ActivationTensorResonance/images/topology.png)
+![3D PCA trajectory of semantic dissolution](docs/assets/topology.png)
 
 ---
 
@@ -114,13 +114,13 @@ This syntactic structure found its own basin: suggesting mythological language a
 
 ### Phase 2: Reproducibility Gate ✅
 
-📓 **Notebook:** [`00_reproducibility_gate.ipynb`](B_Reporduceability/00_reproducibility_gate.ipynb)
+📓 **Notebook:** [`00_reproducibility_gate.ipynb`](experiments/gpt2_small/00_reproducibility_gate.ipynb)
 
 The experiment was re-run with identical parameters. **All five terminal basins reproduced.** Intermediate dissolution pathways show sensitivity to floating-point non-determinism (expected for iterative nonlinear maps), but always converge to identical fixed points.
 
 ### Phase 3: Attractor Dominance (125 prompts) ✅
 
-📓 **Notebook:** [`01_attractor_dominance.ipynb`](B_AttractorDominance/01_attractor_dominance.ipynb)
+📓 **Notebook:** [`01_attractor_dominance.ipynb`](experiments/gpt2_small/01_attractor_dominance.ipynb)
 
 125 prompts across 7 categories (Complex, Narrative, Simple, Chemical, Acronyms, Vulgarity, Wild) were swept through the ATR process. The attractor landscape proved far richer than the initial 2-basin observation:
 
@@ -132,13 +132,13 @@ The experiment was re-run with identical parameters. **All five terminal basins 
 | **`till`** | 19 | 15.2% | Temporal / persistence |
 | **`solidarity`** | 2 | 1.6% | Collective action |
 
-All five basin tokens cluster semantically in the embedding space (W_E neighbourhood analysis confirms this — see [Session 01 Review](docs/ATR_SOURCE_PACKAGE/SESSION_01_SUPERVISORY_REVIEW.md)). The all-warm cross-similarity matrix (no negative correlations) indicates the basins occupy a compact subspace — the thematic centre of mass of the training corpus.
+All five basin tokens cluster semantically in the embedding space (W_E neighbourhood analysis confirms this — see [Session 01 Review](docs/sessions/SESSION_01.md)). The all-warm cross-similarity matrix (no negative correlations) indicates the basins occupy a compact subspace — the thematic centre of mass of the training corpus.
 
-![Cross-similarity matrix of basin tokens — all-warm, no negative correlations](docs/supervisor/token%20similarity.png)
+![Cross-similarity matrix of basin tokens — all-warm, no negative correlations](docs/assets/token_similarity.png)
 
-![Basin distribution across 125 prompts](B_AttractorDominance/output_stage1/basin_distribution.png)
+![Basin distribution across 125 prompts](experiments/gpt2_small/output/basin_distribution.png)
 
-![3D topology of convergence trajectories](B_AttractorDominance/output_stage1/topology_3d.png)
+![3D topology of convergence trajectories](experiments/gpt2_small/output/topology_3d.png)
 
 ---
 
@@ -148,8 +148,8 @@ All four hypotheses proposed following the initial Activation Tensor Resonance e
 
 | ID | Hypothesis | Status | Evidence |
 |---|---|---|---|
-| H0 | Results are deterministic | ✅ PASSED | [Reproducibility gate](B_Reporduceability/00_reproducibility_gate.ipynb) — N=2 identical terminal basins |
-| H1 | `prolet` is the dominant basin | ✅ Supported | 35.2% of 125 prompts ([Stage 1 results](B_AttractorDominance/output_stage1/hypothesis_assessment.md)) |
+| H0 | Results are deterministic | ✅ PASSED | [Reproducibility gate](experiments/gpt2_small/00_reproducibility_gate.ipynb) — N=2 identical terminal basins |
+| H1 | `prolet` is the dominant basin | ✅ Supported | 35.2% of 125 prompts ([Stage 1 results](experiments/gpt2_small/output/hypothesis_assessment.md)) |
 | H2 | `Divine` is a genuine secondary basin | ✅ Supported | 27.2% + 3 additional basins discovered |
 | H3 | Intermediate tokens reflect training corpus topology | ✅ Supported | 4/5 basins show semantic clustering in W_E |
 
@@ -159,12 +159,12 @@ All four hypotheses proposed following the initial Activation Tensor Resonance e
 
 | | |
 |:---:|:---:|
-| ![Token drift](ActivationTensorResonance/images/tokendrift.png) | ![Convergence curves](ActivationTensorResonance/images/convergence.png) |
+| ![Token drift](docs/assets/tokendrift.png) | ![Convergence curves](docs/assets/convergence.png) |
 | *Token drift across all five prompts* | *Cosine similarity between iterations* |
-| ![Position collapse](ActivationTensorResonance/images/positioncollapse.png) | ![Norm trajectory](ActivationTensorResonance/images/normaltrajectory.png) |
+| ![Position collapse](docs/assets/positioncollapse.png) | ![Norm trajectory](docs/assets/normaltrajectory.png) |
 | *All token positions merging into one* | *The energy of the signal* |
 
-![Cross-prompt convergence — initial 5 prompts](ActivationTensorResonance/images/crosspromptconverg.png)
+![Cross-prompt convergence — initial 5 prompts](docs/assets/crosspromptconverg.png)
 
 ---
 
