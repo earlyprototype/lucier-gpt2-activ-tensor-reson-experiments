@@ -39,3 +39,6 @@ env/
 
 # Local archive
 README_ORIGINAL.md
+
+# Local agent session config
+.claude/

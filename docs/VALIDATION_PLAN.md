@@ -1,7 +1,7 @@
 # EXP_009 Validation Series — From Observation to Hypothesis
 
 **Date:** 20 March 2026
-**Status:** Planning
+**Status:** HISTORICAL RECORD — this is the validation design as pre-registered in March 2026, kept unmodified as a record of what was predicted before the data arrived. Outcomes: Stage 0 passed (repeatability); Stages 1–3 ran as the 125-prompt sweep; the series then extended beyond this plan (cross-model, null model, convergence gating). Dispositions of every hypothesis, including the refuted ones: [FINDINGS.md](FINDINGS.md). File paths named below refer to the original lab workspace, not this repository.
 **Depends on:** EXP_009aFIX results (the exploratory Lucier Resonance experiment)
 
 ---

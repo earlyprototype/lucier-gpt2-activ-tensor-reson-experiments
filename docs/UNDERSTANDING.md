@@ -46,7 +46,7 @@ This distinction is fundamental:
 | **What's fed back** | A decoded token (1 integer) | The full residual stream (`[seq_len × 768]` floats) |
 | **Information preserved** | Only the argmax winner | The entire superposition of all 50,257 token candidates |
 | **Dynamics** | Discrete, lossy, stochastic | Continuous, lossless, deterministic |
-| **What converges** | The model's text generation habits | The model's weight geometry — its architectural eigenvoice |
+| **What converges** | The model's text generation habits | The stable states of the iterated model — which depend on the input regime (see below) |
 
 ## Key Parameters
 
@@ -57,3 +57,9 @@ This distinction is fundamental:
 | **Normalisation** | Per-iteration L2 rescaling to initial norm | Prevents energy explosion, enables stable convergence |
 | **Iteration schedule** | `[0, 2, 3, 5, 10, 20, 50, 100, 250, 500]` | Logarithmic — captures both early dynamics and deep convergence |
 | **Temperature** | N/A (deterministic) | No sampling — pure forward-pass dynamics |
+
+## One Important Correction (What the Attractors Are Not)
+
+An earlier framing of this project described the attractors as "the model's weight geometry made audible" — as if the basins were universal properties of the weights that any input would eventually reveal. The null-model control showed this is wrong: iterate pure random noise instead of a prompt and the loop still converges, but into a *different* set of attractors (eighteen scattered punctuation tokens, none of them the five semantic basins).
+
+The correct statement: **the attractors are stable states of the model as driven by a particular kind of input.** Language-shaped input funnels into few, semantically coherent basins; noise scatters into many meaningless ones. And the phenomenon is model-specific — GPT-2 Medium, trained on the same corpus, collapses everything into a single empty token. The full evidence is in [FINDINGS.md](FINDINGS.md).

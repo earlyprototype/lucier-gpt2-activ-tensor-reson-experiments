@@ -4,7 +4,9 @@
 
 ### Overview
 
-This experiment implements iterative re-injection of the full residual stream tensor through the forward pass of GPT-2 Small (124M parameters, 12 layers, 12 heads, d_model=768). The residual stream at `blocks.11.hook_resid_post` is extracted, L2-normalised, and re-injected at `blocks.0.hook_resid_pre` via a TransformerLens forward hook, overwriting the token embeddings. This is repeated for *N* iterations to map the fixed-point attractor landscape of the weight geometry.
+This experiment implements iterative re-injection of the full residual stream tensor through the forward pass of a transformer language model (reference architecture: GPT-2 Small — 124M parameters, 12 layers, 12 heads, d_model=768). The residual stream at the final layer's `hook_resid_post` is extracted, L2-normalised, and re-injected at `blocks.0.hook_resid_pre` via a TransformerLens forward hook, overwriting the token embeddings. This is repeated for *N* iterations to map the fixed-point attractor landscape of the iterated forward map **under the chosen initial-condition regime** — the null-model control shows the landscape is regime-dependent, not a universal property of the weights (see [FINDINGS.md](FINDINGS.md), F4).
+
+The same protocol runs cross-model via the shared engine (`atr_engine.py`): GPT-2 Medium (24 layers, d_model=1024), Pythia-160m (12 layers), Pythia-410m (24 layers) — extraction always at the final layer's `resid_post`, injection at layer 0. A convergence-gated variant (`run_atr_gated`) classifies terminal basins at lock-in (`cos_sim_mean > 0.999` sustained over three consecutive checks) rather than at a fixed iteration horizon.
 
 The process is a **nonlinear analogue of power iteration**: where classical power iteration converges to the dominant eigenvector of a linear operator, this procedure converges to fixed points of the full transformer forward map *f*: ℝ^(seq×d) → ℝ^(seq×d), which includes LayerNorm, softmax attention (with dynamically recomputed QKV), GeLU MLP activations, and residual connections.
 
@@ -115,18 +117,12 @@ Framework:       TransformerLens (Nanda & Bloom, 2022)
 | RNN fixed-point analysis | Maps attractor dynamics of recurrent systems | Transformers are feedforward; we impose recurrence via re-injection |
 | Singular value decomposition of W_OV | Identifies dominant directions of weight matrices | Static analysis; our method probes the *nonlinear* composite operator |
 
-A direct empirical comparison between the last two rows above — the per-head resonant state actually observed under iterative re-injection versus the dominant singular vector predicted by static SVD of `W_OV` — is scaffolded in `ActivationTensorResonance_Spectral/spectral_resonance.ipynb`. It has not been run; see the main README's Hypothesis Status (H4) and Caveats and Pending Work.
+A direct empirical comparison between the last two rows above — the per-head resonant state actually observed under iterative re-injection versus the dominant singular vector predicted by static SVD of `W_OV` — is scaffolded in `experiments/gpt2_small/spectral_resonance.ipynb`. It has not been run; see [FINDINGS.md](FINDINGS.md) (H4) and its Caveats section.
 
 ## Repeatability
 
-Terminal attractors (`prolet` × 4, `Divine` × 1) are stable across N=2 same-machine runs. Intermediate dissolution pathways show sensitivity to floating-point non-determinism (expected for iterative nonlinear maps), but converge to identical fixed points. Full determinism would require CPU execution with fixed seeds. Independent re-implementation on different hardware or by another investigator has not been attempted; "reproducibility" in the strict sense remains pending.
+Terminal attractors (`prolet` × 4, `Divine` × 1) are stable across N=2 same-machine runs. Intermediate dissolution pathways show sensitivity to floating-point non-determinism (expected for iterative nonlinear maps), but converge to identical fixed points. The convergence-gated re-sweep additionally confirms that 91/125 prompts reach a hard fixed point (`cos_sim_mean > 0.999`) and that basin labels assigned at lock-in are stable to 1000 iterations. Full determinism would require CPU execution with fixed seeds. Independent re-implementation on different hardware or by another investigator has not been attempted; "reproducibility" in the strict sense remains pending.
 
 ## Dependencies
 
-```
-torch >= 2.0
-transformer-lens >= 1.0
-plotly >= 5.0
-scikit-learn
-kaleido (for static image export)
-```
+Install from [`requirements.txt`](../requirements.txt) at the repository root.

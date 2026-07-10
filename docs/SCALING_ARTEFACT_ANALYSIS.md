@@ -151,3 +151,17 @@ Each test changes one variable at a time and is implementable with minimal ATR e
 The four models do not share one uniform failure mode; landscapes differ with corpus and architecture. Prompt-level heterogeneity (e.g. some Pythia-410m runs converging while others oscillate) fits intrinsic geometry and depth-dependent iteration maps, not a single broken knob in the apparatus.
 
 Remaining work stays on two tracks: (a) close out readout as an artefact using tensor-level metrics vs token traces, and (b) attribute basin structure to depth, data, width, and unembedding geometry with controlled comparisons.
+
+
+---
+
+## Closing Judgement (2026-07-10 — controls executed)
+
+The attribution tests proposed above were run at series close ([FINDINGS.md](FINDINGS.md), [RESULTS_SUMMARY.md](../experiments/RESULTS_SUMMARY.md)):
+
+- **Test 1 (cross-model cos_sim chart): executed.** GPT-2 Medium and Pythia-160m saturate to 1.0000 by iteration 10 — their single-token collapses are real tensor attractors. Pythia-410m plateaus at ~0.85 through 250 iterations — non-convergence is internal dynamics, not readout.
+- **Test 3 (long horizon): executed.** Pythia-410m at 1000 iterations (8-prompt subset): still fragmented, cross-prompt similarity 0.21. Structural, not under-iterated.
+- **ATR-R1/R3 (confidence-aware readout): implemented and demonstrated** (single-prompt audit; margin rises and entropy falls as trajectories settle). The sharpest dissociation found: GPT-2 Small's `Divine` basin — readout constant while the tensor never passes the convergence gate.
+- **Test 2 (depth control, layers 0–11 vs 0–23): still not run.** The cleanest remaining attribution test.
+
+**Final position:** the guiding principle at the top of this document was applied and the answer landed on the intrinsic side — readout ambiguity is real but secondary; normalisation is inert; the cross-model landscape differences are properties of the models. The one place the readout-first principle earns its keep permanently is `Divine`, where dynamics and decoding genuinely come apart.

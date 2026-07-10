@@ -1,3 +1,5 @@
+*AI-assisted review session (a reviewer persona run against the repo); not institutional supervision.*
+
 # Supervisory Session 01 — Research Notes
 
 **Date:** 2026-03-20

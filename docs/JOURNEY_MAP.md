@@ -1,7 +1,7 @@
 # Project ATR: Complete Journey Map
 
 **Purpose:** Continuity document. Pick up the intellectual thread from any point.
-**Last updated:** 2026-03-20
+**Last updated:** 2026-07-10 (series close)
 
 ---
 
@@ -19,7 +19,7 @@
 - **Discovery 1:** 4/5 prompts converge to the SAME terminal token: `prolet` (BPE fragment of "proletariat")
 - **Discovery 2:** The 5th prompt ("The cat sat on the mat") diverges at iteration 20 to `Divine`
 - **Discovery 3:** All prompts follow a *shared dissolution pathway* through recognisable tokens: `ash → Canad → Ag → FT → capit → injustice → Rousse → prolet`
-- **Discovery 4:** The training data is exclusively Reddit 2018. The model's "naked voice" speaks the discourse of its training corpus
+- **Discovery 4:** The training data is exclusively Reddit 2018; the basin tokens read as that corpus's discourse (interpretation later qualified — see Phase 5)
 - **Output:** README, TECHNICAL.md, UNDERSTANDING.md, ISOMORPHISM.md, visualisations (PCA topology, token drift, convergence curves, position collapse, norm trajectory)
 
 ### Phase 2: Validation Design (VALIDATION_PLAN)
@@ -45,6 +45,13 @@
   - **All-warm cross-similarity:** All 14 tokens positively correlated (0.18–0.47) — compact subspace
 - **Session 02:** Mixing Time analogy formalised. Bias interpretation. ATR named. Cross-model programme sketched.
 
+### Phase 5: Cross-Model Validation & Series Close (2026-07-10)
+- **Cross-model sweeps (gpt2-medium, pythia-160m, pythia-410m):** landscapes are model-specific — one empty-token funnel (`D`), one near-total funnel (`questioned`), one non-consolidating scatter. Fingerprint hypothesis refuted (same corpus ≠ same landscape).
+- **Null model:** random tensors converge to 18 non-semantic basins, ~zero overlap with the real five — basins belong to the language-driven regime, not the weights in general.
+- **Convergence-gated re-sweep:** basins survive proper convergence; `Anarch` was over-counted at iter 100 (corrected shares: prolet 43.2 / Divine 27.2 / till 15.2 / Anarch 13.6 / solidarity 0.8). Pre-registered `till`-transient hypothesis refuted (19/19 stable).
+- **The `Divine` dissociation:** the 34 never-converging prompts are exactly the `Divine` prompts — stable readout over a non-settling tensor.
+- **Artefact attribution:** normalisation exonerated; readout secondary; cross-model differences are tensor-level, intrinsic. Canonical record: [FINDINGS.md](FINDINGS.md).
+
 ---
 
 ## 2. Key Discoveries (Chronological)
@@ -60,8 +67,13 @@
 | 7 | `capit` = capitulation, not capitalism | Session 01 | Nearest neighbours: surrender, succumb, acquiesce |
 | 8 | Dissolution has a structural→semantic phase transition | Session 01 | Early tokens generic (BPE/typographic), late tokens semantic |
 | 9 | All attractor tokens occupy same compact subspace (all-warm matrix) | Session 01 | Cross-similarity 0.18–0.47, no negative values |
-| 10 | The all-warm property is consistent with a compact "thematic-centre-of-mass" interpretation (proposed; pending statistical validation and cross-model evidence) | Session 02 | All 91 off-diagonal pairs of basin/waypoint tokens positively correlated in W_E (0.18–0.47) |
+| 10 | The all-warm property is consistent with a compact "thematic-centre-of-mass" interpretation | Session 02 | All 91 off-diagonal pairs positively correlated in W_E (0.18–0.47). *Series close: the cross-model evidence arrived and refuted the corpus-causal reading (see 13); permutation test still pending.* |
 | 11 | All normalised transformers must have basins (Brouwer fixed-point theorem) | Session 02 | Continuous map on compact set (LayerNorm bounds) — existence guaranteed; count and shape are empirical questions |
+| 12 | Basin landscapes are model-specific, not corpus-tracking | Cross-model (2026-07) | Same corpus (WebText): Small → 5 semantic basins; Medium → 1 empty token |
+| 13 | The five basins are regime-specific, not weight-universal | Null model (2026-07) | Noise → 18 non-semantic basins, ~0 overlap; real count 5 below random CI [11,17] |
+| 14 | Basin labels survive convergence gating, with one correction | Gated re-sweep (2026-07) | 73% hard-converge by iter 120; ~10 prompts move Anarch→prolet |
+| 15 | `Divine` is a readout-stable / tensor-unsettled object | Gated + diagnostic (2026-07) | 34/34 non-convergers are `Divine`; decode constant while tensor moves |
+| 16 | Cross-model differences are intrinsic dynamics, not apparatus | Diagnostics (2026-07) | cos_sim_mean verdicts are tensor-level; normalisation provably inert |
 
 ---
 
@@ -70,9 +82,13 @@
 | ID | Hypothesis | Status | Evidence |
 |---|---|---|---|
 | H0 | Results are deterministic | Repeatability supported | EXP_009d0 — N=2 same-machine runs produce identical terminal basins. Independent re-implementation pending. |
-| H1 | `prolet` is the dominant basin | Supported (structural) | 35.2% of 125 prompts. Per-prompt prediction was poor (~25%); the basin landscape is finer-grained than initially supposed. |
-| H2 | `Divine` is a genuine secondary basin | Supported with revision | 27.2% + 3 additional basins discovered (`Anarch`, `till`, `solidarity`) |
-| H3 | Intermediate tokens reflect training corpus topology | Supported, statistical validation pending | 4/5 basins show semantic clustering in W_E rather than BPE-substring clustering. Null-model and permutation tests have not yet been run. |
+| H1 | `prolet` is the dominant basin | Supported, revised upward | 43.2% at convergence (gated re-sweep); was 35.2% at iter 100 — `Anarch` was over-counted pre-convergence. Per-prompt prediction remained poor (~25%). |
+| H2 | `Divine` is a genuine secondary basin | Supported with qualification | 27.2%; readout-stable over a never-settling tensor — dynamics and decoding dissociate (FINDINGS.md F2). |
+| H3 | Intermediate tokens reflect training corpus topology | Partially supported; generality refuted | Semantic clustering in W_E holds (permutation test pending). The corpus-causal reading failed cross-model: GPT-2 Medium, same corpus, no semantic basins (FINDINGS.md F3). Null model run: basins are regime-specific (F4). |
+| H4 | Per-head resonance ≈ SVD dominant singular vector | Untested | Scaffold only: `experiments/gpt2_small/spectral_resonance.ipynb` |
+| H-fingerprint | Basin profiles read training bias from any model | **Refuted** | FINDINGS.md F3, F4 |
+
+Canonical dispositions with full evidence: [FINDINGS.md](FINDINGS.md) §3.
 
 ---
 
@@ -85,7 +101,7 @@
 | **Topology** | Brouwer fixed-point theorem | Guarantees every normalised transformer has at least one ATR attractor |
 | **Acoustics** | Mixing time (T_mix) | Isomorphic to ATR's structural→semantic phase transition |
 | **Acoustics** | Impulse response / room modes | Lucier's room ↔ transformer weight matrices |
-| **Fractal Geometry** | Fractal dimensional analysis | PI's Master's thesis — potential metric for basin characterisation |
+| **Fractal Geometry** | Fractal dimensional analysis | Potential metric for basin characterisation (untested) |
 | **BPE/Tokenisation** | Byte Pair Encoding | Why attractors appear as fragments (`prolet`, not `proletariat`) |
 | **Mechanistic Interp.** | Activation patching, probing, SAEs | Adjacent methods ATR complements |
 | **Mechanistic Interp.** | Logit Lens / Tuned Lens | Per-layer prediction; ATR reveals per-model global structure |
@@ -101,7 +117,7 @@
 
 | Term | Definition | First Appearance |
 |---|---|---|
-| **ATR** (Activation Tensor Resonance) | Iterative re-injection of a model's residual stream through its forward pass to reveal weight geometry attractors | Session 02 |
+| **ATR** (Activation Tensor Resonance) | Iterative re-injection of a model's residual stream through its forward pass to reveal the attractor landscape of its iterated dynamics (regime-dependent — see FINDINGS.md F4) | Session 02 |
 | **Attractor basin** | A region of activation space where all initial conditions converge to the same terminal state under ATR | EXP_009aFIX |
 | **Basin token** | The terminal BPE token a basin converges to (e.g., `prolet`, `Divine`) | EXP_009aFIX |
 | **Waypoint token** | An intermediate token observed during the dissolution pathway | Session 01 |
@@ -116,10 +132,10 @@
 | **Cross-prompt invariance** | Property where different prompts produce near-identical final states (cosine sim > 0.999) | TECHNICAL.md |
 | **L2 normalisation** | Energy conservation: rescale tensor to initial norm each iteration, preventing explosion | TECHNICAL.md |
 | **All-warm matrix** | Cross-similarity matrix with no negative values — indicates compact attractor subspace | Session 02 |
-| **Eigenvoice** | Metaphor: the model's "native voice" revealed when input is exhausted — its dominant eigenmodes | ISOMORPHISM.md |
+| **Eigenvoice** | Metaphor (art register): the model's "native voice" under iteration. The reporting-register correction: the voice depends on what drove it (FINDINGS.md F4) | ISOMORPHISM.md |
 | **Q-vector dichotomy** | Slonski's finding: token Q-vectors polarise into 2 groups at cosine similarity ≈ -1 | Session 01 |
 | **Glitch token** | Anomalous BPE tokens with unusual embedding properties (e.g., SolidGoldMagworthy) — ruled out for our basins | Session 01 |
-| **Bias profile** | The distribution of attractor basins as a geometric fingerprint of training data themes | Session 02 |
+| **Bias profile** | *Retired term.* Originally: basin distribution as a fingerprint of training data themes — refuted at series close (FINDINGS.md F3) | Session 02 |
 
 ---
 
@@ -157,15 +173,18 @@ The bottleneck is always phase 2. Automation of interpretation is the scaling ch
 
 | Question | Status | Next Step |
 |---|---|---|
+| Why does GPT-2 Small — alone in this set — resolve language into few semantic basins? | **The open question of the series** | New experimental stage |
+| What is the `Divine` object — limit cycle, wandering attractor, decode-region plateau? | Open (FINDINGS.md F2) | Confidence audit at scale; trajectory analysis |
+| Does the landscape depend on where the loop is cut (layer window / depth)? | Designed, not run | Pythia-410m depth control (0–11 vs 0–23); window sweeps |
+| W_E semantic-clustering statistics | Pending | Permutation test over random token sets |
+| True lock-in iterations (gate fired at its floor, 120) | Pending | Finer gate cadence |
 | What is T_mix_LLM for each basin? | Measurable from existing data | Compute from `.pt` |
-| Do basins sort cleanly in the convergence matrix? | Testable | Reorder by terminal basin |
 | Are all basins in one Slonski macro-group? | Predicted (from all-warm) | One Q-vector experiment |
-| Does ATR scale to larger models? | Untested | Run on GPT-2 Medium locally |
-| Do different models have different basin profiles? | Untested | Cross-model ATR programme |
-| Can basin depth predict bias strength? | Theoretical | Requires cross-model data |
-| What statistical validation is sufficient? | Planned | Random baseline + permutation test |
 | Is the fractal dimension of convergence trajectories basin-specific? | Speculative | Requires T_mix first |
+| ~~Does ATR scale to larger models?~~ | Answered: the operation runs; the landscape changes qualitatively | — |
+| ~~Do different models have different basin profiles?~~ | Answered: yes, drastically (FINDINGS.md F3) | — |
+| ~~Can basin depth predict bias strength?~~ | Retired with the fingerprint hypothesis | — |
 
 ---
 
-*This document is a living map. Update after each session.*
+*This document is a living map. Updated at series close, 2026-07-10.*

@@ -1,3 +1,5 @@
+*AI-assisted review session (a reviewer persona run against the repo); not institutional supervision.*
+
 # Session 02 — Experimental Results Discussion
 
 **Date:** 2026-03-20

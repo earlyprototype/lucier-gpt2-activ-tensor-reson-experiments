@@ -1,7 +1,15 @@
 # ATR in Context: Method Comparison & Scaling Programme
 
-**Date:** 2026-03-20
+**Date:** 2026-03-20 · **Revised at series close:** 2026-07-10
 **Purpose:** Orientate ATR within the mechanistic interpretability landscape. Inform resource planning.
+
+> **Revision note (2026-07-10):** the cross-model and null-model experiments this
+> document originally proposed have now been run ([FINDINGS.md](FINDINGS.md)). The
+> fingerprint hypothesis — basin profiles as training-data bias readable from any
+> model — was **refuted**: GPT-2 Medium (same corpus as Small) produces no semantic
+> basins, and random-noise initial states converge to a different attractor set
+> entirely. Tables below have been corrected; rows recording the original March
+> framing are marked where the framing did not survive.
 
 ---
 
@@ -17,7 +25,7 @@
 | **Sparse Autoencoders (SAEs)** | Decompose activations into interpretable features | Per-feature (thousands per layer) | Feature dictionaries + activation patterns |
 | **Ablation Studies** | What breaks when a component is removed | Per-head, per-layer | Performance delta |
 | **Representation Engineering** | Steer model behaviour via activation vectors | Per-layer, per-concept | Control vectors + behavioural change |
-| **ATR (Ours)** | Weight geometry's dominant modes / attractor landscape | Per-model (global) | Basin tokens, convergence trajectories, bias profile |
+| **ATR (Ours)** | Attractor landscape of the iterated forward map under a chosen input regime | Per-model (global) | Basin tokens, convergence trajectories, regime profile |
 
 ### 1b. Resource Requirements
 
@@ -53,17 +61,17 @@
 | **SAEs** | Expensive. Feature interpretation is manual. Scale uncertain beyond GPT-2. |
 | **Ablation** | Destructive. Cannot distinguish redundant from essential components. |
 | **Rep. Engineering** | Requires concept pairs. Doesn't reveal model's "native" organisation. |
-| **ATR** | **Reveals static weight geometry, not dynamic computation. Doesn't explain HOW the model processes input — only what it converges to WITHOUT input.** |
+| **ATR** | **Reveals stable states of iterated dynamics, not per-input computation — and those states are regime-dependent (language-driven and noise-driven starts converge differently; FINDINGS.md F4). Doesn't explain HOW the model processes input.** |
 
 ### 1e. Unique ATR Capabilities
 
 | Capability | ATR | Nearest Alternative |
 |---|---|---|
-| Reveal training-data thematic structure without training-data access | Proposed (single-model evidence; cross-model programme would test it) | Rep. Engineering (partial, needs contrast pairs) |
+| Reveal training-data thematic structure without training-data access | **Refuted** — tested cross-model and failed (FINDINGS.md F3, F4) | Rep. Engineering (partial, needs contrast pairs) |
 | No labelled data required | Yes | Logit Lens, Ablation, Patching |
 | No training/fine-tuning step | Yes | Logit Lens, Ablation, Patching |
 | Global model characterisation (not per-prompt) | Yes | SAEs (but vastly more expensive) |
-| Cross-model comparison via basin profiles | Proposed (untested) | None established |
+| Cross-model comparison via basin profiles | **Demonstrated** — 4 models, qualitatively distinct regimes | None established |
 | Bias auditing of proprietary models (API-only) | No (needs weights) | Behavioural testing |
 | Seconds per run on consumer GPU | Yes | Logit Lens only |
 
@@ -75,9 +83,9 @@
 
 ATR is **complementary** to existing methods, not a replacement. It answers a question no other method asks:
 
-> **"What are the dominant modes of the model's weight geometry, independent of any input?"**
+> **"What are the stable states of the model's iterated forward map, and how do they depend on the input regime?"**
 
-This is the bias question. Other methods tell you what the model does with a specific input. ATR tells you what the model does when input influence is exhausted — revealing the training data's thematic fingerprint.
+Other methods tell you what the model does with a specific input. ATR tells you where the model's dynamics settle when the input is played back through it indefinitely. The original framing — "revealing the training data's thematic fingerprint" — did not survive the cross-model test (FINDINGS.md F3); what ATR demonstrably provides is a cheap, tensor-level regime comparison across models.
 
 ### Closest Parallels
 
@@ -91,8 +99,8 @@ This is the bias question. Other methods tell you what the model does with a spe
 |---|---|---|
 | Attractor basins exist with the shape and dominance shares observed | Supported (GPT-2 Small, single-model) | Confirms iterated forward map produces a discrete attractor landscape |
 | Basin tokens cluster semantically rather than by BPE substring | Supported (W_E neighbourhood test on GPT-2 Small; statistical validation pending) | The attractors carry meaning, not artefact |
-| Basin profiles vary predictably by model / training data | Untested | If supported, ATR becomes a model-characterisation tool |
-| ATR-derived basins can stand in for training-data inspection in bias characterisation | Untested at scale | If supported on cross-model evidence, potential safety relevance |
+| Basin profiles vary predictably by model / training data | **Tested: they vary, but not corpus-trackably** (same corpus → unrelated landscapes) | Partially — ATR distinguishes models, but not by training data |
+| ATR-derived basins can stand in for training-data inspection in bias characterisation | **Refuted** (FINDINGS.md F3, F4) | — |
 | Basin topology correlates with model capabilities | Speculative | Transformative if true, but years from testable |
 
 ---
@@ -100,6 +108,8 @@ This is the bias question. Other methods tell you what the model does with a spe
 ## 3. Compute Programme
 
 ### 3a. Research Programme: Cross-Model ATR Landscape Mapping
+
+> **Status (2026-07-10):** a local 2×2 slice of this programme (GPT-2 Small/Medium × Pythia-160m/410m, CPU) has been executed — results in [FINDINGS.md](FINDINGS.md). It answered the programme's central question early: landscapes are model-specific and do not track the corpus. The larger sweep remains open as characterisation work, with the fingerprint motivation retired.
 
 **Objective:** Run ATR across a systematic sweep of open-weight language models to determine whether attractor basin profiles are model-specific, architecture-specific, or scale-dependent.
 
