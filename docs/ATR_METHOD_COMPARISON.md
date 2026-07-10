@@ -59,13 +59,13 @@
 
 | Capability | ATR | Nearest Alternative |
 |---|---|---|
-| Reveal training data bias without training data | ✅ | Rep. Engineering (partial, needs contrast pairs) |
-| No labelled data required | ✅ | Logit Lens, Ablation, Patching |
-| No training/fine-tuning step | ✅ | Logit Lens, Ablation, Patching |
-| Global model characterisation (not per-prompt) | ✅ | SAEs (but vastly more expensive) |
-| Cross-model comparison via basin profiles | ✅ | None established |
-| Bias auditing of proprietary models (API-only) | ❌ (needs weights) | Behavioural testing |
-| Seconds per run on consumer GPU | ✅ | Logit Lens only |
+| Reveal training-data thematic structure without training-data access | Proposed (single-model evidence; cross-model programme would test it) | Rep. Engineering (partial, needs contrast pairs) |
+| No labelled data required | Yes | Logit Lens, Ablation, Patching |
+| No training/fine-tuning step | Yes | Logit Lens, Ablation, Patching |
+| Global model characterisation (not per-prompt) | Yes | SAEs (but vastly more expensive) |
+| Cross-model comparison via basin profiles | Proposed (untested) | None established |
+| Bias auditing of proprietary models (API-only) | No (needs weights) | Behavioural testing |
+| Seconds per run on consumer GPU | Yes | Logit Lens only |
 
 ---
 
@@ -89,9 +89,10 @@ This is the bias question. Other methods tell you what the model does with a spe
 
 | Claim | Evidence Level | Impact if Validated |
 |---|---|---|
-| Attractor basins correspond to training data themes | Supported (GPT-2 Small, 1 model) | Medium — confirms training data influence on weight geometry |
-| Basin profiles vary by model/training data | Untested | **High** — model characterisation tool |
-| ATR can audit training bias without training data | Untested at scale | **Very high** — regulatory/safety application |
+| Attractor basins exist with the shape and dominance shares observed | Supported (GPT-2 Small, single-model) | Confirms iterated forward map produces a discrete attractor landscape |
+| Basin tokens cluster semantically rather than by BPE substring | Supported (W_E neighbourhood test on GPT-2 Small; statistical validation pending) | The attractors carry meaning, not artefact |
+| Basin profiles vary predictably by model / training data | Untested | If supported, ATR becomes a model-characterisation tool |
+| ATR-derived basins can stand in for training-data inspection in bias characterisation | Untested at scale | If supported on cross-model evidence, potential safety relevance |
 | Basin topology correlates with model capabilities | Speculative | Transformative if true, but years from testable |
 
 ---
@@ -136,11 +137,10 @@ This is the bias question. Other methods tell you what the model does with a spe
 ### 3e. Why HPC
 
 - **Low total compute** — 170–500 GPU-hours is modest by HPC standards
-- **High ratio of output to compute** — each ATR run produces rich, interpretable data
-- **AI safety relevance** — bias auditing is a priority for EU AI Act compliance
-- **FactoryXChange EDIH alignment** — contributes to AI trustworthiness and explainability goals
-- **Publication potential** — cross-model attractor comparison is novel territory
-- **Clean methodology** — fully deterministic, reproducible, no training required
+- **High ratio of output to compute** — each ATR run produces rich, interpretable data per unit of GPU time
+- **Novel research territory** — cross-model attractor-landscape comparison has not been published; results either way (basins generalise predictably, basins generalise but unpredictably, or basins fail to generalise) are publishable findings
+- **Methodological cleanness** — fully deterministic at the same-machine level, no training required, reproducible in principle
+- **Conditional safety relevance** — *if* the central hypothesis (basin profiles reflect training-corpus thematic structure) generalises across models, ATR could offer a route to bias characterisation without training-data access. The cross-model programme is what would test this; the relevance is conditional on that test, not established by the GPT-2 Small results alone.
 
 ### 3f. Timeline
 
@@ -160,6 +160,7 @@ This is the bias question. Other methods tell you what the model does with a spe
 - [ ] T_mix_LLM measurement
 - [ ] Basin-sorted convergence matrix
 - [ ] Automated ATR pipeline (parameterisable model, prompt set, output directory)
+- [ ] SVD/spectral-gap prediction of per-head resonant states vs. observed convergence (scaffolded in `spectral_resonance.ipynb`; not yet run)
 
 ### Short-Term (Pre-HPC)
 - [ ] ATR on GPT-2 Medium/Large (validate scaling locally)
