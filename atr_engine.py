@@ -39,6 +39,59 @@ def get_top_tokens(model, resid_vector, k=5):
     return list(zip(tokens, top_probs.tolist()))
 
 
+def get_readout_detail(model, resid_vector, k=5):
+    """Confidence-aware readout for one residual vector (ATR-R1).
+
+    Complements get_top_tokens with the confidence metrics the concordance
+    audit (ATR-R3) needs: token IDs, the top-1 vs top-2 *logit* margin, and
+    the full-vocabulary softmax entropy (nats).
+
+    Args:
+        model: HookedTransformer model instance
+        resid_vector: [d_model] tensor — a single position's residual stream
+        k: number of top predictions to return
+
+    Returns:
+        dict with top_token_ids, top_token_strings, top_token_probs,
+        top_logit_margin (logit[top1] - logit[top2]), entropy.
+    """
+    normalized = model.ln_final(resid_vector)
+    logits = normalized @ model.W_U + model.b_U
+    probs = torch.softmax(logits, dim=-1)
+    top_probs, top_indices = torch.topk(probs, k)
+    top_logits = logits[top_indices]
+    ids = [int(idx) for idx in top_indices]
+    margin = float(top_logits[0] - top_logits[1]) if top_logits.numel() > 1 else 0.0
+    entropy = float(-(probs * torch.log(probs.clamp_min(1e-12))).sum())
+    return {
+        "top_token_ids": ids,
+        "top_token_strings": [model.tokenizer.decode([idx]) for idx in ids],
+        "top_token_probs": [float(p) for p in top_probs],
+        "top_logit_margin": margin,
+        "entropy": entropy,
+    }
+
+
+def position_argmax_ids(model, tensor):
+    """Argmax token id + decoded string for every position (ID-first trace, ATR-R2).
+
+    Vectorised over positions; argmax of logits equals argmax of softmax, so
+    the decoded strings match a per-position top-1 readout exactly.
+
+    Args:
+        model: HookedTransformer model instance
+        tensor: [seq_len, d_model] residual stream tensor
+
+    Returns:
+        (id_list, string_list) — token ids and their decoded strings per position.
+    """
+    normalized = model.ln_final(tensor)
+    logits = normalized @ model.W_U + model.b_U
+    id_list = [int(idx) for idx in logits.argmax(dim=-1)]
+    string_list = [model.tokenizer.decode([idx]) for idx in id_list]
+    return id_list, string_list
+
+
 def run_atr_loop(model, prompt, layer_start, layer_end, max_iter, schedule, verbose=True):
     """
     Activation Tensor Resonance loop: iteratively re-inject the ENTIRE 
@@ -84,10 +137,8 @@ def run_atr_loop(model, prompt, layer_start, layer_end, max_iter, schedule, verb
     # Record iteration 0 snapshot
     if 0 in schedule:
         top_tokens_last = get_top_tokens(model, last_vec)
-        all_pos_tokens = []
-        for pos in range(seq_len):
-            pos_top = get_top_tokens(model, current_tensor[pos, :], k=1)
-            all_pos_tokens.append(pos_top[0][0])
+        readout = get_readout_detail(model, last_vec)
+        all_pos_ids, all_pos_tokens = position_argmax_ids(model, current_tensor)
         snapshots.append({
             "iteration": 0,
             "tensor": current_tensor.clone().cpu(),
@@ -98,6 +149,13 @@ def run_atr_loop(model, prompt, layer_start, layer_end, max_iter, schedule, verb
             "tensor_norm": current_tensor.norm().item(),
             "top_tokens": top_tokens_last,
             "all_position_tokens": all_pos_tokens,
+            "top_token_ids_last": readout["top_token_ids"],
+            "top_token_strings_last": readout["top_token_strings"],
+            "top_token_probs_last": readout["top_token_probs"],
+            "top_logit_margin_last": readout["top_logit_margin"],
+            "entropy_last": readout["entropy"],
+            "all_position_token_ids": all_pos_ids,
+            "all_position_token_strings": all_pos_tokens,
             "cosine_sim_last": 1.0,
             "cosine_sim_mean": 1.0,
             "position_similarity": 1.0,
@@ -149,11 +207,9 @@ def run_atr_loop(model, prompt, layer_start, layer_end, max_iter, schedule, verb
             position_similarity = pos_sim_matrix[mask].mean().item()
             
             top_tokens_last = get_top_tokens(model, last_vec)
-            all_pos_tokens = []
-            for pos in range(seq_len):
-                pos_top = get_top_tokens(model, current_tensor[pos, :], k=1)
-                all_pos_tokens.append(pos_top[0][0])
-            
+            readout = get_readout_detail(model, last_vec)
+            all_pos_ids, all_pos_tokens = position_argmax_ids(model, current_tensor)
+
             snapshots.append({
                 "iteration": i,
                 "tensor": current_tensor.clone().cpu(),
@@ -164,6 +220,13 @@ def run_atr_loop(model, prompt, layer_start, layer_end, max_iter, schedule, verb
                 "tensor_norm": current_tensor.norm().item(),
                 "top_tokens": top_tokens_last,
                 "all_position_tokens": all_pos_tokens,
+                "top_token_ids_last": readout["top_token_ids"],
+                "top_token_strings_last": readout["top_token_strings"],
+                "top_token_probs_last": readout["top_token_probs"],
+                "top_logit_margin_last": readout["top_logit_margin"],
+                "entropy_last": readout["entropy"],
+                "all_position_token_ids": all_pos_ids,
+                "all_position_token_strings": all_pos_tokens,
                 "cosine_sim_last": cos_sim_last,
                 "cosine_sim_mean": cos_sim_mean,
                 "position_similarity": position_similarity,

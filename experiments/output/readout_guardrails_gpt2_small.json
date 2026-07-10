@@ -1,0 +1,300 @@
+{
+  "config": {
+    "model_name": "gpt2-small",
+    "prompt": "The cat sat on the mat and then",
+    "layer_start": 0,
+    "layer_end": 11,
+    "max_iter": 100,
+    "schedule": [
+      0,
+      2,
+      3,
+      5,
+      10,
+      20,
+      50,
+      100
+    ],
+    "high_cos_threshold": 0.995,
+    "low_margin_threshold": 0.2
+  },
+  "category_counts": {
+    "high_cos_low_margin": 1,
+    "high_cos_high_margin": 0,
+    "lower_cos": 7
+  },
+  "rows": [
+    {
+      "iteration": 0,
+      "cosine_sim_mean": 1.0,
+      "cosine_sim_last": 1.0,
+      "position_similarity": 1.0,
+      "top_token_id": 3114,
+      "top_token_string": " looked",
+      "top_token_prob": 0.0296137947589159,
+      "top_logit_margin": 0.07073497772216797,
+      "entropy": 6.00173807144165,
+      "all_position_token_ids": [
+        198,
+        717,
+        373,
+        319,
+        262,
+        4314,
+        11,
+        3114,
+        3114
+      ],
+      "all_position_token_strings": [
+        "\n",
+        " first",
+        " was",
+        " on",
+        " the",
+        " floor",
+        ",",
+        " looked",
+        " looked"
+      ],
+      "concordance_category": "high_cos_low_margin"
+    },
+    {
+      "iteration": 2,
+      "cosine_sim_mean": 0.783017635345459,
+      "cosine_sim_last": 0.8254053592681885,
+      "position_similarity": 0.9596139192581177,
+      "top_token_id": 262,
+      "top_token_string": " the",
+      "top_token_prob": 0.06369450688362122,
+      "top_logit_margin": 0.45520877838134766,
+      "entropy": 6.998056888580322,
+      "all_position_token_ids": [
+        198,
+        198,
+        198,
+        262,
+        262,
+        198,
+        262,
+        262,
+        262
+      ],
+      "all_position_token_strings": [
+        "\n",
+        "\n",
+        "\n",
+        " the",
+        " the",
+        "\n",
+        " the",
+        " the",
+        " the"
+      ],
+      "concordance_category": "lower_cos"
+    },
+    {
+      "iteration": 3,
+      "cosine_sim_mean": -0.7840666174888611,
+      "cosine_sim_last": -0.72947096824646,
+      "position_similarity": 0.946426510810852,
+      "top_token_id": 262,
+      "top_token_string": " the",
+      "top_token_prob": 0.011273467913269997,
+      "top_logit_margin": 0.37797069549560547,
+      "entropy": 9.499982833862305,
+      "all_position_token_ids": [
+        464,
+        198,
+        198,
+        262,
+        262,
+        13,
+        262,
+        262,
+        262
+      ],
+      "all_position_token_strings": [
+        "The",
+        "\n",
+        "\n",
+        " the",
+        " the",
+        ".",
+        " the",
+        " the",
+        " the"
+      ],
+      "concordance_category": "lower_cos"
+    },
+    {
+      "iteration": 5,
+      "cosine_sim_mean": -0.16786932945251465,
+      "cosine_sim_last": -0.14338275790214539,
+      "position_similarity": 0.992950439453125,
+      "top_token_id": 2796,
+      "top_token_string": " fem",
+      "top_token_prob": 0.01897704228758812,
+      "top_logit_margin": 0.034554481506347656,
+      "entropy": 8.576099395751953,
+      "all_position_token_ids": [
+        1077,
+        2294,
+        2294,
+        2294,
+        2294,
+        2294,
+        2294,
+        2294,
+        2796
+      ],
+      "all_position_token_strings": [
+        "ash",
+        " Canad",
+        " Canad",
+        " Canad",
+        " Canad",
+        " Canad",
+        " Canad",
+        " Canad",
+        " fem"
+      ],
+      "concordance_category": "lower_cos"
+    },
+    {
+      "iteration": 10,
+      "cosine_sim_mean": 0.6048592329025269,
+      "cosine_sim_last": 0.6115343570709229,
+      "position_similarity": 0.9992978572845459,
+      "top_token_id": 2449,
+      "top_token_string": " Ag",
+      "top_token_prob": 0.0782456174492836,
+      "top_logit_margin": 1.0760211944580078,
+      "entropy": 6.3155837059021,
+      "all_position_token_ids": [
+        2449,
+        2449,
+        2449,
+        2449,
+        2449,
+        2449,
+        2449,
+        2449,
+        2449
+      ],
+      "all_position_token_strings": [
+        " Ag",
+        " Ag",
+        " Ag",
+        " Ag",
+        " Ag",
+        " Ag",
+        " Ag",
+        " Ag",
+        " Ag"
+      ],
+      "concordance_category": "lower_cos"
+    },
+    {
+      "iteration": 20,
+      "cosine_sim_mean": 0.9731958508491516,
+      "cosine_sim_last": 0.972964346408844,
+      "position_similarity": 0.9999971389770508,
+      "top_token_id": 12169,
+      "top_token_string": " Zero",
+      "top_token_prob": 0.06799294799566269,
+      "top_logit_margin": 0.7551069259643555,
+      "entropy": 6.035229682922363,
+      "all_position_token_ids": [
+        12169,
+        12169,
+        12169,
+        12169,
+        12169,
+        12169,
+        12169,
+        12169,
+        12169
+      ],
+      "all_position_token_strings": [
+        " Zero",
+        " Zero",
+        " Zero",
+        " Zero",
+        " Zero",
+        " Zero",
+        " Zero",
+        " Zero",
+        " Zero"
+      ],
+      "concordance_category": "lower_cos"
+    },
+    {
+      "iteration": 50,
+      "cosine_sim_mean": 0.6700909733772278,
+      "cosine_sim_last": 0.6700913906097412,
+      "position_similarity": 0.9999998807907104,
+      "top_token_id": 13009,
+      "top_token_string": " Divine",
+      "top_token_prob": 0.40396639704704285,
+      "top_logit_margin": 2.411257743835449,
+      "entropy": 3.97092342376709,
+      "all_position_token_ids": [
+        13009,
+        13009,
+        13009,
+        13009,
+        13009,
+        13009,
+        13009,
+        13009,
+        13009
+      ],
+      "all_position_token_strings": [
+        " Divine",
+        " Divine",
+        " Divine",
+        " Divine",
+        " Divine",
+        " Divine",
+        " Divine",
+        " Divine",
+        " Divine"
+      ],
+      "concordance_category": "lower_cos"
+    },
+    {
+      "iteration": 100,
+      "cosine_sim_mean": 0.6775649189949036,
+      "cosine_sim_last": 0.6775647401809692,
+      "position_similarity": 1.0,
+      "top_token_id": 13009,
+      "top_token_string": " Divine",
+      "top_token_prob": 0.45356908440589905,
+      "top_logit_margin": 1.9122848510742188,
+      "entropy": 3.303433895111084,
+      "all_position_token_ids": [
+        13009,
+        13009,
+        13009,
+        13009,
+        13009,
+        13009,
+        13009,
+        13009,
+        13009
+      ],
+      "all_position_token_strings": [
+        " Divine",
+        " Divine",
+        " Divine",
+        " Divine",
+        " Divine",
+        " Divine",
+        " Divine",
+        " Divine",
+        " Divine"
+      ],
+      "concordance_category": "lower_cos"
+    }
+  ]
+}

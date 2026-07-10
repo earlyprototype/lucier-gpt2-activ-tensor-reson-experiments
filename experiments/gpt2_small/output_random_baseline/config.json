@@ -1,0 +1,25 @@
+{
+  "experiment": "EXP_009d3_random_baseline",
+  "n_trials": 125,
+  "seed": 42,
+  "schedule": [
+    0,
+    2,
+    3,
+    5,
+    10,
+    20,
+    50,
+    100
+  ],
+  "layers": "0->11",
+  "d_model": 768,
+  "calibration": {
+    "mean_norm": 397.17687817382813,
+    "std_norm": 43.860541764212016,
+    "mean_seq_len": 10,
+    "min_seq_len": 2,
+    "max_seq_len": 25
+  },
+  "device": "cpu"
+}
