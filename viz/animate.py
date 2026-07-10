@@ -81,7 +81,7 @@ def anim1_reveal(terminals, n=210):
 # anim3 : velocity field -- particles flowing downhill into the basins
 # --------------------------------------------------------------------------
 def anim3_flow(paths, terminals, n=240):
-    X, Y, Z, xs, ys, facecolors, xy, basins, vel = build_velocity_surface(
+    X, Y, Z, xs, ys, facecolors, xy, basins, _vel = build_velocity_surface(
         paths, terminals, g=200)
 
     # gradient of the surface for downhill flow
@@ -145,7 +145,8 @@ def per_iter_stats(paths):
     """For each scheduled iteration return: basin commit counts, the modal
     top-token (what the 'room' is muttering) and its unison fraction."""
     from collections import Counter
-    n = len(ITERS); total = len(paths)
+    n = len(ITERS)
+    total = len(paths)
     counts = [{b: 0 for b in BASINS} for _ in range(n)]
     modal, unison = [], []
     for k in range(n):
@@ -158,9 +159,11 @@ def per_iter_stats(paths):
                 counts[k][t] += 1
         if cnt:
             tok, c = cnt.most_common(1)[0]
-            modal.append(tok); unison.append(c / total)
+            modal.append(tok)
+            unison.append(c / total)
         else:
-            modal.append(""); unison.append(0.0)
+            modal.append("")
+            unison.append(0.0)
     return counts, total, modal, unison
 
 
@@ -196,7 +199,9 @@ def anim2_evolve(paths):
     frames = len(s_tl)
 
     def lerp_node(arr, s):
-        lo = int(np.floor(s)); hi = min(lo + 1, n_seg); f = s - lo
+        lo = int(np.floor(s))
+        hi = min(lo + 1, n_seg)
+        f = s - lo
         return arr[lo] * (1 - f) + arr[hi] * f
 
     fig = plt.figure(figsize=(9, 8))
@@ -213,13 +218,16 @@ def anim2_evolve(paths):
     with imageio.get_writer(path, fps=FPS, codec="libx264", quality=8,
                             macro_block_size=16) as w:
         for i, s in enumerate(s_tl):
-            lo = int(np.floor(s)); hi = min(lo + 1, n_seg); f = ease(s - lo)
+            lo = int(np.floor(s))
+            hi = min(lo + 1, n_seg)
+            f = ease(s - lo)
             depths = {b: depth_keys[lo][b] * (1 - f) + depth_keys[hi][b] * f
                       for b in BASINS}
             X, Y, Z, fc = make_wells(depths, g=220, mono=CYAN)
 
             # standing-wave churn: amplitude = unison * (1 - committed)
-            u = lerp_node(unison, s); cm = lerp_node(committed, s)
+            u = lerp_node(unison, s)
+            cm = lerp_node(committed, s)
             amp = 0.085 * u * (1 - cm)
             ph = i * 0.30
             churn = (np.sin(1.7 * X + ph) * np.sin(1.3 * Y - 0.7 * ph)
@@ -280,7 +288,9 @@ def anim2_gallery(paths, speed=4):
     ev = len(s_tl)
 
     def lerp_node(arr, s):
-        lo = int(np.floor(s)); hi = min(lo + 1, n_seg); ff = s - lo
+        lo = int(np.floor(s))
+        hi = min(lo + 1, n_seg)
+        ff = s - lo
         return arr[lo] * (1 - ff) + arr[hi] * ff
 
     Xf, Yf, Zf, fcf = make_wells(depth_keys[-1], g=220, mono=CYAN)
@@ -295,8 +305,10 @@ def anim2_gallery(paths, speed=4):
             + [("spin", j) for j in range(spin)])
     Nf = len(spec)
 
-    fdir = OUT / "_frames"
-    fdir.mkdir(exist_ok=True)
+    # cache dir is namespaced by the render parameters so a resumed run never
+    # reuses frames from a differently-configured render
+    fdir = OUT / f"_frames_s{speed}_n{Nf}"
+    fdir.mkdir(parents=True, exist_ok=True)
     fig = plt.figure(figsize=(9, 8))
     ax = fig.add_subplot(111, projection="3d")
 
@@ -313,19 +325,24 @@ def anim2_gallery(paths, speed=4):
         if fp.exists():
             continue
         if kind == "form":
-            i = a; s = s_tl[i]
-            lo = int(np.floor(s)); hi = min(lo + 1, n_seg); f = ease(s - lo)
+            i = a
+            s = s_tl[i]
+            lo = int(np.floor(s))
+            hi = min(lo + 1, n_seg)
+            f = ease(s - lo)
             depths = {b: depth_keys[lo][b] * (1 - f) + depth_keys[hi][b] * f
                       for b in BASINS}
             X, Y, Z, fc = make_wells(depths, g=220, mono=CYAN)
-            u = lerp_node(unison, s); cm = lerp_node(committed, s)
+            u = lerp_node(unison, s)
+            cm = lerp_node(committed, s)
             amp = 0.085 * u * (1 - cm)
             ph = i * 0.30 / speed
             churn = (np.sin(1.7 * X + ph) * np.sin(1.3 * Y - 0.7 * ph)
                      + 0.6 * np.sin(2.6 * X - 1.1 * ph) * np.sin(2.1 * Y + ph))
             Z = Z + amp * churn
             strength = amp / 0.085
-            cr = np.clip(churn, 0, None); cr = (cr / (cr.max() + 1e-9))[..., None]
+            cr = np.clip(churn, 0, None)
+            cr = (cr / (cr.max() + 1e-9))[..., None]
             fc = fc.copy()
             fc[..., :3] = np.clip(fc[..., :3] + 0.60 * strength * cr * CYAN, 0, 1)
             draw(X, Y, Z, fc, 40, -55 + 18 * (i / (ev - 1)))

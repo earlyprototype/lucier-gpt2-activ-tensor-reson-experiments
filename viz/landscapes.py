@@ -25,7 +25,14 @@ from scipy.ndimage import gaussian_filter
 from sklearn.manifold import MDS
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-STAGE1 = ROOT / "B_AttractorDominance" / "output_stage1"
+# Stage-1 artifacts moved in the cross-model restructure; support both layouts
+# so this module works on either side of that merge.
+_STAGE1_CANDIDATES = [
+    ROOT / "experiments" / "gpt2_small" / "output",
+    ROOT / "B_AttractorDominance" / "output_stage1",
+]
+STAGE1 = next((p for p in _STAGE1_CANDIDATES if (p / "hypothesis_assessment.md").exists()),
+              _STAGE1_CANDIDATES[0])
 OUT = ROOT / "viz" / "out"
 OUT.mkdir(parents=True, exist_ok=True)
 
@@ -105,7 +112,9 @@ def style_3d(ax):
     for axis in (ax.xaxis, ax.yaxis, ax.zaxis):
         axis._axinfo["grid"]["color"] = (1, 1, 1, 0.04)
         axis.line.set_color((1, 1, 1, 0.08))
-    ax.set_xticks([]); ax.set_yticks([]); ax.set_zticks([])
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_zticks([])
 
 
 # --------------------------------------------------------------------------
@@ -197,9 +206,8 @@ def fig1_population_wells(terminals):
                         fontsize=9, fontweight="bold")
     fig.suptitle("#1  Basin-population wells  ·  depth = share of 125 prompts captured",
                  color="#e8eaf0", fontsize=14, y=0.96)
-    fig.text(0.5, 0.04,
-             "prolet 44  ·  Divine 34  ·  Anarch 26  ·  till 19  ·  solidarity 2     "
-             "(exact, from hypothesis_assessment.md)",
+    footer = "  ·  ".join(f"{b} {counts[b]}" for b in BASINS)
+    fig.text(0.5, 0.04, f"{footer}     (exact, from hypothesis_assessment.md)",
              ha="center", color="#7d8295", fontsize=9)
     p = OUT / "01_population_wells.png"
     fig.savefig(p, dpi=130, bbox_inches="tight")
@@ -259,7 +267,8 @@ def fig2_density_terrain(paths, terminals):
     for b, c in cents.items():
         d = (X - c[0]) ** 2 + (Y - c[1]) ** 2
         m = d < best
-        best[m] = d[m]; owner[m] = b
+        best[m] = d[m]
+        owner[m] = b
     for b in cents:
         rgba = np.array(matplotlib.colors.to_rgba(BASIN_COLOR[b]))
         facecolors[owner == b] = rgba
@@ -313,10 +322,12 @@ def build_velocity_surface(paths, terminals, g=260):
     ys = np.linspace(-3.4, 3.4, g)
     X, Y = np.meshgrid(xs, ys)
     # interpolate velocity over the plane (Shepard / inverse-distance)
-    Z = np.zeros_like(X); Wsum = np.zeros_like(X)
+    Z = np.zeros_like(X)
+    Wsum = np.zeros_like(X)
     for (px, py), v in zip(xy, vel):
         wd = 1.0 / (((X - px) ** 2 + (Y - py) ** 2) + 0.15)
-        Z += wd * v; Wsum += wd
+        Z += wd * v
+        Wsum += wd
     Z = Z / Wsum
     Z = gaussian_filter(Z, 3.0)
     Z -= Z.min()
@@ -333,7 +344,7 @@ def fig3_velocity_field(paths, terminals):
     ax = fig.add_subplot(111, projection="3d")
     ax.plot_surface(X, Y, Z, facecolors=facecolors, rstride=2, cstride=2,
                     linewidth=0, antialiased=True, shade=False)
-    for (px, py), b, v in zip(xy, basins, vel):
+    for (px, py), b, _v in zip(xy, basins, vel):
         zi = np.interp(px, xs, Z[np.argmin(np.abs(ys - py))])
         ax.scatter(px, py, zi + 0.02, color=BASIN_COLOR[b], s=16,
                    edgecolors="white", linewidths=0.3, depthshade=False)
