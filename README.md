@@ -14,6 +14,18 @@ Inspired by Alvin Lucier's iterative feedback composition *I Am Sitting in a Roo
 
 ---
 
+## The Findings, Briefly
+
+*For readers who want the results before the piece. The full record, every number and every caveat: [FINDINGS.md](docs/FINDINGS.md).*
+
+- GPT-2 Small resolves 125 language prompts into **five attractor basins**, classified at convergence: `prolet` 43.2%, `Divine` 27.2%, `till` 15.2%, `Anarch` 13.6%, `solidarity` 0.8% — four of the five semantically coherent in embedding space.
+- The founding hypothesis — basins as a **thematic fingerprint of the training corpus**, readable from any model — was **refuted by its own validation programme**: GPT-2 Medium, trained on the *same* corpus, collapses every prompt to the single token `D`; Pythia-160m funnels into `questioned`; Pythia-410m never consolidates at all.
+- A null control relocated the basins: **pure noise converges into 18 non-semantic attractors** with no overlap with the real five. The basins belong to the *language-driven regime* of the model, not to the weights in general.
+- The 34 prompts that never converge are exactly the 34 `Divine` prompts — a **stable readout over a never-settling tensor**, the study's sharpest dissociation of dynamics from decoding.
+- What survives the refutation: a cheap, training-free **probe of iterated-dynamics regimes** that cleanly separates four models into four qualitatively different landscapes — and one open anomaly: *why GPT-2 Small alone resolves language into semantic basins.*
+
+---
+
 ## The Inspiration
 
 <p align="center">

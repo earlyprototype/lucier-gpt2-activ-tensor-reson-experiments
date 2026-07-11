@@ -1,5 +1,29 @@
 # ATR — Findings (Canonical Record)
 
+## Abstract
+
+Activation Tensor Resonance (ATR) iterates a transformer's full residual-stream
+tensor back through its own forward pass — extract at the final layer,
+L2-rescale, re-inject at layer 0 — until the state stabilises. On GPT-2 Small,
+125 language prompts resolve into five attractor basins (`prolet` 43.2%,
+`Divine` 27.2%, `till` 15.2%, `Anarch` 13.6%, `solidarity` 0.8%, classified at
+convergence), four of them semantically coherent in embedding space. The
+founding hypothesis — that these basins constitute a thematic fingerprint of
+the training corpus, readable from any open-weight model — was refuted by the
+project's own validation series: GPT-2 Medium, trained on the same corpus,
+collapses all prompts to a single empty token; the Pythia models produce
+unrelated landscapes; and a random-noise control converges to eighteen
+non-semantic attractors disjoint from the five, locating the basins in the
+language-driven regime rather than the weight geometry per se. Diagnostics
+attribute the cross-model differences to intrinsic model dynamics, not
+apparatus. What remains is a cheap, training-free probe of iterated-dynamics
+regimes, one sharp dissociation between dynamics and decoding (the `Divine`
+basin: stable readout over a never-settling tensor), and one open anomaly:
+why GPT-2 Small — alone in this set — resolves language into few, semantic,
+high-confidence attractors.
+
+---
+
 **Scope:** Complete record of the ATR experimental series as of 2026-07-10: Stage 0
 (repeatability) through Stage 5 (convergence-gated re-sweep), across GPT-2 Small,
 GPT-2 Medium, Pythia-160m, and Pythia-410m, plus a random-noise null model and
@@ -143,3 +167,26 @@ Small's five semantically coherent, language-specific attractor basins.
 Open directions, in rough order of leverage: why GPT-2 Small (the anomaly); the
 `Divine` object (F2); hook-window/depth dependence (caveat 6); the pending statistics
 (caveats 4, 5); H4.
+
+## 6. Stage boundary — why the series closed with work unexecuted
+
+The series was scoped by a question, not a task list: *is the GPT-2 Small result
+real, and does the fingerprint hypothesis survive validation?* Both parts are now
+answered (yes; no) and published. Work that was planned but not executed falls into
+three classes, deliberately:
+
+1. **Retired with the hypothesis.** The large cross-model scaling programme and
+   bias-profiling work (ATR_METHOD_COMPARISON §3) existed to extend the fingerprint
+   claim. The claim was refuted before they ran; executing them for that purpose
+   would have been waste. They survive only as re-motivated characterisation work.
+2. **Transferred to the next question.** The depth control (caveat 6), per-layer /
+   per-head decomposition, the spectral test (H4), and readout upgrades do not test
+   whether the result is real — they test *why the models differ*. That is the
+   successor project's question. Their scaffolds are retained, labelled not-run, as
+   pre-registration.
+3. **Declared debt.** Two items belong to this series' question and remain open:
+   the W_E permutation test (caveat 4) and finer convergence-gate cadence
+   (caveat 5). Neither can overturn a principal finding — the refutation stands on
+   GPT-2 Medium regardless of the permutation test, and the basin identities stand
+   on the gate regardless of cadence — so the series closes with them declared
+   rather than resolved.
