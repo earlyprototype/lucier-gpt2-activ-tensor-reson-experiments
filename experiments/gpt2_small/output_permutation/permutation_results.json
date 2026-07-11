@@ -1,0 +1,28 @@
+{
+  "design": {
+    "n_permutations": 10000,
+    "set_size": 14,
+    "seed": 1969,
+    "sampling": "uniform over full vocab, without replacement per set"
+  },
+  "observed": {
+    "n_pairs": 91,
+    "all_positive": true,
+    "min": 0.18105876445770264,
+    "mean": 0.2880174517631531,
+    "max": 0.470275342464447
+  },
+  "null": {
+    "S1_all_positive_count": 9994,
+    "S1_p": 0.9994000599940006,
+    "S2_min_geq_observed_count": 1674,
+    "S2_p": 0.16748325167483252,
+    "S3_mean_geq_observed_count": 989,
+    "S3_p": 0.098990100989901,
+    "random_min_median": 0.15827921777963638,
+    "random_mean_median": 0.267510786652565
+  },
+  "context": {
+    "global_mean_pairwise_cosine": 0.26826903223991394
+  }
+}

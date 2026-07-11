@@ -49,6 +49,7 @@ exploratory work: 2026-03. Method specification: [TECHNICAL.md](TECHNICAL.md).
 | 5 | Convergence-gated re-sweep | gpt2-small | 125 prompts, gate cos>0.999×3, ≤1000 iters | `experiments/gpt2_small/output_gated/` |
 | — | Tensor convergence diagnostic | all four | reads runs 1–2 | `experiments/cos_sim_diagnostic.ipynb` |
 | — | Readout confidence audit | gpt2-small | single-prompt demo | `experiments/output/readout_guardrails_gpt2_small.json` |
+| — | All-warm permutation test | gpt2-small (W_E) | 10,000 random 14-token sets | `experiments/gpt2_small/output_permutation/` |
 
 ## 2. Principal findings
 
@@ -125,7 +126,7 @@ Three attribution results ([SCALING_ARTEFACT_ANALYSIS.md](SCALING_ARTEFACT_ANALY
 | H0 | Results are deterministic | **Repeatability supported** (N=2, same machine, identical terminal basins; intermediate paths float-sensitive). Independent reproduction not attempted. |
 | H1 | `prolet` is the dominant basin | **Supported, revised upward** — 43.2% at lock-in (was 35.2% at iter 100). Per-prompt category predictions remained poor (~25%); the structural claim stands, the predictive one does not. |
 | H2 | `Divine` is a genuine secondary basin | **Supported with qualification** — 27.2%, but it is a readout-stable/tensor-unsettled object (F2), unlike the other four. |
-| H3 | Intermediate tokens reflect training-corpus topology | **Partially supported, generality refuted** — 4/5 basin tokens cluster semantically in W_E (permutation test still pending), but the corpus-causal reading fails cross-model (F3). |
+| H3 | Intermediate tokens reflect training-corpus topology | **Weakened further at close** — the all-warm cross-similarity matrix was permutation-tested and found to be an anisotropy artifact (99.9% of random 14-token sets are also all-positive; see caveat 4, resolved). The local semantic-neighbourhood observation (4/5 basins) stands as qualitative only. The corpus-causal reading had already failed cross-model (F3). |
 | H4 | Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector) | **Untested** — protocol scaffolded (`experiments/gpt2_small/spectral_resonance.ipynb`), not run. |
 | H-fingerprint | Basin profiles read training-data bias without data access | **Refuted as stated** (F3, F4). |
 | H-till | `till` is a slow transient | **Refuted** (F1: 19/19 stable). |
@@ -139,9 +140,13 @@ Three attribution results ([SCALING_ARTEFACT_ANALYSIS.md](SCALING_ARTEFACT_ANALY
 3. **Deep-convergence subset.** The 1000-iteration Pythia-410m run used 8 prompts
    (CPU constraint). Direction matches the 125-prompt evidence at 250 iterations, but
    the subset is small.
-4. **W_E permutation test pending.** The semantic-clustering claim (H3) rests on
-   neighbourhood inspection plus an all-positive cross-similarity matrix (91/91 pairs,
-   0.18–0.47); the designed random-token-set permutation test has not been run.
+4. **W_E permutation test — RESOLVED (2026-07-11), negative.** The all-warm
+   cross-similarity matrix (91/91 pairs positive, 0.18–0.47) is an anisotropy
+   artifact: 9,994/10,000 random 14-token sets are also all-positive, and the
+   global mean pairwise cosine of the embedding space is 0.268 vs the observed
+   set's 0.288 (S2 p=0.167, S3 p=0.099). The compact-subspace interpretation is
+   withdrawn. The local semantic-neighbourhood observation remains qualitative.
+   Record: `experiments/gpt2_small/output_permutation/`.
 5. **Gate cadence.** Lock-in iterations cluster at 120 because that is the gate's
    earliest possible firing; true settling times between 100 and 120 are unresolved.
 6. **Hook-position dependence unexplored.** All runs cut the loop at
@@ -184,9 +189,8 @@ three classes, deliberately:
    whether the result is real — they test *why the models differ*. That is the
    successor project's question. Their scaffolds are retained, labelled not-run, as
    pre-registration.
-3. **Declared debt.** Two items belong to this series' question and remain open:
-   the W_E permutation test (caveat 4) and finer convergence-gate cadence
-   (caveat 5). Neither can overturn a principal finding — the refutation stands on
-   GPT-2 Medium regardless of the permutation test, and the basin identities stand
-   on the gate regardless of cadence — so the series closes with them declared
-   rather than resolved.
+3. **Declared debt.** One item remains open: finer convergence-gate cadence
+   (caveat 5). It cannot overturn a principal finding — basin identities stand on
+   the gate regardless of cadence. (The other declared item, the W_E permutation
+   test, was paid at close: negative — see caveat 4. It withdrew the all-warm
+   supporting evidence for H3 without touching F1–F5.)

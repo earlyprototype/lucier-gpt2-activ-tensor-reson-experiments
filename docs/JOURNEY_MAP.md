@@ -66,7 +66,7 @@
 | 6 | Basin attractors cluster semantically in W_E | Session 01 | prolet→political philosophy, Divine→theology, Anarch→political, solidarity→collective action |
 | 7 | `capit` = capitulation, not capitalism | Session 01 | Nearest neighbours: surrender, succumb, acquiesce |
 | 8 | Dissolution has a structural→semantic phase transition | Session 01 | Early tokens generic (BPE/typographic), late tokens semantic |
-| 9 | All attractor tokens occupy same compact subspace (all-warm matrix) | Session 01 | Cross-similarity 0.18–0.47, no negative values |
+| 9 | All attractor tokens occupy same compact subspace (all-warm matrix) | Session 01 | Cross-similarity 0.18–0.47, no negative values. *Retired 2026-07-11: permutation test shows this is embedding-space anisotropy, not a special subspace.* |
 | 10 | The all-warm property is consistent with a compact "thematic-centre-of-mass" interpretation | Session 02 | All 91 off-diagonal pairs positively correlated in W_E (0.18–0.47). *Series close: the cross-model evidence arrived and refuted the corpus-causal reading (see 13); permutation test still pending.* |
 | 11 | All normalised transformers must have basins (Brouwer fixed-point theorem) | Session 02 | Continuous map on compact set (LayerNorm bounds) — existence guaranteed; count and shape are empirical questions |
 | 12 | Basin landscapes are model-specific, not corpus-tracking | Cross-model (2026-07) | Same corpus (WebText): Small → 5 semantic basins; Medium → 1 empty token |
@@ -176,7 +176,7 @@ The bottleneck is always phase 2. Automation of interpretation is the scaling ch
 | Why does GPT-2 Small — alone in this set — resolve language into few semantic basins? | **The open question of the series** | New experimental stage |
 | What is the `Divine` object — limit cycle, wandering attractor, decode-region plateau? | Open (FINDINGS.md F2) | Confidence audit at scale; trajectory analysis |
 | Does the landscape depend on where the loop is cut (layer window / depth)? | Designed, not run | Pythia-410m depth control (0–11 vs 0–23); window sweeps |
-| W_E semantic-clustering statistics | Pending | Permutation test over random token sets |
+| ~~W_E semantic-clustering statistics~~ | Answered (2026-07-11): all-warm matrix is an anisotropy artifact — 99.9% of random 14-token sets are also all-positive; compact-subspace reading withdrawn. Neighbourhood claim remains qualitative | — |
 | True lock-in iterations (gate fired at its floor, 120) | Pending | Finer gate cadence |
 | What is T_mix_LLM for each basin? | Measurable from existing data | Compute from `.pt` |
 | Are all basins in one Slonski macro-group? | Predicted (from all-warm) | One Q-vector experiment |

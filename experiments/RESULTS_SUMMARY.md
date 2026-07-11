@@ -281,6 +281,23 @@ for the ATR-R1/R3 confidence audit (Notebook 2's machinery) — is its readout h
 throughout while the tensor wanders? Also: 120 is the *floor* of the gate (first possible
 lock-in); a finer check cadence would show the true settling iteration for each prompt.
 
+## 6. `02b_permutation_test.py` — all-warm matrix null (post-close, 2026-07-11)
+
+**What ran:** the pre-registered permutation test for the all-warm cross-similarity
+finding (FINDINGS caveat 4). 10,000 random 14-token sets vs the canonical 5 basin +
+9 waypoint tokens in W_E. Seed 1969. Reproduction gate passed (observed: 91/91
+positive, min 0.181, mean 0.288, max 0.470 — matches the March record).
+
+**Headline numbers:** S1 (all-positive): 9,994/10,000 random sets, p≈1.0.
+S2 (min ≥ observed): p=0.167. S3 (mean ≥ observed): p=0.099. Global mean pairwise
+cosine of the embedding space: 0.268.
+
+**Decides:** the all-warm property is an **anisotropy artifact** — nearly any 14
+tokens in GPT-2 Small's embedding space are all-warm. The compact
+"thematic-centre-of-mass subspace" interpretation is withdrawn. The local
+semantic-neighbourhood observation is out of scope of this test and stands as
+qualitative. Full report: `gpt2_small/output_permutation/permutation_report.md`.
+
 ## Synthesis
 
 **The cross-model differences are intrinsic model properties, not readout artefacts.**
