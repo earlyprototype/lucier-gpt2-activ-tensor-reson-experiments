@@ -1,0 +1,282 @@
+{
+ "meta": {
+  "issue": 14,
+  "date": "2026-07-19",
+  "base_iteration": 1000,
+  "n_continuation_iters": 24,
+  "n_dense_iterates": 25,
+  "max_lag": 8,
+  "threshold": 0.999,
+  "threshold_source": "atr_engine.run_atr_gated default (gated_resweep.py ran the 125-prompt sweep at the same value)",
+  "gate_lag_default": 1,
+  "gate_metric": "cos_sim_mean: cosine between mean vectors of iterates gate_lag apart (lag tables for the last vector are recorded alongside)",
+  "source_states": [
+   "output_divine_motion/state_divine.pt",
+   "output_divine_motion/state_prolet.pt",
+   "output_divine_motion/state_noise.pt"
+  ],
+  "sanity_gate": {
+   "cos_A_fA": 0.6849116683006287,
+   "cos_A_ffA": 1.0,
+   "expected_cosAB": 0.6849116683006287,
+   "expected_cosAA2": 1.0,
+   "tol_lag1": 0.005,
+   "min_lag2": 0.9999,
+   "passed": true
+  }
+ },
+ "runs": {
+  "Divine_Syntactic": {
+   "prompt": "The cat sat on the mat and then the",
+   "lag_mean_cos_meanvec": {
+    "1": 0.6849116683006287,
+    "2": 1.0,
+    "3": 0.6849116683006287,
+    "4": 1.0,
+    "5": 0.6849116683006287,
+    "6": 1.0,
+    "7": 0.6849116683006287,
+    "8": 1.0
+   },
+   "lag_mean_cos_lastvec": {
+    "1": 0.6849115490913391,
+    "2": 1.0,
+    "3": 0.6849116683006287,
+    "4": 1.0,
+    "5": 0.6849116683006287,
+    "6": 1.0,
+    "7": 0.6849116683006287,
+    "8": 1.0
+   },
+   "lag_min_cos_meanvec": {
+    "1": 0.6849113702774048,
+    "2": 0.9999998807907104,
+    "3": 0.6849114298820496,
+    "4": 0.9999998807907104,
+    "5": 0.6849113702774048,
+    "6": 0.9999998807907104,
+    "7": 0.6849113702774048,
+    "8": 0.9999998807907104
+   },
+   "passes_at_lag": {
+    "1": false,
+    "2": true,
+    "3": false,
+    "4": true,
+    "5": false,
+    "6": true,
+    "7": false,
+    "8": true
+   },
+   "smallest_passing_lag": 2,
+   "final_lag1_pairs": [
+    {
+     "iter_from": 1020,
+     "iter_to": 1021,
+     "cos_last": 0.6849117279052734,
+     "l2_last": 1249.427978515625
+    },
+    {
+     "iter_from": 1021,
+     "iter_to": 1022,
+     "cos_last": 0.6849117875099182,
+     "l2_last": 1249.427978515625
+    },
+    {
+     "iter_from": 1022,
+     "iter_to": 1023,
+     "cos_last": 0.6849116086959839,
+     "l2_last": 1249.4285888671875
+    },
+    {
+     "iter_from": 1023,
+     "iter_to": 1024,
+     "cos_last": 0.6849113702774048,
+     "l2_last": 1249.4287109375
+    }
+   ],
+   "final_readout": {
+    "top1": " Divine",
+    "top1_id": 13009,
+    "top1_prob": 0.5046374797821045,
+    "entropy_nats": 3.050010919570923
+   },
+   "phase_readouts": {
+    "iter_1023_phase_B": {
+     "top1": " Divine",
+     "top1_id": 13009,
+     "top1_prob": 0.22520287334918976,
+     "entropy_nats": 4.617503643035889
+    },
+    "iter_1024_phase_A": {
+     "top1": " Divine",
+     "top1_id": 13009,
+     "top1_prob": 0.5046374797821045,
+     "entropy_nats": 3.050010919570923
+    }
+   },
+   "regate_verdict": {
+    "gate_lag": 2,
+    "threshold": 0.999,
+    "mean_cos_at_lag_2": 1.0,
+    "min_cos_at_lag_2": 0.9999998807907104,
+    "mean_cos_at_lag_1": 0.6849116683006287,
+    "converged_at_gate_lag_2": true,
+    "converged_at_gate_lag_1": false,
+    "note": "every lag-2 pair in the window clears the threshold, so any patience/check_every schedule locks in; at lag 1 the cosine is pinned at cos(A, B) and can never pass"
+   }
+  },
+  "Control_prolet_Semantic": {
+   "prompt": "The Eiffel Tower is located in the city of",
+   "lag_mean_cos_meanvec": {
+    "1": 1.0,
+    "2": 1.0,
+    "3": 1.0,
+    "4": 1.0,
+    "5": 1.0,
+    "6": 1.0,
+    "7": 1.0,
+    "8": 1.0
+   },
+   "lag_mean_cos_lastvec": {
+    "1": 1.0,
+    "2": 1.0,
+    "3": 1.0,
+    "4": 1.0,
+    "5": 1.0,
+    "6": 0.9999998807907104,
+    "7": 1.0,
+    "8": 1.0
+   },
+   "lag_min_cos_meanvec": {
+    "1": 0.9999998807907104,
+    "2": 0.9999998807907104,
+    "3": 0.9999998807907104,
+    "4": 0.9999998807907104,
+    "5": 0.9999998807907104,
+    "6": 0.9999998807907104,
+    "7": 0.9999998807907104,
+    "8": 0.9999998807907104
+   },
+   "passes_at_lag": {
+    "1": true,
+    "2": true,
+    "3": true,
+    "4": true,
+    "5": true,
+    "6": true,
+    "7": true,
+    "8": true
+   },
+   "smallest_passing_lag": 1,
+   "final_lag1_pairs": [
+    {
+     "iter_from": 1020,
+     "iter_to": 1021,
+     "cos_last": 0.9999998807907104,
+     "l2_last": 0.00043050211388617754
+    },
+    {
+     "iter_from": 1021,
+     "iter_to": 1022,
+     "cos_last": 0.9999999403953552,
+     "l2_last": 0.0003179260529577732
+    },
+    {
+     "iter_from": 1022,
+     "iter_to": 1023,
+     "cos_last": 0.9999999403953552,
+     "l2_last": 0.00037714140489697456
+    },
+    {
+     "iter_from": 1023,
+     "iter_to": 1024,
+     "cos_last": 0.9999999403953552,
+     "l2_last": 0.00024977096472866833
+    }
+   ],
+   "final_readout": {
+    "top1": " prolet",
+    "top1_id": 22758,
+    "top1_prob": 0.0858367308974266,
+    "entropy_nats": 5.067375183105469
+   }
+  },
+  "Control_noise": {
+   "prompt": null,
+   "lag_mean_cos_meanvec": {
+    "1": 0.9999961853027344,
+    "2": 0.9999851584434509,
+    "3": 0.9999668598175049,
+    "4": 0.999941349029541,
+    "5": 0.9999088048934937,
+    "6": 0.9998695850372314,
+    "7": 0.9998235702514648,
+    "8": 0.9997708797454834
+   },
+   "lag_mean_cos_lastvec": {
+    "1": 0.9999961853027344,
+    "2": 0.9999852180480957,
+    "3": 0.9999668598175049,
+    "4": 0.9999412298202515,
+    "5": 0.9999088048934937,
+    "6": 0.9998695850372314,
+    "7": 0.9998235702514648,
+    "8": 0.9997708797454834
+   },
+   "lag_min_cos_meanvec": {
+    "1": 0.999995231628418,
+    "2": 0.9999809861183167,
+    "3": 0.9999575614929199,
+    "4": 0.999924898147583,
+    "5": 0.9998835325241089,
+    "6": 0.9998339414596558,
+    "7": 0.9997769594192505,
+    "8": 0.9997125864028931
+   },
+   "passes_at_lag": {
+    "1": true,
+    "2": true,
+    "3": true,
+    "4": true,
+    "5": true,
+    "6": true,
+    "7": true,
+    "8": true
+   },
+   "smallest_passing_lag": 1,
+   "final_lag1_pairs": [
+    {
+     "iter_from": 1020,
+     "iter_to": 1021,
+     "cos_last": 0.9999969005584717,
+     "l2_last": 3.1929025650024414
+    },
+    {
+     "iter_from": 1021,
+     "iter_to": 1022,
+     "cos_last": 0.9999969005584717,
+     "l2_last": 3.2410502433776855
+    },
+    {
+     "iter_from": 1022,
+     "iter_to": 1023,
+     "cos_last": 0.9999967217445374,
+     "l2_last": 3.3049800395965576
+    },
+    {
+     "iter_from": 1023,
+     "iter_to": 1024,
+     "cos_last": 0.9999964237213135,
+     "l2_last": 3.3852016925811768
+    }
+   ],
+   "final_readout": {
+    "top1": "\u2015",
+    "top1_id": 31857,
+    "top1_prob": 0.5971249938011169,
+    "entropy_nats": 2.982297420501709
+   }
+  }
+ }
+}
