@@ -122,7 +122,7 @@ def continue_state(key):
 
     lasts = [current[-1, :].clone()]
     means = [current.mean(dim=0).clone()]
-    for i in range(BASE_ITER + 1, BASE_ITER + N_CONT + 1):
+    for _ in range(BASE_ITER + 1, BASE_ITER + N_CONT + 1):
         cn = current.norm().item()
         if cn > 0:
             current = current * (initial_norm / cn)
@@ -158,6 +158,7 @@ def slim_readout(vec):
 
 
 # ---- 1. Continuations (Divine first: its sanity gate guards the rest) ----
+assert KEYS[0] == "divine", "sanity gate must run first; see meta.sanity_gate"
 runs = {}
 for key in KEYS:
     runs[key] = continue_state(key)

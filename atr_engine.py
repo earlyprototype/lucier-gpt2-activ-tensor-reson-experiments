@@ -260,8 +260,7 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
     existing callers behave as before. A period-p limit cycle can only pass
     a gate whose lag is a multiple of p: the Divine period-2 bell holds its
     lag-1 cosine at 0.685 forever (never passes) but reads 1.0 at
-    ``gate_lag=2``. Assumes ``check_start`` >= ``gate_lag`` (true for any
-    realistic setting).
+    ``gate_lag=2``. ``check_start`` must be >= ``gate_lag`` (enforced).
 
     Lean by design (one readout decode, at the end) so a 125-prompt × 1000-iter
     sweep stays forward-pass-bound.
@@ -272,6 +271,12 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
         n_iters (iterations actually run), final_cos_sim_mean,
         top_logit_margin, entropy.
     """
+    if gate_lag < 1:
+        raise ValueError(f"gate_lag must be >= 1, got {gate_lag}")
+    if check_start < gate_lag:
+        raise ValueError(
+            f"check_start ({check_start}) must be >= gate_lag ({gate_lag}) "
+            "for the lagged comparison to be well-formed")
     hook_point_read = f"blocks.{layer_end}.hook_resid_post"
     hook_point_write = f"blocks.{layer_start}.hook_resid_pre"
 

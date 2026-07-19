@@ -450,11 +450,11 @@ print("part 1 checkpoint saved", flush=True)
 print("PART 2: layer attribution", flush=True)
 
 CACHE_NAMES = set()
-for l in range(N_LAYERS):
-    CACHE_NAMES.add(f"blocks.{l}.hook_resid_pre")
-    CACHE_NAMES.add(f"blocks.{l}.hook_attn_out")
-    CACHE_NAMES.add(f"blocks.{l}.hook_mlp_out")
-    CACHE_NAMES.add(f"blocks.{l}.attn.hook_z")
+for layer in range(N_LAYERS):
+    CACHE_NAMES.add(f"blocks.{layer}.hook_resid_pre")
+    CACHE_NAMES.add(f"blocks.{layer}.hook_attn_out")
+    CACHE_NAMES.add(f"blocks.{layer}.hook_mlp_out")
+    CACHE_NAMES.add(f"blocks.{layer}.attn.hook_z")
 CACHE_NAMES.add(HOOK_READ)
 
 
@@ -479,11 +479,11 @@ def layer_tables(base_cache, pert_cache, eps_abs, e_row, D_hat):
     """Per-boundary and per-block deltas, d components measured at the last
     position against the unit row direction e_row, full-tensor against D_hat."""
     boundaries = []
-    for l in range(N_LAYERS + 1):
-        name = (f"blocks.{l}.hook_resid_pre" if l < N_LAYERS else HOOK_READ)
+    for layer in range(N_LAYERS + 1):
+        name = (f"blocks.{layer}.hook_resid_pre" if layer < N_LAYERS else HOOK_READ)
         delta = (pert_cache[name] - base_cache[name]) / eps_abs
         boundaries.append({
-            "boundary": (f"resid_pre_{l}" if l < N_LAYERS
+            "boundary": (f"resid_pre_{layer}" if layer < N_LAYERS
                          else f"resid_post_{N_LAYERS - 1}"),
             "cos_last_vs_d": fcos(delta[-1], e_row),
             "cos_full_vs_D": fcos(delta, D_hat),
@@ -491,13 +491,13 @@ def layer_tables(base_cache, pert_cache, eps_abs, e_row, D_hat):
             "d_component_last": float(delta[-1] @ e_row),
         })
     blocks = []
-    for l in range(N_LAYERS):
-        da = (pert_cache[f"blocks.{l}.hook_attn_out"]
-              - base_cache[f"blocks.{l}.hook_attn_out"]) / eps_abs
-        dm = (pert_cache[f"blocks.{l}.hook_mlp_out"]
-              - base_cache[f"blocks.{l}.hook_mlp_out"]) / eps_abs
+    for layer in range(N_LAYERS):
+        da = (pert_cache[f"blocks.{layer}.hook_attn_out"]
+              - base_cache[f"blocks.{layer}.hook_attn_out"]) / eps_abs
+        dm = (pert_cache[f"blocks.{layer}.hook_mlp_out"]
+              - base_cache[f"blocks.{layer}.hook_mlp_out"]) / eps_abs
         blocks.append({
-            "layer": l,
+            "layer": layer,
             "attn_d_component_last": float(da[-1] @ e_row),
             "attn_cos_last_vs_d": fcos(da[-1], e_row),
             "attn_gain": float(da.norm()),

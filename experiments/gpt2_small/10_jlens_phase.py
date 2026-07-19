@@ -171,7 +171,7 @@ def stage1():
         x = x * (NOISE_NORM / x.norm())
         init_n = x.norm().item()
         current = x.clone()
-        for i in range(NOISE_ITERS):
+        for _ in range(NOISE_ITERS):
             cn = current.norm().item()
             if cn > 0:
                 current = current * (init_n / cn)
@@ -193,7 +193,7 @@ def stage1():
 
     # ---- W_U singular split of the hinge (mirrors 06_bell_anatomy.py) ----
     with torch.no_grad():
-        U, S, Vh = torch.linalg.svd(model.W_U, full_matrices=False)
+        U, _S, _Vh = torch.linalg.svd(model.W_U, full_matrices=False)
         unit = U.T @ (d / d.norm())
         d_top100_energy = float((unit[:100] ** 2).sum())
         d_bot100_energy = float((unit[-100:] ** 2).sum())
@@ -278,10 +278,10 @@ def probe_state(jlens, h, n_layers, gen):
     """One state through the pilot probe: identical logic and generator
     consumption order to the 05_jlens_pilot.py per-state loop."""
     per_layer = []
-    for l in range(n_layers):
-        D = jlens[:, l, :]
+    for layer_idx in range(n_layers):
+        D = jlens[:, layer_idx, :]
         entry = {
-            "layer": l,
+            "layer": layer_idx,
             "lstsq_share": lstsq_share(D, h),
             "nn_sparse_k25_share": nn_sparse_share(D, h),
         }
@@ -328,8 +328,8 @@ def stage2():
         diffs = {}
         for col in ["lstsq_share", "nn_sparse_k25_share",
                     "random_lstsq_share_mean", "random_nn_sparse_k25_share"]:
-            diffs[col] = max(abs(per_layer[l][col] - ref[l][col])
-                             for l in range(n_layers))
+            diffs[col] = max(abs(per_layer[layer_idx][col] - ref[layer_idx][col])
+                             for layer_idx in range(n_layers))
         results["reproduction_check"][label] = diffs
         print(f"replicated {label}: L6 lstsq={per_layer[6]['lstsq_share']:.6f} "
               f"(pilot {ref[6]['lstsq_share']:.6f}), max lens col diff "
@@ -365,9 +365,9 @@ def stage2():
                      ("d_vis_top100", ph["d_vis_top100"]),
                      ("d_quiet_bot100", ph["d_quiet_bot100"])]:
         per_layer = []
-        for l in range(n_layers):
-            D = jlens[:, l, :]
-            entry = {"layer": l, "lstsq_share": lstsq_share(D, v)}
+        for layer_idx in range(n_layers):
+            D = jlens[:, layer_idx, :]
+            entry = {"layer": layer_idx, "lstsq_share": lstsq_share(D, v)}
             if label == "d_hinge":
                 entry["nn_sparse_k25_share_plus"] = nn_sparse_share(D, v)
                 entry["nn_sparse_k25_share_minus"] = nn_sparse_share(D, -v)
@@ -388,17 +388,17 @@ def stage2():
 
     # ---- Summary block ----
     def col(label, key="lstsq_share"):
-        return [results["per_state"][label]["per_layer"][l][key]
-                for l in range(n_layers)]
+        return [results["per_state"][label]["per_layer"][layer_idx][key]
+                for layer_idx in range(n_layers)]
     prolet_labels = ["Lucier", "Semantic", "Nonsense", "Imperative"]
     noise_labels = ["Noise_0", "Noise_1", "Noise_2"]
     def mean_cols(labels, key):
         cols = [col(lb, key) for lb in labels]
-        return [sum(c[l] for c in cols) / len(cols) for l in range(n_layers)]
-    d_span = [direction_probe["d_hinge"]["per_layer"][l]["lstsq_share"]
-              for l in range(n_layers)]
-    generic = [direction_probe["d_hinge"]["per_layer"][l]["random_direction_lstsq_mean"]
-               for l in range(n_layers)]
+        return [sum(c[layer_idx] for c in cols) / len(cols) for layer_idx in range(n_layers)]
+    d_span = [direction_probe["d_hinge"]["per_layer"][layer_idx]["lstsq_share"]
+              for layer_idx in range(n_layers)]
+    generic = [direction_probe["d_hinge"]["per_layer"][layer_idx]["random_direction_lstsq_mean"]
+               for layer_idx in range(n_layers)]
     summary = {
         "span_by_layer": {
             "Divine_A": col("Divine_A"), "Divine_B": col("Divine_B"),
@@ -465,33 +465,33 @@ def stage2():
     print("| layer | A | B | M | prolet | noise | hinge d | generic dir |")
     print("|---|---|---|---|---|---|---|---|")
     s = summary["span_by_layer"]
-    for l in range(n_layers):
-        print(f"| L{l} | {fmt(s['Divine_A'][l])} | {fmt(s['Divine_B'][l])} | "
-              f"{fmt(s['Divine_M'][l])} | {fmt(s['prolet_mean'][l])} | "
-              f"{fmt(s['noise_mean'][l])} | {fmt(s['d_hinge'][l])} | "
-              f"{fmt(s['generic_direction'][l])} |")
+    for layer_idx in range(n_layers):
+        print(f"| L{layer_idx} | {fmt(s['Divine_A'][layer_idx])} | {fmt(s['Divine_B'][layer_idx])} | "
+              f"{fmt(s['Divine_M'][layer_idx])} | {fmt(s['prolet_mean'][layer_idx])} | "
+              f"{fmt(s['noise_mean'][layer_idx])} | {fmt(s['d_hinge'][layer_idx])} | "
+              f"{fmt(s['generic_direction'][layer_idx])} |")
     print("\n#### sparse table")
     print("| layer | A | B | M | prolet | noise |")
     print("|---|---|---|---|---|---|")
     sp = summary["sparse_by_layer"]
-    for l in range(n_layers):
-        print(f"| L{l} | {fmt(sp['Divine_A'][l])} | {fmt(sp['Divine_B'][l])} | "
-              f"{fmt(sp['Divine_M'][l])} | {fmt(sp['prolet_mean'][l])} | "
-              f"{fmt(sp['noise_mean'][l])} |")
+    for layer_idx in range(n_layers):
+        print(f"| L{layer_idx} | {fmt(sp['Divine_A'][layer_idx])} | {fmt(sp['Divine_B'][layer_idx])} | "
+              f"{fmt(sp['Divine_M'][layer_idx])} | {fmt(sp['prolet_mean'][layer_idx])} | "
+              f"{fmt(sp['noise_mean'][layer_idx])} |")
     print("\n#### hinge detail")
     print("| layer | d span | rand-dict span | generic-dir span | d nn25 (+d) | "
           "d nn25 (-d) | d_vis span | d_quiet span |")
     print("|---|---|---|---|---|---|---|---|")
     dp = direction_probe
-    for l in range(n_layers):
-        e = dp["d_hinge"]["per_layer"][l]
-        print(f"| L{l} | {fmt(e['lstsq_share'])} | "
+    for layer_idx in range(n_layers):
+        e = dp["d_hinge"]["per_layer"][layer_idx]
+        print(f"| L{layer_idx} | {fmt(e['lstsq_share'])} | "
               f"{fmt(e['random_lstsq_share_mean'])} | "
               f"{fmt(e['random_direction_lstsq_mean'])} | "
               f"{fmt(e['nn_sparse_k25_share_plus'])} | "
               f"{fmt(e['nn_sparse_k25_share_minus'])} | "
-              f"{fmt(dp['d_vis_top100']['per_layer'][l]['lstsq_share'])} | "
-              f"{fmt(dp['d_quiet_bot100']['per_layer'][l]['lstsq_share'])} |")
+              f"{fmt(dp['d_vis_top100']['per_layer'][layer_idx]['lstsq_share'])} | "
+              f"{fmt(dp['d_quiet_bot100']['per_layer'][layer_idx]['lstsq_share'])} |")
     print("\nhinge headline:", json.dumps(summary["hinge_headline"], indent=1))
 
 
