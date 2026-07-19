@@ -63,7 +63,7 @@ This is a nonlinear analogue of power iteration: where the classical version con
 
 ## Act I — The Dissolution
 
-*The Body without Organs is a Marxist[?].*
+*The Body without Organs is a Marxist [?]*
 
 Five prompts were chosen for their diversity: a question, a fact, a nursery-grammar sentence, nonsense, a command.
 
