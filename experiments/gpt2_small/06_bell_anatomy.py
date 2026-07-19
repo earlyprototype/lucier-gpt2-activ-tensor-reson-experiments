@@ -1,21 +1,35 @@
 import os, sys, json, math
-os.environ["HF_HUB_OFFLINE"]="1"; os.environ["TRANSFORMERS_OFFLINE"]="1"
-SCRATCH=os.path.dirname(os.path.abspath(__file__)); LOCAL=os.path.join(SCRATCH,"gpt2local")
-REPO="/home/user/lucier-gpt2-activ-tensor-reson-experiments"
-sys.path.insert(0, REPO)
-import torch
-from transformers import GPT2LMHeadModel, GPT2TokenizerFast, GPT2Config
-hf=GPT2LMHeadModel.from_pretrained(LOCAL); tok=GPT2TokenizerFast.from_pretrained(LOCAL)
-import transformer_lens.loading_from_pretrained as lfp
-cfg=GPT2Config.from_pretrained(LOCAL)
-class S:
-    @staticmethod
-    def from_pretrained(n,*a,**k): return cfg
-lfp.AutoConfig=S
-from transformer_lens import HookedTransformer
-m=HookedTransformer.from_pretrained("gpt2",hf_model=hf,tokenizer=tok,device="cpu"); m.eval()
 
-st=torch.load(os.path.join(REPO,"experiments/gpt2_small/output_divine_motion/state_divine.pt"), weights_only=True)
+HERE = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
+OUT = os.path.join(HERE, "output_divine_motion")
+os.makedirs(OUT, exist_ok=True)
+sys.path.insert(0, REPO)
+
+import torch
+
+LOCAL = os.environ.get("ATR_GPT2_LOCAL")
+if LOCAL:
+    os.environ["HF_HUB_OFFLINE"] = "1"
+    os.environ["TRANSFORMERS_OFFLINE"] = "1"
+    from transformers import GPT2LMHeadModel, GPT2TokenizerFast, GPT2Config
+    import transformer_lens.loading_from_pretrained as lfp
+    hf = GPT2LMHeadModel.from_pretrained(LOCAL)
+    tok = GPT2TokenizerFast.from_pretrained(LOCAL)
+    cfg = GPT2Config.from_pretrained(LOCAL)
+    class S:
+        @staticmethod
+        def from_pretrained(n, *a, **k):
+            return cfg
+    lfp.AutoConfig = S
+    from transformer_lens import HookedTransformer
+    m = HookedTransformer.from_pretrained("gpt2", hf_model=hf, tokenizer=tok, device="cpu")
+else:
+    from transformer_lens import HookedTransformer
+    m = HookedTransformer.from_pretrained("gpt2", device="cpu")
+m.eval()
+
+st = torch.load(os.path.join(OUT, "state_divine.pt"), weights_only=True)
 A_full=st["current_tensor"]; initial_norm=st["initial_norm"]
 prompt="The cat sat on the mat and then the"
 hook_read=f"blocks.{m.cfg.n_layers-1}.hook_resid_post"; hook_write="blocks.0.hook_resid_pre"
@@ -78,7 +92,6 @@ def logit_response(v):
         return float((pert-base).norm())
 torch.manual_seed(0)
 rd=[logit_response(torch.randn(768)*(d.norm()/math.sqrt(768))* (1.0)) for _ in range(20)]
-rd=[x for x in rd]
 resp_d=logit_response(d); resp_r=sum(rd)/len(rd)
 print(f"\naxis invisibility: logit response of d = {resp_d:.0f}, equal-ish random mean = {resp_r:.0f}, ratio={resp_d/resp_r:.3f}")
 
@@ -103,5 +116,5 @@ json.dump({"cosAB":cosAB,"cosAA2":cosAA2,"HA":HA,"HB":HB,"HM":HM,
            "chordA":chord(idsA),"chordB":chord(idsB),"chordM":chord(idsM),
            "axis_ratio":resp_d/resp_r,"pos_alignment":off,
            "d_top100":top100,"d_bot100":bot100,"M_top100":top100M,"M_bot100":bot100M},
-          open("bell_anatomy.json","w"), indent=1)
+          open(os.path.join(OUT, "bell_anatomy.json"), "w"), indent=1)
 print("\nsaved bell_anatomy.json")

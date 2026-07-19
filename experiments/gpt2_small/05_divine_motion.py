@@ -104,7 +104,7 @@ def full_logits_probs(vec):
 
 
 def readout_summary(vec):
-    logits, probs = full_logits_probs(vec)
+    _, probs = full_logits_probs(vec)
     top_p, top_i = torch.topk(probs, 5)
     H = float(-(probs * torch.log(probs.clamp_min(1e-12))).sum())
     return {
@@ -167,7 +167,7 @@ def stage_chunk(key, n_iters):
         print(f"[{key}] RUN_COMPLETE (already finished)", flush=True)
         return
     if os.path.exists(state_path):
-        state = torch.load(state_path, weights_only=False)
+        state = torch.load(state_path, weights_only=True)
     else:
         state = init_state(key)
     label, prompt = state["label"], state["prompt"]
@@ -324,7 +324,7 @@ def stage_probe(key, n_iters=20):
     phase-locked (snapshots 10 apart are identical while consecutive-iteration
     cosine sits at 0.685). Only lag-1 sampling can see the true motion.
     """
-    state = torch.load(os.path.join(OUT, f"state_{key}.pt"), weights_only=False)
+    state = torch.load(os.path.join(OUT, f"state_{key}.pt"), weights_only=True)
     label, prompt = state["label"], state["prompt"]
     hook_read = f"blocks.{L1}.hook_resid_post"
     hook_write = f"blocks.{L0}.hook_resid_pre"
@@ -403,7 +403,7 @@ def stage_analyse():
     }, "runs": {}}
     for key in ["divine", "prolet", "noise"]:
         ck = torch.load(os.path.join(OUT, f"snapshots_{key}.pt"),
-                        weights_only=False)
+                        weights_only=True)
         label = ck["label"]
         results["runs"][label] = analyse_snapshots(ck["snapshots"], label)
         results["runs"][label]["prompt"] = ck["prompt"]
