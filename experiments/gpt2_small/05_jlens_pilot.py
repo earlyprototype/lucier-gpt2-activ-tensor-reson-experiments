@@ -127,7 +127,8 @@ def build_token_set(seed=1234):
     groups = {}
     # (a) top-20 readout tokens of every converged state (recomputed from
     # the saved tensors; the archived JSON predates the id-first format)
-    conv = torch.load(os.path.join(HERE, "output_confidence", "converged_tensors.pt"))
+    conv = torch.load(os.path.join(HERE, "output_confidence", "converged_tensors.pt"),
+                  weights_only=True)
     readout_ids = []
     with torch.no_grad():
         for label, tens in conv.items():
@@ -169,7 +170,8 @@ if args.max_tokens and len(TOKEN_IDS) > args.max_tokens:
     keep = set(TOKEN_GROUPS["readout"])
     rest = [t for t in TOKEN_IDS if t not in keep]
     random.Random(7).shuffle(rest)
-    TOKEN_IDS = sorted(keep | set(rest[:args.max_tokens - len(keep)]))
+    n_rest = max(0, args.max_tokens - len(keep))
+    TOKEN_IDS = sorted(keep | set(rest[:n_rest]))
 print(f"token set: {len(TOKEN_IDS)} tokens "
       f"(readout {len(TOKEN_GROUPS['readout'])}, common {len(TOKEN_GROUPS['common'])}, "
       f"random {len(TOKEN_GROUPS['random_control'])}, before union)", flush=True)
@@ -252,7 +254,7 @@ for pi, prompt in enumerate(CORPUS):
     g, rawnorm = prompt_gradients(prompt, TOKEN_IDS)
     acc += g
     raw_norms_log.append(rawnorm.mean(dim=0).tolist())  # [n_layers]
-    if pi + 1 == len(CORPUS) // 2:
+    if pi + 1 == max(1, len(CORPUS) // 2):
         snapshot_half = acc.clone() / (pi + 1)
     print(f"prompt {pi+1}/{len(CORPUS)} done "
           f"({(time.time()-t_start)/60:.1f} min elapsed)", flush=True)
@@ -284,7 +286,8 @@ torch.save({
 print("J-lens vectors saved.", flush=True)
 
 # ---- 4. States to probe ----
-conv = torch.load(os.path.join(HERE, "output_confidence", "converged_tensors.pt"))
+conv = torch.load(os.path.join(HERE, "output_confidence", "converged_tensors.pt"),
+                  weights_only=True)
 states = {label: tens[-1, :].clone() for label, tens in conv.items()}
 
 # 3 fresh converged-noise states (noise loop copied from 04_readout_confidence.py)
@@ -383,9 +386,9 @@ for label, h in states.items():
         for _ in range(3):
             R = random_dict_like(D, gen)
             rand_shares.append(lstsq_share(R, h))
+            rand_nn.append(nn_sparse_share(R, h))
         entry["random_lstsq_share_mean"] = sum(rand_shares) / len(rand_shares)
-        R = random_dict_like(D, gen)
-        entry["random_nn_sparse_k25_share"] = nn_sparse_share(R, h)
+        entry["random_nn_sparse_k25_share"] = sum(rand_nn) / len(rand_nn)
         per_layer.append(entry)
     results["per_state"][label] = {"per_layer": per_layer,
                                    "state_norm": float(h.norm())}

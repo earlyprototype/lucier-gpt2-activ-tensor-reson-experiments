@@ -22,8 +22,9 @@ vector-Jacobian products:
   caching the residual stream at `blocks.l.hook_resid_post` for all 12 layers.
 - For each token t in the restricted set, the scalar `s_t = sum over positions t' of
   logit_t(t')` where `logit = ln_final(resid_final) @ W_U[:, t]` (the constant `b_U`
-  drops out of the gradient). One backward pass of `s_t` yields `ds_t/dh_l,pos` for every
-  layer and position at once. Causal masking automatically restricts each position's
+  drops out of the gradient). Tokens are processed in batches of up to 25 by replicating
+  the prompt across the batch dimension, so one backward pass covers a whole batch and
+  yields `ds_t/dh_l,pos` for every layer and position at once. Causal masking automatically restricts each position's
   gradient to contributions from t' >= pos.
 - Gradients are averaged over positions within a prompt, then over the 30 prompts:
   `v_t,l = E_prompts[ E_pos[ ds_t/dh_l,pos ] ]`, one vector per (token, layer),
@@ -224,14 +225,18 @@ direction.** The hypothesis from JSPACE_PRIMER.md Part 6 was that the prolet att
 might live inside the verbalizable subspace (the loop settling into something the model
 can "say") while the Divine state's never-settling tensor might live outside it (its
 constant readout a shadow on the exit door). In this restricted probe, the Divine state
-is at least as expressible in pilot J-lens coordinates as the prolet attractor at every
-layer, by both probes, by a small margin. What the pilot does weakly support is a
+is at least as expressible in pilot J-lens coordinates as the prolet attractor: at every
+layer on the span probe, and at 11 of 12 layers on the sparse probe (the exception is L1,
+sparse 0.109 vs 0.112), by a small margin throughout. What the pilot does weakly support is a
 coarser version of the inside/outside story drawn at the regime boundary: prompt-derived
 attractors (prolet AND Divine alike) carry more sparse J-lens structure than converged
 noise, which sits below even a random-dictionary control. With one Divine state, one
 effective prolet attractor, a 30-prompt hand-written corpus, a 193-token lens, and an
 averaged Jacobian that is still visibly moving at 30 prompts (mean cosine 0.95 to 0.98
-in the very layers that matter), none of this rises above pilot confidence. A null or
+in the very layers that matter), none of this rises above pilot confidence. One recording caveat: the
+random-dictionary control for the sparse probe in the recorded JSON used a single draw
+per layer (the least-squares control averaged three); the script now averages three for
+both, affecting future runs only. A null or
 reversed result here is information, not failure: it says the interesting boundary may
 be language-vs-noise, not prolet-vs-Divine.
 
