@@ -6,7 +6,7 @@
 
 Inspired by Alvin Lucier's iterative feedback composition *I Am Sitting in a Room*, this project applies an analogous operation to small open-weight language models. Where Lucier's process dissolved speech into a room's resonant frequencies through looped excitation, **Activation Tensor Resonance** dissolves semantic content into a model's stable states — and then asks what those states are made of.
 
-What started as a moment of curiosity, turned up a rather unexpected result. This result posed a number of questions, some of which have been answered with further experiment and some left unexplained. The recent publication of Anthropics J-space paper has created a new path to travel with some of these open questions, and is currently the focus of further investigation.
+NOTE: What started as a moment of curiosity, turned up a rather unexpected result. This result posed a number of questions, some of which have been answered with further experiment and some left unexplained. The recent publication of Anthropics J-space paper has created a new path to travel with some of these open questions, and is currently the focus of a further, seperate investigation.
 
 <p align="center">
   <img src="experiments/gpt2_small/output/convergence_matrix.png" alt="Cross-prompt convergence matrix — 125 prompts, block structure showing distinct attractor basins in GPT-2 Small" width="800"/>
