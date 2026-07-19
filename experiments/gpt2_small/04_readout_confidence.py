@@ -82,6 +82,7 @@ def full_readout(vec, k=20):
         top_logits = logits[top_i]
         H = float(-(probs * torch.log(probs.clamp_min(1e-12))).sum())
         return {
+            "top_token_ids": [int(i) for i in top_i],
             "top_tokens": [model.tokenizer.decode([int(i)]) for i in top_i],
             "top_probs": [float(p) for p in top_p],
             "top1_prob": float(top_p[0]),
@@ -93,20 +94,21 @@ def full_readout(vec, k=20):
         }
 
 
-def chordness(token_strings):
-    """Mean pairwise W_E cosine among single-token strings (semantic coherence)."""
-    ids = []
-    for t in token_strings:
-        enc = model.tokenizer.encode(t, add_special_tokens=False)
-        if len(enc) == 1:
-            ids.append(enc[0])
-    if len(ids) < 3:
+def chordness(token_ids):
+    """Mean pairwise W_E cosine among tokens (semantic coherence).
+
+    Takes token IDs directly (not decoded strings) so the measurement is
+    guaranteed to cover the exact tokens in the readout distribution;
+    re-encoding decoded strings can round-trip to different or multiple
+    BPE IDs and silently drop tokens.
+    """
+    if len(token_ids) < 3:
         return None
     with torch.no_grad():
-        E = model.W_E[ids]
+        E = model.W_E[token_ids]
         E = E / E.norm(dim=-1, keepdim=True)
         sim = E @ E.T
-        n = len(ids)
+        n = len(token_ids)
         return float((sim.sum() - n) / (n * (n - 1)))
 
 
@@ -139,7 +141,7 @@ for label, prompt in PROMPTS.items():
         "final_mean_vector": full_readout(final["mean_vector"]),
         "baseline_iter0": full_readout(snaps[0]["last_vector"]),
         "final_all_position_tokens": final["all_position_tokens"],
-        "chordness_top10": chordness(fr["top_tokens"][:10]),
+        "chordness_top10": chordness(fr["top_token_ids"][:10]),
     }
     tensors_to_save[label] = final["tensor"]
     print(f"  top1={fr['top_tokens'][0]!r} p={fr['top1_prob']:.3f} "
@@ -192,7 +194,7 @@ for trial in range(N_NOISE):
         "trace": trace,
         "final_last_vector": fr,
         "final_mean_vector": full_readout(current.mean(dim=0)),
-        "chordness_top10": chordness(fr["top_tokens"][:10]),
+        "chordness_top10": chordness(fr["top_token_ids"][:10]),
     }
     print(f"noise {trial:02d}: top1={fr['top_tokens'][0]!r} p={fr['top1_prob']:.3f} "
           f"H={fr['entropy_nats']:.2f} "
