@@ -6,7 +6,7 @@
 
 Inspired by Alvin Lucier's iterative feedback composition *I Am Sitting in a Room*, this project applies an analogous operation to small open-weight language models. Where Lucier's process dissolved speech into a room's resonant frequencies through looped excitation, **Activation Tensor Resonance** dissolves semantic content into a model's stable states — and then asks what those states are made of.
 
-NOTE: What started as a moment of curiosity, turned up a rather unexpected result. This result posed a number of questions, some of which have been answered with further experiment and some left unexplained. The recent publication of Anthropics J-space paper has created a new path to travel with some of these open questions, and is currently the focus of a further, seperate investigation.
+NOTE: What started as a moment of curiosity turned up a rather unexpected result. This result posed a number of questions, some of which have been answered with further experiment and some left unexplained. The recent publication of Anthropic's J-space paper has created a new path to travel with some of these open questions, and is currently the focus of a further, separate investigation.
 
 <p align="center">
   <img src="experiments/gpt2_small/output/convergence_matrix.png" alt="Cross-prompt convergence matrix — 125 prompts, block structure showing distinct attractor basins in GPT-2 Small" width="800"/>
@@ -190,10 +190,41 @@ ATR never set out to be a technique at all. It began as a thought experiment, an
 | [`readout_guardrails.ipynb`](experiments/readout_guardrails.ipynb) | Readout confidence audit (single-prompt demo) | ✅ run |
 | [`spectral_resonance.ipynb`](experiments/gpt2_small/spectral_resonance.ipynb) | SVD-predicted per-head resonance (H4) | 🔬 scaffold, not run |
 
-## Requirements
+## Running It Yourself
+
+Everything here was built to be re-run. The experiments live in Jupyter notebooks deliberately: each one is meant to be read top to bottom as a guided walk through the method, with the code, the commentary and the outputs interleaved, so following along is itself a way of learning how the operation works. Reproduction is the point, not an afterthought.
 
 ```bash
 pip install -r requirements.txt
+python download_models.py   # optional: pre-cache the three comparison models
+```
+
+GPT-2 Small downloads automatically the first time a notebook runs. All four models are small (124M to 410M parameters), so any single experiment finishes in minutes on a consumer GPU; CPU works too, just more slowly.
+
+A suggested listening order:
+
+1. [`lucier_total_resonance.ipynb`](experiments/gpt2_small/lucier_total_resonance.ipynb): the original piece. Five prompts, 500 iterations. Start here.
+2. [`00_reproducibility_gate.ipynb`](experiments/gpt2_small/00_reproducibility_gate.ipynb): does your machine reproduce the published terminal tokens?
+3. [`01_attractor_dominance.ipynb`](experiments/gpt2_small/01_attractor_dominance.ipynb): the 125-prompt sweep. Repeat in each model directory for the cross-model comparison.
+4. [`03_random_baseline.ipynb`](experiments/gpt2_small/03_random_baseline.ipynb): the null model. Noise instead of language.
+5. [`cos_sim_diagnostic.ipynb`](experiments/cos_sim_diagnostic.ipynb) and [`readout_guardrails.ipynb`](experiments/readout_guardrails.ipynb): the measurement checks behind the claims.
+
+> **Note:** the 125-prompt sweep notebooks (`01_*`), `gated_resweep.py` and the Pythia-410m deep run import `prompt_library.py`, which is temporarily absent from the repository and will be restored shortly. Steps 1, 2, 4 and 5 run without it.
+
+## Citing This Work
+
+If this project is useful in your research or writing, please cite it:
+
+```bibtex
+@misc{conaty2026atr,
+  author       = {Conaty, Thom},
+  title        = {Activation Tensor Resonance: Attractor Basins in Small
+                  Language Models via Iterative Activation Re-injection},
+  year         = {2026},
+  howpublished = {\url{https://github.com/earlyprototype/lucier-gpt2-activ-tensor-reson-experiments}},
+  note         = {Experimental series, Stages 0--5: GPT-2 Small/Medium,
+                  Pythia-160m/410m, null-model control}
+}
 ```
 
 ## Caveats
