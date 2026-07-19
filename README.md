@@ -69,6 +69,8 @@ Five prompts were chosen for their diversity: a question, a fact, a nursery-gram
 
 📓 [`lucier_total_resonance.ipynb`](experiments/gpt2_small/lucier_total_resonance.ipynb)
 
+Each prompt was played into the room and left there: 500 passes through the ATR loop, the full activation tensor extracted, rescaled and re-injected after every forward pass, with the nearest vocabulary tokens decoded at each step to hear what the model was saying. The traces below are those decoded readouts.
+
 Words drain and dissolve. First connection goes, then meaning, then grammar. A littering of acronyms, chemical symbols, punctuation and broken slang settles toward a final form: a fragmented word, endlessly repeated. Four of the five prompts followed an almost identical descent into the same resting place — the BPE subword `prolet`. A fragment. A suggestion.
 
 ```
@@ -83,7 +85,9 @@ After completing this first experiment and observing the results, I had to know 
 
 The fifth prompt — *"The cat sat on the mat and then the"* — followed the same early descent, then left the path at iteration 20 and settled somewhere else entirely: `Divine`.
 
-At scale, the pattern holds. Swept over 125 prompts across seven registers, the model's languagespace collapses into **five basins**, classified at convergence (not at an arbitrary stopping time — see the [gated re-sweep](docs/FINDINGS.md#run-5)):
+But five hand-picked prompts converging is an anecdote, and an easy one to distrust: perhaps the selection, not the model, chose the destination. So the experiment was scaled up. A library of **125 prompts** was generated across seven registers (simple, narrative, complex, chemical, acronyms, vulgarity, wild) and swept through the same loop, taking the choice of starting point out of any one person's hands.
+
+At scale, the pattern holds: the model's languagespace collapses into **five basins**, classified at convergence (not at an arbitrary stopping time; see the [gated re-sweep](docs/FINDINGS.md#run-5)):
 
 | Basin | Share at convergence | Semantic neighbourhood (W_E) |
 |:---|:---:|:---|
@@ -133,7 +137,7 @@ The full record of Acts I and II — every run, every number, every hypothesis d
 
 ## What This Is Now
 
-ATR set out to be a bias-audit technique and refuted itself: the cross-model evidence killed the general fingerprint claim, and the null model relocated the basins from "the weights" to "the language-driven regime of the weights." What the operation actually turned out to measure is stranger and, we think, more interesting:
+ATR never set out to be a technique at all. It began as a thought experiment, an homage to Lucier carried out on a language model to see what would happen, and only earned its name once the results demanded one. The bias-audit reading arrived later, as a working hypothesis the first results seemed to insist on, and it was that hypothesis, not the project, that got refuted: the cross-model evidence killed the general fingerprint claim, and the null model relocated the basins from "the weights" to "the language-driven regime of the weights." What the operation actually turned out to measure is stranger and, we think, more interesting:
 
 - **A cheap dynamical probe.** No labelled data, no training, seconds-to-minutes per run on consumer hardware. It answers: *what are the stable states of this model's iterated forward map, and how do they depend on where you start?*
 - **A regime detector.** Four models produced four qualitatively different landscapes — few-semantic-basins / single-funnel / single-funnel / no-consolidation. The differences are intrinsic to the models (tensor-level, not decoding artefacts — see [SCALING_ARTEFACT_ANALYSIS.md](docs/SCALING_ARTEFACT_ANALYSIS.md)).
