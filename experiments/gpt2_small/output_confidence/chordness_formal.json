@@ -1,0 +1,1149 @@
+{
+ "gpt2_small": {
+  "meta": {
+   "n_null_draws": 1000,
+   "n_norm_bins": 20,
+   "p_value_definition": "(1 + #null >= observed) / (1 + n_draws), one-sided (high chordness)",
+   "null_statistic": "plain chordness at k=10 (first 10 valid recovered tokens)",
+   "uniform_null_k10_mean": 0.26848432421684265,
+   "uniform_null_k10_sd": 0.018794281408190727,
+   "token_id_recovery": {
+    "Lucier": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "Semantic": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "Syntactic": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "Nonsense": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "Imperative": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "trial_00": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "trial_01": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "trial_02": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "trial_03": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "trial_04": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "trial_05": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "trial_06": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "trial_07": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "trial_08": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "trial_09": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "trial_10": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "trial_11": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "trial_12": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "trial_13": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    },
+    "trial_14": {
+     "source": "re-encoded",
+     "n_excluded": 0,
+     "excluded_tokens": []
+    }
+   }
+  },
+  "states": {
+   "Lucier": {
+    "family": "prompt",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.4893740117549896,
+    "weighted_k5": 0.49285399352927683,
+    "plain_k10": 0.4096868634223938,
+    "weighted_k10": 0.456618295967899,
+    "plain_k20": 0.3750981390476227,
+    "weighted_k20": 0.421414558764878,
+    "p_uniform": 0.000999000999000999,
+    "p_freqmatched": 0.000999000999000999,
+    "freq_null_mean": 0.26973503828048706,
+    "freq_null_sd": 0.01956086792051792,
+    "p_freqmatched_weighted": 0.000999000999000999
+   },
+   "Semantic": {
+    "family": "prompt",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.4893741011619568,
+    "weighted_k5": 0.4943794683300812,
+    "plain_k10": 0.4705827832221985,
+    "weighted_k10": 0.4946757654831096,
+    "plain_k20": 0.3722361922264099,
+    "weighted_k20": 0.4349174326590092,
+    "p_uniform": 0.000999000999000999,
+    "p_freqmatched": 0.000999000999000999,
+    "freq_null_mean": 0.27426502108573914,
+    "freq_null_sd": 0.01694369688630104,
+    "p_freqmatched_weighted": 0.000999000999000999
+   },
+   "Syntactic": {
+    "family": "prompt",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.3199261724948883,
+    "weighted_k5": 0.3355739488395219,
+    "plain_k10": 0.3179093599319458,
+    "weighted_k10": 0.32582872865119317,
+    "plain_k20": 0.28513243794441223,
+    "weighted_k20": 0.3183019638387608,
+    "p_uniform": 0.006993006993006993,
+    "p_freqmatched": 0.004995004995004995,
+    "freq_null_mean": 0.2714119851589203,
+    "freq_null_sd": 0.015819812193512917,
+    "p_freqmatched_weighted": 0.03696303696303696
+   },
+   "Nonsense": {
+    "family": "prompt",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.4893741011619568,
+    "weighted_k5": 0.4936458924453212,
+    "plain_k10": 0.4705827534198761,
+    "weighted_k10": 0.49384012500746205,
+    "plain_k20": 0.36903116106987,
+    "weighted_k20": 0.4305406609489828,
+    "p_uniform": 0.000999000999000999,
+    "p_freqmatched": 0.000999000999000999,
+    "freq_null_mean": 0.2744140923023224,
+    "freq_null_sd": 0.016627410426735878,
+    "p_freqmatched_weighted": 0.000999000999000999
+   },
+   "Imperative": {
+    "family": "prompt",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.4893741011619568,
+    "weighted_k5": 0.4937898977896679,
+    "plain_k10": 0.4705827534198761,
+    "weighted_k10": 0.49396812375342514,
+    "plain_k20": 0.36903116106987,
+    "weighted_k20": 0.4314074710637307,
+    "p_uniform": 0.000999000999000999,
+    "p_freqmatched": 0.000999000999000999,
+    "freq_null_mean": 0.27426159381866455,
+    "freq_null_sd": 0.01674680784344673,
+    "p_freqmatched_weighted": 0.000999000999000999
+   },
+   "trial_00": {
+    "family": "noise",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.31097984313964844,
+    "weighted_k5": 0.2844668535053528,
+    "plain_k10": 0.2769940197467804,
+    "weighted_k10": 0.28041916548320933,
+    "plain_k20": 0.29054147005081177,
+    "weighted_k20": 0.28987670846937436,
+    "p_uniform": 0.32867132867132864,
+    "p_freqmatched": 0.3836163836163836,
+    "freq_null_mean": 0.27276450395584106,
+    "freq_null_sd": 0.01601259596645832,
+    "p_freqmatched_weighted": 0.35864135864135865
+   },
+   "trial_01": {
+    "family": "noise",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.31097984313964844,
+    "weighted_k5": 0.28139432920376733,
+    "plain_k10": 0.2769940197467804,
+    "weighted_k10": 0.2780958899393351,
+    "plain_k20": 0.28227612376213074,
+    "weighted_k20": 0.2856638883422843,
+    "p_uniform": 0.32867132867132864,
+    "p_freqmatched": 0.3646353646353646,
+    "freq_null_mean": 0.27127978205680847,
+    "freq_null_sd": 0.01548383105546236,
+    "p_freqmatched_weighted": 0.3936063936063936
+   },
+   "trial_02": {
+    "family": "noise",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.2747223973274231,
+    "weighted_k5": 0.26068421319108914,
+    "plain_k10": 0.27483776211738586,
+    "weighted_k10": 0.2637687030980446,
+    "plain_k20": 0.28638091683387756,
+    "weighted_k20": 0.2749477965089013,
+    "p_uniform": 0.37162837162837165,
+    "p_freqmatched": 0.46553446553446554,
+    "freq_null_mean": 0.273478627204895,
+    "freq_null_sd": 0.016915159299969673,
+    "p_freqmatched_weighted": 0.6123876123876124
+   },
+   "trial_03": {
+    "family": "noise",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.29007959365844727,
+    "weighted_k5": 0.28908073149952157,
+    "plain_k10": 0.28564897179603577,
+    "weighted_k10": 0.2857333803618475,
+    "plain_k20": 0.2683573365211487,
+    "weighted_k20": 0.27782949990475064,
+    "p_uniform": 0.1798201798201798,
+    "p_freqmatched": 0.1938061938061938,
+    "freq_null_mean": 0.27375444769859314,
+    "freq_null_sd": 0.014437330886721611,
+    "p_freqmatched_weighted": 0.2057942057942058
+   },
+   "trial_04": {
+    "family": "noise",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.27303871512413025,
+    "weighted_k5": 0.2799956839619289,
+    "plain_k10": 0.273694783449173,
+    "weighted_k10": 0.2763521463291233,
+    "plain_k20": 0.2628275752067566,
+    "weighted_k20": 0.2703127250171487,
+    "p_uniform": 0.3966033966033966,
+    "p_freqmatched": 0.4875124875124875,
+    "freq_null_mean": 0.27334046363830566,
+    "freq_null_sd": 0.015079351142048836,
+    "p_freqmatched_weighted": 0.38461538461538464
+   },
+   "trial_05": {
+    "family": "noise",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.289573609828949,
+    "weighted_k5": 0.2887146983393578,
+    "plain_k10": 0.2674923241138458,
+    "weighted_k10": 0.2738347633223101,
+    "plain_k20": 0.27284157276153564,
+    "weighted_k20": 0.2755804459377825,
+    "p_uniform": 0.5134865134865135,
+    "p_freqmatched": 0.6733266733266733,
+    "freq_null_mean": 0.2744591236114502,
+    "freq_null_sd": 0.015247742645442486,
+    "p_freqmatched_weighted": 0.5184815184815185
+   },
+   "trial_06": {
+    "family": "noise",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.31097984313964844,
+    "weighted_k5": 0.2914576899282592,
+    "plain_k10": 0.28298136591911316,
+    "weighted_k10": 0.2908695596078436,
+    "plain_k20": 0.2990071773529053,
+    "weighted_k20": 0.30275381506451843,
+    "p_uniform": 0.2137862137862138,
+    "p_freqmatched": 0.26873126873126874,
+    "freq_null_mean": 0.2731436789035797,
+    "freq_null_sd": 0.015820175409317017,
+    "p_freqmatched_weighted": 0.2077922077922078
+   },
+   "trial_07": {
+    "family": "noise",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.2914876341819763,
+    "weighted_k5": 0.3397892297843333,
+    "plain_k10": 0.30884850025177,
+    "weighted_k10": 0.3403231333180707,
+    "plain_k20": 0.2880181074142456,
+    "weighted_k20": 0.31303897735766767,
+    "p_uniform": 0.014985014985014986,
+    "p_freqmatched": 0.026973026973026972,
+    "freq_null_mean": 0.27176785469055176,
+    "freq_null_sd": 0.017974242568016052,
+    "p_freqmatched_weighted": 0.001998001998001998
+   },
+   "trial_08": {
+    "family": "noise",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.289573609828949,
+    "weighted_k5": 0.2884754224914655,
+    "plain_k10": 0.2674923837184906,
+    "weighted_k10": 0.2737058876587707,
+    "plain_k20": 0.27284157276153564,
+    "weighted_k20": 0.2755132615304205,
+    "p_uniform": 0.5134865134865135,
+    "p_freqmatched": 0.6653346653346653,
+    "freq_null_mean": 0.2748751938343048,
+    "freq_null_sd": 0.015088498592376709,
+    "p_freqmatched_weighted": 0.5194805194805194
+   },
+   "trial_09": {
+    "family": "noise",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.29380226135253906,
+    "weighted_k5": 0.27508678912806733,
+    "plain_k10": 0.2879495918750763,
+    "weighted_k10": 0.27440153881197427,
+    "plain_k20": 0.2621699571609497,
+    "weighted_k20": 0.268954804844299,
+    "p_uniform": 0.15184815184815184,
+    "p_freqmatched": 0.16883116883116883,
+    "freq_null_mean": 0.2730579972267151,
+    "freq_null_sd": 0.01537354476749897,
+    "p_freqmatched_weighted": 0.4225774225774226
+   },
+   "trial_10": {
+    "family": "noise",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.2566160559654236,
+    "weighted_k5": 0.2547816879358804,
+    "plain_k10": 0.28165489435195923,
+    "weighted_k10": 0.2640272522178696,
+    "plain_k20": 0.2751656174659729,
+    "weighted_k20": 0.26929058658833077,
+    "p_uniform": 0.23776223776223776,
+    "p_freqmatched": 0.2627372627372627,
+    "freq_null_mean": 0.2709893584251404,
+    "freq_null_sd": 0.01717102713882923,
+    "p_freqmatched_weighted": 0.6343656343656343
+   },
+   "trial_11": {
+    "family": "noise",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.4898582398891449,
+    "weighted_k5": 0.5377241894280006,
+    "plain_k10": 0.5113300085067749,
+    "weighted_k10": 0.5286822483692016,
+    "plain_k20": 0.4257948100566864,
+    "weighted_k20": 0.5064302349211548,
+    "p_uniform": 0.000999000999000999,
+    "p_freqmatched": 0.000999000999000999,
+    "freq_null_mean": 0.27488911151885986,
+    "freq_null_sd": 0.016135282814502716,
+    "p_freqmatched_weighted": 0.000999000999000999
+   },
+   "trial_12": {
+    "family": "noise",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.30144014954566956,
+    "weighted_k5": 0.3255983511795729,
+    "plain_k10": 0.3134942352771759,
+    "weighted_k10": 0.33520230985024896,
+    "plain_k20": 0.3109513521194458,
+    "weighted_k20": 0.33434988904893925,
+    "p_uniform": 0.008991008991008992,
+    "p_freqmatched": 0.004995004995004995,
+    "freq_null_mean": 0.2716638445854187,
+    "freq_null_sd": 0.015734340995550156,
+    "p_freqmatched_weighted": 0.008991008991008992
+   },
+   "trial_13": {
+    "family": "noise",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.31097984313964844,
+    "weighted_k5": 0.27578036677942974,
+    "plain_k10": 0.2887422442436218,
+    "weighted_k10": 0.27248673659089717,
+    "plain_k20": 0.27879104018211365,
+    "weighted_k20": 0.2781851787728544,
+    "p_uniform": 0.13786213786213786,
+    "p_freqmatched": 0.15184815184815184,
+    "freq_null_mean": 0.2722731828689575,
+    "freq_null_sd": 0.015805918723344803,
+    "p_freqmatched_weighted": 0.5014985014985015
+   },
+   "trial_14": {
+    "family": "noise",
+    "n_valid_tokens": 20,
+    "plain_k5": 0.289573609828949,
+    "weighted_k5": 0.2878626354419695,
+    "plain_k10": 0.27255627512931824,
+    "weighted_k10": 0.2765651896481287,
+    "plain_k20": 0.2751230299472809,
+    "weighted_k20": 0.27690130642648086,
+    "p_uniform": 0.4165834165834166,
+    "p_freqmatched": 0.5264735264735265,
+    "freq_null_mean": 0.2748366594314575,
+    "freq_null_sd": 0.015505706891417503,
+    "p_freqmatched_weighted": 0.43356643356643354
+   }
+  }
+ },
+ "gpt2_medium": {
+  "meta": {
+   "model": "gpt2-medium (legacy-S3 weights)",
+   "schedule": [
+    0,
+    2,
+    3,
+    5,
+    10,
+    20,
+    50,
+    100
+   ],
+   "max_iter": 100,
+   "vocab": 50257,
+   "n_null_draws": 1000,
+   "n_norm_bins": 20
+  },
+  "prompts": {
+   "Lucier": {
+    "prompt": "Am I sitting in a room different from the one you are in now",
+    "trace": [
+     {
+      "iteration": 0,
+      "top1": "?",
+      "top1_prob": 0.8634598851203918,
+      "cos_sim_last": 1.0
+     },
+     {
+      "iteration": 2,
+      "top1": ",",
+      "top1_prob": 0.03143329545855522,
+      "cos_sim_last": 0.9857178926467896
+     },
+     {
+      "iteration": 3,
+      "top1": ".",
+      "top1_prob": 0.005441728979349136,
+      "cos_sim_last": 0.9839475750923157
+     },
+     {
+      "iteration": 5,
+      "top1": "local",
+      "top1_prob": 0.006506924517452717,
+      "cos_sim_last": 0.9968462586402893
+     },
+     {
+      "iteration": 10,
+      "top1": "D",
+      "top1_prob": 0.009420215152204037,
+      "cos_sim_last": 0.9999181628227234
+     },
+     {
+      "iteration": 20,
+      "top1": "D",
+      "top1_prob": 0.010221689939498901,
+      "cos_sim_last": 0.9999999403953552
+     },
+     {
+      "iteration": 50,
+      "top1": "D",
+      "top1_prob": 0.010197990573942661,
+      "cos_sim_last": 0.9999999403953552
+     },
+     {
+      "iteration": 100,
+      "top1": "D",
+      "top1_prob": 0.010197495110332966,
+      "cos_sim_last": 0.9999998807907104
+     }
+    ],
+    "final_last_vector": {
+     "top_token_ids": [
+      35,
+      4299,
+      32,
+      51,
+      54,
+      6242,
+      40,
+      464,
+      20530,
+      12001,
+      4774,
+      5840,
+      34,
+      9487,
+      50,
+      52,
+      3118,
+      13603,
+      2484,
+      15
+     ],
+     "top_tokens": [
+      "D",
+      "def",
+      "A",
+      "T",
+      "W",
+      "AB",
+      "I",
+      "The",
+      "RAW",
+      "local",
+      "host",
+      "Am",
+      "C",
+      "Class",
+      "S",
+      "U",
+      "Un",
+      "Dev",
+      "Sh",
+      "0"
+     ],
+     "top_probs": [
+      0.010197495110332966,
+      0.006069154478609562,
+      0.005532350391149521,
+      0.004869230091571808,
+      0.004726860672235489,
+      0.004538067150861025,
+      0.0042808870784938335,
+      0.0041612922213971615,
+      0.003858249168843031,
+      0.0037659662775695324,
+      0.0035913963802158833,
+      0.003413525177165866,
+      0.003329773200675845,
+      0.003189003560692072,
+      0.003121902234852314,
+      0.0030057618860155344,
+      0.0029559044633060694,
+      0.0029018325731158257,
+      0.0027976413257420063,
+      0.0027389577589929104
+     ],
+     "top1_prob": 0.010197495110332966,
+     "top10_mass": 0.05199955031275749,
+     "logit_margin": 0.5189228057861328,
+     "entropy_nats": 7.938584804534912,
+     "effective_support": 2803.3903543749075
+    },
+    "plain_k5": 0.5340773463249207,
+    "weighted_k5": 0.5382429815929901,
+    "plain_k10": 0.46082738041877747,
+    "weighted_k10": 0.4759838215436289,
+    "plain_k20": 0.4440787732601166,
+    "weighted_k20": 0.4562626820098841,
+    "p_freqmatched": 0.000999000999000999,
+    "freq_null_mean": 0.3060987591743469,
+    "freq_null_sd": 0.02351468801498413,
+    "p_uniform": 0.000999000999000999,
+    "uniform_null_mean": 0.30766189098358154,
+    "uniform_null_sd": 0.017698947340250015
+   },
+   "Semantic": {
+    "prompt": "The Eiffel Tower is located in the city of",
+    "trace": [
+     {
+      "iteration": 0,
+      "top1": " Paris",
+      "top1_prob": 0.7789158225059509,
+      "cos_sim_last": 1.0
+     },
+     {
+      "iteration": 2,
+      "top1": "The",
+      "top1_prob": 0.004901486914604902,
+      "cos_sim_last": 0.9754555821418762
+     },
+     {
+      "iteration": 3,
+      "top1": "D",
+      "top1_prob": 0.006532024592161179,
+      "cos_sim_last": 0.9939006567001343
+     },
+     {
+      "iteration": 5,
+      "top1": "D",
+      "top1_prob": 0.008952975273132324,
+      "cos_sim_last": 0.9990638494491577
+     },
+     {
+      "iteration": 10,
+      "top1": "D",
+      "top1_prob": 0.010184703394770622,
+      "cos_sim_last": 0.9999887943267822
+     },
+     {
+      "iteration": 20,
+      "top1": "D",
+      "top1_prob": 0.010092262178659439,
+      "cos_sim_last": 0.9999998807907104
+     },
+     {
+      "iteration": 50,
+      "top1": "D",
+      "top1_prob": 0.010029471479356289,
+      "cos_sim_last": 1.0000001192092896
+     },
+     {
+      "iteration": 100,
+      "top1": "D",
+      "top1_prob": 0.010029218159615993,
+      "cos_sim_last": 1.0
+     }
+    ],
+    "final_last_vector": {
+     "top_token_ids": [
+      35,
+      4299,
+      32,
+      51,
+      54,
+      6242,
+      464,
+      40,
+      20530,
+      12001,
+      4774,
+      5840,
+      9487,
+      34,
+      50,
+      52,
+      13603,
+      3118,
+      2484,
+      14126
+     ],
+     "top_tokens": [
+      "D",
+      "def",
+      "A",
+      "T",
+      "W",
+      "AB",
+      "The",
+      "I",
+      "RAW",
+      "local",
+      "host",
+      "Am",
+      "Class",
+      "C",
+      "S",
+      "U",
+      "Dev",
+      "Un",
+      "Sh",
+      "Chapter"
+     ],
+     "top_probs": [
+      0.010029218159615993,
+      0.005975478328764439,
+      0.005484102759510279,
+      0.004948580637574196,
+      0.004552759230136871,
+      0.004342620261013508,
+      0.004232450854033232,
+      0.004181777127087116,
+      0.004001746419817209,
+      0.0035459999926388264,
+      0.003494072239845991,
+      0.003385024145245552,
+      0.003337216330692172,
+      0.0032161560375243425,
+      0.003131450852379203,
+      0.002941916696727276,
+      0.002921091625466943,
+      0.002917355392128229,
+      0.002855387283489108,
+      0.002745723817497492
+     ],
+     "top1_prob": 0.010029218159615993,
+     "top10_mass": 0.051294732838869095,
+     "logit_margin": 0.5178384780883789,
+     "entropy_nats": 7.94891357421875,
+     "effective_support": 2832.4959815820876
+    },
+    "plain_k5": 0.5340773463249207,
+    "weighted_k5": 0.538775764513352,
+    "plain_k10": 0.46082738041877747,
+    "weighted_k10": 0.47650518202295983,
+    "plain_k20": 0.4404296875,
+    "weighted_k20": 0.4534067320972657,
+    "p_freqmatched": 0.000999000999000999,
+    "freq_null_mean": 0.3060987591743469,
+    "freq_null_sd": 0.02351468801498413,
+    "p_uniform": 0.000999000999000999,
+    "uniform_null_mean": 0.30766189098358154,
+    "uniform_null_sd": 0.017698947340250015
+   },
+   "Syntactic": {
+    "prompt": "The cat sat on the mat and then the",
+    "trace": [
+     {
+      "iteration": 0,
+      "top1": " dog",
+      "top1_prob": 0.13090728223323822,
+      "cos_sim_last": 1.0
+     },
+     {
+      "iteration": 2,
+      "top1": " man",
+      "top1_prob": 0.003978644963353872,
+      "cos_sim_last": 0.9877558350563049
+     },
+     {
+      "iteration": 3,
+      "top1": "m",
+      "top1_prob": 0.005553153343498707,
+      "cos_sim_last": 0.992510199546814
+     },
+     {
+      "iteration": 5,
+      "top1": "D",
+      "top1_prob": 0.007241980638355017,
+      "cos_sim_last": 0.998590350151062
+     },
+     {
+      "iteration": 10,
+      "top1": "D",
+      "top1_prob": 0.010288993827998638,
+      "cos_sim_last": 0.9999428987503052
+     },
+     {
+      "iteration": 20,
+      "top1": "D",
+      "top1_prob": 0.010321146808564663,
+      "cos_sim_last": 0.9999999403953552
+     },
+     {
+      "iteration": 50,
+      "top1": "D",
+      "top1_prob": 0.010293656028807163,
+      "cos_sim_last": 1.0000001192092896
+     },
+     {
+      "iteration": 100,
+      "top1": "D",
+      "top1_prob": 0.0102929025888443,
+      "cos_sim_last": 0.9999999403953552
+     }
+    ],
+    "final_last_vector": {
+     "top_token_ids": [
+      35,
+      4299,
+      32,
+      51,
+      54,
+      6242,
+      40,
+      464,
+      12001,
+      20530,
+      4774,
+      5840,
+      34,
+      50,
+      9487,
+      52,
+      3118,
+      13603,
+      15,
+      2484
+     ],
+     "top_tokens": [
+      "D",
+      "def",
+      "A",
+      "T",
+      "W",
+      "AB",
+      "I",
+      "The",
+      "local",
+      "RAW",
+      "host",
+      "Am",
+      "C",
+      "S",
+      "Class",
+      "U",
+      "Un",
+      "Dev",
+      "0",
+      "Sh"
+     ],
+     "top_probs": [
+      0.0102929025888443,
+      0.006119573023170233,
+      0.00558114517480135,
+      0.004838760010898113,
+      0.004834286402910948,
+      0.004645315930247307,
+      0.004356228280812502,
+      0.004139663651585579,
+      0.003871351480484009,
+      0.003772281575948,
+      0.0036286984104663134,
+      0.0034261951223015785,
+      0.003400641493499279,
+      0.0031295299995690584,
+      0.003105809446424246,
+      0.003041412914171815,
+      0.0029788799583911896,
+      0.0028860510792583227,
+      0.002815724117681384,
+      0.0027717980556190014
+     ],
+     "top1_prob": 0.0102929025888443,
+     "top10_mass": 0.05245150625705719,
+     "logit_margin": 0.5199623107910156,
+     "entropy_nats": 7.93245792388916,
+     "effective_support": 2786.2668267413883
+    },
+    "plain_k5": 0.5340773463249207,
+    "weighted_k5": 0.5380844664410565,
+    "plain_k10": 0.46082738041877747,
+    "weighted_k10": 0.4760493661306255,
+    "plain_k20": 0.4440787434577942,
+    "weighted_k20": 0.4565398646604872,
+    "p_freqmatched": 0.000999000999000999,
+    "freq_null_mean": 0.3043764531612396,
+    "freq_null_sd": 0.0226775910705328,
+    "p_uniform": 0.000999000999000999,
+    "uniform_null_mean": 0.3069304823875427,
+    "uniform_null_sd": 0.01711137406527996
+   },
+   "Nonsense": {
+    "prompt": "Flurb glex morp wintly skade",
+    "trace": [
+     {
+      "iteration": 0,
+      "top1": "\n",
+      "top1_prob": 0.04419226199388504,
+      "cos_sim_last": 1.0
+     },
+     {
+      "iteration": 2,
+      "top1": "m",
+      "top1_prob": 0.013962146826088428,
+      "cos_sim_last": 0.9934015274047852
+     },
+     {
+      "iteration": 3,
+      "top1": "w",
+      "top1_prob": 0.008839034475386143,
+      "cos_sim_last": 0.9931138753890991
+     },
+     {
+      "iteration": 5,
+      "top1": "D",
+      "top1_prob": 0.006587019190192223,
+      "cos_sim_last": 0.999240517616272
+     },
+     {
+      "iteration": 10,
+      "top1": "D",
+      "top1_prob": 0.010401061736047268,
+      "cos_sim_last": 0.9999837279319763
+     },
+     {
+      "iteration": 20,
+      "top1": "D",
+      "top1_prob": 0.010427908971905708,
+      "cos_sim_last": 0.9999999403953552
+     },
+     {
+      "iteration": 50,
+      "top1": "D",
+      "top1_prob": 0.010301847942173481,
+      "cos_sim_last": 0.9999998211860657
+     },
+     {
+      "iteration": 100,
+      "top1": "D",
+      "top1_prob": 0.01030117366462946,
+      "cos_sim_last": 0.9999998807907104
+     }
+    ],
+    "final_last_vector": {
+     "top_token_ids": [
+      35,
+      4299,
+      32,
+      54,
+      51,
+      6242,
+      40,
+      464,
+      12001,
+      20530,
+      4774,
+      5840,
+      34,
+      50,
+      9487,
+      52,
+      3118,
+      13603,
+      15,
+      2484
+     ],
+     "top_tokens": [
+      "D",
+      "def",
+      "A",
+      "W",
+      "T",
+      "AB",
+      "I",
+      "The",
+      "local",
+      "RAW",
+      "host",
+      "Am",
+      "C",
+      "S",
+      "Class",
+      "U",
+      "Un",
+      "Dev",
+      "0",
+      "Sh"
+     ],
+     "top_probs": [
+      0.01030117366462946,
+      0.006123912055045366,
+      0.005586131010204554,
+      0.004843766335397959,
+      0.004836666863411665,
+      0.004654416814446449,
+      0.004363409709185362,
+      0.004138452932238579,
+      0.003879812778905034,
+      0.0037646563723683357,
+      0.0036313440650701523,
+      0.003427143907174468,
+      0.0034070145338773727,
+      0.003130656201392412,
+      0.0030986685305833817,
+      0.003044504439458251,
+      0.0029809381812810898,
+      0.0028845465276390314,
+      0.002822446171194315,
+      0.0027697798795998096
+     ],
+     "top1_prob": 0.01030117366462946,
+     "top10_mass": 0.052492402493953705,
+     "logit_margin": 0.5200567245483398,
+     "entropy_nats": 7.931917667388916,
+     "effective_support": 2784.7619345273306
+    },
+    "plain_k5": 0.5340772867202759,
+    "weighted_k5": 0.538075194456141,
+    "plain_k10": 0.46082738041877747,
+    "weighted_k10": 0.47606740280504417,
+    "plain_k20": 0.4440787732601166,
+    "weighted_k20": 0.45657417557895846,
+    "p_freqmatched": 0.000999000999000999,
+    "freq_null_mean": 0.3064826726913452,
+    "freq_null_sd": 0.0243658609688282,
+    "p_uniform": 0.000999000999000999,
+    "uniform_null_mean": 0.30800238251686096,
+    "uniform_null_sd": 0.01717873103916645
+   },
+   "Imperative": {
+    "prompt": "Calculate the sum of all prime numbers below",
+    "trace": [
+     {
+      "iteration": 0,
+      "top1": ".",
+      "top1_prob": 0.2605307102203369,
+      "cos_sim_last": 1.0
+     },
+     {
+      "iteration": 2,
+      "top1": "The",
+      "top1_prob": 0.009231633506715298,
+      "cos_sim_last": 0.9850592017173767
+     },
+     {
+      "iteration": 3,
+      "top1": "D",
+      "top1_prob": 0.009067303501069546,
+      "cos_sim_last": 0.9955136179924011
+     },
+     {
+      "iteration": 5,
+      "top1": "D",
+      "top1_prob": 0.00977334100753069,
+      "cos_sim_last": 0.9989547729492188
+     },
+     {
+      "iteration": 10,
+      "top1": "D",
+      "top1_prob": 0.00986537430435419,
+      "cos_sim_last": 0.999994158744812
+     },
+     {
+      "iteration": 20,
+      "top1": "D",
+      "top1_prob": 0.009964908473193645,
+      "cos_sim_last": 1.0
+     },
+     {
+      "iteration": 50,
+      "top1": "D",
+      "top1_prob": 0.009907333180308342,
+      "cos_sim_last": 0.9999998807907104
+     },
+     {
+      "iteration": 100,
+      "top1": "D",
+      "top1_prob": 0.009907271713018417,
+      "cos_sim_last": 0.9999999403953552
+     }
+    ],
+    "final_last_vector": {
+     "top_token_ids": [
+      35,
+      4299,
+      32,
+      51,
+      54,
+      464,
+      6242,
+      40,
+      20530,
+      9487,
+      4774,
+      5840,
+      12001,
+      50,
+      34,
+      13603,
+      2484,
+      52,
+      3118,
+      14126
+     ],
+     "top_tokens": [
+      "D",
+      "def",
+      "A",
+      "T",
+      "W",
+      "The",
+      "AB",
+      "I",
+      "RAW",
+      "Class",
+      "host",
+      "Am",
+      "local",
+      "S",
+      "C",
+      "Dev",
+      "Sh",
+      "U",
+      "Un",
+      "Chapter"
+     ],
+     "top_probs": [
+      0.009907271713018417,
+      0.005902360193431377,
+      0.005481201224029064,
+      0.005027881357818842,
+      0.004438291769474745,
+      0.004315159283578396,
+      0.004194758832454681,
+      0.00413723848760128,
+      0.0041026039980351925,
+      0.003446742193773389,
+      0.0033953217789530754,
+      0.003359780879691243,
+      0.0033580223098397255,
+      0.0031588238198310137,
+      0.0031403901521116495,
+      0.0029268108773976564,
+      0.0029093509074300528,
+      0.002893703058362007,
+      0.0028903905767947435,
+      0.0028260452672839165
+     ],
+     "top1_prob": 0.009907271713018417,
+     "top10_mass": 0.050953514873981476,
+     "logit_margin": 0.5179166793823242,
+     "entropy_nats": 7.956134796142578,
+     "effective_support": 2853.0240934843937
+    },
+    "plain_k5": 0.5340773463249207,
+    "weighted_k5": 0.5393890178798988,
+    "plain_k10": 0.4639906585216522,
+    "weighted_k10": 0.4795685412185538,
+    "plain_k20": 0.4404296576976776,
+    "weighted_k20": 0.45370180588645076,
+    "p_freqmatched": 0.000999000999000999,
+    "freq_null_mean": 0.3058893084526062,
+    "freq_null_sd": 0.02318251132965088,
+    "p_uniform": 0.000999000999000999,
+    "uniform_null_mean": 0.3082434833049774,
+    "uniform_null_sd": 0.01751943677663803
+   }
+  }
+ },
+ "top1_tokens": {
+  "Lucier": "prolet",
+  "Semantic": "prolet",
+  "Syntactic": "Divine",
+  "Nonsense": "prolet",
+  "Imperative": "prolet",
+  "trial_00": "\u2015",
+  "trial_01": "\u2015",
+  "trial_02": "\u2015",
+  "trial_03": "ei",
+  "trial_04": "ei",
+  "trial_05": "vertex",
+  "trial_06": "\u2015",
+  "trial_07": "trader",
+  "trial_08": "vertex",
+  "trial_09": "ei",
+  "trial_10": "instant",
+  "trial_11": "Hindu",
+  "trial_12": "\u2015",
+  "trial_13": "\u2015",
+  "trial_14": "vertex"
+ }
+}
