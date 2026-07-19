@@ -6,7 +6,7 @@
 
 Inspired by Alvin Lucier's iterative feedback composition *I Am Sitting in a Room*, this project applies an analogous operation to small open-weight language models. Where Lucier's process dissolved speech into a room's resonant frequencies through looped excitation, **Activation Tensor Resonance** dissolves semantic content into a model's stable states — and then asks what those states are made of.
 
-NOTE: What started as a moment of curiosity turned up a rather unexpected result. This result posed a number of questions, some of which have been answered with further experiment and some left unexplained. The recent publication of Anthropic's J-space paper has created a new path to travel with some of these open questions, and is currently the focus of a further, separate investigation.
+NOTE: What started as a moment of curiosity turned up a rather unexpected result. This result posed a number of questions, some of which have been answered with further experiment and some left unexplained. The recent publication of Anthropic's [J-space paper](https://transformer-circuits.pub/2026/workspace/index.html) has created a new path to travel with some of these open questions, and is currently the focus of a further, separate investigation. (A reading primer for that paper, and its bridge to this project's open questions, lives in [JSPACE_PRIMER.md](docs/JSPACE_PRIMER.md).)
 
 <p align="center">
   <img src="experiments/gpt2_small/output/convergence_matrix.png" alt="Cross-prompt convergence matrix — 125 prompts, block structure showing distinct attractor basins in GPT-2 Small" width="800"/>
@@ -168,6 +168,8 @@ ATR never set out to be a technique at all. It began as a thought experiment, an
     ├── FINDINGS.md                  ← ⭐ the canonical record: results, hypotheses, caveats
     ├── TECHNICAL.md                 ← formal method specification
     ├── UNDERSTANDING.md             ← accessible mechanism explanation
+    ├── MATH_PRIMER.md               ← the maths from scratch, tied to this repo
+    ├── JSPACE_PRIMER.md             ← reading companion for Anthropic's J-space paper
     ├── ISOMORPHISM.md               ← Lucier ↔ transformer correspondence
     ├── SCALING_ARTEFACT_ANALYSIS.md ← artefact-vs-intrinsic attribution
     ├── VALIDATION_PLAN.md           ← the pre-registered validation design (historical)
@@ -237,3 +239,4 @@ The honest list — sample sizes, pending statistics, what "reproducible" does a
 - Biderman, S., et al. (2023). *Pythia: A Suite for Analyzing Large Language Models Across Training and Scaling.* [arXiv:2304.01373](https://arxiv.org/abs/2304.01373)
 - Lucier, A. (1969). [*I Am Sitting in a Room.*](https://en.wikipedia.org/wiki/I_Am_Sitting_in_a_Room) Lovely Music. [YouTube performance](https://www.youtube.com/watch?v=v9XJWBZBzq4)
 - Nanda, N. & Bloom, J. (2022). [TransformerLens](https://github.com/TransformerLensOrg/TransformerLens)
+- Anthropic (2026). *Verbalizable Representations Form a Global Workspace in Language Models.* [Paper](https://transformer-circuits.pub/2026/workspace/index.html) · [Announcement](https://www.anthropic.com/research/global-workspace) · [Companion code](https://github.com/anthropics/jacobian-lens)
