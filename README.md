@@ -170,6 +170,7 @@ ATR never set out to be a technique at all. It began as a thought experiment, an
     ├── UNDERSTANDING.md             ← accessible mechanism explanation
     ├── MATH_PRIMER.md               ← the maths from scratch, tied to this repo
     ├── JSPACE_PRIMER.md             ← reading companion for Anthropic's J-space paper
+    ├── JSPACE_READING_GUIDE.md      ← page-keyed map of the 133-page paper PDF
     ├── ISOMORPHISM.md               ← Lucier ↔ transformer correspondence
     ├── SCALING_ARTEFACT_ANALYSIS.md ← artefact-vs-intrinsic attribution
     ├── VALIDATION_PLAN.md           ← the pre-registered validation design (historical)
