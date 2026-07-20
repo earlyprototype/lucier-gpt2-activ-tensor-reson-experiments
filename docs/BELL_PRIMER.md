@@ -1,207 +1,199 @@
 # The Mechanics of the Bell
 
-*A self-study companion to the Session 04 experiments (PR #15). Written to be read start to finish, slowly, with no prerequisites beyond [MATH_PRIMER.md](MATH_PRIMER.md) and [JSPACE_PRIMER.md](JSPACE_PRIMER.md). Every new concept is introduced from scratch and then pointed at the exact place it appears in this repository.*
+*A plain-language companion to the Session 04 experiments (PR #15). Written to be read start to finish. Assumes [MATH_PRIMER.md](MATH_PRIMER.md) (vectors, cosine similarity, the residual stream, the readout, iterated maps) and [JSPACE_PRIMER.md](JSPACE_PRIMER.md) (the J-lens). Each section states what was done, what was measured, what the numbers were, and what follows from them. Project names are kept ("the bell", "the hinge") but every one is defined literally at first use.*
 
-**Where this fits among the other docs:** MATH_PRIMER taught the objects (vectors, tensors, cosine similarity), the machine (tokens, embeddings, the residual stream, the readout), and the dynamics (iterated maps, fixed points, basins). JSPACE_PRIMER taught the lens. This document teaches the layer that Session 04 added on top of both: motion, nudges, heads, and the geography of the vocabulary. The four experiment reports (`output_lagk/`, `output_hinge_eigen/`, `output_glitch/`, `output_jlens_phase/` under `experiments/gpt2_small/`) are the primary record; this is the rung below them.
-
----
-
-## Part 1: The Bell
-
-### 1.1 A second kind of settling
-
-MATH_PRIMER Part 3 taught the fixed point: a state the map sends to itself, f(x) = x. Press the key again, nothing changes. The `prolet` basins are fixed points, and for most of this project's life, "settled" and "fixed point" were the same word.
-
-The bell is the second kind of settling. There are two states, call them **A** and **B**, and the map sends each to the other: f(A) = B, f(B) = A. Press the key once and you move; press it twice and you are exactly home. This object is called a **limit cycle** (MATH_PRIMER's glossary listed it as a possibility; the Syntactic prompt's `Divine` state turned out to be one), and its **period** is 2, the number of presses that returns you to your start.
-
-Concretely, A and B are two specific activation tensors, and "exactly" is not a figure of speech: the measured cosine similarity between A and f(f(A)) is 1.000000, machine precision, while A and B sit at cosine 0.685 from each other, clearly different states. The system is not wandering near a valley floor. It is ticking between two floors of one valley, forever.
-
-One more measured fact keeps later sections simple: at the bell, all ten token positions of the tensor hold identical vectors (row spread exactly 0.0). The room has gone fully uniform, so the whole cycle lives in a single 768-dimensional vector and we can talk about "the state" without worrying which position we mean.
-
-**Where you've seen it:** FINDINGS.md F9; `output_divine_motion/bell_anatomy.md`; the phase A and phase B rows of every Session 04 table.
-
-### 1.2 Aliasing, or why every camera missed it
-
-Film a spinning wagon wheel at the wrong frame rate and the wheel appears to stand still or turn backward: the camera samples the motion in step with the motion itself. This failure is called **aliasing**, and it is why the bell stayed hidden for the project's entire life.
-
-Every prior snapshot schedule in this repository sampled at even intervals: every 10 iterations, every 50. A period-2 object looks *perfectly frozen* to any even-step camera, because two steps bring it exactly home, so ten steps do too. The state was photographed thousands of times, always in the same phase, and every photograph agreed. The motion was not small; it was synchronised with the shutter.
-
-The tell, once someone finally looked, was a contradiction between two rulers: snapshots ten apart matched to six decimal places while consecutive iterations matched only to 0.685. Identical at lag ten, different at lag one: impossible for a fixed point, mandatory for a bell.
-
-**Where you've seen it:** FINDINGS.md F9's "why no prior run saw it"; `output_divine_motion/divine_motion_report.md`.
-
-### 1.3 The lag-k gate
-
-The convergence gate (MATH_PRIMER 4.3) asked every trajectory one question: are you the same as you were one step ago? Formally, is the cosine between iterate t and iterate t-1 above 0.999? A fixed point answers yes. A bell answers **no, forever**: its lag-1 cosine is pinned at 0.685 by the geometry of the cycle itself. The old gate did not fail to detect the bell's convergence; it asked a question the bell cannot answer yes to, by construction.
-
-The fix is one idea: let the gate ask "are you the same as you were **k** steps ago" instead, for a chosen lag k. Session 04 added this to the engine (`run_atr_gated` gained a `gate_lag` parameter; the default k = 1 behaves bit-for-bit as before) plus a small helper, `lag_scan`, that measures the cosine at every lag from 1 to 8 at once.
-
-Run that scan on the bell and you get its fingerprint, the **parity stripe**: odd lags all 0.685, even lags all 1.000000. Under a lag-2 gate, `Divine` formally converges, at the standard threshold, with room to spare. The stripe also shows what a longer bell would look like (a period-4 cycle would pass only at lags 4 and 8), which matters because the old cameras were blind to every period equally, and nobody has yet censused the other 33 ringing prompts. That waits on the prompt library (issue #9).
-
-One honesty note the report makes loudly: the lag-k gate fixes *cycle blindness*, not every blindness. The committed noise state drifts so slowly by iteration 1000 that it clears the cosine threshold at every lag while genuinely still moving. A gate is a question, and every question has states that game it.
-
-**Where you've seen it:** `atr_engine.py` (`gate_lag`, `lag_scan`); `output_lagk/lagk_report.md`; FINDINGS.md's "34 prompts ring, pending re-gate" correction.
+**The four experiment reports this document summarises:** `output_lagk/lagk_report.md`, `output_hinge_eigen/hinge_eigenvalue.md`, `output_glitch/glitch_alignment.md`, `output_jlens_phase/jlens_phase.md`, all under `experiments/gpt2_small/`. They are the primary record; where this document and a report differ, the report governs.
 
 ---
 
-## Part 2: The Nudge
+## Part 1: The cycle, and why it was missed
 
-### 2.1 Zooming in until curves look straight
+### 1.1 What Divine is
 
-The forward map f is ferociously nonlinear (MATH_PRIMER 3.3 explained why that word matters: attention softmaxes, GeLUs, LayerNorms). But every smooth curve, examined closely enough around one point, looks like a straight line. **Linearisation** is that zoom: pick a point, and ask what f does to *tiny* displacements away from that point. The answer is always a linear map (a matrix), called the **Jacobian** of f at that point. JSPACE_PRIMER 3.1 built this object from scratch for the lens; here it returns as a microscope for the bell.
+"The bell" is the project's name for the following measured fact. Take the Syntactic prompt's state at iteration 1000 and call it A. Apply the map once (one forward pass plus the energy rescale): the result, B, is a different state. Apply the map to B: the result is A again, exactly.
 
-The Jacobian at a point is a 768 × 768 matrix, big but not the point. The point is what it does to *one direction at a time*.
+- cos(A, B) = 0.685. A and B are clearly different states.
+- cos(A, f(f(A))) = 1.000000. Two applications return the start, to machine precision.
 
-### 2.2 The whisper experiment
+So the trajectory is A, B, A, B, forever. This is called a **limit cycle of period 2**: period 2 because two applications of the map return you to where you started. A and B are called **phase A** and **phase B**. It is a different kind of stable object from a fixed point (where one application returns the start).
 
-Session 04's central measurement is almost embarrassingly simple to describe. Stand the system at a chosen base point. Add a whisper of a chosen direction d (a displacement so small the curve is effectively straight). Run one lap of the map. Subtract what the unwhispered lap gives. What remains is what the map *does* to that direction, and the interesting summary is one number: the **multiplier along d**, how much of the returned whisper still points along d, with what sign and size.
+One measured simplification used throughout: at the bell, all 10 token positions of the tensor hold identical vectors (the row spread is exactly 0.0). So the whole cycle is described by a single 768-dimensional vector per phase, and "the state" needs no position qualifier.
 
-- Multiplier +1: the direction passes through the lap unchanged.
-- Multiplier +0.5: it survives, shrunk by half.
-- Multiplier -1: it comes back exactly flipped, same size.
-- Multiplier -4: it comes back flipped *and four times louder*.
+**Where recorded:** FINDINGS.md F9; `output_divine_motion/bell_anatomy.md`.
 
-Two independent techniques compute this (forward-mode automatic differentiation, and simply doing the whisper twice at two whisper sizes and checking the answers agree). They matched to three or four significant figures on every headline number, which is the report's warrant for trusting them.
+### 1.2 Why it went undetected
 
-The direction whispered was **the hinge, d**: the axis along which the bell actually swings, the normalised difference between phase A and phase B. And the base points were the two phases themselves plus **M**, the **pivot**, the midpoint between them: the still centre the bell swings around.
+Every earlier run saved the state at even intervals: every 10 iterations, or every 50. Ten applications of the map is five full cycles, which returns the state exactly to the phase it was in. Therefore every saved snapshot was the same phase, the saved sequence was constant, and the state appeared frozen. The general name for this failure is **aliasing**: sampling a repeating process at an interval that is a multiple of its period, so the repetition is invisible in the samples.
 
-**Where you've seen it:** `08_hinge_eigenvalue.py`; the "two epsilons" and "jvp" rows of `output_hinge_eigen/hinge_eigenvalue.json`.
+The detection came from a contradiction between two measurements: snapshots 10 iterations apart matched to six decimal places, while consecutive iterations matched only at 0.685. Both cannot be true of a fixed point. Both are necessarily true of a period-2 cycle.
 
-### 2.3 What the numbers said
+### 1.3 The convergence-test fix
 
-The conjecture from Session 03 was elegant: perhaps the hinge carries a multiplier of about **-1**, a perfect see-saw, each lap exactly undoing the last. The measurement kept the sign and destroyed the magnitude.
+The old convergence test compared each iteration to the previous one and declared convergence when the cosine stayed above 0.999. For the bell, that comparison returns 0.685 every time, so the test could never pass, regardless of how long the run continued. This is arithmetic, not a tuning problem.
 
-At the pivot M, the multiplier along the hinge is **-4.3**. Not a gentle see-saw: the map takes any small lean along the hinge, flips it, and *amplifies it four-fold*. The pivot is a balance point in the sense that a pencil on its tip is a balance point: f(M) lands almost exactly back on M (cosine 0.995), but the slightest lean along d is hurled to the other side, harder.
+The fix, added to `atr_engine.py` in Session 04: the comparison interval is now a parameter, `gate_lag`. With `gate_lag = 2`, the test compares each iteration to the one two steps back. Under that test, Divine passes at the standard 0.999 threshold. The default remains `gate_lag = 1`, and with the default the engine's behaviour is unchanged (verified bit-identical against the pre-change code on a real run).
 
-Meanwhile three random control directions, whispered the same way at the same point, came back with multipliers between +0.9 and +1.2: upright, roughly unchanged. The inversion is not a property of the map in general. It is a property of *one direction*. The hinge is special, measurably, and nothing else nearby is.
+A helper, `lag_scan`, measures the cosine at every comparison interval from 1 to 8 at once. For the bell the result is: odd intervals all 0.685, even intervals all 1.000000. This pattern is the direct signature of period 2, and the same table would expose a period-4 cycle (which would pass only at intervals 4 and 8). No one has yet run this scan on the other 33 non-converging prompts; that requires the prompt library (issue #9).
 
-So why does the system not fly apart? Because the right object for a period-2 cycle is not one lap but the round trip: the Jacobian at A composed with the Jacobian at B. Whisper d at A, carry the result through B's lap, and the *two-step* multiplier comes back at **+0.1**. Positive (two flips cancel), and far below 1: any error accumulated around the loop is crushed to a tenth per revolution. The cycle is not marginal. It is strongly attracting.
+Two limits of the fix, stated in the report: it detects cycles, not slow drift (the committed noise state moves slowly enough by iteration 1000 to pass the cosine threshold at every interval while genuinely still moving); and the full re-classification of the 125-prompt sweep has not been run.
 
-**Where you've seen it:** the verdict paragraph of `output_hinge_eigen/hinge_eigenvalue.md`; FINDINGS caveats on the conjecture's fate.
-
-### 2.4 The shape this makes
-
-Hold both numbers at once and the object snaps into focus. A balance point that violently ejects along exactly one axis (-4.3), wrapped inside a two-step orbit that firmly recaptures everything (+0.1). In dynamical systems this configuration has a name, **period doubling**: a would-be fixed point whose instability along one direction does not destroy stability but *converts* it, from resting to oscillating. The system cannot sit at M, and cannot leave the neighbourhood of M, so it does the only remaining thing: it rings.
-
-This is why the bell is best heard as a deep two-step groove rather than a knife edge. Knock it (numerically, the reports did) and it falls back into the same tick.
+**Where recorded:** `atr_engine.py` (`gate_lag`, `lag_scan`); `output_lagk/lagk_report.md`.
 
 ---
 
-## Part 3: The Beam
+## Part 2: The derivative measurement
 
-### 3.1 What an attention head is
+### 2.1 The quantity being measured
 
-MATH_PRIMER 2.3 described each layer as two kinds of machinery painting onto the residual stream: attention (each position reads from other positions) and the MLP (each position transforms alone). One refinement is needed now: a layer's attention is not one reader but **twelve independent readers**, called **heads**. Each head has its own small set of learned weights, its own pattern of where to look and what to copy, and each adds its own contribution into the stream. GPT-2 Small has 12 layers × 12 heads = 144 heads total. Interpretability research names them like apartment doors: L11.H8 is layer 11, head 8.
+Define two objects from the cycle:
 
-A head is not a homunculus. It is a fixed linear-algebra gadget (two low-rank matrix products with a softmax between) whose learned weights happen to implement some input-output habit. Attributing a behaviour to a head means: remove or isolate that head's added contribution and the behaviour follows it. A lever, not an intention.
+- **The hinge, d**: the normalised difference between the phases, d = (A - B) / ‖A - B‖. This is the direction along which the two phases differ, which is the direction the state moves along on every step.
+- **The pivot, M**: the midpoint, M = (A + B) / 2.
 
-### 3.2 Following the whisper through twelve floors
+The question: what does one application of the map do to a small displacement along d? Formally this is a directional derivative. Practically it was measured two independent ways: automatic differentiation (`torch.func.jvp`), and directly, by adding a small multiple of d to the base point, running one iteration, subtracting the undisplaced result, and dividing by the size of the displacement. The two methods agreed to 3 or 4 significant figures on every reported number, and the direct method was repeated at two displacement sizes to confirm the answer did not depend on the size.
 
-The multiplier of Part 2 summarises a whole lap. The obvious next question: *where inside the lap* does the flip happen? The measurement is the same whisper, watched floor by floor: inject the whispered d at the bottom of the network, and at every layer boundary compare the propagated disturbance with d. Cosine near +1: still upright. Cosine near -1: flipped.
+The summary number is the **multiplier along d**: the component of the returned displacement that lies along d, with sign. Multiplier +1 means the displacement passes through one iteration unchanged. Multiplier -1 means it returns with the same size, pointing the opposite way. Multiplier -4 means it returns pointing the opposite way, four times larger.
 
-The answer is theatrical. The disturbance rides **upright through all of layers 0 to 10** (cosine between +0.88 and +0.97 the whole way; layer 2's MLP even amplifies it slightly). Then it crosses layer 11 and emerges at cosine **-0.99**. Eleven floors of faithful transmission, one floor of inversion. The flip is not distributed. It is localised to a single block.
+### 2.2 The results
 
-### 3.3 One head does it
+Measured at the pivot M:
 
-Layer 11 contains thirteen candidate levers: twelve attention heads and one MLP. TransformerLens exposes each one's added contribution separately, so the disturbance each contributes can be measured alone. The MLP's share of the flip is small (-0.17). The attention's is decisive (-2.0). And within the attention, one head, **L11.H8, carries 99.1 percent of the inversion**; the next-largest head contributes 0.014, seventy times less.
+- Along d: multiplier **-4.3**. A small displacement along the hinge returns inverted and 4.3 times larger.
+- Along three random control directions: multipliers **+0.9 to +1.2**. Ordinary directions pass through roughly unchanged.
+- M itself maps almost to itself: cos(f(M), M) = 0.995.
 
-Read that with both the excitement and the discipline it deserves. The excitement: a global dynamical behaviour of the entire network (an eternal two-step oscillation of the whole state) reduces to one nameable component performing one linear-algebra act, flipping one direction. That is the full arc interpretability aims for: phenomenon, anatomy, mechanism. The discipline: this is one head's *role in this cycle at this point of state space*, measured under whispers. It is not a claim about what L11.H8 does for ordinary text, and nobody has yet asked what its attention pattern is actually reading when it performs the flip. That question is sitting there, unopened.
+So M is nearly a fixed point, but unstable in exactly one direction: any component along d grows by a factor of about 4 per step, flipping sign each time. The map treats d differently from every other direction tested.
 
-**Where you've seen it:** the layer table and per-head split in `output_hinge_eigen/hinge_eigenvalue.md`; the flutter-echo beam image in issue #14.
+Measured around the full two-step cycle (the derivative at A composed with the derivative at B):
 
----
+- Along d: net multiplier **+0.1**. Positive, because two inversions cancel; and much smaller than 1, meaning any deviation from the cycle shrinks by roughly 90 percent every two steps.
 
-## Part 4: The Walls
+These two numbers together explain the observed behaviour. The system cannot rest at M (deviations along d grow). It also cannot leave the neighbourhood (deviations from the two-step cycle shrink). The only available behaviour is the alternation itself. The Session 03 conjecture had predicted a multiplier near -1 at the pivot; the sign was right, the size was not. A multiplier of -1 would be a marginal, borderline case. The measured -4.3 with a two-step contraction of +0.1 is a strongly stable oscillation. The technical name for this structure (a near-fixed point whose single unstable direction produces a stable period-2 cycle around it) is a **period-doubling** configuration.
 
-### 4.1 The vocabulary as a city
-
-The embedding matrix W_E (MATH_PRIMER 2.2) gives every one of the 50,257 tokens a home address in 768-dimensional space, learned from training. Training is not even-handed: tokens that appeared constantly (` the`, ` in`, the comma) had their addresses adjusted millions of times; tokens that barely appeared were barely moved. The vocabulary is a city with dense, well-worn districts and, crucially, a **ghost town**: tokens that exist in the dictionary but almost never occurred in the training text, whose embeddings still sit near where random initialisation left them, huddled close to the city's centre of mass (the **centroid**, the average of all token embeddings).
-
-The famous residents of the ghost town are the **glitch tokens** (` SolidGoldMagikarp`, ` petertodd`, `ertodd` and family, Rumbelow and Watkins 2023): strings the tokenizer memorised from Reddit usernames but the model never studied, because the pages they lived on were filtered out before training. Undefined words in the model's own dictionary.
-
-### 4.2 Measuring "points toward"
-
-Session 04 asked a geometric question: does the hinge d *point at* the ghost town, or merely pass nearby? The measurement: take the ghost town's centre (the centroid of the cluster's embeddings), subtract the whole city's centre, normalise, and call that direction u, "from average toward ghost town." Then one cosine: cos(d, u).
-
-The answer: **-0.596** for the tightest cluster definition, and -0.456 for a hand-curated list of 52 published glitch tokens matched into the vocabulary. The sign convention makes the minus meaningful: it says the *phase-B* side of the hinge points at the ghost town. Walk from A to B and you walk toward the untrained quarter. Look at which actual tokens lie along each pole and the picture is blunt: the fifty tokens best aligned with the B pole are 90 percent ghost-town residents; the fifty best aligned with the A pole are ` the`, ` in`, ` on`, the busiest words in the language.
-
-The bell swings between the training distribution's two ends: everything the model practised most, and everything it never practised at all. Those are the two walls of the flutter echo.
-
-### 4.3 The nulls, and one debunking
-
-A cosine of -0.6 means little without knowing what cosines random directions achieve, so the report runs two **null models** (MATH_PRIMER 4.3's move, again). First, 1000 clusters of randomly chosen tokens: their direction-cosines with d never exceed 0.30 in magnitude, so -0.596 is far outside chance (p < 0.001). Second, and stricter, 1000 clusters of tokens *matched to the ghost town's embedding norms*, which tests whether d merely tracks token obscurity in general: those actually lean the *opposite* way (+0.48 on average), making the B pole's ghost-town alignment more surprising, not less.
-
-The nulls also demolished a folk criterion along the way: "low embedding norm finds glitch tokens" is simply false in GPT-2. The lowest-norm tokens are the *most* common function words, and their apparent alignment with the hinge dies under the matched null. In this model, the glitch signature is nearness to the centroid, not smallness.
-
-### 4.4 What this does and does not mean
-
-It does not mean the model is "thinking about Magikarp." The ghost town functions here as *geometry*, not meaning: a degenerate, low-structure corner of embedding space that the dynamics use as one wall to bounce off. What it does mean: training-data artifacts, previously known as input-side curiosities (type the weird token, get weird behaviour), can play a *structural role in a model's intrinsic dynamics*. As far as this project knows, that observation is new.
-
-**Where you've seen it:** `output_glitch/glitch_alignment.md`, including the pole top-50 lists, which are worth reading with your own eyes.
+**Where recorded:** `output_hinge_eigen/hinge_eigenvalue.md`, results 1 and 2; the numbers file `hinge_eigenvalue.json`.
 
 ---
 
-## Part 5: The Register
+## Part 3: Locating the inversion
 
-### 5.1 The lens, in one breath
+### 3.1 Attention heads, defined
 
-JSPACE_PRIMER built the J-lens: an instrument that asks, for any internal state, how much of it lies in the model's *verbalizable subspace*, the region its own language machinery can express. The pilot (issue #8) probed the converged states and found, to everyone's surprise, that the boundary it drew was language-versus-noise, not prolet-versus-Divine.
+Each of GPT-2 Small's 12 layers contains an attention block and an MLP block, and both add their outputs into the residual stream (MATH_PRIMER 2.3). One refinement is needed here: an attention block is not one unit. It is 12 separate **heads**, each with its own learned weights, each computing its own output, all added into the stream. GPT-2 Small therefore has 144 heads. The naming convention is layer then head: L11.H8 is layer 11, head 8.
 
-The pilot probed `Divine` before anyone knew it was a bell. It therefore photographed one phase.
+### 3.2 The measurement
 
-### 5.2 The phase table
+Add a small multiple of d to the state at the point where the loop re-injects it (the input of layer 0). Run one forward pass. At each layer boundary, subtract the undisplaced run from the displaced run to get the propagated displacement, and measure its cosine with d.
 
-Session 04 re-ran the identical probe on phase A, phase B, and the pivot M. Three results, in ascending order of strangeness:
+Results, per layer boundary:
 
-1. **The phases differ.** A is moderately lens-expressible (the pilot's number, faithfully reproduced); B drops below A at every layer, on both probe variants, down to noise level on one of them. The pilot's verdict was a fact about phase A only.
-2. **The pivot M is the most lens-expressible state this project has ever measured.** The still centre the bell swings around is more *sayable* than any settled basin. (Fittingly, the stable ` Divine` readout was already known to be the shadow of M rather than of either phase.)
-3. **The hinge itself is mostly outside the lens.** As a direction, d scores 0.145 against a generic direction's 0.25 chance level, and the split sharpens it: the 73 percent of d that the readout cannot hear is *almost entirely* outside the lens too (falling to 0.008 at the last layer), while the readout-visible sliver of d is strongly inside.
+- After layers 0 through 10: cosine **+0.88 to +0.97**. The displacement is transmitted essentially unchanged in direction through eleven layers.
+- After layer 11: cosine **-0.99**. The inversion happens inside layer 11 and nowhere else.
 
-That third result is the one to sit with. Readout-muteness and lens-muteness travel together: the direction the bell swings along is invisible to the tuner *and* barely within the model's sayable subspace. The system spends eternity oscillating in a register its own voice can hardly reach, around a centre that is the most speakable thing in sight.
+Splitting layer 11's two blocks (their added outputs can be measured separately): the MLP's contribution to the flip is -0.17; the attention block's is -2.0. Splitting the attention block's 12 heads: **head 8 contributes 99.1 percent of the inversion**. The next largest head contributes 0.014.
 
-### 5.3 Confidence level
+### 3.3 What this attribution means, and what it does not
 
-Everything here inherits the pilot's confidence: a restricted lens, built once, on a 124-million-parameter model nobody has shown to have an organised workspace at all. The phase difference and the hinge result are pilot-grade observations with clean internal controls, not established facts. As the reports keep saying: a null here is a finding, and so is a maybe.
+It means: in this region of state space, for this direction, the sign inversion that sustains the cycle is performed by one identifiable component, L11.H8. Remove or isolate that component's output and the flip follows it. This is the standard form of a mechanistic attribution: a global behaviour of the network traced to a specific part.
 
-**Where you've seen it:** `output_jlens_phase/jlens_phase.md`, phase table and hinge decomposition sections.
+It does not mean: that this head "causes Divine" in general, that it behaves this way on ordinary text, or that anyone has examined what its attention pattern attends to during the cycle. Those are open questions. The measurement is local to the cycle and made with small displacements.
 
----
-
-## Part 6: The Frames
-
-Session 04 also caught an error worth understanding, because its moral is the same as aliasing's. The bell-anatomy script had built its hinge from mismatched ingredients: phase A at raw scale, phase B rescaled to the loop's energy shell (MATH_PRIMER 1.3). The resulting "committed d" leans 0.97 toward A itself and only 0.62 toward the clean flip axis. The eigenvalue work caught this, defined the symmetric on-shell hinge properly, measured *everything both ways*, and showed the two versions agree 0.97 once the loop's own normalisation strips the contamination. The earlier results stand, with the caveat recorded; harmonising every script on the clean hinge is queued follow-up work.
-
-The moral, twice in one session: the instrument is part of the experiment. An even-stepped camera reported a frozen bell; a mixed-frame hinge reported a coincidental -0.86 "near minus one" that flattered the conjecture. Both were caught by measuring the same thing two independent ways. That habit, not any single number, is the method.
-
-**Where you've seen it:** the "map, frames, and two hinges" section of `output_hinge_eigen/hinge_eigenvalue.md`; the method flag in PR #15's description.
+**Where recorded:** `output_hinge_eigen/hinge_eigenvalue.md`, result 3 (the per-layer table and per-head split).
 
 ---
 
-## Part 7: Pocket Glossary
+## Part 4: The embedding alignment
 
-| Term | One-line meaning | Where it lives here |
+### 4.1 The token cluster in question
+
+Every token has a 768-number embedding vector, a row of W_E (MATH_PRIMER 2.2). Average all 50,257 rows to get the mean embedding. Most tokens sit far from this mean, because training moved them. A small set of tokens sits unusually close to it: these are tokens that almost never occurred in the training text, so their vectors were barely updated from initialisation.
+
+The known members of this set include the published **glitch tokens** (" SolidGoldMagikarp", " petertodd", "ertodd" and related; Rumbelow and Watkins 2023). The mechanism is documented: these strings occurred often enough in the corpus used to build the tokenizer (largely as Reddit usernames) to receive vocabulary entries, but the pages containing them were filtered out before the model's weight training, so the model never learned anything about them.
+
+Session 04 defined the cluster two independent ways: geometrically (the 0.1 percent of the vocabulary closest to the mean embedding, 50 tokens) and by list (52 published glitch-token strings matched into the vocabulary). The two definitions agree with each other (their centroid directions have cosine +0.67).
+
+### 4.2 The measurements
+
+Let u be the normalised direction from the mean embedding toward the cluster's centroid. Measured:
+
+- **cos(d, u) = -0.596** for the geometric cluster, **-0.456** for the published list. The sign convention: negative means the B side of d points toward the cluster.
+- Chance comparison 1: the same cosine computed for 1000 clusters of randomly chosen tokens never exceeded 0.30 in magnitude. So -0.596 is far outside chance (p < 0.001).
+- Chance comparison 2 (stricter): 1000 clusters of tokens chosen to match the glitch cluster's embedding norms. These lean the opposite way (mean +0.48), so the result is not explained by norm or token rarity in general.
+- Of the 50 vocabulary tokens whose embeddings best align with the B side of d, **45 are in the geometric cluster**. Of the 50 best aligned with the A side, most are the highest-frequency function words: " the", " in", " on", the comma.
+- A side finding from the controls: low embedding norm does not identify glitch tokens in GPT-2. The lowest-norm tokens are the most frequent function words, and their apparent alignment with d disappears under the norm-matched comparison. In this model the glitch signature is proximity to the mean, not small norm.
+
+### 4.3 What follows
+
+Stated plainly: the direction along which Divine oscillates runs between the embedding region of the most-trained tokens (one end) and the region of never-trained tokens (the other end). This is a geometric statement about where the cycle sits in the model's representation space, not a statement that the model is processing or "referring to" those tokens. Its significance: glitch tokens were previously known only as anomalous inputs; here the untrained region of embedding space plays a role in the model's internal dynamics with no glitch token ever appearing in the input.
+
+**Where recorded:** `output_glitch/glitch_alignment.md`, including the two top-50 token lists in full.
+
+---
+
+## Part 5: The lens measurements
+
+### 5.1 The quantity
+
+JSPACE_PRIMER describes the J-lens. For this document one number matters: for any state (or direction), the **span share** is the fraction of it (of its squared length) that can be expressed as a combination of the lens's fixed set of directions. Share 1.0 means fully expressible in that set; 0 means orthogonal to all of it. A random direction scores about 0.25 against this particular lens (193 directions in a 768-dimensional space, measured directly as a baseline). A second variant, the sparse share, restricts the combination to a few nonnegative terms; it behaves consistently and is reported alongside.
+
+The pilot (issue #8) measured Divine before the cycle was known, so it measured one phase. Session 04 repeated the identical measurement on both phases and the midpoint. The replay of the pilot's own states reproduced its recorded numbers to 7 decimal places, which is the check that the instrument was reassembled correctly.
+
+### 5.2 The results (last layer; the per-layer tables are in the report)
+
+| state | span share |
+|:---|---:|
+| phase A | 0.173 |
+| phase B | 0.123 |
+| midpoint M | 0.180 |
+| prolet (average) | 0.157 |
+| noise (average) | 0.114 |
+
+- B scores below A at every layer, on both variants, and near the noise level on the span variant. The pilot's finding ("Divine at least as expressible as prolet") was a fact about phase A only.
+- M scores above everything else this project has measured. Separately, the bell-anatomy work had already shown that the stable ` Divine` readout token is produced by M's direction rather than either phase's.
+- The hinge d as a direction: share 0.145, against the 0.25 baseline for an arbitrary direction. Decomposed: the 73 percent of d that has almost no effect on output-token scores also has almost no overlap with the lens (0.008 at the last layer); the 13 percent of d that does affect output-token scores overlaps strongly (up to 0.62).
+
+### 5.3 What follows, at what confidence
+
+The motion of the cycle is carried by a direction that is mostly outside both the output projection and the lens's set of directions, while the midpoint the motion straddles is the most lens-expressible state measured. The two kinds of low visibility (to the output vocabulary, to the lens) coincide on this direction at every layer.
+
+Confidence: everything in this part inherits the pilot's limitations. The lens is a reduced version built once from limited data, on a 124-million-parameter model for which no one has demonstrated an organised workspace. These are internally consistent pilot-grade measurements, not established properties of the model.
+
+**Where recorded:** `output_jlens_phase/jlens_phase.md`.
+
+---
+
+## Part 6: The error found on the way
+
+The Session 03 bell-anatomy script computed the hinge from A and B expressed at inconsistent scales (A as stored, B rescaled to the loop's fixed energy). The resulting vector was contaminated: 0.97 of it pointed along A itself, and only 0.62 along the true direction of change. The Session 04 derivative work found this, recomputed the hinge with both phases at the same scale, and repeated every measurement with both versions. After the loop's own rescaling step, the two versions agree at cosine 0.97, so the earlier conclusions stand; the contaminated version's coincidental multiplier of -0.86 (which had appeared to confirm the "near -1" conjecture) is noted as an artifact. Bringing the other Session 04 scripts onto the corrected hinge definition is listed as follow-up work.
+
+The reason to keep this section in a learning document: twice in one session, a measurement error produced a plausible result (a frozen state; a multiplier near -1) that a second, independent measurement method exposed. The working rule that caught both: measure the same quantity two ways before believing it.
+
+**Where recorded:** `output_hinge_eigen/hinge_eigenvalue.md`, "the map, the frames, and two hinges"; the method flag in PR #15's description.
+
+---
+
+## Part 7: Glossary
+
+| Term | Definition | Where |
 |:---|:---|:---|
-| Limit cycle, period 2 | Two states the map swaps forever; f(A) = B, f(B) = A | the bell (F9) |
-| Phase A / phase B | The two alternating states of the cycle | every Session 04 table |
-| Pivot M | The midpoint of A and B; near-fixed, flip-unstable | eigenvalue report |
-| Hinge d | The direction along which the bell swings | all four reports |
-| Aliasing | Sampling in step with a motion, hiding it | why the bell stayed hidden |
-| Lag-k gate | "Same as k steps ago?" convergence test | `gate_lag` in `atr_engine.py` |
-| Parity stripe | Odd lags 0.685, even lags 1.000: the bell's fingerprint | `output_lagk/` |
-| Linearisation / Jacobian | The straight-line summary of f near one point | JSPACE_PRIMER 3.1, reused |
-| Multiplier along d | What one lap does to a whisper of d: sign and size | -4.3 at M; +0.1 round trip |
-| Period doubling | Instability at a point converting rest into oscillation | the bell's shape |
-| Attention head | One of 12 independent readers per layer; adds into the stream | L11.H8 |
-| Attribution | Isolating one component's contribution to a behaviour | the per-head split |
-| Centroid / ghost town | Average of all embeddings / untrained tokens huddled near it | the glitch cluster |
-| Norm-matched null | Chance model matched on embedding size, not just count | glitch report |
-| Span share | Fraction of a state (or direction) inside the lens subspace | phase table |
-| Frame | Which scaling convention a vector is expressed in | Part 6's caught error |
+| Limit cycle, period 2 | Two states the map exchanges: f(A) = B, f(B) = A | F9 |
+| Phase A / phase B | The two states of the cycle | all Session 04 tables |
+| The bell | Project name for the Divine period-2 cycle | issue #14 |
+| Pivot M | (A + B) / 2; maps nearly to itself; unstable along d only | Part 2 |
+| Hinge d | (A - B) normalised; the direction of the cycle's motion | Parts 2-5 |
+| Aliasing | Sampling a repeating process at a multiple of its period, hiding it | Part 1.2 |
+| gate_lag | Engine parameter: which earlier iterate the convergence test compares against | `atr_engine.py` |
+| lag_scan | Helper reporting the comparison cosine at intervals 1 to 8 | `output_lagk/` |
+| Multiplier along d | Signed factor applied to a small displacement along d by one iteration | -4.3 at M |
+| Period doubling | A near-fixed point whose one unstable direction yields a stable 2-cycle | Part 2.2 |
+| Attention head | One of 12 independent weighted units per attention block; 144 in the model | L11.H8 |
+| Attribution | Measuring each component's separate contribution to an effect | Part 3 |
+| Glitch tokens | Vocabulary entries absent from weight training; embeddings near the mean | Part 4 |
+| Norm-matched control | Chance comparison using token sets matched on embedding norm | Part 4.2 |
+| Span share | Fraction of a state or direction expressible in the lens's directions | Part 5 |
+| Frame | The scale convention a vector is expressed in; mixing frames was the caught error | Part 6 |
 
 ---
 
-## A closing orientation
+## Summary
 
-The way to check you hold all of this is to say the Session 04 findings back in one breath each. The bell is an exact period-2 limit cycle that even-step cameras aliased into stillness, now formally convergent under a lag-2 gate. Its pivot is a balance point with a single violently unstable direction (multiplier -4.3), tamed into a strongly attracting two-step orbit (+0.1), which is period doubling. The unstable direction is flipped by one attention head, L11.H8, after eleven layers of faithful transmission. The direction's two poles are the training distribution's two ends: busiest words on one side, the untrained ghost town on the other. And the whole motion happens in a register largely outside both the readout and the verbalizable subspace, swinging around the most sayable point the project has measured.
-
-Four axes of model understanding, one object threading them: what stable objects exist (dynamics), what implements them (mechanism), how training shaped the space they live in (data), and what the model can say of its own state (workspace). The census of the other 33 ringing prompts waits on the prompt library; the head's attention pattern waits on curiosity; the sound of all this waits on you.
+Divine is an exact period-2 limit cycle: two states exchanged by the map, hidden from all earlier runs because even-interval snapshots sample a period-2 process in a single phase. The convergence test now supports comparison at lag 2, under which Divine converges. One iteration multiplies a small displacement along the cycle's direction of motion by -4.3 (inverted and amplified) while leaving other directions essentially unchanged; over two iterations the net factor is +0.1, so the cycle is strongly stable. The inversion is performed almost entirely by one component, attention head 8 of layer 11. The direction of motion runs between the embedding region of the most-trained tokens and that of never-trained tokens, and it lies mostly outside both the output projection and the J-lens's expressible set, while the cycle's midpoint is the most lens-expressible state the project has measured. One measurement error (a hinge computed from mixed scales) was found and corrected without changing the conclusions. Open next steps: the lag scan on the remaining 33 non-converging prompts (blocked on issue #9), the content of L11.H8's attention pattern during the cycle, and the same measurements on other models.
