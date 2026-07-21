@@ -5,7 +5,7 @@
 **The gross anatomy:** main text pages 3-75, appendix pages 76-125, references pages 126-133. The spine (what the argument cannot stand without) is roughly 25 pages: 3-13, 15-18, 27-33, 38-41, 70-75. Everything else is evidence depth you can pace yourself through.
 
 **Suggested passes:**
-- **Pass 1 (about an hour):** pages 3-13, then 15-18. Stop and self-test: can you state what J_ℓ is an average of, and why the averaging makes a readout "verbalizable"? That is the hinge of the whole paper.
+- **Pass 1 (about an hour):** pages 3-13, then 15-18. Stop and self-test: can you state what J_ℓ is an average of, and why the averaging makes a readout "verbalizable"? That is the flip axis of the whole paper.
 - **Pass 2:** pages 21-23, 27-33, 38-41. The causal core: intermediates, selectivity, structure.
 - **Pass 3:** pages 49-66 as narrative (it reads almost like case files), then 70-75 carefully.
 - **Consult only:** the appendix, via the catalogue below, whenever a main-text claim makes you want the receipts.

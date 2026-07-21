@@ -1,12 +1,15 @@
-# J-lens Phase Probe: Both Phases of the Divine Bell, the Pivot, and the Hinge (GPT-2 Small)
+# J-lens Phase Probe: Both Phases of the Divine Bell, the Pivot, and the Flip Axis (GPT-2 Small)
+
+*Terminology: the flip axis d was called "the hinge" in earlier revisions of these documents; script names, folder names, and JSON keys keep the old word.*
+
 
 **Status: PILOT follow-up.** The J-lens pilot (`../output_jlens_pilot/jlens_pilot_report.md`,
 issue #8) probed the converged Divine (Syntactic) state before `06_bell_anatomy.py` showed
-that state is an exact period-2 limit cycle: phases A and B, pivot M = (A+B)/2, hinge
-d = (A-B)/2, with the hinge 95 percent mute to the readout (logit response ratio 0.054).
+that state is an exact period-2 limit cycle: phases A and B, pivot M = (A+B)/2, flip axis
+d = (A-B)/2, with the flip axis 95 percent mute to the readout (logit response ratio 0.054).
 The pilot therefore probed only phase A of a two-phase object. This follow-up re-runs the
 pilot's membership probe, unchanged, on both phases and the pivot, and answers one new
-question: is the hinge direction d inside or outside the pilot lens subspace? Everything
+question: is the flip axis d inside or outside the pilot lens subspace? Everything
 here inherits the pilot's confidence level and its limitations in full.
 Script: `../10_jlens_phase.py`.
 
@@ -22,7 +25,7 @@ Script: `../10_jlens_phase.py`.
 - **States**: A, B, M, d reconstructed exactly as `06_bell_anatomy.py` does, from the
   committed iteration-1000 checkpoint `../output_divine_motion/state_divine.pt` (one
   forward pass gives B = f(A), a second verifies period 2). Last-position vectors:
-  |A| = 1612, |B| = 464, |M| = 980, |d| = 669. Note cos(d, M) = 0.909: the hinge is
+  |A| = 1612, |B| = 464, |M| = 980, |d| = 669. Note cos(d, M) = 0.909: the flip axis is
   strongly aligned with the pivot, so B = M - d is the small residual of two nearly
   aligned vectors (|d|/|B| = 1.44), while A = M + d is dominated by M (|d|/|A| = 0.41).
 - **Noise controls**: the pilot generated its three noise states in-script (seed 2026)
@@ -31,13 +34,13 @@ Script: `../10_jlens_phase.py`.
   (gate below), confirming the replay. The separately committed seed-42 noise run
   (`state_noise.pt`, a DIFFERENT trajectory from `05_divine_motion.py`) is included as a
   supplementary row only.
-- **New, for the hinge only**: (a) a 20-random-unit-direction baseline (seed 777) giving
+- **New, for the flip axis only**: (a) a 20-random-unit-direction baseline (seed 777) giving
   what a generic direction scores against each layer dictionary (0.245 to 0.253 at every
   layer, i.e. the 193/768 = 0.251 chance level of a numerically full-rank 193-vector
   span); (b) span probes of d's top-100 (readout-visible) and bottom-100 (readout-quiet)
   W_U singular components, the same split `06_bell_anatomy.py` used. The sparse probe is
   sign-dependent (nonnegative coefficients), so for the direction d both signs are
-  reported; the span share, which is sign- and scale-invariant, is the hinge number.
+  reported; the span share, which is sign- and scale-invariant, is the flip axis number.
 
 ## 2. Sanity gates (all passed)
 
@@ -60,11 +63,11 @@ columns, which are deterministic, reproduce to numerical noise.
 
 ## 3. Results: the phase table
 
-Least-squares span share per layer ("hinge d" and "generic dir" are direction probes,
+Least-squares span share per layer ("flip axis d" and "generic dir" are direction probes,
 included for comparison; prolet is the mean of Lucier, Semantic, Nonsense, Imperative;
 noise is the mean of the three regenerated pilot noise states):
 
-| layer | A | B | M | prolet | noise | hinge d | generic dir |
+| layer | A | B | M | prolet | noise | flip axis d | generic dir |
 |---|---|---|---|---|---|---|---|
 | L0 | 0.213 | 0.152 | 0.221 | 0.183 | 0.184 | 0.179 | 0.253 |
 | L1 | 0.216 | 0.162 | 0.227 | 0.211 | 0.186 | 0.180 | 0.249 |
@@ -120,10 +123,10 @@ Reading, in decreasing order of confidence:
    clean late-layer span separation (language 0.15 to 0.17 vs noise 0.11 to 0.13) is a
    phase-A and pivot property; phase B sits at its edge.
 4. A mechanical account of 1: since cos(d, M) = 0.909 and |d|/|B| = 1.44, phase B's
-   direction is dominated by hinge content, and the hinge is mostly outside the lens
+   direction is dominated by flip axis content, and the flip axis is mostly outside the lens
    (section 4); A's direction is dominated by the pivot, which is inside-leaning.
 
-## 4. The hinge question
+## 4. The flip axis question
 
 Span shares of the direction d and its W_U singular components, against each layer's
 lens dictionary ("rand dict" is the pilot-style matched random dictionary control,
@@ -144,15 +147,15 @@ lens dictionary ("rand dict" is the pilot-style matched random dictionary contro
 | L10 | 0.143 | 0.253 | 0.251 | 0.081 | 0.028 | 0.570 | 0.006 |
 | L11 | 0.145 | 0.261 | 0.252 | 0.080 | 0.026 | 0.619 | 0.008 |
 
-**The one number: the hinge's lens-span share at L11 is 0.145, against a 0.252 chance
+**The one number: the flip axis's lens-span share at L11 is 0.145, against a 0.252 chance
 level for a generic direction (58 percent of chance; mean over all layers 0.169 vs
-0.249, 68 percent).** The hinge leans outside the lens subspace at every depth, and the
+0.249, 68 percent).** The flip axis leans outside the lens subspace at every depth, and the
 deficit deepens with depth (ratio to chance falls from about 0.71 at L0-L7 to 0.57 at
 L10).
 
 The decomposition says why, and connects directly to the bell anatomy's muteness result:
 
-- The readout-QUIET bulk of the hinge (bottom-100 W_U component, 73 percent of d's
+- The readout-QUIET bulk of the flip axis (bottom-100 W_U component, 73 percent of d's
   energy) is essentially outside the lens at every layer: span 0.066 at L0 shrinking
   monotonically to 0.008 at L11 (3 percent of chance). At L11 this is close to
   definitional (the pilot's L11 lens vectors are near logit-lens directions), but at L0
@@ -163,7 +166,7 @@ The decomposition says why, and connects directly to the bell anatomy's muteness
   INSIDE: span 0.335 at L0 rising to 0.619 at L11, 1.3x to 2.5x chance.
 
 So muteness to the readout and muteness to the lens travel together, at every depth of
-the pilot lens: the part of the hinge the readout can hear is exactly the part the lens
+the pilot lens: the part of the flip axis the readout can hear is exactly the part the lens
 can express, and the rest (the "A-to-B displacement at the readout-visible complement"
 is this sliver; its quiet complement is the bulk) is outside both. The sparse probe on d
 is reported for completeness only (0.080 to 0.096 for +d, 0.026 to 0.046 for -d); its
@@ -178,7 +181,7 @@ than the prolet attractor at every layer on both probes and, on the span probe, 
 converged-noise level until the final layer. The bell is not "inside" or "outside" as
 one object: it swings once per iteration between a more-verbalizable phase and a
 less-verbalizable phase, pivoting on the most-verbalizable state in the system, along a
-hinge direction that is mostly outside the lens (span 0.145 vs 0.252 chance at L11), and
+flip axis that is mostly outside the lens (span 0.145 vs 0.252 chance at L11), and
 whose readout-quiet bulk is outside it almost completely at every depth. The
 language-vs-noise boundary remains the pilot's most robust story, but it is now a
 sparse-probe story: on the span probe phase B sits at, and below, the noise level for

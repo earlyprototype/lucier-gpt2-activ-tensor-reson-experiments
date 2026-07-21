@@ -1,18 +1,21 @@
 # Suppression-Head Test for L11.H8: Inversion Confirmed and Load-Bearing, Copy-Suppression Signature Absent on Ordinary Text
 
+*Terminology: the flip axis d was called "the hinge" in earlier revisions of these documents; script names, folder names, and JSON keys keep the old word.*
+
+
 *Follow-up to [hinge_eigenvalue.md](../output_hinge_eigen/hinge_eigenvalue.md) (issue #14, thread 1). Runner: [`11_suppression_test.py`](../11_suppression_test.py); raw numbers: [`suppression_results.json`](suppression_results.json). Model: GPT-2 Small, single Divine trajectory, states rebuilt from the committed iteration-1000 checkpoint. Sanity gates reproduced before any measurement: cos(A, B) = 0.684912, cos(A, f(f(A))) = 1.000000, full-tensor cycle residual 7.97e-04 (JSON: meta.gate).*
 
 ## The hypothesis
 
-Experiment 08 located the sign inversion that sustains the Divine period-2 cycle in one attention head: L11.H8 carries 99.1 percent of the block-11 attention flip along the hinge (per-head d-component -1.981, cos -0.963). The suppression-head hypothesis reads that finding as an instance of a known behaviour class: L11.H8 functions as a suppression head, meaning its output is approximately a negative multiple of a component of its input, the class documented for GPT-2 Small's L10.H7 copy-suppression head, and the closed loop turns that one-shot negative correction into a sustained oscillation.
+Experiment 08 located the sign inversion that sustains the Divine period-2 cycle in one attention head: L11.H8 carries 99.1 percent of the block-11 attention flip along the flip axis (per-head d-component -1.981, cos -0.963). The suppression-head hypothesis reads that finding as an instance of a known behaviour class: L11.H8 functions as a suppression head, meaning its output is approximately a negative multiple of a component of its input, the class documented for GPT-2 Small's L10.H7 copy-suppression head, and the closed loop turns that one-shot negative correction into a sustained oscillation.
 
-Three tests: (1) the OV circuit along the hinge, all 144 heads; (2) ablation of the head inside the loop, against controls; (3) the head's effect on attended-token logits on ordinary text, against the documented copy-suppression head.
+Three tests: (1) the OV circuit along the flip axis, all 144 heads; (2) ablation of the head inside the loop, against controls; (3) the head's effect on attended-token logits on ordinary text, against the documented copy-suppression head.
 
 ## Verdict logic, stated up front
 
 The hypothesis is SUPPORTED if (1) L11.H8's OV inverts d_sym distinctly among heads, (2) ablating it kills the cycle while a control ablation does not, and (3) it shows the negative-delta copy-suppression signature on ordinary text. (1) and (2) without (3) means the head inverts this direction and sustains the cycle but is not a general copy suppressor, and the training-function part of the hypothesis stays open. If ablation kills the cycle, the head is load-bearing either way; test 3 is what separates learned function from structural accident.
 
-**Outcome: (1) supported, (2) supported, (3) refuted, and refuted with the opposite sign.** L11.H8's OV inverts d_sym more strongly than any other head (cos -0.9619, gain 63.68, rank 1 of 144 on both measures), ablating it collapses the cycle to a fixed point within about 10 iterations while the same-layer control ablation leaves a period-2 cycle running, and on ordinary text the head RAISES the logit of the token it attends to at 91.4 percent of positions (mean delta +5.97), while the L10.H7 positive control shows the documented suppression (87.1 percent negative, mean -3.62). L11.H8 sustains the bell by inverting the hinge, but it is not a copy suppressor; outside the loop it is a copy promoter. The training-function part of the hypothesis is not supported by what test 3 measured.
+**Outcome: (1) supported, (2) supported, (3) refuted, and refuted with the opposite sign.** L11.H8's OV inverts d_sym more strongly than any other head (cos -0.9619, gain 63.68, rank 1 of 144 on both measures), ablating it collapses the cycle to a fixed point within about 10 iterations while the same-layer control ablation leaves a period-2 cycle running, and on ordinary text the head RAISES the logit of the token it attends to at 91.4 percent of positions (mean delta +5.97), while the L10.H7 positive control shows the documented suppression (87.1 percent negative, mean -3.62). L11.H8 sustains the bell by inverting the flip axis, but it is not a copy suppressor; outside the loop it is a copy promoter. The training-function part of the hypothesis is not supported by what test 3 measured.
 
 ## Structural fact, verified before measurement
 
@@ -23,11 +26,11 @@ The Divine state is position-uniform, and this makes the head's inside-the-loop 
 
 This licenses reading test 1's static OV numbers as the head's actual in-loop transfer function.
 
-## Test 1: The OV circuit inverts the hinge, and L11.H8 is the extreme of all 144 heads
+## Test 1: The OV circuit inverts the flip axis, and L11.H8 is the extreme of all 144 heads
 
 For every head, y = d @ W_V[l,h] @ W_O[l,h], recording cos(y, d) and gain ||y|| / ||d|| (JSON: test1.directions).
 
-Along the primary hinge d_sym:
+Along the primary flip axis d_sym:
 
 | Head | cos(y, d_sym) | gain | rank by cos (1 = most negative) |
 |:---|:---:|:---:|:---:|
@@ -37,22 +40,22 @@ Along the primary hinge d_sym:
 | L5.H5 (arbitrary) | +0.0815 | 0.20 | 78 |
 | L0.H0 (arbitrary) | +0.1078 | 0.25 | 86 |
 
-Distribution over the 144 heads: median cos +0.059, extremes -0.962 and +0.523; 54 heads below 0; 5 heads below -0.5 (L11.H8 at -0.962 gain 63.68, L1.H11 at -0.913 gain 1.33, L4.H7 at -0.837 gain 0.48, L2.H10 at -0.787 gain 0.29, L1.H10 at -0.778 gain 0.36). L11.H8 is the most negative in cosine, and its gain is 48 times the next-most-negative head's. In d-component terms (cos times gain), L11.H8 writes -61.26 per unit of row-level d_sym; the runner-up is L1.H11 at -1.21. The inversion of the hinge is not merely the most extreme in the population, it is a different magnitude class.
+Distribution over the 144 heads: median cos +0.059, extremes -0.962 and +0.523; 54 heads below 0; 5 heads below -0.5 (L11.H8 at -0.962 gain 63.68, L1.H11 at -0.913 gain 1.33, L4.H7 at -0.837 gain 0.48, L2.H10 at -0.787 gain 0.29, L1.H10 at -0.778 gain 0.36). L11.H8 is the most negative in cosine, and its gain is 48 times the next-most-negative head's. In d-component terms (cos times gain), L11.H8 writes -61.26 per unit of row-level d_sym; the runner-up is L1.H11 at -1.21. The inversion of the flip axis is not merely the most extreme in the population, it is a different magnitude class.
 
 Secondary frame, the committed d (0.616 aligned with d_sym, radial contamination as documented in experiment 08): L11.H8 has cos -0.3895, gain 7.42, rank 6 by cosine, but still the most negative d-component of all heads (-2.89 against -0.73 for the runner-up). Both frames agree on which head does the inversion.
 
 Pole directions: the phase-A pole (+d_sym) and phase-B pole (-d_sym) give values identical to d_sym's, exactly, because the OV map is linear (cos(y(-d), -d) = cos(y(d), d)); recorded as a code-path check.
 
-Controls, 5 random unit vectors (seed 20260721): L11.H8's cos values are +0.0281, -0.0008, +0.0175, -0.0250, -0.0080; the population mean |cos| per direction is 0.077 to 0.083, no head below -0.5 on any random direction, most negative single value -0.301. The inversion is specific to the hinge direction, not a generically negative OV.
+Controls, 5 random unit vectors (seed 20260721): L11.H8's cos values are +0.0281, -0.0008, +0.0175, -0.0250, -0.0080; the population mean |cos| per direction is 0.077 to 0.083, no head below -0.5 on any random direction, most negative single value -0.301. The inversion is specific to the flip axis, not a generically negative OV.
 
 ### Empirical checks at the operating point (JSON: test1.empirical)
 
-All finite-difference responses are in the experiment-08 convention: head-8 output change per unit of the full-tensor unit hinge, measured at the last row against the unit row hinge (row-level values are sqrt(10) = 3.162 times larger).
+All finite-difference responses are in the experiment-08 convention: head-8 output change per unit of the full-tensor unit flip axis, measured at the last row against the unit row flip axis (row-level values are sqrt(10) = 3.162 times larger).
 
 1. **Block-0 injection at Mn_sym (the exp-08 measurement, reproduced).** d-component -1.9814 at eps 1e-3 and -1.9860 at 1e-4, cos -0.9632. The recorded experiment-08 value is -1.9814; reproduction is exact at the matching epsilon.
 2. **Layer-11 injection at Mn_sym (the literal x = M operating point).** d-component -1.1565, cos -0.9619, ln1 scale at the base row 16.76. Converting to row-level (-1.1565 x 3.1623 = -3.657) and multiplying by the ln1 scale gives -61.30, against the raw linear value -61.26 (0.07 percent apart), and the cosine equals the linear cosine to four decimals. At this base point d_sym is exactly orthogonal to M_sym (cos 0.0, JSON: meta.cos_esym_vs_Msym_row), so the ln1 Jacobian reduces to division by the scale, and the raw linear OV row is recovered exactly. Sign and magnitude of the linear computation are confirmed at the operating point.
 3. **Layer-11 injection at the cascade resid_pre_11 (the input the head actually sees mid-loop, row norm 1042.6, ln1 scale 37.62).** d-component -0.3433, cos -0.9645.
-4. **Chain to the exp-08 number.** The cascade delta arriving at layer 11 carries d_sym content 2.5863 out of Frobenius norm 2.9224. The pure-d response times that content is -0.3433 x 2.5863 = -0.8878, against the end-to-end -1.9814: the pure-d channel accounts for 45 percent, and the remaining -1.094 is the head's response to the off-hinge components the cascade generates (norm 1.361), which the head also delivers along -d_sym (end-to-end output cos -0.9632, pure-d output cos -0.9645, same output direction). The head's output direction is the same for both input components: what the cycle feeds it comes back along the negative hinge.
+4. **Chain to the exp-08 number.** The cascade delta arriving at layer 11 carries d_sym content 2.5863 out of Frobenius norm 2.9224. The pure-d response times that content is -0.3433 x 2.5863 = -0.8878, against the end-to-end -1.9814: the pure-d channel accounts for 45 percent, and the remaining -1.094 is the head's response to the off-axis components the cascade generates (norm 1.361), which the head also delivers along -d_sym (end-to-end output cos -0.9632, pure-d output cos -0.9645, same output direction). The head's output direction is the same for both input components: what the cycle feeds it comes back along the negative flip axis.
 
 ## Test 2: Ablating L11.H8 kills the cycle; the control ablation does not
 
@@ -83,7 +86,7 @@ The protocol works: L10.H7 spends most of its attention on BOS, and at every pos
 
 ## What follows
 
-- **The mechanism is confirmed and sharpened.** The hinge inversion that sustains the bell is the static OV geometry of one head: d_sym is the single direction, out of the whole population, that L11.H8's OV both inverts (cos -0.9619) and amplifies (gain 63.7), the empirical operating-point response matches the linear computation exactly once the ln1 scale is accounted for, and the closed loop needs exactly this head: ablate it and the bell is replaced by a fixed point with a generic readout within about 10 iterations; ablate a neighbour and the bell persists.
+- **The mechanism is confirmed and sharpened.** The flip axis inversion that sustains the bell is the static OV geometry of one head: d_sym is the single direction, out of the whole population, that L11.H8's OV both inverts (cos -0.9619) and amplifies (gain 63.7), the empirical operating-point response matches the linear computation exactly once the ln1 scale is accounted for, and the closed loop needs exactly this head: ablate it and the bell is replaced by a fixed point with a generic readout within about 10 iterations; ablate a neighbour and the bell persists.
 - **The behaviour-class part of the hypothesis fails.** L11.H8 does not show suppression behaviour on ordinary text; it shows the reverse, while the measurement demonstrably detects suppression where it is documented (L10.H7). The one-shot negative correction that the loop recycles is therefore not this head's text-time function along token directions.
 - **On learned function versus structural accident.** The ablation result makes the head load-bearing for the cycle under either reading, so it cannot separate them; test 3 was the separator, and it came out against learned general suppression. On the evidence here, the Divine oscillation exploits a strongly negative direction that happens to exist in this head's OV spectrum, a direction whose sign-inverting treatment is not exercised as suppression in ordinary next-token service. The accident reading is strengthened; what remains open is whether d_sym relates to some non-token content the head suppresses in contexts not sampled here.
 
@@ -92,5 +95,5 @@ The protocol works: L10.H7 spends most of its attention on BOS, and at every pos
 - Test 3's delta omits the final LayerNorm scaling, a positive per-position scalar that cannot change signs, and reads W_U directly (W_O writes are centered by the loading convention). It measures copy suppression in the token-unembedding sense only; suppression of non-token content would not register.
 - The top non-BOS source may be the query position itself (19 percent of L11.H8's positions, 48 percent of L10.H7's); no exclusion was applied, matching the stated protocol.
 - One trajectory, one loop prompt, one model. The OV computation ignores QK: which content the head attends to inside the loop is moot (the pattern is uniform and irrelevant under position uniformity), but on text the source selection is QK's and was taken as observed.
-- The committed-d numbers inherit the frame mix documented in experiment 08; d_sym is the physical hinge and all headline claims use it.
+- The committed-d numbers inherit the frame mix documented in experiment 08; d_sym is the physical flip axis and all headline claims use it.
 - 12 sentences, 116 positions is a small text sample; the L11.H8 result (frac negative 0.086 against L10.H7's 0.871) is far from any decision boundary, so the sample suffices for the sign of the verdict but not for fine effect sizes.

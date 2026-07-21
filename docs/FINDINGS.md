@@ -345,12 +345,13 @@ Consequences:
 
 Record: `divine_motion_report.md`; exact-cycle verification in `bell_anatomy.md`.
 
-### F10: Anatomy of the bell: one nearly mute hinge between a game-vocabulary pole and the glitch-token pole
+### F10: Anatomy of the bell: one nearly mute flip axis between a game-vocabulary pole and the glitch-token pole
 
 The bell-anatomy run (run 9) dissected the cycle recovered from the saved
 iteration-1000 checkpoint. Writing the two phases as A = M + d and B = M - d
-around their midpoint M, the **hinge** (first use: the single flip axis d that
-the iterated map negates on each pass) turns out to be one global direction: the
+around their midpoint M, the **flip axis** (first use: the single direction d that
+the iterated map negates on each pass; called the hinge in earlier revisions) turns
+out to be one global direction: the
 per-position flip axes agree at mean pairwise cosine 1.0000 across all ten
 positions. The whole tensor tilts on a single rank-1 see-saw, which makes the
 negative-eigenvalue reading of the cycle nearly literal.
@@ -363,7 +364,7 @@ negative-eigenvalue reading of the cycle nearly literal.
   1612 in phase A and 464 in phase B; the full-tensor norm is conserved by
   construction, so the oscillation redistributes energy across positions and the
   loop's re-normalisation pumps it back.
-- **The hinge is about 95 percent mute to the readout.** The axis d produces a
+- **The flip axis is about 95 percent mute to the readout.** The axis d produces a
   logit response of 33 against 612 for equal-norm random directions: ratio
   0.054, far more suppressed than the full per-step delta (0.295, F9).
   Decomposed against the unembedding W_U's singular directions, 73 percent of
@@ -388,7 +389,7 @@ game-vocabulary pole and the glitch-token pole, with the swing itself almost
 entirely invisible to the vocabulary projection; the stable `Divine` argmax is
 the shadow of the shared pivot M. The glitch-token identification is by
 inspection against published lists, not a systematic test. Open: whether all 34
-`Divine` prompts share this hinge (blocked on the prompt-library restoration,
+`Divine` prompts share this flip axis (blocked on the prompt-library restoration,
 issue #9). Record: `bell_anatomy.md`.
 
 ### F11: J-lens pilot: the prolet-inside/Divine-outside prediction did not hold; the boundary that appeared is language-vs-noise
@@ -521,7 +522,7 @@ Record: `chordness_formal.md`.
     trials, so the 3/15 boundary-case rate carries a wide interval; one `Divine`
     trajectory from one prompt, with period-2 exactness verified over 20
     iterations at iteration 1000; whether all 34 `Divine` prompts share the F10
-    hinge is untested (prompt library pending, issue #9).
+    flip axis is untested (prompt library pending, issue #9).
 12. **Even-iteration aliasing in the archive.** From lock-in onward, every
     snapshot recorded before the lag-1 probe fell on even iterations, so all
     archived `Divine` distributions are phase A only (F9). Any schedule that
@@ -550,7 +551,7 @@ distribution (chords, F8), carried at a quiet argmax (F7).
 
 Open directions, in rough order of leverage: why GPT-2 Small (the anomaly, now
 with quiet coherent chords as the thing to explain); the lag-2 re-gate of the 34
-ringing prompts and whether they share the F10 hinge (blocked in part on the
+ringing prompts and whether they share the F10 flip axis (blocked in part on the
 prompt-library restoration, issue #9); the shape-class-matched chordness null and
 its application to the 125-sweep (F12, caveat 10); the phase-aware J-lens full
 build (F11, issue #8); hook-window/depth dependence (caveat 6); gate cadence

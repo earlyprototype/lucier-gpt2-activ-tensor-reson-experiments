@@ -1,14 +1,17 @@
-# Glitch Alignment: the Divine Hinge and the Anomalous-Token Cluster
+# Glitch Alignment: the Divine Flip Axis and the Anomalous-Token Cluster
+
+*Terminology: the flip axis d was called "the hinge" in earlier revisions of these documents; script names, folder names, and JSON keys keep the old word.*
+
 
 *Follow-up to [bell_anatomy.md](../output_divine_motion/bell_anatomy.md) (issue #14, thread 4). Runner: [`07_glitch_alignment.py`](../07_glitch_alignment.py); raw numbers: [`glitch_alignment.json`](glitch_alignment.json). Same single Divine trajectory, states recovered from the saved iteration-1000 checkpoint.*
 
 ## Question asked
 
-The bell's rank-1 hinge d had phase-B riders from the published GPT-2 anomalous-token family (the SolidGoldMagikarp family, Rumbelow and Watkins 2023). Is d ALIGNED with that cluster in embedding space, or merely near it?
+The bell's rank-1 flip axis d had phase-B riders from the published GPT-2 anomalous-token family (the SolidGoldMagikarp family, Rumbelow and Watkins 2023). Is d ALIGNED with that cluster in embedding space, or merely near it?
 
 ## Setup
 
-States replicated exactly as in 06, and the sanity gate passed before any measurement: cos(A, B) = 0.684912 (recorded: 0.6849117), cos(A, f(f(A))) = 1.000000. Hinge d = (A - B)/2 at the last position; +d is the phase-A pole, -d is the phase-B pole. d is a residual-stream direction and W_E rows write into the same 768-dimensional residual space, so cos(d, W_E row) is well-defined. All geometry is in the TransformerLens processed basis that 04/06 used; cluster membership is identical in the raw HF basis (Jaccard 1.0 on all four geometric sets).
+States replicated exactly as in 06, and the sanity gate passed before any measurement: cos(A, B) = 0.684912 (recorded: 0.6849117), cos(A, f(f(A))) = 1.000000. Flip Axis d = (A - B)/2 at the last position; +d is the phase-A pole, -d is the phase-B pole. d is a residual-stream direction and W_E rows write into the same 768-dimensional residual space, so cos(d, W_E row) is well-defined. All geometry is in the TransformerLens processed basis that 04/06 used; cluster membership is identical in the raw HF basis (Jaccard 1.0 on all four geometric sets).
 
 The cluster, identified three ways:
 
@@ -36,13 +39,13 @@ Scale: random same-size token sets give mean |cos| = 0.065 with a maximum of 0.3
 
 **The A pole is the opposite corner: the most-trained tokens.** The top-50 toward +d contains no cluster member of any definition; 42 of 50 are in the bottom 0.5 percent by norm. Top 15: ` the`, `,`, ` in`, ` and`, ` a`, `.`, ` to`, `\n`, `-`, ` (`, ` of`, ` "`, ` on`, ` for`, ` that`. The see-saw runs between the high-frequency function-word corner (phase A) and the untrained corner (phase B): cos(u_core, u_lownorm) = -0.68, and the two independent definitions of the glitch corner agree on where the B wall is, cos(u_core, u_curated) = +0.67.
 
-**Offset, not spread.** cos(d, PC1 of the core's centered embeddings) = +0.009 (curated: +0.047): the hinge aligns with where the cluster sits relative to the global mean, not with the cluster's internal principal axis. (For the shell, |cos(d, PC1)| = 0.43, because at that radius the dominant internal variance direction is the core's own offset.)
+**Offset, not spread.** cos(d, PC1 of the core's centered embeddings) = +0.009 (curated: +0.047): the flip axis aligns with where the cluster sits relative to the global mean, not with the cluster's internal principal axis. (For the shell, |cos(d, PC1)| = 0.43, because at that radius the dominant internal variance direction is the core's own offset.)
 
-**The hinge is global, and the pivot leans with A.** Recomputed pos_alignment = 1.0000; cos(d_pos, d_last) = 1.0000 and cos(d_pos, u_core) = -0.5958 identically at every one of the 10 positions. The hinge is one global direction, not a last-position artifact: the pos_alignment = 1.0 already recorded in bell_anatomy.json means exactly this, confirmed here. The pivot M tilts toward the function-word corner (cos(M, u_core) = -0.498, cos(M, u_lownorm 0.5%) = +0.529). Note cos(d, M) = 0.909 (|A| = 1612 against |B| = 464 leaves both dominated by A's direction), so the A pole nearly coincides with the bell's standing direction; the distinctive, informative pole is -d, phase B's excursion.
+**The flip axis is global, and the pivot leans with A.** Recomputed pos_alignment = 1.0000; cos(d_pos, d_last) = 1.0000 and cos(d_pos, u_core) = -0.5958 identically at every one of the 10 positions. The flip axis is one global direction, not a last-position artifact: the pos_alignment = 1.0 already recorded in bell_anatomy.json means exactly this, confirmed here. The pivot M tilts toward the function-word corner (cos(M, u_core) = -0.498, cos(M, u_lownorm 0.5%) = +0.529). Note cos(d, M) = 0.909 (|A| = 1612 against |B| = 464 leaves both dominated by A's direction), so the A pole nearly coincides with the bell's standing direction; the distinctive, informative pole is -d, phase B's excursion.
 
 ## Verdict
 
-**Aligned (structural).** cos(-d, u) = +0.60 with the geometric core and +0.46 with the curated family, beyond every one of 1000 random sets and 1000 norm-matched sets (which, for the core, point the opposite way), with the -d top-50 90 to 100 percent inside the cluster, the named family enriched about 100-fold on that ray, and the same alignment at all 10 positions. The magnitude is a strong tilt, not an identity: 0.46 to 0.60, not 0.9, and the hinge also carries a large component along the pivot. But the direction of phase B's excursion is unambiguous: each pass, the normalised map throws the state into the degenerate, untrained corner of embedding space and back. The flutter echo has the anomalous-token cluster as one wall and the function-word corner as the other: the cycle oscillates between the model's least-trained and most-trained token directions.
+**Aligned (structural).** cos(-d, u) = +0.60 with the geometric core and +0.46 with the curated family, beyond every one of 1000 random sets and 1000 norm-matched sets (which, for the core, point the opposite way), with the -d top-50 90 to 100 percent inside the cluster, the named family enriched about 100-fold on that ray, and the same alignment at all 10 positions. The magnitude is a strong tilt, not an identity: 0.46 to 0.60, not 0.9, and the flip axis also carries a large component along the pivot. But the direction of phase B's excursion is unambiguous: each pass, the normalised map throws the state into the degenerate, untrained corner of embedding space and back. The flutter echo has the anomalous-token cluster as one wall and the function-word corner as the other: the cycle oscillates between the model's least-trained and most-trained token directions.
 
 ## Caveats
 
