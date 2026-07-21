@@ -612,6 +612,9 @@ def stage3():
     base_dirs = torch.randn(20, jlens.shape[2], generator=gen777)
     base_dirs = base_dirs / base_dirs.norm(dim=-1, keepdim=True)
 
+    random_means = [float(sum(lstsq_share(jlens[:, layer_idx, :], base_dirs[i])
+                              for i in range(20)) / 20)
+                    for layer_idx in range(n_layers)]
     direction_probe_sym = {}
     for label, v in [("d_sym", d_sym),
                      ("dsym_vis_top100", ph["dsym_vis_top100"]),
@@ -623,8 +626,7 @@ def stage3():
             if label == "d_sym":
                 entry["nn_sparse_k25_share_plus"] = nn_sparse_share(D, v)
                 entry["nn_sparse_k25_share_minus"] = nn_sparse_share(D, -v)
-            entry["random_direction_lstsq_mean"] = float(
-                sum(lstsq_share(D, base_dirs[i]) for i in range(20)) / 20)
+            entry["random_direction_lstsq_mean"] = random_means[layer_idx]
             per_layer.append(entry)
         direction_probe_sym[label] = {"per_layer": per_layer,
                                       "norm": float(v.norm())}

@@ -468,7 +468,12 @@ def stage_test2(run_name, ablate_head, n_target):
         prev_row = ck["prev_row"]
         tail_rows = [r for r in ck["tail_rows"]]
         start = int(ck["n_done"]) + 1
-        records = run["records"]
+        # The checkpoint is the single source of truth for the records too,
+        # so tensor state and records can never desynchronise across a crash
+        # (older checkpoints without a records key fall back to the JSON).
+        records = ck.get("records", run["records"])
+        run["records"] = records
+        run["n_done"] = int(ck["n_done"])
         print(f"  [{run_name}] resuming at iteration {start}", flush=True)
     else:
         cur = A_full.clone()
@@ -535,9 +540,13 @@ def stage_test2(run_name, ablate_head, n_target):
         cur = out
         if i % 100 == 0 or i == n_target:
             run["n_done"] = i
+            # One atomic artifact holds the tensor state AND the records at
+            # the same iteration marker; the JSON below is derived output.
             torch.save({"current_tensor": cur, "prev_row": prev_row,
-                        "tail_rows": torch.stack(tail_rows), "n_done": i},
-                       ck_path)
+                        "tail_rows": torch.stack(tail_rows), "n_done": i,
+                        "records": records},
+                       ck_path + ".tmp")
+            os.replace(ck_path + ".tmp", ck_path)
             atomic_save(results)
             print(f"  iter {i}: lag1 {rec['lag1_cos']:+.4f}, cosA "
                   f"{rec['cos_to_A']:+.4f}, cosB {rec['cos_to_B']:+.4f}, "
