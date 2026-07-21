@@ -1,5 +1,5 @@
 """
-ATR Engine — Activation Tensor Resonance
+ATR Engine: Activation Tensor Resonance
 =========================================
 Core engine for iterative re-injection of the residual stream through 
 a TransformerLens HookedTransformer model.
@@ -25,7 +25,7 @@ def get_top_tokens(model, resid_vector, k=5):
     
     Args:
         model: HookedTransformer model instance
-        resid_vector: [d_model] tensor — a single position's residual stream
+        resid_vector: [d_model] tensor, a single position's residual stream
         k: number of top predictions to return
     
     Returns:
@@ -48,7 +48,7 @@ def get_readout_detail(model, resid_vector, k=5):
 
     Args:
         model: HookedTransformer model instance
-        resid_vector: [d_model] tensor — a single position's residual stream
+        resid_vector: [d_model] tensor, a single position's residual stream
         k: number of top predictions to return
 
     Returns:
@@ -83,7 +83,7 @@ def position_argmax_ids(model, tensor):
         tensor: [seq_len, d_model] residual stream tensor
 
     Returns:
-        (id_list, string_list) — token ids and their decoded strings per position.
+        (id_list, string_list): token ids and their decoded strings per position.
     """
     normalized = model.ln_final(tensor)
     logits = normalized @ model.W_U + model.b_U
@@ -97,7 +97,7 @@ def run_atr_loop(model, prompt, layer_start, layer_end, max_iter, schedule, verb
     Activation Tensor Resonance loop: iteratively re-inject the ENTIRE 
     residual stream tensor (all token positions) through the layer slice.
     
-    This is a nonlinear analogue of power iteration — converges to fixed 
+    This is a nonlinear analogue of power iteration: it converges to fixed
     points of the full transformer forward map.
     
     Args:
@@ -244,15 +244,23 @@ def run_atr_loop(model, prompt, layer_start, layer_end, max_iter, schedule, verb
 
 def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
                   threshold=0.999, patience=3, check_every=10, check_start=100,
-                  verbose=False):
+                  verbose=False, gate_lag=1):
     """Convergence-gated ATR loop (early-stop variant of run_atr_loop).
 
     Iterates the full-tensor re-injection until the tensor stops moving, then
     classifies the terminal basin *at lock-in* rather than at a fixed horizon.
-    Lock-in = ``cos_sim_mean`` (consecutive-iteration mean-vector similarity)
-    stays above ``threshold`` for ``patience`` consecutive checks, checked every
-    ``check_every`` iterations once ``check_start`` is passed. If lock-in never
-    occurs, runs to ``max_iter`` and classifies there.
+    Lock-in = ``cos_sim_mean`` (mean-vector cosine between iterate t and
+    iterate t - ``gate_lag``) stays above ``threshold`` for ``patience``
+    consecutive checks, checked every ``check_every`` iterations once
+    ``check_start`` is passed. If lock-in never occurs, runs to ``max_iter``
+    and classifies there.
+
+    ``gate_lag`` (int >= 1, default 1) generalises the gate. The default
+    reproduces the historical consecutive-iteration comparison exactly, so
+    existing callers behave as before. A period-p limit cycle can only pass
+    a gate whose lag is a multiple of p: the Divine period-2 bell holds its
+    lag-1 cosine at 0.685 forever (never passes) but reads 1.0 at
+    ``gate_lag=2``. ``check_start`` must be >= ``gate_lag`` (enforced).
 
     Lean by design (one readout decode, at the end) so a 125-prompt × 1000-iter
     sweep stays forward-pass-bound.
@@ -263,6 +271,12 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
         n_iters (iterations actually run), final_cos_sim_mean,
         top_logit_margin, entropy.
     """
+    if gate_lag < 1:
+        raise ValueError(f"gate_lag must be >= 1, got {gate_lag}")
+    if check_start < gate_lag:
+        raise ValueError(
+            f"check_start ({check_start}) must be >= gate_lag ({gate_lag}) "
+            "for the lagged comparison to be well-formed")
     hook_point_read = f"blocks.{layer_end}.hook_resid_post"
     hook_point_write = f"blocks.{layer_start}.hook_resid_pre"
 
@@ -272,7 +286,9 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
         )
     current_tensor = cache[hook_point_read][0].clone()
     initial_norm = current_tensor.norm().item()
-    prev_mean = current_tensor.mean(dim=0).clone()
+    # Oldest-first buffer of the last gate_lag mean vectors: entry 0 is the
+    # iterate gate_lag steps back once i >= gate_lag.
+    mean_history = [current_tensor.mean(dim=0).clone()]
 
     consecutive = 0
     lock_in_iter = None
@@ -304,7 +320,7 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
 
         if i >= check_start and i % check_every == 0:
             cos = F.cosine_similarity(
-                mean_vec.unsqueeze(0), prev_mean.unsqueeze(0)
+                mean_vec.unsqueeze(0), mean_history[0].unsqueeze(0)
             ).item()
             final_cos = cos
             consecutive = consecutive + 1 if cos > threshold else 0
@@ -312,10 +328,11 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
                 print(f"    iter {i:>4}: cos_mean={cos:.5f} streak={consecutive}")
             if consecutive >= patience:
                 lock_in_iter = i
-                prev_mean = mean_vec
                 break
 
-        prev_mean = mean_vec
+        mean_history.append(mean_vec)
+        if len(mean_history) > gate_lag:
+            mean_history.pop(0)
 
     last_vec = current_tensor[-1, :].clone()
     top = get_top_tokens(model, last_vec, k=1)[0]
@@ -331,3 +348,35 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
         "top_logit_margin": detail["top_logit_margin"],
         "entropy": detail["entropy"],
     }
+
+
+def lag_scan(iterates, max_lag=8):
+    """Mean cosine similarity between iterates k apart, for k = 1..max_lag.
+
+    Census instrument for periodic attractors: a lag-1 gate can never pass a
+    period-2 limit cycle, and any single-lag gate aliases every period that
+    does not divide its lag. Scanning k = 1..max_lag makes the period readable
+    from the pattern: a fixed point scores ~1.0 at every lag, a period-p cycle
+    only at multiples of p, a drifting state at none (cosine decays with lag).
+
+    Pure tensor arithmetic, no model needed.
+
+    Args:
+        iterates: consecutive iterates in order, with no gaps (a list of [d]
+            tensors, or a stacked [n, d] tensor); e.g. the mean_vector or
+            last_vector at iterations t, t+1, t+2, ...
+        max_lag: largest lag to scan.
+
+    Returns:
+        dict {k: mean cosine over the n - k available pairs} for each lag
+        k in 1..max_lag that has at least one pair.
+    """
+    if not torch.is_tensor(iterates):
+        iterates = torch.stack(list(iterates))
+    result = {}
+    for k in range(1, max_lag + 1):
+        if k >= iterates.shape[0]:
+            break
+        cos = F.cosine_similarity(iterates[k:], iterates[:-k], dim=-1)
+        result[k] = cos.mean().item()
+    return result
