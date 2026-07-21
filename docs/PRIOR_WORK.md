@@ -113,7 +113,7 @@ name movers 10.7 and 11.10, which write against the correct name; head list [ver
 https://raw.githubusercontent.com/ArthurConmy/Automatic-Circuit-Discovery/main/acdc/ioi/utils.py. Copy suppression (McDougall, Conmy,
 Rushing, McGrath, Nanda 2023, arXiv 2310.04625 [verified: search snippet]): L10.H7 detects the currently predicted token and writes against
 its unembedding; this is the class the suppression tests (BELL_PRIMER Part 7) show L11.H8 opposes on ordinary text, where it raises the
-attended token's score at 91.4 percent of positions. Successor and greater-than year heads (arXiv 2312.09230; arXiv 2305.00586)
+attended token's score at 91.4 percent of positions. Successor, greater-than, and year heads (arXiv 2312.09230; arXiv 2305.00586)
 [verified: search snippet] place documented number and date machinery in layers 5 to 9. L11.H8 appears in none of these catalogues; the only
 documented layer 11 copy machinery (11.10) has the opposite sign to finding 4.
 
@@ -122,12 +122,12 @@ documented layer 11 copy machinery (11.10) has the opposite sign to finding 4.
 https://robertzk.github.io/gpt2-small-saes/
 The standout of the whole survey, and the only public per-head documentation of L11.H8. SAEs (sparse autoencoders, learned dictionaries of
 directions) were trained on GPT-2 Small attention outputs and the top features attributed to each of the 144 heads. A direct read of the
-H11.8 card shows its top feature (1958) puts positive logits almost entirely on glitch and undertrained tokens (" guiActiveUn", "ertodd",
+L11.H8 card (the card itself labels the head "11.8") shows its top feature (1958) puts positive logits almost entirely on glitch and undertrained tokens (" guiActiveUn", "ertodd",
 "ThumbnailImage", "ActionCode", "externalToEVA", byte fragments) and negative logits on the most frequent function tokens (" the", ",", "
 and", " in", " a", " to", " of"); the next four features promote numerals, dates, years, and round quantities, with glitch tokens
 ("rawdownload", "oreAndOnline", "embedreportprint", " TheNitrome") at their negative ends. This is exactly the polarity of finding 5: the
 head's output features already span a frequent-token versus glitch-token axis, the axis the flip runs along. The pattern is head-specific by
-control: the H11.10 card shows ordinary verb and event-structure features and no glitch axis. The record contains no interpretation, prose
+control: the L11.H10 card shows ordinary verb and event-structure features and no glitch axis. The record contains no interpretation, prose
 account, or causal test of these features. Caveat carried from the source thread: extreme vocabulary logit lists surface glitch tokens
 spuriously (aizi, below), which tempers but does not remove the card evidence.
 
@@ -228,9 +228,11 @@ mapping, no limit-cycle taxonomy. No located work runs the analogy on a language
 
 ## What remains ours, on this evidence
 
-Deduplicated from the four threads' gap analyses, each with the nearest work it must be distinguished from.
+Deduplicated from the four threads' gap analyses, each with the nearest work it must be distinguished from. Scope note: every claim
+below means "we found no such work in the searched sources", not proof of absence; the searches covered the phrasings the threads
+tried, on the dates given, under the network limits stated in the header, and different vocabulary could hide a preprint.
 
-1. **The frozen-model residual-stream attractor census.** No found work re-injects the full final-layer residual tensor of an unmodified
+1. **The frozen-model residual-stream attractor census.** We found no work that re-injects the full final-layer residual tensor of an unmodified
    pretrained LM into layer 0, renormalises energy, and iterates to exhaustion, mapping basins over a prompt corpus versus noise (findings
    1, 2, 7). Distinguish from Coconut and Soft Thinking (the same feedback edge, used for reasoning, no attractor map) and Layers as
    Painters (frozen-layer loops without the closed loop or the census).
@@ -238,13 +240,13 @@ Deduplicated from the four threads' gap analyses, each with the nearest work it 
    and no prior localisation of a cycle to a named attention head's OV circuit with measured per-step multipliers (findings 3, 4).
    Distinguish from Wang et al. (approximate period-2 at the text interface, no mechanism) and Marcus and Westervelt (period-2 in
    homogeneous neural maps, no transformer, no component).
-3. **The glitch-region structural role.** No prior work ties the untrained vocabulary region to any internal dynamical mode; the record
+3. **The glitch-region structural role.** We found no work tying the untrained vocabulary region to any internal dynamical mode; the record
    treats glitch tokens exclusively as inputs (finding 5). Distinguish from GlitchProber (internal activations as a classifier signal for a
-   glitch token in the input) and the Kissane et al. H11.8 card (the same axis in static SAE features, uninterpreted and untested).
-4. **The lag-k correction.** Live looped-LM literature gates convergence on lag-1 successive-difference norms; no found work flags that this
+   glitch token in the input) and the Kissane et al. L11.H8 card (the same axis in static SAE features, uninterpreted and untested).
+4. **The lag-k correction.** Live looped-LM literature diagnoses convergence with lag-1 successive-difference norms; we found no work flagging that this
    gate misclassifies period-2 cycles, which finding 3 demonstrates concretely (and which makes ATR's own Pythia-410m null provisional).
    Distinguish from Blayney et al. (the gate in use) and Wang et al. (a periodicity metric at the text level only).
-5. **The readout-invisible persistent state, at pilot confidence.** No prior work places iterated dynamics inside the unembedding's weak
+5. **The readout-invisible persistent state, at pilot confidence.** We found no work placing iterated dynamics inside the unembedding's weak
    directions; the precedents (entropy neurons, dark signals, the workspace paper) establish the invisible subspace statically (finding 6).
    Distinguish from Cancedda (static spectral bands, no dynamics).
 6. **The Lucier frame for language models.** The analogy has been executed for codecs, speech recognisers, and image latents, never for a
