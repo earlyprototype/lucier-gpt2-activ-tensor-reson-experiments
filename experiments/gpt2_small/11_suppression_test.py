@@ -21,7 +21,7 @@ phase A before any measurement (hooked head-8 output vs the direct
 computation ln1(x) @ W_V[11,8] @ W_O[11,8], plus the b_V term).
 
 Three tests:
-  1. OV CIRCUIT. For all 144 heads, y = d @ W_V[l,h] @ W_O[l,h]; record
+  1. OV CIRCUIT. For all 144 heads, y = d @ W_V[layer,h] @ W_O[layer,h]; record
      cos(y, d) and gain ||y||/||d||, for d_sym (primary), the committed d
      (secondary), the +d_sym and -d_sym pole directions, and 5 random unit
      vectors (control). Plus empirical operating-point checks: the exp-08
@@ -293,7 +293,7 @@ def stage_gate():
 
 # ================================================================== test1 ===
 def ov_all_heads(t_row):
-    """y = t @ W_V[l,h] @ W_O[l,h] for every head; cos(y, t), gain ||y||/||t||."""
+    """y = t @ W_V[layer,h] @ W_O[layer,h] for every head; cos(y, t), gain ||y||/||t||."""
     with torch.no_grad():
         tu = unit(t_row)
         v = torch.einsum("d,lhdk->lhk", tu, model.W_V)     # [12,12,64]
@@ -305,30 +305,30 @@ def ov_all_heads(t_row):
 
 def direction_entry(name, t_row):
     coss, gains = ov_all_heads(t_row)
-    flat = [(float(coss[l, h]), float(gains[l, h]), l, h)
-            for l in range(N_LAYERS) for h in range(N_HEADS)]
+    flat = [(float(coss[layer, h]), float(gains[layer, h]), layer, h)
+            for layer in range(N_LAYERS) for h in range(N_HEADS)]
     by_cos = sorted(flat)                                  # ascending cos
-    rank = {(l, h): i + 1 for i, (_, _, l, h) in enumerate(by_cos)}
+    rank = {(layer, h): i + 1 for i, (_, _, layer, h) in enumerate(by_cos)}
     entry = {
         "direction": name,
-        "all_heads": [{"layer": l, "head": h,
-                       "cos": round(float(coss[l, h]), 6),
-                       "gain": round(float(gains[l, h]), 6)}
-                      for l in range(N_LAYERS) for h in range(N_HEADS)],
+        "all_heads": [{"layer": layer, "head": h,
+                       "cos": round(float(coss[layer, h]), 6),
+                       "gain": round(float(gains[layer, h]), 6)}
+                      for layer in range(N_LAYERS) for h in range(N_HEADS)],
         "n_heads_cos_below_-0.5": int((coss < -0.5).sum()),
         "n_heads_cos_below_0": int((coss < 0).sum()),
         "most_negative_head": {"layer": by_cos[0][2], "head": by_cos[0][3],
                                "cos": by_cos[0][0], "gain": by_cos[0][1]},
-        "top5_most_negative": [{"layer": l, "head": h, "cos": c, "gain": g}
-                               for c, g, l, h in by_cos[:5]],
+        "top5_most_negative": [{"layer": layer, "head": h, "cos": c, "gain": g}
+                               for c, g, layer, h in by_cos[:5]],
         "mean_cos": float(coss.mean()),
         "mean_abs_cos": float(coss.abs().mean()),
         "tracked_heads": {},
     }
-    for l, h in TRACK_HEADS:
-        entry["tracked_heads"][f"L{l}.H{h}"] = {
-            "cos": float(coss[l, h]), "gain": float(gains[l, h]),
-            "rank_by_cos_ascending": rank[(l, h)],
+    for layer, h in TRACK_HEADS:
+        entry["tracked_heads"][f"L{layer}.H{h}"] = {
+            "cos": float(coss[layer, h]), "gain": float(gains[layer, h]),
+            "rank_by_cos_ascending": rank[(layer, h)],
         }
     return entry
 
@@ -589,9 +589,9 @@ ATTN_THRESHOLD = 0.2
 def stage_test3():
     print("TEST 3: ordinary text", flush=True)
     cache_names = set()
-    for l, _ in TEST3_HEADS:
-        cache_names.add(f"blocks.{l}.attn.hook_pattern")
-        cache_names.add(f"blocks.{l}.attn.hook_z")
+    for layer, _ in TEST3_HEADS:
+        cache_names.add(f"blocks.{layer}.attn.hook_pattern")
+        cache_names.add(f"blocks.{layer}.attn.hook_z")
     rows = []
     prompt_meta = []
     for pi, sent in enumerate(TEST3_PROMPTS):
@@ -602,11 +602,11 @@ def stage_test3():
         with torch.no_grad():
             _, cache = model.run_with_cache(
                 toks, names_filter=lambda n: n in cache_names)
-        for l, h in TEST3_HEADS:
-            pat = cache[f"blocks.{l}.attn.hook_pattern"][0][h]   # [L, L]
-            z = cache[f"blocks.{l}.attn.hook_z"][0]              # [L, nh, dh]
+        for layer, h in TEST3_HEADS:
+            pat = cache[f"blocks.{layer}.attn.hook_pattern"][0][h]   # [L, L]
+            z = cache[f"blocks.{layer}.attn.hook_z"][0]              # [L, nh, dh]
             with torch.no_grad():
-                outs = z[:, h, :] @ model.W_O[l, h]              # [L, 768]
+                outs = z[:, h, :] @ model.W_O[layer, h]              # [L, 768]
             for t in range(2, L):
                 p_row = pat[t]
                 s = int(p_row[1:t + 1].argmax()) + 1
@@ -617,7 +617,7 @@ def stage_test3():
                     delta = float(out_t @ model.W_U[:, tok_s])
                     onorm = float(out_t.norm())
                 rows.append({
-                    "prompt": pi, "layer": l, "head": h, "t": t, "s": s,
+                    "prompt": pi, "layer": layer, "head": h, "t": t, "s": s,
                     "s_is_t": s == t,
                     "attn_to_bos": float(p_row[0]),
                     "attn_to_top_source": a_top,
@@ -627,8 +627,8 @@ def stage_test3():
                     "head_output_norm": onorm,
                 })
     per_head = {}
-    for l, h in TEST3_HEADS:
-        sel = [r for r in rows if r["layer"] == l and r["head"] == h]
+    for layer, h in TEST3_HEADS:
+        sel = [r for r in rows if r["layer"] == layer and r["head"] == h]
         res = [r for r in sel if r["attn_to_top_source"] > ATTN_THRESHOLD]
         def agg(rs):
             if not rs:
@@ -642,20 +642,20 @@ def stage_test3():
                 "mean_delta_per_unit_output": sum(dn) / len(dn),
                 "min_delta": min(ds), "max_delta": max(ds),
             }
-        per_head[f"L{l}.H{h}"] = {
+        per_head[f"L{layer}.H{h}"] = {
             "all_positions": agg(sel),
             f"attn_top_source_gt_{ATTN_THRESHOLD}": agg(res),
             "mean_attn_to_bos": sum(r["attn_to_bos"] for r in sel) / len(sel),
             "frac_top_source_is_self": sum(
                 1 for r in sel if r["s_is_t"]) / len(sel),
         }
-        a = per_head[f"L{l}.H{h}"]["all_positions"]
-        rst = per_head[f"L{l}.H{h}"][f"attn_top_source_gt_{ATTN_THRESHOLD}"]
-        print(f"  L{l}.H{h}: n {a['n']}, frac neg {a['frac_delta_negative']:.3f}, "
+        a = per_head[f"L{layer}.H{h}"]["all_positions"]
+        rst = per_head[f"L{layer}.H{h}"][f"attn_top_source_gt_{ATTN_THRESHOLD}"]
+        print(f"  L{layer}.H{h}: n {a['n']}, frac neg {a['frac_delta_negative']:.3f}, "
               f"mean delta {a['mean_delta']:+.3f}; restricted n {rst['n']}, "
               f"frac neg {rst.get('frac_delta_negative', float('nan')):.3f}, "
               f"mean {rst.get('mean_delta', float('nan')):+.3f}; "
-              f"BOS attn {per_head[f'L{l}.H{h}']['mean_attn_to_bos']:.3f}",
+              f"BOS attn {per_head[f'L{layer}.H{h}']['mean_attn_to_bos']:.3f}",
               flush=True)
     results["test3"] = {
         "prompts": prompt_meta,
