@@ -57,8 +57,8 @@ stream, and it meets the loop's degenerative attractor empirically: continued so
 adds Cold Stop, an entropy-threshold early exit that ends latent reasoning before collapse (pp. 2, 5). Ouro (arXiv 2510.25741)\* [preprint,
 unreviewed] and retrofitted recurrence (arXiv 2511.07384)\* [preprint, unreviewed] convert pretrained stacks into loops by training. The
 looped-LM literature names its failure mode latent collapse, the hidden state falling into an input-independent fixed point, and engineers
-against it (STARS, arXiv 2605.26733\*; Solve the Loop, also circulating under the title Attractor Models for Language and Reasoning, arXiv
-2605.12466\*) [both preprint, unreviewed]. Movahedi et al., Fixed-Point Reasoners (arXiv 2606.18206) [preprint, unreviewed] close the
+against it (STARS, arXiv 2605.26733\* [preprint, unreviewed]; Solve the Loop, also circulating under the title Attractor Models for Language and Reasoning, arXiv
+2605.12466\* [preprint, unreviewed]). Movahedi et al., Fixed-Point Reasoners (arXiv 2606.18206) [preprint, unreviewed] close the
 family from the fixed-point side: a 7M-parameter looped reasoner trained from scratch for algorithmic tasks, not natural language (p. 15),
 halts when consecutive iterates become sufficiently close (p. 3), observes that for some inputs the model descends into oscillatory
 behaviour around a fixed point of the outer iteration map (p. 6), and ships FPOPT, a patience-based damping that eliminates the
@@ -101,13 +101,13 @@ looped-model internals is here visible only through lenses, and the lenses disag
 is claimed, and recurrence scaling stays below 5 percent GSM8K accuracy without explicit chain-of-thought at every depth from 4 to 256
 steps, against 24.87 with it (Table 1, p. 5).
 
-**Deep equilibrium models.** Bai, Kolter, Koltun (NeurIPS 2019) [peer-reviewed] replaced explicit depth with root-finding for the fixed point of one
+**Deep equilibrium models.** Bai, Kolter, Koltun (NeurIPS 2019)\* [peer-reviewed] replaced explicit depth with root-finding for the fixed point of one
 weight-tied block, with the founding admission that plain forward iteration often fails to converge; the repair toolchain exists because
-undamped iteration stalls or oscillates (Anderson acceleration, arXiv 2410.19460 [preprint, unreviewed]; Jacobian regularisation, arXiv 2106.14342 [peer-reviewed, ICML 2021]; monotone
-operator networks, arXiv 2006.08591 [peer-reviewed, NeurIPS 2020]). Standard fixed-point numerics give the mechanism class: an eigenvalue of magnitude above 1 with
+undamped iteration stalls or oscillates (Anderson acceleration, arXiv 2410.19460\* [preprint, unreviewed]; Jacobian regularisation, arXiv 2106.14342\* [peer-reviewed, ICML 2021]; monotone
+operator networks, arXiv 2006.08591\* [peer-reviewed, NeurIPS 2020]). Standard fixed-point numerics give the mechanism class: an eigenvalue of magnitude above 1 with
 negative sign at a fixed point produces oscillation around it. Finding 4 is that signature in a pretrained transformer (a period-doubling
 configuration: a near-fixed point whose one unstable direction yields a stable 2-cycle), localised to a named component, which no DEQ work
-does. All\*.
+does.
 
 **Marcus, Westervelt, Dynamics of Iterated-Map Neural Networks (Phys Rev A 1989).**\* [peer-reviewed]
 https://neuron.eng.wayne.edu/tarek/MITbook/ref/refs.html
@@ -164,11 +164,11 @@ limit cycle is possible at all, and the paper's 94 pages contain no occurrence o
 energy and so produce fixed points only; Hyper-SET, an unreviewed preprint, independently arrives at ATR's two mechanics (norm-constrained
 states, repeated block) as design principles.
 
-**The loop's preconditions.** Transformer Layers as Painters (AAAI 2025, arXiv 2407.09298) [peer-reviewed] ran frozen pretrained layers in altered orders
+**The loop's preconditions.** Transformer Layers as Painters (AAAI 2025, arXiv 2407.09298)\* [peer-reviewed] ran frozen pretrained layers in altered orders
 and loops, the nearest published practice of iterating frozen layers off-distribution; it did not renormalise, close the full
-output-to-input loop, or map attractors. Heimersheim and Turner (LessWrong 2023) [community post, unreviewed] put per-layer residual norm
+output-to-input loop, or map attractors. Heimersheim and Turner (LessWrong 2023)\* [community post, unreviewed] put per-layer residual norm
 growth in GPT-2 class models at roughly 4.5 percent, an unreviewed community measurement; whatever its exact value, without the energy
-renormalisation the loop diverges in norm, so the attractors are properties of the renormalised map. Both\*.
+renormalisation the loop diverges in norm, so the attractors are properties of the renormalised map.
 
 ## GPT-2 internals
 
@@ -241,10 +241,10 @@ subspace carries most causal effect on outputs and most activation variance lies
 
 **Anisotropy and outlier dimensions.** Ethayarajh 2019 (arXiv 1909.00512) [peer-reviewed, EMNLP 2019]: GPT-2 representations occupy a narrow
 anisotropic cone, the most-trained pole of finding 5. Rogue and outlier dimensions (Timkey and van Schijndel, arXiv
-2109.04404 [peer-reviewed, EMNLP 2021]; Kovaleva et al., arXiv 2105.06990 [peer-reviewed, Findings of ACL 2021]; Puccetti et al., arXiv
-2205.11380 [peer-reviewed, Findings of EMNLP 2022]): a few dimensions dominate similarity yet barely matter
+2109.04404\* [peer-reviewed, EMNLP 2021]; Kovaleva et al., arXiv 2105.06990\* [peer-reviewed, Findings of ACL 2021]; Puccetti et al., arXiv
+2205.11380\* [peer-reviewed, Findings of EMNLP 2022]): a few dimensions dominate similarity yet barely matter
 behaviourally, and outlier magnitudes track token frequency; the dissociation between what dominates geometry and what drives behaviour
-parallels findings 5 and 6. All\*.
+parallels findings 5 and 6.
 
 ## Glitch tokens
 
@@ -351,9 +351,9 @@ in, text out, geometry measured on an external embedding of the outputs, no mode
 exists in the record as defined vocabulary at the text interface, unoccupied by measurement; the bell is not an instance of it, and nothing
 in the framework reaches activation level.
 
-**Self-refinement convergence.** Self-Refine (NeurIPS 2023, arXiv 2303.17651) [peer-reviewed] closes the loop through text plus an instruction, with
-convergence imposed by a stopping rule, not analysed as dynamics. Huang et al. (ICLR 2024, arXiv 2310.01798) [peer-reviewed]: intrinsic self-correction
-without external feedback fails to improve and often degrades, consistent with dissolution rather than convergence to meaning. Both\*.
+**Self-refinement convergence.** Self-Refine (NeurIPS 2023, arXiv 2303.17651)\* [peer-reviewed] closes the loop through text plus an instruction, with
+convergence imposed by a stopping rule, not analysed as dynamics. Huang et al. (ICLR 2024, arXiv 2310.01798)\* [peer-reviewed]: intrinsic self-correction
+without external feedback fails to improve and often degrades, consistent with dissolution rather than convergence to meaning.
 
 **The Lucier lineage.** Alvin Lucier's I Am Sitting in a Room (1969) is the procedure of feeding a medium its own output until the medium's
 character dominates. The located record transposes it to computational substrates four times. Backes, i am sitting in a machine\* [community post, unreviewed] https://www.martinbackes.com/i-am-sitting-in-a-machine/: an artificial voice through an MP3 encoder 3000 times, a
