@@ -237,15 +237,16 @@ work, not proof of absence; absence claims are bounded by the review's coverage,
    GPT-2, but no source states the measured result (lowest-norm rows are frequent function words; the signature is mean proximity).
    Distinguish from Land and Bartolo (the tied-embedding caveat, stated for their indicator, not as a GPT-2 measurement).
 
-Caveat: absence of evidence is bounded by this review's coverage (arXiv, ACL, NeurIPS, ICML, ICLR, LessWrong, Alignment Forum, as of
-July 2026). A same-niche preprint under different vocabulary (for example "activation recycling" or "representation feedback") could
+Caveat: absence of evidence is bounded by this review's coverage (the venues cited in this document, arXiv and the major ML and NLP
+venues among them, as surfaced by public indexes, as of July 2026). A same-niche preprint under different vocabulary (for example "activation recycling" or "representation feedback") could
 exist outside the phrasings this review covers.
 
 ## Sources
 
 URLs for the works cited above, deduplicated, grouped by topic.
 
-Dynamical systems: https://github.com/locuslab/deq , https://wiki.math.ntnu.no/_media/ma2501/2014v/fixedpoint.pdf ,
+Dynamical systems: https://arxiv.org/abs/2505.15778 ,
+https://github.com/locuslab/deq , https://wiki.math.ntnu.no/_media/ma2501/2014v/fixedpoint.pdf ,
 https://arxiv.org/html/2410.19460 , https://arxiv.org/abs/2106.14342 , https://arxiv.org/abs/2006.08591 , https://arxiv.org/pdf/2502.05171 ,
 https://arxiv.org/abs/2604.11791 , https://arxiv.org/abs/2605.26733 , https://arxiv.org/abs/2605.12466 , https://arxiv.org/abs/2510.25741 ,
 https://arxiv.org/abs/2511.07384 , https://arxiv.org/pdf/2412.06769, https://arxiv.org/abs/2103.03404,
@@ -253,10 +254,10 @@ https://people.lids.mit.edu/yp/homepage/data/2023_transformers1.pdf , https://ar
 https://www.lesswrong.com/posts/8mizBCm3dyc432nK8/residual-stream-norms-grow-exponentially-over-the-forward,
 https://arxiv.org/abs/2008.02217v3 , https://arxiv.org/abs/2302.07253 , https://arxiv.org/abs/2502.11646 ,
 https://direct.mit.edu/neco/article/25/3/626/7854 , https://neuron.eng.wayne.edu/tarek/MITbook/ref/refs.html ,
-https://aclanthology.org/2025.acl-long.624/ and https://arxiv.org/abs/2502.15208, https://arxiv.org/abs/2402.09221 ,
-https://transformer-circuits.pub/2026/workspace/index.html (secondary coverage https://thezvi.substack.com/p/no-space-like-j-space )
+https://aclanthology.org/2025.acl-long.624/ and https://arxiv.org/abs/2502.15208 (secondary coverage https://thezvi.substack.com/p/no-space-like-j-space )
 
-GPT-2 mechanistic interpretability: https://transformer-circuits.pub/2021/framework/index.html,
+GPT-2 mechanistic interpretability: https://arxiv.org/abs/2402.09221 , https://transformer-circuits.pub/2026/workspace/index.html ,
+https://transformer-circuits.pub/2021/framework/index.html,
 https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-gpt-the-logit-lens , https://arxiv.org/abs/2303.08112 ,
 https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html , https://arxiv.org/abs/2211.00593 ,
 https://raw.githubusercontent.com/ArthurConmy/Automatic-Circuit-Discovery/main/acdc/ioi/utils.py , https://arxiv.org/abs/2310.04625 ,
@@ -279,4 +280,4 @@ https://www.translationparty.com , https://arxiv.org/abs/2407.04503, https://arx
 https://arxiv.org/abs/2303.17651 , https://arxiv.org/abs/2310.01798 , https://arxiv.org/abs/2305.17493 ,
 https://www.nature.com/articles/s41586-024-07566-y , https://arxiv.org/abs/2307.01850 , https://arxiv.org/abs/2402.07043 ,
 https://www.martinbackes.com/i-am-sitting-in-a-machine/ , https://dorothysantos.com/portfolio/the-degradation-of-speech/ ,
-https://arxiv.org/abs/2602.19033, https://arxiv.org/abs/2505.15778
+https://arxiv.org/abs/2602.19033
