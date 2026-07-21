@@ -44,13 +44,33 @@ Stage 2 (no model; pure linear algebra on the committed lens):
     The top-100 (readout-visible) and bottom-100 (readout-quiet) W_U
     components of d are span-probed separately.
 
+Stage 3 (review fix; pure linear algebra unless the W_U cache is missing):
+  - The stage-2 direction probe ran on the COMMITTED flip axis d, which
+    06_bell_anatomy.py builds by mixing frames (raw-scale A with
+    shell-normalised B), so that d is 0.909 aligned with its own pivot M:
+    mostly radial contamination. The physical cycle axis is the SYMMETRIC
+    on-shell axis d_sym = normalise(An - Bn), both phases rescaled to the
+    loop shell N0, orthogonal to its pivot M_sym (see
+    output_hinge_eigen/hinge_eigenvalue.md, "The map, the frames, and two
+    flip axes"). Stage 3 reconstructs d_sym from the stage-1 checkpoint,
+    gates it against hinge_eigenvalue.json (orthogonality to M_sym;
+    cos(d_sym, d_committed) = 0.616; cos with the tangentialised committed
+    d = 0.973), and runs the same probes on it: per-layer span share,
+    sparse share for both signs, the seed-777 generic-direction baseline
+    (gated to replay stage 2 exactly), and span probes of d_sym's top-100
+    and bottom-100 W_U singular components (the components need the model
+    once; they are cached back into phase_states.pt, so re-runs are pure
+    linear algebra). Results are appended to jlens_phase.json under
+    direction_probe_sym; the stage-2 numbers are kept and relabelled
+    d_committed in the report.
+
 The lens itself is REUSED from output_jlens_pilot/jlens_vectors.pt; its
 corpus is unreachable on this network, so no lens recomputation is attempted.
 
 Outputs: output_jlens_phase/{phase_states.pt, jlens_phase.json} plus
 markdown-ready tables on stdout (report: output_jlens_phase/jlens_phase.md).
 
-Run:  ATR_GPT2_LOCAL=<gpt2 dir> python 10_jlens_phase.py [stage1|stage2|all]
+Run:  ATR_GPT2_LOCAL=<gpt2 dir> python 10_jlens_phase.py [stage1|stage2|stage3|all]
 """
 import os, sys, json, time
 
@@ -60,6 +80,7 @@ OUT = os.path.join(HERE, "output_jlens_phase")
 DM = os.path.join(HERE, "output_divine_motion")
 JPILOT = os.path.join(HERE, "output_jlens_pilot")
 CONF = os.path.join(HERE, "output_confidence")
+HEIG = os.path.join(HERE, "output_hinge_eigen")
 os.makedirs(OUT, exist_ok=True)
 sys.path.insert(0, REPO)
 
@@ -495,6 +516,200 @@ def stage2():
     print("\nhinge headline:", json.dumps(summary["hinge_headline"], indent=1))
 
 
+def stage3():
+    """Probe the symmetric on-shell flip axis d_sym (review fix).
+
+    The committed axis probed in stage 2 mixes frames (raw A with shell B)
+    and is 0.909 aligned with its own pivot; d_sym is the frame-clean cycle
+    axis, orthogonal to M_sym. Appends direction_probe_sym to
+    jlens_phase.json; stage-2 results are untouched.
+    """
+    t0 = time.time()
+    json_path = os.path.join(OUT, "jlens_phase.json")
+    if not os.path.exists(json_path):
+        raise SystemExit("stage 3 needs jlens_phase.json; run stage2 first.")
+    ph = torch.load(STATES_PT, weights_only=True)
+
+    def cos(a, b):
+        return float(F.cosine_similarity(a.unsqueeze(0), b.unsqueeze(0)))
+
+    # ---- Construct d_sym from the checkpointed states ----
+    # Stage 1 stored A in the raw frame (last row of the iteration-1000
+    # tensor, full norm 5098) and B already on the shell (full norm N0).
+    # The state is exactly position-collapsed, so rescaling the stored row
+    # by N0 / ||A_full|| equals taking the last row of norm_to(A_full, N0),
+    # which is how 08_hinge_eigenvalue.py builds An.
+    N0 = ph["norms"]["initial_norm"]
+    An = ph["A"] * (N0 / ph["norms"]["A_full"])
+    Bn = ph["B"]
+    D_sym = (An - Bn) / 2
+    M_sym = (An + Bn) / 2
+    d_sym = D_sym / D_sym.norm()
+
+    with open(os.path.join(HEIG, "hinge_eigenvalue.json")) as fh:
+        heig = json.load(fh)
+    geo = heig["meta"]["geometry"]
+    tang_ref = heig["part2"]["d_committed_tangential_note"]["cos_vs_d_sym"]
+
+    dc_hat = ph["d"] / ph["d"].norm()
+    mc_hat = ph["M"] / ph["M"].norm()
+    dc_tang = dc_hat - float(dc_hat @ mc_hat) * mc_hat
+    dc_tang = dc_tang / dc_tang.norm()
+
+    cos_dsym_msym = cos(d_sym, M_sym)
+    cos_dsym_dcom = cos(d_sym, ph["d"])
+    cos_dsym_tang = cos(d_sym, dc_tang)
+    print(f"gate cos(d_sym, M_sym)             = {cos_dsym_msym:+.2e}  "
+          f"(hinge_eigenvalue: {geo['cos_Dsym_vs_Msym']:.2e})")
+    print(f"gate cos(d_sym, d_committed)       = {cos_dsym_dcom:.6f}  "
+          f"(hinge_eigenvalue: {geo['cos_Dcommitted_vs_Dsym']:.6f})")
+    print(f"gate cos(d_sym, tangential d_comm) = {cos_dsym_tang:.6f}  "
+          f"(hinge_eigenvalue: {tang_ref:.6f})")
+    if not (abs(cos_dsym_msym) < 1e-4
+            and abs(cos_dsym_dcom - geo["cos_Dcommitted_vs_Dsym"]) < 1e-3
+            and abs(cos_dsym_tang - tang_ref) < 1e-3):
+        raise SystemExit("SANITY GATE FAILED (stage 3): d_sym reconstruction "
+                         "does not match hinge_eigenvalue.json. Stopping.")
+    print("stage-3 d_sym construction gates PASSED", flush=True)
+
+    # ---- W_U singular split of d_sym (model needed once; then cached) ----
+    if "dsym_vis_top100" not in ph:
+        model = load_model()
+        print(f"model loaded for W_U split ({time.time()-t0:.0f}s)", flush=True)
+        with torch.no_grad():
+            U, _S, _Vh = torch.linalg.svd(model.W_U, full_matrices=False)
+            unit_c = U.T @ dc_hat
+            top_c = float((unit_c[:100] ** 2).sum())
+            bot_c = float((unit_c[-100:] ** 2).sum())
+            if (abs(top_c - ph["gates"]["d_top100_energy"]) > 1e-5
+                    or abs(bot_c - ph["gates"]["d_bot100_energy"]) > 1e-5):
+                raise SystemExit("SANITY GATE FAILED (stage 3): fresh W_U SVD "
+                                 "does not reproduce the stage-1 committed-d "
+                                 "split. Stopping.")
+            coef = U.T @ d_sym
+            ph["dsym_vis_top100"] = (U[:, :100] @ coef[:100]).clone()
+            ph["dsym_quiet_bot100"] = (U[:, -100:] @ coef[-100:]).clone()
+            ph["dsym_wu_energies"] = {
+                "top100": float((coef[:100] ** 2).sum()),
+                "bot100": float((coef[-100:] ** 2).sum()),
+            }
+        torch.save(ph, STATES_PT)
+        print("stage-3 W_U gate PASSED; d_sym components cached into "
+              "phase_states.pt", flush=True)
+    top_e = ph["dsym_wu_energies"]["top100"]
+    bot_e = ph["dsym_wu_energies"]["bot100"]
+    print(f"d_sym energy in top-100 / bottom-100 W_U dirs = "
+          f"{top_e:.6f} / {bot_e:.6f} (covered {top_e + bot_e:.6f})", flush=True)
+
+    # ---- Probes: identical machinery, same seed-777 baseline as stage 2 ----
+    jl = torch.load(os.path.join(JPILOT, "jlens_vectors.pt"), weights_only=True)
+    jlens = jl["vectors"]
+    n_layers = len(jl["layers"])
+    with open(json_path) as fh:
+        results = json.load(fh)
+
+    gen777 = torch.Generator().manual_seed(777)
+    base_dirs = torch.randn(20, jlens.shape[2], generator=gen777)
+    base_dirs = base_dirs / base_dirs.norm(dim=-1, keepdim=True)
+
+    direction_probe_sym = {}
+    for label, v in [("d_sym", d_sym),
+                     ("dsym_vis_top100", ph["dsym_vis_top100"]),
+                     ("dsym_quiet_bot100", ph["dsym_quiet_bot100"])]:
+        per_layer = []
+        for layer_idx in range(n_layers):
+            D = jlens[:, layer_idx, :]
+            entry = {"layer": layer_idx, "lstsq_share": lstsq_share(D, v)}
+            if label == "d_sym":
+                entry["nn_sparse_k25_share_plus"] = nn_sparse_share(D, v)
+                entry["nn_sparse_k25_share_minus"] = nn_sparse_share(D, -v)
+            entry["random_direction_lstsq_mean"] = float(
+                sum(lstsq_share(D, base_dirs[i]) for i in range(20)) / 20)
+            per_layer.append(entry)
+        direction_probe_sym[label] = {"per_layer": per_layer,
+                                      "norm": float(v.norm())}
+        print(f"direction {label}: L6 span={per_layer[6]['lstsq_share']:.4f} "
+              f"L11 span={per_layer[11]['lstsq_share']:.4f} "
+              f"(generic dir L11 {per_layer[11]['random_direction_lstsq_mean']:.4f})",
+              flush=True)
+
+    # Baseline replay gate: the seed-777 generic-direction column must equal
+    # the one stage 2 recorded (it is a per-layer property, not a per-
+    # direction one), proving the two stages are on the same footing.
+    max_dg = max(
+        abs(direction_probe_sym["d_sym"]["per_layer"][layer_idx]
+            ["random_direction_lstsq_mean"]
+            - results["direction_probe"]["d_hinge"]["per_layer"][layer_idx]
+            ["random_direction_lstsq_mean"])
+        for layer_idx in range(n_layers))
+    print(f"gate seed-777 baseline vs stage 2: max diff {max_dg:.2e}")
+    if max_dg > 1e-6:
+        raise SystemExit("SANITY GATE FAILED (stage 3): the generic-direction "
+                         "baseline does not replay stage 2. Stopping.")
+    print("stage-3 baseline replay gate PASSED", flush=True)
+
+    # ---- Summary block and JSON update (idempotent keys, no appends) ----
+    ds = [direction_probe_sym["d_sym"]["per_layer"][layer_idx]["lstsq_share"]
+          for layer_idx in range(n_layers)]
+    gn = [direction_probe_sym["d_sym"]["per_layer"][layer_idx]
+          ["random_direction_lstsq_mean"] for layer_idx in range(n_layers)]
+    vis = [direction_probe_sym["dsym_vis_top100"]["per_layer"][layer_idx]
+           ["lstsq_share"] for layer_idx in range(n_layers)]
+    qt = [direction_probe_sym["dsym_quiet_bot100"]["per_layer"][layer_idx]
+          ["lstsq_share"] for layer_idx in range(n_layers)]
+    results["direction_probe_sym"] = direction_probe_sym
+    results["summary"]["sym_axis_headline"] = {
+        "d_sym_span_L11": ds[11], "d_sym_span_L6": ds[6],
+        "d_sym_span_mean_all_layers": sum(ds) / len(ds),
+        "generic_direction_span_L11": gn[11],
+        "generic_direction_span_mean": sum(gn) / len(gn),
+        "dsym_vis_span_L0": vis[0], "dsym_vis_span_L11": vis[11],
+        "dsym_quiet_span_L0": qt[0], "dsym_quiet_span_L11": qt[11],
+        "wu_energy_top100": top_e, "wu_energy_bot100": bot_e,
+        "wu_energy_covered": top_e + bot_e,
+    }
+    results["summary"]["axis_frame_check"] = {
+        "cos_dsym_Msym": cos_dsym_msym,
+        "cos_dsym_dcommitted": cos_dsym_dcom,
+        "cos_dsym_dcommitted_tangential": cos_dsym_tang,
+        "norm_Dsym_last": float(D_sym.norm()),
+        "norm_Msym_last": float(M_sym.norm()),
+        "committed_wu_energy_top100": ph["gates"]["d_top100_energy"],
+        "committed_wu_energy_bot100": ph["gates"]["d_bot100_energy"],
+        "committed_wu_energy_covered": (ph["gates"]["d_top100_energy"]
+                                        + ph["gates"]["d_bot100_energy"]),
+    }
+    results["meta"]["frame_note"] = (
+        "direction_probe keys d_hinge, d_vis_top100, d_quiet_bot100 are the "
+        "COMMITTED flip axis d_committed, built exactly as 06_bell_anatomy.py "
+        "builds it (raw-frame A mixed with shell-frame B; cos(d, M) = 0.909, "
+        "mostly radial contamination). direction_probe_sym is the symmetric "
+        "on-shell axis d_sym = normalise(An - Bn), both phases on the loop "
+        "shell N0, orthogonal to its pivot M_sym; it is the physical cycle "
+        "axis. See output_hinge_eigen/hinge_eigenvalue.md, 'The map, the "
+        "frames, and two flip axes'.")
+    with open(json_path, "w") as fh:
+        json.dump(results, fh, indent=1)
+    print(f"stage 3 complete ({time.time()-t0:.0f}s). JSON updated.", flush=True)
+
+    # ---- Markdown-ready table ----
+    def fmt(x):
+        return f"{x:.3f}"
+    print("\n#### symmetric axis detail")
+    print("| layer | d_sym span | generic-dir span | d_sym nn25 (+) | "
+          "d_sym nn25 (-) | dsym_vis span | dsym_quiet span |")
+    print("|---|---|---|---|---|---|---|")
+    for layer_idx in range(n_layers):
+        e = direction_probe_sym["d_sym"]["per_layer"][layer_idx]
+        print(f"| L{layer_idx} | {fmt(e['lstsq_share'])} | "
+              f"{fmt(e['random_direction_lstsq_mean'])} | "
+              f"{fmt(e['nn_sparse_k25_share_plus'])} | "
+              f"{fmt(e['nn_sparse_k25_share_minus'])} | "
+              f"{fmt(vis[layer_idx])} | {fmt(qt[layer_idx])} |")
+    print("\nsym axis headline:",
+          json.dumps(results["summary"]["sym_axis_headline"], indent=1))
+
+
 if __name__ == "__main__":
     if STAGE in ("stage1", "all") and not os.path.exists(STATES_PT):
         stage1()
@@ -502,3 +717,5 @@ if __name__ == "__main__":
         print("phase_states.pt exists; skipping stage 1", flush=True)
     if STAGE in ("stage2", "all"):
         stage2()
+    if STAGE in ("stage3", "all"):
+        stage3()

@@ -1531,6 +1531,30 @@
    "d_span_mean_all_layers": 0.1687291885415713,
    "generic_direction_span_L11": 0.2518016591668129,
    "generic_direction_span_mean": 0.24875103893379372
+  },
+  "sym_axis_headline": {
+   "d_sym_span_L11": 0.012574020773172379,
+   "d_sym_span_L6": 0.028533611446619034,
+   "d_sym_span_mean_all_layers": 0.02147177265336116,
+   "generic_direction_span_L11": 0.2518016591668129,
+   "generic_direction_span_mean": 0.24875103893379372,
+   "dsym_vis_span_L0": 0.25573551654815674,
+   "dsym_vis_span_L11": 0.5717077255249023,
+   "dsym_quiet_span_L0": 0.008540517650544643,
+   "dsym_quiet_span_L11": 0.0020827308762818575,
+   "wu_energy_top100": 0.011601632460951805,
+   "wu_energy_bot100": 0.9704546928405762,
+   "wu_energy_covered": 0.982056325301528
+  },
+  "axis_frame_check": {
+   "cos_dsym_Msym": 3.725290298461914e-07,
+   "cos_dsym_dcommitted": 0.6161857843399048,
+   "cos_dsym_dcommitted_tangential": 0.9726013541221619,
+   "norm_Dsym_last": 184.3197479248047,
+   "norm_Msym_last": 426.2301940917969,
+   "committed_wu_energy_top100": 0.1285160779953003,
+   "committed_wu_energy_bot100": 0.7317866683006287,
+   "committed_wu_energy_covered": 0.860302746295929
   }
  },
  "meta": {
@@ -1571,6 +1595,228 @@
    "Divine_A equals the pilot's probed Syntactic state up to cos > 0.9999998 (L2 diff 0.025 at norm 1612), so its rows duplicate the Syntactic rows within numerical noise.",
    "The random sparse control differs from the recorded pilot JSON by design: the pilot report documents that its recorded value came from a single draw while the committed script (and this replay) averages three.",
    "Span shares are scale- and sign-invariant; the sparse probe is sign-dependent, hence both signs reported for d."
-  ]
+  ],
+  "frame_note": "direction_probe keys d_hinge, d_vis_top100, d_quiet_bot100 are the COMMITTED flip axis d_committed, built exactly as 06_bell_anatomy.py builds it (raw-frame A mixed with shell-frame B; cos(d, M) = 0.909, mostly radial contamination). direction_probe_sym is the symmetric on-shell axis d_sym = normalise(An - Bn), both phases on the loop shell N0, orthogonal to its pivot M_sym; it is the physical cycle axis. See output_hinge_eigen/hinge_eigenvalue.md, 'The map, the frames, and two flip axes'."
+ },
+ "direction_probe_sym": {
+  "d_sym": {
+   "per_layer": [
+    {
+     "layer": 0,
+     "lstsq_share": 0.01728329248726368,
+     "nn_sparse_k25_share_plus": 0.005589742213487625,
+     "nn_sparse_k25_share_minus": 0.00250071263872087,
+     "random_direction_lstsq_mean": 0.2532338067889214
+    },
+    {
+     "layer": 1,
+     "lstsq_share": 0.016972364857792854,
+     "nn_sparse_k25_share_plus": 0.006373175885528326,
+     "nn_sparse_k25_share_minus": 0.002038161735981703,
+     "random_direction_lstsq_mean": 0.24881661534309388
+    },
+    {
+     "layer": 2,
+     "lstsq_share": 0.019639985635876656,
+     "nn_sparse_k25_share_plus": 0.005722843110561371,
+     "nn_sparse_k25_share_minus": 0.004007997922599316,
+     "random_direction_lstsq_mean": 0.24741039127111436
+    },
+    {
+     "layer": 3,
+     "lstsq_share": 0.02434530481696129,
+     "nn_sparse_k25_share_plus": 0.009861024096608162,
+     "nn_sparse_k25_share_minus": 0.006291762460023165,
+     "random_direction_lstsq_mean": 0.24460487961769103
+    },
+    {
+     "layer": 4,
+     "lstsq_share": 0.028446566313505173,
+     "nn_sparse_k25_share_plus": 0.010741613805294037,
+     "nn_sparse_k25_share_minus": 0.009843071922659874,
+     "random_direction_lstsq_mean": 0.24487075060606003
+    },
+    {
+     "layer": 5,
+     "lstsq_share": 0.028438037261366844,
+     "nn_sparse_k25_share_plus": 0.011614087969064713,
+     "nn_sparse_k25_share_minus": 0.006800601724535227,
+     "random_direction_lstsq_mean": 0.24796833619475364
+    },
+    {
+     "layer": 6,
+     "lstsq_share": 0.028533611446619034,
+     "nn_sparse_k25_share_plus": 0.011205743998289108,
+     "nn_sparse_k25_share_minus": 0.0065026008524000645,
+     "random_direction_lstsq_mean": 0.2467530533671379
+    },
+    {
+     "layer": 7,
+     "lstsq_share": 0.023913033306598663,
+     "nn_sparse_k25_share_plus": 0.011049040593206882,
+     "nn_sparse_k25_share_minus": 0.005764050874859095,
+     "random_direction_lstsq_mean": 0.2480023644864559
+    },
+    {
+     "layer": 8,
+     "lstsq_share": 0.021090582013130188,
+     "nn_sparse_k25_share_plus": 0.009161272086203098,
+     "nn_sparse_k25_share_minus": 0.006362661719322205,
+     "random_direction_lstsq_mean": 0.2506168752908707
+    },
+    {
+     "layer": 9,
+     "lstsq_share": 0.018978489562869072,
+     "nn_sparse_k25_share_plus": 0.007612479850649834,
+     "nn_sparse_k25_share_minus": 0.005512770731002092,
+     "random_direction_lstsq_mean": 0.2494920775294304
+    },
+    {
+     "layer": 10,
+     "lstsq_share": 0.017445983365178108,
+     "nn_sparse_k25_share_plus": 0.006887150462716818,
+     "nn_sparse_k25_share_minus": 0.00469325203448534,
+     "random_direction_lstsq_mean": 0.2514416575431824
+    },
+    {
+     "layer": 11,
+     "lstsq_share": 0.012574020773172379,
+     "nn_sparse_k25_share_plus": 0.005292646121233702,
+     "nn_sparse_k25_share_minus": 0.0026660356670618057,
+     "random_direction_lstsq_mean": 0.2518016591668129
+    }
+   ],
+   "norm": 0.9999998211860657
+  },
+  "dsym_vis_top100": {
+   "per_layer": [
+    {
+     "layer": 0,
+     "lstsq_share": 0.25573551654815674,
+     "random_direction_lstsq_mean": 0.2532338067889214
+    },
+    {
+     "layer": 1,
+     "lstsq_share": 0.282755583524704,
+     "random_direction_lstsq_mean": 0.24881661534309388
+    },
+    {
+     "layer": 2,
+     "lstsq_share": 0.3023497760295868,
+     "random_direction_lstsq_mean": 0.24741039127111436
+    },
+    {
+     "layer": 3,
+     "lstsq_share": 0.3283745348453522,
+     "random_direction_lstsq_mean": 0.24460487961769103
+    },
+    {
+     "layer": 4,
+     "lstsq_share": 0.35034844279289246,
+     "random_direction_lstsq_mean": 0.24487075060606003
+    },
+    {
+     "layer": 5,
+     "lstsq_share": 0.3540392816066742,
+     "random_direction_lstsq_mean": 0.24796833619475364
+    },
+    {
+     "layer": 6,
+     "lstsq_share": 0.3720824420452118,
+     "random_direction_lstsq_mean": 0.2467530533671379
+    },
+    {
+     "layer": 7,
+     "lstsq_share": 0.3750956058502197,
+     "random_direction_lstsq_mean": 0.2480023644864559
+    },
+    {
+     "layer": 8,
+     "lstsq_share": 0.39032572507858276,
+     "random_direction_lstsq_mean": 0.2506168752908707
+    },
+    {
+     "layer": 9,
+     "lstsq_share": 0.40890705585479736,
+     "random_direction_lstsq_mean": 0.2494920775294304
+    },
+    {
+     "layer": 10,
+     "lstsq_share": 0.44913139939308167,
+     "random_direction_lstsq_mean": 0.2514416575431824
+    },
+    {
+     "layer": 11,
+     "lstsq_share": 0.5717077255249023,
+     "random_direction_lstsq_mean": 0.2518016591668129
+    }
+   ],
+   "norm": 0.10771089792251587
+  },
+  "dsym_quiet_bot100": {
+   "per_layer": [
+    {
+     "layer": 0,
+     "lstsq_share": 0.008540517650544643,
+     "random_direction_lstsq_mean": 0.2532338067889214
+    },
+    {
+     "layer": 1,
+     "lstsq_share": 0.009772904217243195,
+     "random_direction_lstsq_mean": 0.24881661534309388
+    },
+    {
+     "layer": 2,
+     "lstsq_share": 0.011370495893061161,
+     "random_direction_lstsq_mean": 0.24741039127111436
+    },
+    {
+     "layer": 3,
+     "lstsq_share": 0.015034851618111134,
+     "random_direction_lstsq_mean": 0.24460487961769103
+    },
+    {
+     "layer": 4,
+     "lstsq_share": 0.019375013187527657,
+     "random_direction_lstsq_mean": 0.24487075060606003
+    },
+    {
+     "layer": 5,
+     "lstsq_share": 0.01877439394593239,
+     "random_direction_lstsq_mean": 0.24796833619475364
+    },
+    {
+     "layer": 6,
+     "lstsq_share": 0.017908893525600433,
+     "random_direction_lstsq_mean": 0.2467530533671379
+    },
+    {
+     "layer": 7,
+     "lstsq_share": 0.015112646855413914,
+     "random_direction_lstsq_mean": 0.2480023644864559
+    },
+    {
+     "layer": 8,
+     "lstsq_share": 0.012136959470808506,
+     "random_direction_lstsq_mean": 0.2506168752908707
+    },
+    {
+     "layer": 9,
+     "lstsq_share": 0.009187965653836727,
+     "random_direction_lstsq_mean": 0.2494920775294304
+    },
+    {
+     "layer": 10,
+     "lstsq_share": 0.007873437367379665,
+     "random_direction_lstsq_mean": 0.2514416575431824
+    },
+    {
+     "layer": 11,
+     "lstsq_share": 0.0020827308762818575,
+     "random_direction_lstsq_mean": 0.2518016591668129
+    }
+   ],
+   "norm": 0.9851162433624268
+  }
  }
 }
