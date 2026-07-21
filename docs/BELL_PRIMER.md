@@ -33,7 +33,7 @@ The old convergence test compared each iteration to the previous one and declare
 
 The fix, added to `atr_engine.py` in Session 04: the comparison interval is now a parameter, `gate_lag`. With `gate_lag = 2`, the test compares each iteration to the one two steps back. Under that test, Divine passes at the standard 0.999 threshold. The default remains `gate_lag = 1`, and with the default the engine's behaviour is unchanged (verified bit-identical against the pre-change code on a real run).
 
-A helper, `lag_scan`, measures the cosine at every comparison interval from 1 to 8 at once. For the bell the result is: odd intervals all 0.685, even intervals all 1.000000. This pattern is the direct signature of period 2, and the same table would expose a period-4 cycle (which would pass only at intervals 4 and 8). No one has yet run this scan on the other 33 non-converging prompts; that requires the prompt library (issue #9).
+A helper, `lag_scan`, measures the cosine at every comparison interval from 1 to 8 at once. For the bell the result is: odd intervals all 0.685, even intervals all 1.000000. This pattern is the direct signature of period 2, and the same table would expose a period-4 cycle: its exact 1.000000 return would appear only at intervals 4 and 8. (Intermediate intervals could still score above the threshold if that cycle's states happened to lie close together; the exact return, not merely a high score, is the signature.) No one has yet run this scan on the other 33 non-converging prompts; that requires the prompt library (issue #9).
 
 Two limits of the fix, stated in the report: it detects cycles, not slow drift (the committed noise state moves slowly enough by iteration 1000 to pass the cosine threshold at every interval while genuinely still moving); and the full re-classification of the 125-prompt sweep has not been run.
 
@@ -62,13 +62,13 @@ Measured at the pivot M:
 - Along three random control directions: multipliers **+0.9 to +1.2**. Ordinary directions pass through roughly unchanged.
 - M itself maps almost to itself: cos(f(M), M) = 0.995.
 
-So M is nearly a fixed point, but unstable in exactly one direction: any component along d grows by a factor of about 4 per step, flipping sign each time. The map treats d differently from every other direction tested.
+So M is nearly a fixed point, but unstable along d: any component along d grows by a factor of about 4 per step, flipping sign each time. The map treats d differently from every other direction tested. (Tested means d plus three random probes; the full set of 768 independent directions has not been examined, so "one unstable direction" is the simplest reading consistent with these probes, not a proven count.)
 
 Measured around the full two-step cycle (the derivative at A composed with the derivative at B):
 
 - Along d: net multiplier **+0.1**. Positive, because two inversions cancel; and much smaller than 1, meaning any deviation from the cycle shrinks by roughly 90 percent every two steps.
 
-These two numbers together explain the observed behaviour. The system cannot rest at M (deviations along d grow). It also cannot leave the neighbourhood (deviations from the two-step cycle shrink). The only available behaviour is the alternation itself. The Session 03 conjecture had predicted a multiplier near -1 at the pivot; the sign was right, the size was not. A multiplier of -1 would be a marginal, borderline case. The measured -4.3 with a two-step contraction of +0.1 is a strongly stable oscillation. The technical name for this structure (a near-fixed point whose single unstable direction produces a stable period-2 cycle around it) is a **period-doubling** configuration.
+These two numbers together explain the observed behaviour. The system cannot rest at M (deviations along d grow). Deviations from the two-step cycle shrink along every direction tested. What is observed, and what these numbers make stable, is the alternation itself. The Session 03 conjecture had predicted a multiplier near -1 at the pivot; the sign was right, the size was not. A multiplier of -1 would be a marginal, borderline case. The measured -4.3 with a two-step contraction of +0.1 is a strongly stable oscillation. The technical name for this structure (a near-fixed point whose single unstable direction produces a stable period-2 cycle around it) is a **period-doubling** configuration.
 
 **Where recorded:** `output_hinge_eigen/hinge_eigenvalue.md`, results 1 and 2; the numbers file `hinge_eigenvalue.json`.
 
@@ -116,8 +116,8 @@ Session 04 defined the cluster two independent ways: geometrically (the 0.1 perc
 Let u be the normalised direction from the mean embedding toward the cluster's centroid. Measured:
 
 - **cos(d, u) = -0.596** for the geometric cluster, **-0.456** for the published list. The sign convention: negative means the B side of d points toward the cluster.
-- Chance comparison 1: the same cosine computed for 1000 clusters of randomly chosen tokens never exceeded 0.30 in magnitude. So -0.596 is far outside chance (p < 0.001).
-- Chance comparison 2 (stricter): 1000 clusters of tokens chosen to match the glitch cluster's embedding norms. These lean the opposite way (mean +0.48), so the result is not explained by norm or token rarity in general.
+- Chance comparison 1: the same cosine computed for 1000 clusters of randomly chosen tokens never exceeded 0.30 in magnitude. Zero exceedances in 1000 draws gives p ≤ 0.001 under the standard finite-sample bound.
+- Chance comparison 2 (stricter): 1000 clusters of tokens chosen to match the glitch cluster's embedding norms. These lean the opposite way (mean +0.48), so the result is not explained by embedding norm. Norm is the available proxy for token frequency here; a null matched directly on corpus frequency was not run.
 - Of the 50 vocabulary tokens whose embeddings best align with the B side of d, **45 are in the geometric cluster**. Of the 50 best aligned with the A side, most are the highest-frequency function words: " the", " in", " on", the comma.
 - A side finding from the controls: low embedding norm does not identify glitch tokens in GPT-2. The lowest-norm tokens are the most frequent function words, and their apparent alignment with d disappears under the norm-matched comparison. In this model the glitch signature is proximity to the mean, not small norm.
 
