@@ -4,7 +4,12 @@ This document places the ATR experiments (closed-loop reinjection of GPT-2 Small
 energy-renormalised, iterated to exhaustion) against the published record: what the nearest neighbouring work did and found, how it
 relates to each ATR result, and what, on the evidence here, has no prior occupant. Citations that could not be checked against their
 primary sources are marked with an asterisk and rest on secondary descriptions (title, venue, abstract-level claims); unmarked citations
-were checked against primary material. Terminology follows BELL_PRIMER.md: the
+were checked against primary material. Independently of that check, every work discussed in prose carries a source-class tag immediately
+after its citation, one of [peer-reviewed], [preprint, unreviewed], [community post, unreviewed], or [primary data, read directly] (with
+[published research report, not journal-reviewed] and [status unverified] for sources those four classes do not fit, and with the venue
+named inside the tag where the classification rests on a venue the citation itself does not state); the tag records the source's formal
+status as listed by its own venue or host, and formal status is no guarantee of correctness: peer-reviewed work can be wrong, and
+replication is the stronger signal, noted where known. Terminology follows BELL_PRIMER.md: the
 bell (the exact period-2 limit cycle), phases A and B (its two states), the pivot M (their midpoint), the flip axis d (their normalised
 difference), L11.H8 (layer 11, head 8).
 
@@ -22,7 +27,7 @@ The ATR findings the entries refer to, by number:
 ## The nearest neighbours
 
 **Wang, Li, Yan, Cheng, Zhang, Unveiling Attractor Cycles in Large Language Models: A Dynamical Systems View of Successive Paraphrasing (ACL
-2025).**\* https://aclanthology.org/2025.acl-long.624/ and https://arxiv.org/abs/2502.15208
+2025).**\* [peer-reviewed] https://aclanthology.org/2025.acl-long.624/ and https://arxiv.org/abs/2502.15208
 The established nearest neighbour. Iterated paraphrasing through
 the model's text interface converges to stable periodic states, prominently period-2 cycles, robust to temperature, alternating prompts, and
 alternating models; the authors built a dedicated periodicity metric because convergence metrics miss cycles, independently confirming the
@@ -30,88 +35,90 @@ diagnostic point of finding 3. The differences bound the overlap: their loop run
 paraphrase resembles the one two steps back), and they report no mechanism. The bell is activation-level, exact to machine precision, and
 mechanistically attributed (findings 3, 4): convergent evidence at a different interface.
 
-**Trained-loop architectures.** Geiping et al., Huginn (arXiv 2502.05171): a 3.5B model trained to iterate a middle block; some tokens fall
+**Trained-loop architectures.** Geiping et al., Huginn (arXiv 2502.05171) [preprint, unreviewed]: a 3.5B model trained to iterate a middle block; some tokens fall
 into stable orbits, the closest trained-model analogue of finding 3, but the model is trained for the loop, receives fresh input each step,
-and the orbits are read as functional. Hao et al., Coconut (arXiv 2412.06769) feeds the last hidden
+and the orbits are read as functional. Hao et al., Coconut (arXiv 2412.06769) [preprint, unreviewed] feeds the last hidden
 state back as the next input embedding: ATR's feedback edge, built by training, run for a few steps, no attractor map. Zhang et al., Soft
-Thinking (arXiv 2505.15778) is the closest inference-only relative (training-free self-feedback on a frozen model), mediated by the output
-distribution rather than the residual stream. Ouro (arXiv 2510.25741) and retrofitted recurrence (arXiv 2511.07384) convert pretrained
+Thinking (arXiv 2505.15778) [preprint, unreviewed] is the closest inference-only relative (training-free self-feedback on a frozen model), mediated by the output
+distribution rather than the residual stream. Ouro (arXiv 2510.25741) [preprint, unreviewed] and retrofitted recurrence (arXiv 2511.07384) [preprint, unreviewed] convert pretrained
 stacks into loops by training. The looped-LM literature names its failure mode latent collapse, the hidden state falling into an
-input-independent fixed point, and engineers against it (STARS, arXiv 2605.26733; Solve the Loop, arXiv 2605.12466). All\*. What this literature suppresses or exploits, ATR studies descriptively in a model never trained for the loop.
+input-independent fixed point, and engineers against it (STARS, arXiv 2605.26733; Solve the Loop, arXiv 2605.12466) [both preprint, unreviewed]. All\*. Every work in
+this entry is an unreviewed preprint. What this literature suppresses or exploits, ATR studies descriptively in a model never trained for the loop.
 
-**Blayney et al., A Mechanistic Analysis of Looped Reasoning Language Models (arXiv 2604.11791).**\*
-Compares Huginn, Ouro, and retrofitted-recurrence Llama, and diagnoses convergence with lag-1 successive-iterate difference norms on the
-looped residual stream. Finding 3 shows this gate is period-2-blind as a matter of arithmetic: a 2-cycle registers as a constant nonzero
+**Blayney et al., A Mechanistic Analysis of Looped Reasoning Language Models (arXiv 2604.11791).**\* [preprint, unreviewed]
+An unreviewed preprint: it compares Huginn, Ouro, and retrofitted-recurrence Llama, and diagnoses convergence with lag-1 successive-iterate
+difference norms on the looped residual stream. Finding 3 shows this gate is period-2-blind as a matter of arithmetic: a 2-cycle registers as a constant nonzero
 lag-1 difference, or as a fixed point under stride-2 sampling, never as a cycle. The lag-k correction (`gate_lag` and `lag_scan` in
-`atr_engine.py`) is therefore a citable methodological contribution against live literature, and it retroactively questions ATR's own
+`atr_engine.py`) is therefore a citable methodological contribution against live literature, none of it yet through review, and it retroactively questions ATR's own
 Pythia-410m null (finding 7).
 
-**Deep equilibrium models.** Bai, Kolter, Koltun (NeurIPS 2019) replaced explicit depth with root-finding for the fixed point of one
+**Deep equilibrium models.** Bai, Kolter, Koltun (NeurIPS 2019) [peer-reviewed] replaced explicit depth with root-finding for the fixed point of one
 weight-tied block, with the founding admission that plain forward iteration often fails to converge; the repair toolchain exists because
-undamped iteration stalls or oscillates (Anderson acceleration, arXiv 2410.19460; Jacobian regularisation, arXiv 2106.14342; monotone
-operator networks, arXiv 2006.08591). Standard fixed-point numerics give the mechanism class: an eigenvalue of magnitude above 1 with
+undamped iteration stalls or oscillates (Anderson acceleration, arXiv 2410.19460 [preprint, unreviewed]; Jacobian regularisation, arXiv 2106.14342 [peer-reviewed, ICML 2021]; monotone
+operator networks, arXiv 2006.08591 [peer-reviewed, NeurIPS 2020]). Standard fixed-point numerics give the mechanism class: an eigenvalue of magnitude above 1 with
 negative sign at a fixed point produces oscillation around it. Finding 4 is that signature in a pretrained transformer (a period-doubling
 configuration: a near-fixed point whose one unstable direction yields a stable 2-cycle), localised to a named component, which no DEQ work
 does. All\*.
 
-**Marcus, Westervelt, Dynamics of Iterated-Map Neural Networks (Phys Rev A 1989).**\*
+**Marcus, Westervelt, Dynamics of Iterated-Map Neural Networks (Phys Rev A 1989).**\* [peer-reviewed]
 https://neuron.eng.wayne.edu/tarek/MITbook/ref/refs.html
 The classical anchor for finding 3: in discrete-time parallel-update neural networks, when a fixed point destabilises, the generic new
 attractor is a period-2 oscillation. ATR adds the transformer instantiation and the single-head OV mechanism, which has no analogue in these
 homogeneous models.
 
-**Sussillo, Barak, Opening the Black Box (2013).**\* https://direct.mit.edu/neco/article/25/3/626/7854
+**Sussillo, Barak, Opening the Black Box (2013).**\* [peer-reviewed, Neural Computation 2013] https://direct.mit.edu/neco/article/25/3/626/7854
 The methodological ancestor: find fixed points of a trained recurrent network, linearise around them, read the computation from the
 attractor skeleton. ATR is this program transplanted to a transformer made recurrent by an external loop.
 
-**Dong, Cordonnier, Loukas, Attention is Not All You Need (ICML 2021).**\* https://arxiv.org/abs/2103.Pure self-attention converges doubly exponentially to a rank-1, token-uniform state; skip connections
+**Dong, Cordonnier, Loukas, Attention is Not All You Need (ICML 2021).**\* [peer-reviewed] https://arxiv.org/abs/2103.Pure self-attention converges doubly exponentially to a rank-1, token-uniform state; skip connections
 and MLPs counteract the collapse. Finding 2 is this token-uniformity bias expressed under closed-loop iteration, where effective depth
 reaches hundreds of blocks; the counterweight result is consistent with finding 1, since with MLPs and skips present the collapse is not to
-one global point. Geshkovski, Letrouit, Polyanskiy, Rigollet model tokens as interacting particles that cluster as depth grows, the final
+one global point. Geshkovski, Letrouit, Polyanskiy, Rigollet [status unverified] model tokens as interacting particles that cluster as depth grows, the final
 configuration set by the input\*. The oversmoothing line anticipates finding 2 and supports finding 1; none of it
 describes an unplanned oscillation coexisting with position-uniform states.
 
-**Attention as associative memory.** Ramsauer et al. (ICLR 2021, arXiv 2008.02217) identify attention with the update rule of a continuous
+**Attention as associative memory.** Ramsauer et al. (ICLR 2021, arXiv 2008.02217) [peer-reviewed] identify attention with the update rule of a continuous
 modern Hopfield network whose fixed points are global averages (a position-uniform state, finding 2) or metastable subset averages
 (resembling the basins of finding 1). The energy-descent guarantee holds only for the idealised symmetric update; a full block with MLP,
 LayerNorm, and external renormalisation has no Lyapunov function, which is why a limit cycle is possible at all. Energy Transformer (arXiv
-2302.07253) and Hyper-SET (arXiv 2502.11646) build blocks that provably descend an energy and so produce fixed points only; Hyper-SET
-independently arrives at ATR's two mechanics (norm-constrained states, repeated block) as design principles. All\*.
+2302.07253) [peer-reviewed, NeurIPS 2023] and Hyper-SET (arXiv 2502.11646) [preprint, unreviewed] build blocks that provably descend an energy and so produce fixed points only; Hyper-SET,
+an unreviewed preprint, independently arrives at ATR's two mechanics (norm-constrained states, repeated block) as design principles. All\*.
 
-**The loop's preconditions.** Transformer Layers as Painters (AAAI 2025, arXiv 2407.09298) ran frozen pretrained layers in altered orders
+**The loop's preconditions.** Transformer Layers as Painters (AAAI 2025, arXiv 2407.09298) [peer-reviewed] ran frozen pretrained layers in altered orders
 and loops, the nearest published practice of iterating frozen layers off-distribution; it did not renormalise, close the full
-output-to-input loop, or map attractors. Heimersheim and Turner (LessWrong 2023) measured roughly 4.5 percent
-per-layer residual norm growth in GPT-2 class models: without the energy renormalisation the loop diverges in norm, so the attractors are
-properties of the renormalised map. Both\*.
+output-to-input loop, or map attractors. Heimersheim and Turner (LessWrong 2023) [community post, unreviewed] put per-layer residual norm
+growth in GPT-2 class models at roughly 4.5 percent, an unreviewed community measurement; whatever its exact value, without the energy
+renormalisation the loop diverges in norm, so the attractors are properties of the renormalised map. Both\*.
 
 ## GPT-2 internals
 
-**Elhage et al., A Mathematical Framework for Transformer Circuits (Anthropic 2021).**\*
+**Elhage et al., A Mathematical Framework for Transformer Circuits (Anthropic 2021).**\* [published research report, not journal-reviewed]
 https://transformer-circuits.pub/2021/framework/index.html
 The residual stream is a shared communication channel; heads decompose into QK circuits (where to
 attend) and OV circuits (what is written); copying is scored by positive real eigenvalues of the full OV circuit W_U W_OV W_E. This supplies
 the formalism of finding 4: the -4.3 action on the flip axis d is a strong anti-copying eigenmode, and the head-level attribution is this
 framework applied to closed-loop dynamics.
 
-**Lens instruments and their failure modes.** The logit lens (nostalgebraist 2020) decodes intermediate residual states through the final
+**Lens instruments and their failure modes.** The logit lens (nostalgebraist 2020) [community post, unreviewed] decodes intermediate residual states through the final
 LayerNorm and the unembedding W_U; its structural failure mode is that it reads only components aligned with W_U's strong directions. The
-tuned lens (Belrose et al. 2023, arXiv 2303.08112) documents the logit lens's brittleness and per-model variability. Finding 6 is a concrete instance of the known blind spot: any lens defines a verbalizable subspace and misses its
+tuned lens (Belrose et al. 2023, arXiv 2303.08112) [preprint, unreviewed] reports the logit lens's brittleness and per-model variability. Finding 6 is a concrete instance of the known blind spot: any lens defines a verbalizable subspace and misses its
 complement, where the closed-loop motion lives, so lens-based accounts of the loop would wrongly report stasis. Both\*.
 
-**The head catalogue, and where L11.H8 is not.** Induction heads (Olsson et al. 2022): prefix matching plus copying, the copying OV raising
+**The head catalogue, and where L11.H8 is not.** Induction heads (Olsson et al. 2022) [published research report, not journal-reviewed]: prefix matching plus copying, the copying OV raising
 the attended token's logit; GPT-2 Small induction heads 5.5, 5.8, 5.9, 6.9, paper\*.
-The IOI circuit (indirect object identification; Wang et al. 2022, arXiv 2211.00593\*): 26 heads including negative
+The IOI circuit (indirect object identification; Wang et al. 2022, arXiv 2211.00593\*) [peer-reviewed, ICLR 2023]: 26 heads including negative
 name movers 10.7 and 11.10, which write against the correct name; head list
-https://raw.githubusercontent.com/ArthurConmy/Automatic-Circuit-Discovery/main/acdc/ioi/utils.py. Copy suppression (McDougall, Conmy,
-Rushing, McGrath, Nanda 2023, arXiv 2310.04625\*): L10.H7 detects the currently predicted token and writes against
+https://raw.githubusercontent.com/ArthurConmy/Automatic-Circuit-Discovery/main/acdc/ioi/utils.py [primary data, read directly]. Copy suppression (McDougall, Conmy,
+Rushing, McGrath, Nanda 2023, arXiv 2310.04625\*) [preprint, unreviewed]: an unreviewed preprint reports that L10.H7 detects the currently predicted token and writes against
 its unembedding; this is the class the suppression tests (BELL_PRIMER Part 7) show L11.H8 opposes on ordinary text, where it raises the
-attended token's score at 91.4 percent of positions. Successor, greater-than, and year heads (arXiv 2312.09230; arXiv 2305.00586)\* place documented number and date machinery in layers 5 to 9. L11.H8 appears in none of these catalogues; the only
+attended token's score at 91.4 percent of positions. Successor, greater-than, and year heads (arXiv 2312.09230 [peer-reviewed, ICLR 2024]; arXiv 2305.00586 [peer-reviewed, NeurIPS 2023])\* place documented number and date machinery in layers 5 to 9. L11.H8 appears in none of these catalogues; the only
 documented layer 11 copy machinery (11.10) has the opposite sign to finding 4.
 
-**Kissane, Krzyzanowski, Bloom, Conmy, Nanda 2024, Attention Output SAEs (arXiv 2406.17759).**\* https://arxiv.org/abs/2406.17759, per-head cards
-https://robertzk.github.io/gpt2-small-saes/
+**Kissane, Krzyzanowski, Bloom, Conmy, Nanda 2024, Attention Output SAEs (arXiv 2406.17759).**\* [preprint, unreviewed] https://arxiv.org/abs/2406.17759, per-head cards
+https://robertzk.github.io/gpt2-small-saes/ [primary data, read directly]
 The only public per-head documentation of L11.H8. SAEs (sparse autoencoders, learned dictionaries of
-directions) were trained on GPT-2 Small attention outputs and the top features attributed to each of the 144 heads. A direct read of the
+directions) were trained on GPT-2 Small attention outputs and the top features attributed to each of the 144 heads. The training and
+attribution methodology is the preprint's, unreviewed; the card contents are read directly. A direct read of the
 L11.H8 card (the card itself labels the head "11.8") shows its top feature (1958) puts positive logits almost entirely on glitch and undertrained tokens (" guiActiveUn", "ertodd",
 "ThumbnailImage", "ActionCode", "externalToEVA", byte fragments) and negative logits on the most frequent function tokens (" the", ",", "
 and", " in", " a", " to", " of"); the next four features promote numerals, dates, years, and round quantities, with glitch tokens
@@ -121,18 +128,20 @@ control: the L11.H10 card shows ordinary verb and event-structure features and n
 account, or causal test of these features. Caveat: extreme vocabulary logit lists surface glitch tokens
 spuriously (aizi, below), which tempers but does not remove the card evidence.
 
-**Precedent for readout-invisible computation.** Entropy neurons (Gurnee et al., arXiv 2401.12181; Stolfo et al., arXiv 2406.16254) have
-high weight norm and near-zero direct logit effect because they write into the effective null space of W_U (whose singular values drop
+**Precedent for readout-invisible computation.** Entropy neurons (Gurnee et al., arXiv 2401.12181 [preprint, unreviewed]; Stolfo et al.,
+arXiv 2406.16254 [preprint, unreviewed]): two unreviewed preprints report neurons with high weight norm and near-zero direct logit effect
+because they write into the effective null space of W_U (whose singular values drop
 sharply near index 755), acting on entropy through the final LayerNorm scale. Cancedda, Spectral Filters, Dark Signals, and Attention Sinks
-(ACL 2024, arXiv 2402.09221) found dark low-band residual signals that barely affect logits yet carry essential function. All\*. These are the strongest precedent for finding 6: GPT-2 components
-demonstrably route computation through readout-invisible directions; ATR extends this to an attention head OV output carrying a limit cycle,
-with 73 percent of d in W_U's weakest directions. The Anthropic workspace paper (Transformer Circuits, July 2026)\*
-https://transformer-circuits.pub/2026/workspace/index.html gives finding 6 its sharpest vocabulary: a small mid-layer subspace carries most
-causal effect on outputs, and most activation variance lies outside it.
+(ACL 2024, arXiv 2402.09221) [peer-reviewed] found dark low-band residual signals that barely affect logits yet carry essential function. All\*. These are the strongest precedent for finding 6: GPT-2 components
+demonstrably route computation through readout-invisible directions (the peer-reviewed Cancedda result alone establishes this); ATR extends this to an attention head OV output carrying a limit cycle,
+with 73 percent of d in W_U's weakest directions. The Anthropic workspace paper (Transformer Circuits, July 2026)\* [published research report, not journal-reviewed]
+https://transformer-circuits.pub/2026/workspace/index.html gives finding 6 its sharpest vocabulary, reporting that a small mid-layer
+subspace carries most causal effect on outputs and most activation variance lies outside it.
 
-**Anisotropy and outlier dimensions.** Ethayarajh 2019 (arXiv 1909.00512): GPT-2 representations occupy a narrow
+**Anisotropy and outlier dimensions.** Ethayarajh 2019 (arXiv 1909.00512) [peer-reviewed, EMNLP 2019]: GPT-2 representations occupy a narrow
 anisotropic cone, the most-trained pole of finding 5. Rogue and outlier dimensions (Timkey and van Schijndel, arXiv
-2109.04404; Kovaleva et al., arXiv 2105.06990; Puccetti et al., arXiv 2205.11380): a few dimensions dominate similarity yet barely matter
+2109.04404 [peer-reviewed, EMNLP 2021]; Kovaleva et al., arXiv 2105.06990 [peer-reviewed, Findings of ACL 2021]; Puccetti et al., arXiv
+2205.11380 [peer-reviewed, Findings of EMNLP 2022]): a few dimensions dominate similarity yet barely matter
 behaviourally, and outlier magnitudes track token frequency; the dissociation between what dominates geometry and what drives behaviour
 parallels findings 5 and 6. All\*.
 
@@ -140,15 +149,17 @@ parallels findings 5 and 6. All\*.
 
 Glitch tokens are vocabulary entries that received few or no weight updates in training; in GPT-2 they cluster near the mean embedding.
 
-**Rumbelow and Watkins, SolidGoldMagikarp I to III (LessWrong / Alignment Forum, Feb 2023).**\*
+**Rumbelow and Watkins, SolidGoldMagikarp I to III (LessWrong / Alignment Forum, Feb 2023).**\* [community post, unreviewed]
 https://www.lesswrong.The discovery posts: tokens closest to the embedding centroid behave anomalously, cannot be repeated
 by the model, and derail generation; the recurring geometric marker is centroid proximity, not embedding norm; the provenance is a
 tokenizer-corpus mismatch (Reddit r/counting usernames, game logs, and boilerplate earned byte pair encoding merges while the training
-corpus excluded them). This characterises the never-trained pole of finding 5, including its resistance to verbalisation. Purely
+corpus excluded them). This characterises the never-trained pole of finding 5, including its resistance to verbalisation. The posts passed
+no review; their core facts (the near-centroid cluster, the anomalous behaviour, the tokenizer-corpus provenance) were later replicated in
+Land and Bartolo (below), which is peer-reviewed, so the characterisation rests on that replication rather than on the posts alone. Purely
 input-driven prompting; no internal dynamics.
 
-**Land and Bartolo, Fishing for Magikarp (EMNLP 2024, arXiv 2405.05417).**\*
-https://arxiv.org/abs/2405.05417 and https://github.com/cohere-ai/magikarp
+**Land and Bartolo, Fishing for Magikarp (EMNLP 2024, arXiv 2405.05417).**\* [peer-reviewed]
+https://arxiv.org/abs/2405.05417 and https://github.com/cohere-ai/magikarp [primary data, read directly]
 Systematic undertrained-token detection with about 90 model reports including all four GPT-2 sizes:
 1,236 to 2,301 candidates and 36 to 68 verified undertrained tokens per size (excluding special and single-byte). The repo states that tied-embedding models such as GPT-2 need hand-selected unused-token
 reference sets because the plain weight indicator is unreliable there; the paper's indicator is cosine distance to the mean of known-unused
@@ -157,19 +168,19 @@ methodological relative of ATR's criterion, and it agrees with ATR's negative re
 tokens (the lowest-norm rows are frequent function words; the signature is proximity to the mean embedding). No source states that
 falsification as a measured GPT-2 result, so it stands as a citable standalone.
 
-**The detection-tool family.** GlitchHunter (FSE 2024, arXiv 2404.09894) found 7,895 glitch tokens across 7 LLMs and confirmed they cluster
-in embedding space; GlitchMiner (arXiv 2410.15052) and AnomaLLMy (arXiv 2406.19840) detect via predictive entropy and API confidence; Secret
-Dictionary (arXiv 2605.22005) and UTF fingerprinting (arXiv 2410.12318) detect from weight geometry alone. Supporting geometry: Mu and
+**The detection-tool family.** GlitchHunter (FSE 2024, arXiv 2404.09894) [peer-reviewed] found 7,895 glitch tokens across 7 LLMs and confirmed they cluster
+in embedding space; GlitchMiner (arXiv 2410.15052) [preprint, unreviewed] and AnomaLLMy (arXiv 2406.19840) [preprint, unreviewed] detect via predictive entropy and API confidence; Secret
+Dictionary (arXiv 2605.22005) [preprint, unreviewed] and UTF fingerprinting (arXiv 2410.12318) [preprint, unreviewed] detect from weight geometry alone. Supporting geometry: Mu and
 Viswanath, All-but-the-Top
-(ICLR 2018, arXiv 1702.01417) established a dominant frequency-linked, mean-anchored direction in embedding
-spaces, the geometry the flip axis d is a dynamical expression of; Watkins, Mapping the Semantic Void, probed the mean-embedding
-neighbourhood and found it structured; a mechanistic LessWrong post explains why unspeakable tokens are silent under tied embeddings (no
-direction makes them the argmax). All\*. aizi's random-direction baseline\* supplies the caveat that extreme logit lists surface glitch tokens spuriously.
+(ICLR 2018, arXiv 1702.01417) [peer-reviewed] established a dominant frequency-linked, mean-anchored direction in embedding
+spaces, the geometry the flip axis d is a dynamical expression of; Watkins, Mapping the Semantic Void [community post, unreviewed], probed the mean-embedding
+neighbourhood and reports finding it structured; a mechanistic LessWrong post [community post, unreviewed] argues that unspeakable tokens are silent under tied embeddings (no
+direction makes them the argmax). All\*. aizi's random-direction baseline\* [community post, unreviewed] supplies the caveat that extreme logit lists surface glitch tokens spuriously.
 
 **The confirmed null.** No located work connects glitch or undertrained tokens to a model's internal dynamics. In every source above they
 are anomalous inputs: discovered by prompting, detected by querying or weight inspection, exploited or repaired. The null held under
 repeated searches with varied phrasings across 2023 to 2026. Two boundary cases are preempted explicitly. GlitchProber (ASE 2024, arXiv
-2408.04905)\* reads internal activations, but only as a classifier signal evoked by a glitch token present in the
+2408.04905)\* [peer-reviewed] reads internal activations, but only as a classifier signal evoked by a glitch token present in the
 input; no closed loop, no autonomous dynamics. The successive-paraphrasing cycles paper (above) has the period-2 phenomenology but never
 mentions glitch tokens, embedding centroids, or the untrained region. Nothing in the record resembles finding 5's measurement: a dynamical
 mode aligned with the glitch-cluster direction (cos -0.596, significant under uniform and norm-matched nulls, 45 of 50 pole-aligned tokens
@@ -177,42 +188,44 @@ in the near-centroid cluster, no glitch token in the input).
 
 ## Text-level loops and the lineage
 
-**Degeneration and repetition self-reinforcement.** Holtzman et al. (ICLR 2020, arXiv 1904.09751): maximisation-based decoding drives
-generation into repetitive loops, the everyday token-level attractor of the generation map. Xu et al. (NeurIPS 2022, arXiv 2206.02369)
+**Degeneration and repetition self-reinforcement.** Holtzman et al. (ICLR 2020, arXiv 1904.09751) [peer-reviewed]: maximisation-based decoding drives
+generation into repetitive loops, the everyday token-level attractor of the generation map. Xu et al. (NeurIPS 2022, arXiv 2206.02369) [peer-reviewed]
 quantified self-reinforcement in GPT-2: the more a sentence appears in context, the higher the probability of producing it again. Both\*.
 
-**Model collapse.** Shumailov et al. (Nature 2024, arXiv 2305.17493): training generation n+1 on generation n's output loses distribution
-tails first, then collapses variance. Alemohammad et al. (ICLR 2024, arXiv 2307.01850) and Dohmatob et al. (ICML 2024, arXiv 2402.07043)
+**Model collapse.** Shumailov et al. (Nature 2024, arXiv 2305.17493) [peer-reviewed]: training generation n+1 on generation n's output loses distribution
+tails first, then collapses variance. Alemohammad et al. (ICLR 2024, arXiv 2307.01850) [peer-reviewed] and Dohmatob et al. (ICML 2024, arXiv 2402.07043) [peer-reviewed]
 identify tail truncation as the mechanism. All\*. This is a different object: the learning map iterated across
 generations of models, where ATR
 iterates the inference map across states of one frozen model. Both lose low-probability structure first, but ATR's loop has no training
 signal, so its degeneration cannot be blamed on estimation error; it is a property of the learned map itself. No paper states or tests this
 correspondence.
 
-**Telephone games and paraphrase attractors.** Translation Party (2009) is the earliest popular demonstration that iterating a learned
-text-to-text map finds fixed points. Perez et al., When LLMs Play the Telephone Game (ICLR 2025, arXiv 2407.04503)
+**Telephone games and paraphrase attractors.** Translation Party (2009) [primary data, read directly] is the earliest popular demonstration that iterating a learned
+text-to-text map finds fixed points. Perez et al., When LLMs Play the Telephone Game (ICLR 2025, arXiv 2407.04503) [peer-reviewed]
 D: transmission chains evolve toward attractor states in property space, with attractor strength depending on task constraint. Kaplanski
-(2026, arXiv 2605.02236) measures how much injected text moves a settled loop into another basin and whether the move persists: the
-text-level counterpart of ATR's perturbation and basin-escape experiments. All\*.
+(2026, arXiv 2605.02236) [preprint, unreviewed] is an unreviewed 2026 preprint reporting how much injected text moves a settled loop into
+another basin and whether the move persists: the text-level counterpart of ATR's perturbation and basin-escape experiments. All\*.
 
-**Self-refinement convergence.** Self-Refine (NeurIPS 2023, arXiv 2303.17651) closes the loop through text plus an instruction, with
-convergence imposed by a stopping rule, not analysed as dynamics. Huang et al. (ICLR 2024, arXiv 2310.01798): intrinsic self-correction
+**Self-refinement convergence.** Self-Refine (NeurIPS 2023, arXiv 2303.17651) [peer-reviewed] closes the loop through text plus an instruction, with
+convergence imposed by a stopping rule, not analysed as dynamics. Huang et al. (ICLR 2024, arXiv 2310.01798) [peer-reviewed]: intrinsic self-correction
 without external feedback fails to improve and often degrades, consistent with dissolution rather than convergence to meaning. Both\*.
 
 **The Lucier lineage.** Alvin Lucier's I Am Sitting in a Room (1969) is the procedure of feeding a medium its own output until the medium's
-character dominates. The located record transposes it to computational substrates three times. Backes, i am sitting in a machine\* https://www.martinbackes.com/i-am-sitting-in-a-machine/: an artificial voice through an MP3 encoder 3000 times, a
-stated homage, the iterated operator a codec. Santos, The Degradation of Speech (2023)\*
+character dominates. The located record transposes it to computational substrates three times. Backes, i am sitting in a machine\* [community post, unreviewed] https://www.martinbackes.com/i-am-sitting-in-a-machine/: an artificial voice through an MP3 encoder 3000 times, a
+stated homage, the iterated operator a codec. Santos, The Degradation of Speech (2023)\* [community post, unreviewed]
 https://dorothysantos.com/portfolio/the-degradation-of-speech/: repeated reading into a neural speech recogniser, human in the loop. Vats,
 Crandall, Goree, A Markovian View of Iterative-Feedback Loops in Image Generative Models: Neural Resonance and Model Collapse (2026, under
-review)\* https://arxiv.org/abs/2602.19033: proves a broad class of iterative feedback
-processes converges to low-dimensional invariant structure in latent space, treats diffusion loops, style transfer, and Lucier's piece in
-one framework, and is the closest published Lucier-to-neural-network analogy: image models, no language model, no per-basin semantic
-mapping, no limit-cycle taxonomy. No located work runs the analogy on a language model, and none at the activation level.
+review)\* [preprint, unreviewed] https://arxiv.org/abs/2602.19033: an unreviewed preprint reporting a proof that a broad class of iterative
+feedback processes converges to low-dimensional invariant structure in latent space; it treats diffusion loops, style transfer, and
+Lucier's piece in one framework, and is the closest located Lucier-to-neural-network analogy: image models, no language model, no per-basin
+semantic mapping, no limit-cycle taxonomy. No located work runs the analogy on a language model, and none at the activation level.
 
 ## What remains ours, on this evidence
 
 Each claim below, with the nearest work it must be distinguished from. Scope note: every claim means that this review found no such
 work, not proof of absence; absence claims are bounded by the review's coverage, and work under different vocabulary could overturn one.
+The absence claims also rest on the whole pool above, unreviewed preprints and community posts included: that widens the coverage, but it
+means the nearest-neighbour picture includes work that has passed no review.
 
 1. **The frozen-model residual-stream attractor census.** We found no work that re-injects the full final-layer residual tensor of an unmodified
    pretrained LM into layer 0, renormalises energy, and iterates to exhaustion, mapping basins over a prompt corpus versus noise (findings
