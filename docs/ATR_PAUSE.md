@@ -15,7 +15,7 @@ operator-set condition.
 
 ## The gate (re-entry condition)
 
-Two parts, both with the primers and findings documents closed.
+Two parts, both done without the primers and findings documents open or consulted.
 
 1. Cold writeup, one page, in the author's own words:
    - What ATR does mechanically, step by step.
