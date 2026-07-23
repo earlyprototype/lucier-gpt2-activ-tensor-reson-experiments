@@ -1,4 +1,4 @@
-# Section 5 — GPT-2 Small Convergence-Gated Re-sweep
+# Section 5: GPT-2 Small Convergence-Gated Re-sweep
 
 - Prompts: 125  |  gate: cos_sim_mean > 0.999 x3 (every 10 iters past 100), max_iter=1000
 - Locked in (converged): 91/125  |  ran to 1000: 34/125

@@ -15,7 +15,7 @@ This work sits at the intersection of three fields:
 |---|---|---|
 | **Mechanistic Interpretability** | Tools for understanding neural network internals (activation patching, probing, ablation) | The field we're publishing into |
 | **Dynamical Systems Theory** | Fixed-point analysis, basin structure, attractor topology, spectral decomposition | The mathematical framework |
-| **Activation Tensor Resonance (ATR)** | Our specific method — iterative re-injection of the residual stream to reveal weight geometry | Our contribution |
+| **Activation Tensor Resonance (ATR)** | Our specific method, iterative re-injection of the residual stream to reveal weight geometry | Our contribution |
 
 The specific technique, iterating the forward map to convergence and studying the resulting attractor landscape, is best described as **nonlinear power iteration on the transformer's residual stream**. It is analogous to how power iteration finds the dominant eigenvector of a matrix, but with nonlinearities (attention, MLP, LayerNorm) introducing multiple fixed points.
 

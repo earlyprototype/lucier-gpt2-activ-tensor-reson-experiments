@@ -176,14 +176,14 @@ The bottleneck is always phase 2. Automation of interpretation is the scaling ch
 | Why does GPT-2 Small, alone in this set, resolve language into few semantic basins? | **The open question of the series** | New experimental stage |
 | What is the `Divine` object: limit cycle, wandering attractor, decode-region plateau? | Open (FINDINGS.md F2) | Confidence audit at scale; trajectory analysis |
 | Does the landscape depend on where the loop is cut (layer window / depth)? | Designed, not run | Pythia-410m depth control (0–11 vs 0–23); window sweeps |
-| ~~W_E semantic-clustering statistics~~ | Answered (2026-07-11): all-warm matrix is an anisotropy artifact: 99.9% of random 14-token sets are also all-positive; compact-subspace reading withdrawn. Neighbourhood claim remains qualitative | — |
+| ~~W_E semantic-clustering statistics~~ | Answered (2026-07-11): all-warm matrix is an anisotropy artifact: 99.9% of random 14-token sets are also all-positive; compact-subspace reading withdrawn. Neighbourhood claim remains qualitative | - |
 | True lock-in iterations (gate fired at its floor, 120) | Pending | Finer gate cadence |
 | What is T_mix_LLM for each basin? | Measurable from existing data | Compute from `.pt` |
 | Are all basins in one Slonski macro-group? | Predicted (from all-warm) | One Q-vector experiment |
 | Is the fractal dimension of convergence trajectories basin-specific? | Speculative | Requires T_mix first |
-| ~~Does ATR scale to larger models?~~ | Answered: the operation runs; the landscape changes qualitatively | — |
-| ~~Do different models have different basin profiles?~~ | Answered: yes, drastically (FINDINGS.md F3) | — |
-| ~~Can basin depth predict bias strength?~~ | Retired with the fingerprint hypothesis | — |
+| ~~Does ATR scale to larger models?~~ | Answered: the operation runs; the landscape changes qualitatively | - |
+| ~~Do different models have different basin profiles?~~ | Answered: yes, drastically (FINDINGS.md F3) | - |
+| ~~Can basin depth predict bias strength?~~ | Retired with the fingerprint hypothesis | - |
 
 ---
 

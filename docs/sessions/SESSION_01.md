@@ -14,9 +14,9 @@ The project operates under four hypotheses, originally authored by the principal
 | ID | Hypothesis | Status |
 |---|---|---|
 | **H0** | The Lucier Resonance results are **deterministic**. Same model + same prompts + same parameters → identical terminal attractors and dissolution trajectories. | **PASSED** (EXP_009d0) |
-| **H1** | `prolet` is the **dominant basin** of GPT-2 Small's weight geometry. | **Supported** — 35.2% of 125 prompts (44/125) |
-| **H2** | `Divine` is a **genuine secondary basin**, not a one-off artefact. | **Supported** — 27.2% of 125 prompts (34/125). Three additional basins also discovered: `Anarch` (20.8%), `till` (15.2%), `solidarity` (1.6%) |
-| **H3** | The intermediate tokens reflect the **statistical topology of the training corpus**. | **Supported** — 4/5 basin tokens show strong semantic clustering in `W_E`; pathway shows structural→semantic phase transition |
+| **H1** | `prolet` is the **dominant basin** of GPT-2 Small's weight geometry. | **Supported**: 35.2% of 125 prompts (44/125) |
+| **H2** | `Divine` is a **genuine secondary basin**, not a one-off artefact. | **Supported**: 27.2% of 125 prompts (34/125). Three additional basins also discovered: `Anarch` (20.8%), `till` (15.2%), `solidarity` (1.6%) |
+| **H3** | The intermediate tokens reflect the **statistical topology of the training corpus**. | **Supported**: 4/5 basin tokens show strong semantic clustering in `W_E`; pathway shows structural→semantic phase transition |
 
 > **Critical note:** H1 and H2 are *structural* claims about the architecture. H3 is a *semantic* claim about the relationship between weight geometry and training data. H3 is the hypothesis that connects the experimental results to the Reddit/2018 provenance observation.
 
@@ -60,7 +60,7 @@ A primer on Eduardo Slonski's findings, contextualised for this project.
 | **Binary dichotomy** | Slonski's core finding: all token Q-vectors in a sequence polarise into exactly **two groups** with near **-1 cosine similarity**. | A room where everyone faces either North or South |
 | **Tartan/plaid pattern** | Visual signature of the dichotomy as a similarity matrix. Same-group → yellow (+1), cross-group → dark (-1). | A checkerboard with irregular block sizes |
 | **Outlier dimensions** | The ~5–10 dimensions (of 768) where the two groups dramatically differ. Group 1 has large positive, Group 2 large negative. Most other dimensions are similar. | 760 "knobs" set similarly; 5–10 cranked to opposite extremes |
-| **Orthogonal tokens** | Tokens belonging to *neither* group. Lack outlier dimensions. Much smaller magnitude. ~0 cosine similarity with both groups. | Ghosts — present but not participating |
+| **Orthogonal tokens** | Tokens belonging to *neither* group. Lack outlier dimensions. Much smaller magnitude. ~0 cosine similarity with both groups. | Ghosts, present but not participating |
 
 ### Slonski's Key Finding (Summary)
 
@@ -97,7 +97,7 @@ GPT-2 has a fixed vocabulary of **50,257 token fragments** learned from the trai
 | Word | BPE Tokens |
 |---|---|
 | `proletariat` | `prolet` + `ariat` |
-| `capitulate` | `capit` + `ulate` (⚠ NOT `capitalism` — corrected by neighbourhood analysis) |
+| `capitulate` | `capit` + `ulate` (⚠ NOT `capitalism`, corrected by neighbourhood analysis) |
 | `Rousseau` | `Rousse` + `au` |
 | `Divine` | `Divine` (one token) |
 | `Anarch` | `Anarch` (prefix of Anarchist, Anarchy) |

@@ -1,4 +1,4 @@
-# EXP_009d3: Random Baseline — Results Summary
+# EXP_009d3: Random Baseline, Results Summary
 
 ## Experimental Parameters
 - **Trials:** 125 random Gaussian tensors
@@ -14,7 +14,7 @@
 | Terminal basins | 5 | 18 |
 | Position collapse at iter 100 | ~1.000 | 1.0000 |
 | Cosine convergence at iter 100 | ~1.000 | 0.9256 |
-| Basin overlap | — | 1/5 (20%) |
+| Basin overlap | - | 1/5 (20%) |
 
 ## Interpretation
 

@@ -68,9 +68,9 @@ Charts render inline via `fig.show()`. Duration ~1–2 min. Deviation: fillcolor
 
 | Model | iter 2 | iter 5 | iter 10 | iter 50 | iter 100 | iter 250 | Tensor verdict |
 |---|---|---|---|---|---|---|---|
-| GPT-2 Small (124M) | 0.69 | −0.24 | 0.61 | 0.84 | 0.91 (σ .15) | — | partial, noisy |
-| GPT-2 Medium (345M) | 0.991 | 0.9994 | **1.0000** | 1.0000 | 1.0000 | — | **saturated by iter 10** |
-| Pythia-160m | 0.991 | 0.9997 | **1.0000** | 1.0000 | 1.0000 | — | **saturated by iter 10** |
+| GPT-2 Small (124M) | 0.69 | −0.24 | 0.61 | 0.84 | 0.91 (σ .15) | - | partial, noisy |
+| GPT-2 Medium (345M) | 0.991 | 0.9994 | **1.0000** | 1.0000 | 1.0000 | - | **saturated by iter 10** |
+| Pythia-160m | 0.991 | 0.9997 | **1.0000** | 1.0000 | 1.0000 | - | **saturated by iter 10** |
 | Pythia-410m | 0.82 | 0.90 | 0.89 | 0.85 | 0.85 | 0.86 (σ .14) | **never converges (~0.85 plateau)** |
 
 Pythia-410m breakdown: only **9/125** prompts converge (cos > 0.99 from iter 100+);
@@ -154,7 +154,7 @@ Outputs in `experiments/gpt2_small/output_random_baseline/`
 | Basin identity | `prolet` 35%, `Divine` 27%, `Anarch` 21%, `till` 15%, `solidarity` 2% | `―` 64%, `instant` 11%, `abs` 4%, `justified` 4%, … (mostly punctuation/fragments) |
 | Position collapse @100 | ~1.000 | 1.0000 |
 | Cosine convergence @100 | ~1.000 | 0.926 (σ 0.17) |
-| Basin overlap | — | **1/5** (`prolet`, hit by 1/125 random trials) |
+| Basin overlap | - | **1/5** (`prolet`, hit by 1/125 random trials) |
 
 Bootstrap on the random basin count: **14.1 (95% CI [11, 17])**. Real count **5 is below
 the CI → significant**.
@@ -255,7 +255,7 @@ Basin shares, iter 100 (published) → at lock-in:
 | `prolet` | 44 (35.2%) | **54 (43.2%)** | gains 10 from Anarch |
 | `Divine` | 34 (27.2%) | 34 (27.2%) | unchanged (readout-stable, tensor never settles) |
 | `Anarch` | 26 (20.8%) | **17 (13.6%)** | loses 10 to prolet (all converged, by iter 120) |
-| `till` | 19 (15.2%) | 19 (15.2%) | **unchanged — 19/19 retained** |
+| `till` | 19 (15.2%) | 19 (15.2%) | **unchanged, 19/19 retained** |
 | `solidarity` | 2 (1.6%) | 1 (0.8%) | loses 1 to Anarch |
 
 **Decides:** *Are the five basins stable under proper convergence, or stop-time artefacts?*

@@ -100,7 +100,7 @@ Other methods tell you what the model does with a specific input. ATR tells you 
 | Attractor basins exist with the shape and dominance shares observed | Supported (GPT-2 Small, single-model) | Confirms iterated forward map produces a discrete attractor landscape |
 | Basin tokens cluster semantically rather than by BPE substring | Supported (W_E neighbourhood test on GPT-2 Small; statistical validation pending) | The attractors carry meaning, not artefact |
 | Basin profiles vary predictably by model / training data | **Tested: they vary, but not corpus-trackably** (same corpus → unrelated landscapes) | Partially: ATR distinguishes models, but not by training data |
-| ATR-derived basins can stand in for training-data inspection in bias characterisation | **Refuted** (FINDINGS.md F3, F4) | — |
+| ATR-derived basins can stand in for training-data inspection in bias characterisation | **Refuted** (FINDINGS.md F3, F4) | - |
 | Basin topology correlates with model capabilities | Speculative | Transformative if true, but years from testable |
 
 ---
