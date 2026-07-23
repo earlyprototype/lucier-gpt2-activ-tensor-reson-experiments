@@ -11,7 +11,7 @@ after its citation, one of [peer-reviewed], [preprint, unreviewed], [community p
 named inside the tag where the classification rests on a venue the citation itself does not state); the tag records the source's formal
 status as listed by its own venue or host, and formal status is no guarantee of correctness: peer-reviewed work can be wrong, and
 replication is the stronger signal, noted where known. Terminology follows BELL_PRIMER.md: the
-bell (the exact period-2 limit cycle), phases A and B (its two states), the pivot M (their midpoint), the flip axis d (their normalised
+cycle (the exact period-2 limit cycle), phases A and B (its two states), the pivot M (their midpoint), the flip axis d (their normalised
 difference), L11.H8 (layer 11, head 8).
 
 The ATR findings the entries refer to, by number:
@@ -41,7 +41,7 @@ memory depth rather than a model constant (Sec. 5.6, p. 8); and chains generated
 model's measure, read by the authors as "a general statistical optimum that multiple LLMs gravitate toward" (p. 7), so the attractor states
 are shared across models. The paper takes no internal measurement of any kind; the explanation it offers is behavioural, self-reinforcement
 plus task invertibility (pp. 5-6). The differences bound the overlap: their loop runs over discrete text, their cycles are approximate, and
-no mechanism is located inside the model. The bell is activation-level, exact to machine precision, and mechanistically attributed
+no mechanism is located inside the model. The period-2 cycle is activation-level, exact to machine precision, and mechanistically attributed
 (findings 3, 4): convergent phenomenology at a different interface.
 
 **Trained-loop architectures.** Geiping et al., Huginn (arXiv 2502.05171) [preprint, unreviewed]: a 3.5B model trained to iterate a middle
@@ -77,10 +77,10 @@ at most 0.08 percent for retrofitted Llama, up to 2.81 percent of examples under
 with dominant frequencies 0.125 and 0.344 cycles per iteration (Fig. 13, p. 18); no period-2 orbit is reported anywhere, and the orbit and
 slider labels are credited to Geiping et al. (p. 4). The classifier also checks its fixed-point class first, with tolerance 0.05 on cosine
 similarity over 90 percent of late iterates (p. 17), so a 2-cycle whose two phases sit within cosine 0.95 of each other is filed as a fixed
-point; the bell, with its small flip along one axis, plausibly falls in that class. Separately, Proposition 4.1 (p. 4) describes cyclic
+point; the period-2 cycle, with its small flip along one axis, plausibly falls in that class. Separately, Proposition 4.1 (p. 4) describes cyclic
 fixed points: when a k-layer looped block reaches a block-level fixed point, each layer settles to its own point and one pass of the block
 traces a closed cycle in latent space, period equal to the block depth by construction, observed frequently in practice (Fig. 5, p. 5);
-that is the trivial cycle of a converged loop, indexed by layer, orthogonal to the bell's period 2 in the iterate index at a fixed layer.
+that is the trivial cycle of a converged loop, indexed by layer, orthogonal to the period-2 cycle's period 2 in the iterate index at a fixed layer.
 Randomly initialised, untrained loops show the same cyclic fixed-point behaviour (Sec. 4.2, pp. 5-6), so the fixed-point tendency is
 architectural rather than trained, which supports studying a model never trained for the loop. Against this record the lag-k correction
 (`gate_lag` and `lag_scan` in `atr_engine.py`) is scoped precisely: no located work, Blayney's full text included, states that the lag-1
@@ -348,7 +348,7 @@ iterations, two prompts (p. 9): a paraphrase prompt contracts (persistent cluste
 summarise-then-negate prompt is filed as exploratory, with no valid cluster under any tested configuration (p. 13), even though its
 transcript alternates between opposing positions step by step (App. C, p. 23). Everything is black-box by declared assumption (p. 7): text
 in, text out, geometry measured on an external embedding of the outputs, no model internals of any kind. The oscillatory class therefore
-exists in the record as defined vocabulary at the text interface, unoccupied by measurement; the bell is not an instance of it, and nothing
+exists in the record as defined vocabulary at the text interface, unoccupied by measurement; the period-2 cycle is not an instance of it, and nothing
 in the framework reaches activation level.
 
 **Self-refinement convergence.** Self-Refine (NeurIPS 2023, arXiv 2303.17651)\* [peer-reviewed] closes the loop through text plus an instruction, with

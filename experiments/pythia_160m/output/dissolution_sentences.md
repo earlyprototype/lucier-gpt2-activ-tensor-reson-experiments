@@ -1,4 +1,4 @@
-# Full Sentence Dissolution — All 125 Prompts
+# Full Sentence Dissolution: All 125 Prompts
 
 ### A01_physics [Complex] -> `questioned` (predicted: `prolet`)
 *"The implications of quantum entanglement suggest that"*

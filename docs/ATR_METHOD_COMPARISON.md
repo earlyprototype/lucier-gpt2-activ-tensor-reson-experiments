@@ -5,8 +5,8 @@
 
 > **Revision note (2026-07-10):** the cross-model and null-model experiments this
 > document originally proposed have now been run ([FINDINGS.md](FINDINGS.md)). The
-> fingerprint hypothesis — basin profiles as training-data bias readable from any
-> model — was **refuted**: GPT-2 Medium (same corpus as Small) produces no semantic
+> fingerprint hypothesis, basin profiles as training-data bias readable from any
+> model, was **refuted**: GPT-2 Medium (same corpus as Small) produces no semantic
 > basins, and random-noise initial states converge to a different attractor set
 > entirely. Tables below have been corrected; rows recording the original March
 > framing are marked where the framing did not survive.
@@ -61,17 +61,17 @@
 | **SAEs** | Expensive. Feature interpretation is manual. Scale uncertain beyond GPT-2. |
 | **Ablation** | Destructive. Cannot distinguish redundant from essential components. |
 | **Rep. Engineering** | Requires concept pairs. Doesn't reveal model's "native" organisation. |
-| **ATR** | **Reveals stable states of iterated dynamics, not per-input computation — and those states are regime-dependent (language-driven and noise-driven starts converge differently; FINDINGS.md F4). Doesn't explain HOW the model processes input.** |
+| **ATR** | **Reveals stable states of iterated dynamics, not per-input computation, and those states are regime-dependent (language-driven and noise-driven starts converge differently; FINDINGS.md F4). Doesn't explain HOW the model processes input.** |
 
 ### 1e. Unique ATR Capabilities
 
 | Capability | ATR | Nearest Alternative |
 |---|---|---|
-| Reveal training-data thematic structure without training-data access | **Refuted** — tested cross-model and failed (FINDINGS.md F3, F4) | Rep. Engineering (partial, needs contrast pairs) |
+| Reveal training-data thematic structure without training-data access | **Refuted**: tested cross-model and failed (FINDINGS.md F3, F4) | Rep. Engineering (partial, needs contrast pairs) |
 | No labelled data required | Yes | Logit Lens, Ablation, Patching |
 | No training/fine-tuning step | Yes | Logit Lens, Ablation, Patching |
 | Global model characterisation (not per-prompt) | Yes | SAEs (but vastly more expensive) |
-| Cross-model comparison via basin profiles | **Demonstrated** — 4 models, qualitatively distinct regimes | None established |
+| Cross-model comparison via basin profiles | **Demonstrated**: 4 models, qualitatively distinct regimes | None established |
 | Bias auditing of proprietary models (API-only) | No (needs weights) | Behavioural testing |
 | Seconds per run on consumer GPU | Yes | Logit Lens only |
 
@@ -85,13 +85,13 @@ ATR is **complementary** to existing methods, not a replacement. It answers a qu
 
 > **"What are the stable states of the model's iterated forward map, and how do they depend on the input regime?"**
 
-Other methods tell you what the model does with a specific input. ATR tells you where the model's dynamics settle when the input is played back through it indefinitely. The original framing — "revealing the training data's thematic fingerprint" — did not survive the cross-model test (FINDINGS.md F3); what ATR demonstrably provides is a cheap, tensor-level regime comparison across models.
+Other methods tell you what the model does with a specific input. ATR tells you where the model's dynamics settle when the input is played back through it indefinitely. The original framing, "revealing the training data's thematic fingerprint", did not survive the cross-model test (FINDINGS.md F3); what ATR demonstrably provides is a cheap, tensor-level regime comparison across models.
 
 ### Closest Parallels
 
-- **Power iteration** in linear algebra (find dominant eigenvector by repeated multiplication) — ATR is the nonlinear analogue
-- **Room impulse response** measurement in acoustics (inject impulse, observe system response) — ATR is this for neural networks
-- **Lyapunov exponent analysis** in dynamical systems (characterise stability of trajectories) — ATR maps the attractor landscape
+- **Power iteration** in linear algebra (find dominant eigenvector by repeated multiplication): ATR is the nonlinear analogue
+- **Room impulse response** measurement in acoustics (inject impulse, observe system response): ATR is this for neural networks
+- **Lyapunov exponent analysis** in dynamical systems (characterise stability of trajectories): ATR maps the attractor landscape
 
 ### State-of-the-Art Impact Potential
 
@@ -99,8 +99,8 @@ Other methods tell you what the model does with a specific input. ATR tells you 
 |---|---|---|
 | Attractor basins exist with the shape and dominance shares observed | Supported (GPT-2 Small, single-model) | Confirms iterated forward map produces a discrete attractor landscape |
 | Basin tokens cluster semantically rather than by BPE substring | Supported (W_E neighbourhood test on GPT-2 Small; statistical validation pending) | The attractors carry meaning, not artefact |
-| Basin profiles vary predictably by model / training data | **Tested: they vary, but not corpus-trackably** (same corpus → unrelated landscapes) | Partially — ATR distinguishes models, but not by training data |
-| ATR-derived basins can stand in for training-data inspection in bias characterisation | **Refuted** (FINDINGS.md F3, F4) | — |
+| Basin profiles vary predictably by model / training data | **Tested: they vary, but not corpus-trackably** (same corpus → unrelated landscapes) | Partially: ATR distinguishes models, but not by training data |
+| ATR-derived basins can stand in for training-data inspection in bias characterisation | **Refuted** (FINDINGS.md F3, F4) | - |
 | Basin topology correlates with model capabilities | Speculative | Transformative if true, but years from testable |
 
 ---
@@ -109,7 +109,7 @@ Other methods tell you what the model does with a specific input. ATR tells you 
 
 ### 3a. Research Programme: Cross-Model ATR Landscape Mapping
 
-> **Status (2026-07-10):** a local 2×2 slice of this programme (GPT-2 Small/Medium × Pythia-160m/410m, CPU) has been executed — results in [FINDINGS.md](FINDINGS.md). It answered the programme's central question early: landscapes are model-specific and do not track the corpus. The larger sweep remains open as characterisation work, with the fingerprint motivation retired.
+> **Status (2026-07-10):** a local 2×2 slice of this programme (GPT-2 Small/Medium × Pythia-160m/410m, CPU) has been executed: results in [FINDINGS.md](FINDINGS.md). It answered the programme's central question early: landscapes are model-specific and do not track the corpus. The larger sweep remains open as characterisation work, with the fingerprint motivation retired.
 
 **Objective:** Run ATR across a systematic sweep of open-weight language models to determine whether attractor basin profiles are model-specific, architecture-specific, or scale-dependent.
 
@@ -146,17 +146,17 @@ Other methods tell you what the model does with a specific input. ATR tells you 
 
 ### 3e. Why HPC
 
-- **Low total compute** — 170–500 GPU-hours is modest by HPC standards
-- **High ratio of output to compute** — each ATR run produces rich, interpretable data per unit of GPU time
-- **Novel research territory** — cross-model attractor-landscape comparison has not been published; results either way (basins generalise predictably, basins generalise but unpredictably, or basins fail to generalise) are publishable findings
-- **Methodological cleanness** — fully deterministic at the same-machine level, no training required, reproducible in principle
-- **Conditional safety relevance** — *if* the central hypothesis (basin profiles reflect training-corpus thematic structure) generalises across models, ATR could offer a route to bias characterisation without training-data access. The cross-model programme is what would test this; the relevance is conditional on that test, not established by the GPT-2 Small results alone.
+- **Low total compute**: 170–500 GPU-hours is modest by HPC standards
+- **High ratio of output to compute**: each ATR run produces rich, interpretable data per unit of GPU time
+- **Novel research territory**: cross-model attractor-landscape comparison has not been published; results either way (basins generalise predictably, basins generalise but unpredictably, or basins fail to generalise) are publishable findings
+- **Methodological cleanness**: fully deterministic at the same-machine level, no training required, reproducible in principle
+- **Conditional safety relevance**: *if* the central hypothesis (basin profiles reflect training-corpus thematic structure) generalises across models, ATR could offer a route to bias characterisation without training-data access. The cross-model programme is what would test this; the relevance is conditional on that test, not established by the GPT-2 Small results alone.
 
 ### 3f. Timeline
 
 | Week | Activity |
 |---|---|
-| 1 | Phase 1 + 2 (GPT-2 family + Pythia subset) — validate ATR scales |
+| 1 | Phase 1 + 2 (GPT-2 family + Pythia subset): validate ATR scales |
 | 2 | Phase 3 + 4 (architecture diversity + alignment comparison) |
 | 3 | Phase 5 (scale sweep, if resource permits) |
 | 4 | Analysis, visualisation, draft findings |
@@ -165,7 +165,7 @@ Other methods tell you what the model does with a specific input. ATR tells you 
 
 ## 4. Development Roadmap
 
-### Immediate (Current Setup — Local GPU)
+### Immediate (Current Setup: Local GPU)
 - [x] ATR on GPT-2 Small (done)
 - [ ] T_mix_LLM measurement
 - [ ] Basin-sorted convergence matrix
@@ -191,4 +191,4 @@ Other methods tell you what the model does with a specific input. ATR tells you 
 
 ---
 
-*Document created 2026-03-20. Living document — update as programme develops.*
+*Document created 2026-03-20. Living document: update as programme develops.*

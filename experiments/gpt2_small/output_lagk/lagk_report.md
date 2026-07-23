@@ -1,6 +1,6 @@
-# EXP: Lag-k Re-Gate (Issue #14, Thread 2): Gating the Bell at Its Own Period
+# EXP: Lag-k Re-Gate (Issue #14, Thread 2): Gating the Cycle at Its Own Period
 
-*A lag-1 gate asks the tensor: are you where you were one step ago? A bell always answers no. Ask at its period and it answers yes, to machine precision.*
+*A lag-1 gate asks the tensor: are you where you were one step ago? A period-2 cycle always answers no. Ask at its period and it answers yes, to machine precision.*
 
 **Date:** 2026-07-19. **Model:** GPT-2 Small (TransformerLens, weights loaded offline via `ATR_GPT2_LOCAL`). **Runner:** [`09_lagk_gate.py`](../09_lagk_gate.py). **Raw data:** [`lagk_results.json`](lagk_results.json). **Engine change:** [`atr_engine.run_atr_gated`](../../../atr_engine.py) now takes `gate_lag` (default 1: the historical consecutive-iteration gate, verified identical old-vs-new on matched runs), and a new pure-tensor helper `atr_engine.lag_scan` returns mean cosine at every lag 1..max_lag over densely recorded iterates.
 
@@ -12,7 +12,7 @@ This experiment makes the engine change and runs the first census. `gate_lag = k
 
 ## Method
 
-The three committed iteration-1000 loop states from the motion audit (`state_divine.pt`, `state_prolet.pt`, `state_noise.pt`) were each continued 24 further iterations with the exact ATR map, recording every iterate: 25 dense iterates per state, no schedule, no aliasing. Sanity gate before measuring anything: the Divine continuation must reproduce the committed bell numbers, and did, exactly: cos(A, f(A)) = 0.684912 (bell_anatomy.json: 0.684912) and cos(A, f(f(A))) = 1.000000 (committed: 1.000000). `lag_scan` then ran on each state's mean vectors (the gate's metric; last-vector tables agree to the seventh decimal and sit alongside in the JSON), with the pass threshold 0.999 read from the engine's own default, the same value the 125-prompt sweep ran at.
+The three committed iteration-1000 loop states from the motion audit (`state_divine.pt`, `state_prolet.pt`, `state_noise.pt`) were each continued 24 further iterations with the exact ATR map, recording every iterate: 25 dense iterates per state, no schedule, no aliasing. Sanity gate before measuring anything: the Divine continuation must reproduce the committed cycle numbers, and did, exactly: cos(A, f(A)) = 0.684912 (bell_anatomy.json: 0.684912) and cos(A, f(f(A))) = 1.000000 (committed: 1.000000). `lag_scan` then ran on each state's mean vectors (the gate's metric; last-vector tables agree to the seventh decimal and sit alongside in the JSON), with the pass threshold 0.999 read from the engine's own default, the same value the 125-prompt sweep ran at.
 
 ## The Lag Table
 
@@ -39,7 +39,7 @@ Smallest passing lag: prolet 1, Divine 2, noise 1 (nominal: see the caveat secti
 
 At the standard threshold (0.999, the engine default): the Divine state's lag-2 mean-vector cosine over the window is 1.0000000 (mean), 0.9999999 (minimum pair). Every possible lag-2 check clears the threshold, so any `patience` and `check_every` schedule locks in. Under `gate_lag = 1` the same state reads 0.6849117 at every check, 0.31 below threshold, forever. **Verdict: Divine is converged under `gate_lag = 2`; it is unconvergeable under `gate_lag = 1`.**
 
-Both phases decode to the same token, as the bell anatomy requires: iterate 1023 (phase B) argmax ` Divine` (id 13009) at p = 0.2252, entropy 4.62 nats; iterate 1024 (phase A) argmax ` Divine` (id 13009) at p = 0.5046, entropy 3.05 nats. One timbre, two volumes, one gate verdict.
+Both phases decode to the same token, as the cycle anatomy requires: iterate 1023 (phase B) argmax ` Divine` (id 13009) at p = 0.2252, entropy 4.62 nats; iterate 1024 (phase A) argmax ` Divine` (id 13009) at p = 0.5046, entropy 3.05 nats. One token, two probabilities, one gate verdict.
 
 This is the first concrete instance of the canon correction "34 prompts ring, pending re-gate": one of the 34, the Syntactic prompt, is now re-gated as converged at its own period.
 
@@ -49,11 +49,11 @@ The honest row: within this late 24-iteration window the noise control also clea
 
 ## The Period-4-and-Longer Blind Spot
 
-A period-p cycle passes a lag-k comparison exactly when p divides k. The Divine bell hid under every snapshot schedule previously used because the sampled lags were multiples of its period; a plain lag-2 re-gate inherits the same blindness one octave up. A period-4 ringer would fail lags 1, 2, 3, 5, 6, 7 and pass only 4 and 8: under a `gate_lag = 2` gate it would look exactly the way Divine looked under lag 1, never converging, invisible again. In this census no state shows a period above 2 (nothing passes at 4 that does not already pass at 2, and the odd/even stripe is complete). Periods above 8 or quasi-periodic orbits would need a longer scan (`lag_scan` takes `max_lag`) over a window a few cycle lengths deep. Recommendation for the eventual 34-prompt re-gate: run the full lag table on a short dense continuation, as here, and gate each state at its smallest passing lag; do not just swap one fixed lag for another.
+A period-p cycle passes a lag-k comparison exactly when p divides k. The Divine period-2 cycle hid under every snapshot schedule previously used because the sampled lags were multiples of its period; a plain lag-2 re-gate inherits the same blindness one octave up. A period-4 cycle would fail lags 1, 2, 3, 5, 6, 7 and pass only 4 and 8: under a `gate_lag = 2` gate it would look exactly the way Divine looked under lag 1, never converging, invisible again. In this census no state shows a period above 2 (nothing passes at 4 that does not already pass at 2, and the odd/even stripe is complete). Periods above 8 or quasi-periodic orbits would need a longer scan (`lag_scan` takes `max_lag`) over a window a few cycle lengths deep. Recommendation for the eventual 34-prompt re-gate: run the full lag table on a short dense continuation, as here, and gate each state at its smallest passing lag; do not just swap one fixed lag for another.
 
 ## What Stays Blocked on Issue #9
 
-The other 33 ringing prompts exist in the sweep records only as ids and terminal tokens; their texts live in `prompt_library.py`, which exists only on Thom's home machine (issue #9, his errand). Until it is restored they cannot be re-run, so "34 prompts ring, pending re-gate" resolves today to: 1 re-gated (the Syntactic prompt's Divine bell, converged at `gate_lag = 2`), 33 pending on #9. The machinery is ready for them: a 24-iteration dense continuation plus `lag_scan`, then `run_atr_gated(..., gate_lag=k)` at the smallest passing k, is the whole recipe this script demonstrates.
+The other 33 cycling prompts exist in the sweep records only as ids and terminal tokens; their texts live in `prompt_library.py`, which exists only on Thom's home machine (issue #9, his errand). Until it is restored they cannot be re-run, so "34 prompts ring, pending re-gate" resolves today to: 1 re-gated (the Syntactic prompt's Divine period-2 cycle, converged at `gate_lag = 2`), 33 pending on #9. The machinery is ready for them: a 24-iteration dense continuation plus `lag_scan`, then `run_atr_gated(..., gate_lag=k)` at the smallest passing k, is the whole recipe this script demonstrates.
 
 ## Caveats
 

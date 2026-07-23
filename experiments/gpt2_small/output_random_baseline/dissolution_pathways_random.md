@@ -1,4 +1,4 @@
-# Dissolution Pathways — Random Baseline
+# Dissolution Pathways: Random Baseline
 
 ## 125 Random Gaussian Tensors (seed=42)
 

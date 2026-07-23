@@ -56,4 +56,4 @@
 
 - **Unique terminal tokens at 1000 iters:** 8
 - **Stage 1 (100 iters) had:** 30+ scattered tokens
-- **Verdict:** Partial convergence — some basin formation
+- **Verdict:** Partial convergence, some basin formation

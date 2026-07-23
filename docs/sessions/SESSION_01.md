@@ -1,6 +1,6 @@
 *AI-assisted review session (a reviewer persona run against the repo); not institutional supervision.*
 
-# Supervisory Session 01 — Research Notes
+# Supervisory Session 01: Research Notes
 
 **Date:** 2026-03-20
 **Context:** First supervisory review of the Lucier ATR (Activation Tensor Resonance) project after 6 months of independent work.
@@ -9,14 +9,14 @@
 
 ## 1. Hypothesis Framework (Reinstated)
 
-The project operates under four hypotheses, originally authored by the principal investigator. A fifth hypothesis ("basin membership is determined by syntactic register") was introduced by a former collaborator and has been **removed** — it was falsified by the Stage 1 data, and more importantly, it inverts the Lucier framing by asking about the *input* rather than the *architecture*.
+The project operates under four hypotheses, originally authored by the principal investigator. A fifth hypothesis ("basin membership is determined by syntactic register") was introduced by a former collaborator and has been **removed**: it was falsified by the Stage 1 data, and more importantly, it inverts the Lucier framing by asking about the *input* rather than the *architecture*.
 
 | ID | Hypothesis | Status |
 |---|---|---|
 | **H0** | The Lucier Resonance results are **deterministic**. Same model + same prompts + same parameters → identical terminal attractors and dissolution trajectories. | **PASSED** (EXP_009d0) |
-| **H1** | `prolet` is the **dominant basin** of GPT-2 Small's weight geometry. | **Supported** — 35.2% of 125 prompts (44/125) |
-| **H2** | `Divine` is a **genuine secondary basin**, not a one-off artefact. | **Supported** — 27.2% of 125 prompts (34/125). Three additional basins also discovered: `Anarch` (20.8%), `till` (15.2%), `solidarity` (1.6%) |
-| **H3** | The intermediate tokens reflect the **statistical topology of the training corpus**. | **Supported** — 4/5 basin tokens show strong semantic clustering in `W_E`; pathway shows structural→semantic phase transition |
+| **H1** | `prolet` is the **dominant basin** of GPT-2 Small's weight geometry. | **Supported**: 35.2% of 125 prompts (44/125) |
+| **H2** | `Divine` is a **genuine secondary basin**, not a one-off artefact. | **Supported**: 27.2% of 125 prompts (34/125). Three additional basins also discovered: `Anarch` (20.8%), `till` (15.2%), `solidarity` (1.6%) |
+| **H3** | The intermediate tokens reflect the **statistical topology of the training corpus**. | **Supported**: 4/5 basin tokens show strong semantic clustering in `W_E`; pathway shows structural→semantic phase transition |
 
 > **Critical note:** H1 and H2 are *structural* claims about the architecture. H3 is a *semantic* claim about the relationship between weight geometry and training data. H3 is the hypothesis that connects the experimental results to the Reddit/2018 provenance observation.
 
@@ -26,16 +26,16 @@ The project operates under four hypotheses, originally authored by the principal
 
 The current evidence supporting H3 rests on four independent lines of observation:
 
-### Observation 1 — Experimental (Discrete Convergence)
-Iterative re-injection produces **discrete attractor basins** — not noise, not gradients, but hard convergence to specific tokens. 125 diverse prompts collapse to exactly 5 terminal states out of a vocabulary of 50,257 tokens. This selectivity is extraordinary and demands explanation.
+### Observation 1: Experimental (Discrete Convergence)
+Iterative re-injection produces **discrete attractor basins**: not noise, not gradients, but hard convergence to specific tokens. 125 diverse prompts collapse to exactly 5 terminal states out of a vocabulary of 50,257 tokens. This selectivity is extraordinary and demands explanation.
 
-### Observation 2 — Linguistic (Semantic Coherence)
-The terminal tokens (`prolet`, `Divine`, `Anarch`, `solidarity`) and the waypoints (`injustice`, `Fem`) cluster in embedding space with tokens from **political philosophy, theology, gender discourse, and moral grievance**. The waypoint `capit` clusters as **capitulation/surrender** (not capitalism — a key correction). See §8 for full results.
+### Observation 2: Linguistic (Semantic Coherence)
+The terminal tokens (`prolet`, `Divine`, `Anarch`, `solidarity`) and the waypoints (`injustice`, `Fem`) cluster in embedding space with tokens from **political philosophy, theology, gender discourse, and moral grievance**. The waypoint `capit` clusters as **capitulation/surrender** (not capitalism, a key correction). See §8 for full results.
 
-### Observation 3 — External (Training Data Provenance)
-The training data is **WebText** — exclusively Reddit posts with ≥3 upvotes, scraped ~2018 — a period dominated by exactly the political discourse these tokens reference. The culture wars, WallStreetBets, #MeToo, and post-2016 political polarisation dominated the platform.
+### Observation 3: External (Training Data Provenance)
+The training data is **WebText**: exclusively Reddit posts with ≥3 upvotes, scraped ~2018, a period dominated by exactly the political discourse these tokens reference. The culture wars, WallStreetBets, #MeToo, and post-2016 political polarisation dominated the platform.
 
-### Observation 4 — Trajectorial (Directional Narrative)
+### Observation 4: Trajectorial (Directional Narrative)
 The dissolution pathway passes through tokens in a **directional sequence** with a clear **phase transition**:
 ```
 ash (generic) → Canad (geographic) → Ag (agricultural) → FT (typographic) → capit (SURRENDER) → Fem (gender) → injustice (grievance) → Rousse (ambiguous) → prolet (political philosophy)
@@ -60,7 +60,7 @@ A primer on Eduardo Slonski's findings, contextualised for this project.
 | **Binary dichotomy** | Slonski's core finding: all token Q-vectors in a sequence polarise into exactly **two groups** with near **-1 cosine similarity**. | A room where everyone faces either North or South |
 | **Tartan/plaid pattern** | Visual signature of the dichotomy as a similarity matrix. Same-group → yellow (+1), cross-group → dark (-1). | A checkerboard with irregular block sizes |
 | **Outlier dimensions** | The ~5–10 dimensions (of 768) where the two groups dramatically differ. Group 1 has large positive, Group 2 large negative. Most other dimensions are similar. | 760 "knobs" set similarly; 5–10 cranked to opposite extremes |
-| **Orthogonal tokens** | Tokens belonging to *neither* group. Lack outlier dimensions. Much smaller magnitude. ~0 cosine similarity with both groups. | Ghosts — present but not participating |
+| **Orthogonal tokens** | Tokens belonging to *neither* group. Lack outlier dimensions. Much smaller magnitude. ~0 cosine similarity with both groups. | Ghosts, present but not participating |
 
 ### Slonski's Key Finding (Summary)
 
@@ -68,7 +68,7 @@ In a single forward pass, every token's Q-vector gets sorted into one of two mac
 
 ---
 
-## 4. The Tartan Connection — Your Convergence Matrix
+## 4. The Tartan Connection: Your Convergence Matrix
 
 **Question:** "Is the tartan pattern I see in my convergence matrix the same thing Slonski is describing?"
 
@@ -84,7 +84,7 @@ In a single forward pass, every token's Q-vector gets sorted into one of two mac
 
 **Linking hypothesis:** Iteration may **resolve additional structure within** Slonski's two macro-clusters. His static analysis sees 2 groups. Your iterated map amplifies subtler features, separating 2 coarse groups into 5 fine basins.
 
-> **Is this topology?** Yes. You're mapping the **basin structure of a high-dimensional dynamical system** — regions in activation space that flow toward distinct fixed points under iteration. This is literally attractor topology. Not a metaphor.
+> **Is this topology?** Yes. You're mapping the **basin structure of a high-dimensional dynamical system**: regions in activation space that flow toward distinct fixed points under iteration. This is literally attractor topology. Not a metaphor.
 
 ---
 
@@ -97,16 +97,16 @@ GPT-2 has a fixed vocabulary of **50,257 token fragments** learned from the trai
 | Word | BPE Tokens |
 |---|---|
 | `proletariat` | `prolet` + `ariat` |
-| `capitulate` | `capit` + `ulate` (⚠ NOT `capitalism` — corrected by neighbourhood analysis) |
+| `capitulate` | `capit` + `ulate` (⚠ NOT `capitalism`, corrected by neighbourhood analysis) |
 | `Rousseau` | `Rousse` + `au` |
 | `Divine` | `Divine` (one token) |
 | `Anarch` | `Anarch` (prefix of Anarchist, Anarchy) |
 
 **Why this matters for H3:** When the experiment converges to `prolet`, two explanations exist:
 
-**(a) Semantic:** `prolet` is the attractor because the weight geometry encodes strong associations with political philosophy — reflecting training corpus topology. The token's *meaning* is relevant.
+**(a) Semantic:** `prolet` is the attractor because the weight geometry encodes strong associations with political philosophy, reflecting training corpus topology. The token's *meaning* is relevant.
 
-**(b) Geometric coincidence:** `prolet` sits at a geometric fixed point for reasons unrelated to its semantic content — anomalous embedding properties, unusual norm/direction.
+**(b) Geometric coincidence:** `prolet` sits at a geometric fixed point for reasons unrelated to its semantic content: anomalous embedding properties, unusual norm/direction.
 
 **The test:** Look at `prolet`'s nearest neighbours in `W_E`. Semantic neighbours (`ariat`, `Marx`, `bourgeois`) → H3 supported. BPE substring neighbours (`proced`, `promin`, `profess`) → H3 challenged.
 
@@ -128,12 +128,12 @@ The saved file (~6.5MB) contains, for **each of 125 prompts** at **every snapsho
 
 ### Analyses enabled (no re-run needed):
 
-1. **Embedding neighbourhood test** — cross-reference basin tokens with `W_E`
-2. **Basin-sorted convergence matrix** — reorder by terminal basin
-3. **Intermediate trajectory clustering** — PCA/UMAP of all snapshots, colour by basin
-4. **Convergence speed by basin** — do `prolet` prompts converge faster?
-5. **Position collapse dynamics** — when does the "sentence" fully dissolve?
-6. **Slonski Q-vector comparison** — requires one new forward pass (not the `.pt` file)
+1. **Embedding neighbourhood test**: cross-reference basin tokens with `W_E`
+2. **Basin-sorted convergence matrix**: reorder by terminal basin
+3. **Intermediate trajectory clustering**: PCA/UMAP of all snapshots, colour by basin
+4. **Convergence speed by basin**: do `prolet` prompts converge faster?
+5. **Position collapse dynamics**: when does the "sentence" fully dissolve?
+6. **Slonski Q-vector comparison**: requires one new forward pass (not the `.pt` file)
 
 ---
 
@@ -162,7 +162,7 @@ Lucier ATR: Iterative re-injection reveals 5 basins (dynamic).
 **Notebook:** `docs/supervisor/01_token_id_extraction.ipynb`
 **Date completed:** 2026-03-20
 
-### Basin Tokens — Neighbourhood Summary
+### Basin Tokens: Neighbourhood Summary
 
 | Token | ID | Neighbourhood Type | Key Neighbours | H3 |
 |---|---|---|---|---|
@@ -172,7 +172,7 @@ Lucier ATR: Iterative re-injection reveals 5 basins (dynamic).
 | `solidarity` | 17803 | Collective action (20/20, 0 BPE) | `sympathy`, `activism`, `protest`, `comrades` | ✅ Strong |
 | `till` | 10597 | Temporal conjunctions | `until`, `whilst`, `unless`, `hitherto` | ⚠ Functional |
 
-### Waypoint Tokens — Neighbourhood Summary
+### Waypoint Tokens: Neighbourhood Summary
 
 | Token | ID | Neighbourhood Type | Key Neighbours | Notes |
 |---|---|---|---|---|
@@ -186,7 +186,7 @@ Lucier ATR: Iterative re-injection reveals 5 basins (dynamic).
 | `Canad` | 2294 | Geographic prefix | `Canada`, `Canadian` | ❌ Structural |
 | `Zero` | 28667 | Glitch-adjacent | `Nitrome`, `rawdownload` in neighbours | ⚠ Suspicious |
 
-### Embedding Norms — No Outliers
+### Embedding Norms: No Outliers
 
 All tokens within ±1.5σ of mean norm (3.9583 ± 0.4336). None flagged as anomalous. Glitch token explanation ruled out.
 
@@ -207,15 +207,15 @@ A structural isomorphism between the dissolution phase transition and **Mixing T
 
 ### Room Acoustics
 In impulse response analysis, T_mix is the moment when reverberation transitions from:
-- **Early reflections** — carrying spatial information (room geometry, source position)
-- **Late reverberation** — carrying only the room's modal response (eigenfrequencies, material absorption)
+- **Early reflections**: carrying spatial information (room geometry, source position)
+- **Late reverberation**: carrying only the room's modal response (eigenfrequencies, material absorption)
 
 Before T_mix: you hear *where*. After T_mix: you hear *what the room sounds like*.
 
 ### Lucier ATR
 The dissolution pathway transitions from:
-- **Early iterations** — carrying prompt-specific information (input identity, positional encoding)
-- **Late iterations** — carrying only the model's weight geometry (training corpus topology, attractor basins)
+- **Early iterations**: carrying prompt-specific information (input identity, positional encoding)
+- **Late iterations**: carrying only the model's weight geometry (training corpus topology, attractor basins)
 
 Before transition: the residual stream remembers *what was said*. After: it reflects only *what the model is made of*.
 

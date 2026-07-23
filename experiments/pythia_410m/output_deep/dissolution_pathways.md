@@ -1,4 +1,4 @@
-# Deep Dissolution Pathways — Last-Token Top Prediction
+# Deep Dissolution Pathways: Last-Token Top Prediction
 
 ## Complex (1 prompts)
 

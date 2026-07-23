@@ -1,4 +1,4 @@
-# J-lens Phase Probe: Both Phases of the Divine Bell, the Pivot, and the Flip Axis (GPT-2 Small)
+# J-lens Phase Probe: Both Phases of the Divine Period-2 Cycle, the Pivot, and the Flip Axis (GPT-2 Small)
 
 *Terminology: the flip axis d was called "the hinge" in earlier revisions of these documents; script names, folder names, and JSON keys keep the old word.*
 
@@ -6,7 +6,7 @@
 **Status: PILOT follow-up.** The J-lens pilot (`../output_jlens_pilot/jlens_pilot_report.md`,
 issue #8) probed the converged Divine (Syntactic) state before `06_bell_anatomy.py` showed
 that state is an exact period-2 limit cycle: phases A and B, pivot M = (A+B)/2, flip axis
-d = (A-B)/2, with the flip axis 95 percent mute to the readout (logit response ratio 0.054).
+d = (A-B)/2, with the flip axis 95 percent invisible to the readout (logit response ratio 0.054).
 The pilot therefore probed only phase A of a two-phase object. This follow-up re-runs the
 pilot's membership probe, unchanged, on both phases and the pivot, and answers one new
 question: is the flip axis inside or outside the pilot lens subspace? Everything
@@ -133,7 +133,7 @@ Reading, in decreasing order of confidence:
    the prolet level.
 2. **The pivot M is the most lens-expressible object probed**: above A at every layer on
    both probes (span +0.007 to +0.011, sparse +0.003 to +0.007). The stable ` Divine`
-   readout was shown in the bell anatomy to be the shadow of M; M is also the most
+   readout was shown in the cycle anatomy to be the shadow of M; M is also the most
    verbalizable-adjacent state the instrument has seen.
 3. **The language-vs-noise boundary survives on the sparse probe, and weakens for B on
    the span probe.** On sparse, every language-derived state including B stays above the
@@ -198,8 +198,8 @@ contamination, not cycle motion.
 The W_U singular split of d_sym: the top-100 (readout-visible) component carries 1.2
 percent of its energy and the bottom-100 (readout-quiet) component 97.0 percent;
 together the two subsets cover 98.2 percent of the energy, and the middle 568 singular
-directions hold the remaining 1.8 percent. The split restates the bell anatomy's
-muteness result in the clean frame: the physical swing is almost wholly readout-quiet.
+directions hold the remaining 1.8 percent. The split restates the cycle anatomy's
+invisibility-to-the-readout result in the clean frame: the physical swing is almost wholly readout-quiet.
 
 - The quiet bulk (97.0 percent of d_sym's energy) is essentially outside the lens at
   every layer: span between 0.002 (L11) and 0.019 (L4), at most 8 percent of chance.
@@ -238,7 +238,7 @@ and the deficit deepens with depth (ratio to chance falls from about 0.71 at L0-
 0.57 at L10). Per section 4a, this milder deficit is a pivot-diluted version of the
 d_sym result.
 
-The decomposition connects to the bell anatomy's muteness result:
+The decomposition connects to the cycle anatomy's invisibility-to-the-readout result:
 
 - The readout-QUIET bulk of d_committed (bottom-100 W_U component, 73.2 percent of
   d_committed's energy) is essentially outside the lens at every layer: span 0.066 at
@@ -250,7 +250,7 @@ The decomposition connects to the bell anatomy's muteness result:
 - The readout-VISIBLE sliver (top-100 component, 12.9 percent of d_committed's energy)
   is strongly INSIDE: span 0.335 at L0 rising to 0.619 at L11, 1.3x to 2.5x chance.
 
-So on the tested subsets, muteness to the readout and muteness to the lens point the
+So on the tested subsets, invisibility to the readout and invisibility to the lens point the
 same way at every depth of the pilot lens: the top-100 (readout-visible) component
 leans inside and the bottom-100 (readout-quiet) component sits outside. The
 coincidence claim applies to these selected extremes of the W_U spectrum only. The two
@@ -269,7 +269,7 @@ number the answer.
 pilot's reversal ("Divine at least as expressible as prolet") holds for phase A, is
 strengthened at the pivot M, and REVERSES for phase B, which is less lens-expressible
 than the prolet attractor at every layer on both probes and, on the span probe, dips to
-converged-noise level until the final layer. The bell is not "inside" or "outside" as
+converged-noise level until the final layer. The period-2 cycle is not "inside" or "outside" as
 one object: it swings once per iteration between a more-verbalizable phase and a
 less-verbalizable phase, pivoting on the most-verbalizable state in the system, along a
 flip axis that on the physical construction is almost entirely outside the lens (d_sym

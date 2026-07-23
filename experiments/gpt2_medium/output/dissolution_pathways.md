@@ -1,4 +1,4 @@
-# Dissolution Pathways — Last-Token Top Prediction
+# Dissolution Pathways: Last-Token Top Prediction
 
 ## Complex (25 prompts)
 
