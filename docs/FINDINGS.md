@@ -29,7 +29,14 @@ And the coherence lives one level deeper than previously measured: the settled
 basins decode as chords, not notes (top-10 readout tokens with mean pairwise
 embedding cosine 0.41-0.47 against a 0.27 random baseline, p = 0.001 under
 uniform and frequency-matched permutation nulls), while the winning token
-itself carries only 6-9% of the probability mass.
+itself carries only 6-9% of the probability mass. A mechanism series (F13-F17)
+then traced the cycle to its cause: a single overshooting eigenvalue (-4.3 at the
+pivot) executed almost entirely by one attention head, L11.H8, along a flip axis
+that connects the model's most-trained and least-trained token directions and
+sits almost wholly outside both the readout and the J-lens subspace. The head is
+load-bearing for the cycle (ablating it collapses it to a fixed point) but is a
+copy promoter on ordinary text, not the copy-suppression head the mechanism first
+suggested.
 
 ---
 
@@ -69,6 +76,11 @@ cloud container, a different machine class from all prior runs, with `gpt2` and
 | 8 | Divine motion audit (lag-10 + lag-1 probe) | gpt2-small | 3 trajectories × 1000 iters, +20 lag-1 iters | `experiments/gpt2_small/output_divine_motion/` |
 | 9 | Bell anatomy | gpt2-small | 1 Divine trajectory, iteration-1000 states | `experiments/gpt2_small/output_divine_motion/bell_anatomy.md` |
 | 10 | J-lens pilot (restricted) | gpt2-small | 193-token lens × 30 prompts; 8 states probed | `experiments/gpt2_small/output_jlens_pilot/` |
+| 11 | Glitch alignment (flip axis vs anomalous-token cluster) | gpt2-small | 1 `Divine` trajectory | `experiments/gpt2_small/output_glitch/` |
+| 12 | Flip-axis eigenvalue + per-block/head localisation | gpt2-small | 1 `Divine` trajectory (jvp + finite diff) | `experiments/gpt2_small/output_hinge_eigen/` |
+| 13 | Lag-k re-gate + engine `gate_lag` | gpt2-small | 3 states × 25 dense iters | `experiments/gpt2_small/output_lagk/` |
+| 14 | J-lens phase probe (both phases, pivot, flip axis) | gpt2-small | pilot lens × cycle states | `experiments/gpt2_small/output_jlens_phase/` |
+| 15 | Suppression-head test for L11.H8 | gpt2-small | 144 heads; loop ablation; 12 sentences | `experiments/gpt2_small/output_suppression/` |
 | — | Tensor convergence diagnostic | all four | reads runs 1–2 | `experiments/cos_sim_diagnostic.ipynb` |
 | — | Readout confidence audit | gpt2-small | single-prompt demo | `experiments/output/readout_guardrails_gpt2_small.json` |
 | — | All-warm permutation test | gpt2-small (W_E) | 10,000 random 14-token sets | `experiments/gpt2_small/output_permutation/` |
@@ -76,7 +88,9 @@ cloud container, a different machine class from all prior runs, with `gpt2` and
 Runs 6-10 are the Act II.5 readout-audit series (2026-07-19), executed on different
 hardware from all prior runs (F6). Scripts:
 `experiments/gpt2_small/04_readout_confidence.py`, `05_divine_motion.py`,
-`06_bell_anatomy.py`, `05_jlens_pilot.py`.
+`06_bell_anatomy.py`, `05_jlens_pilot.py`. Runs 11-15 are the mechanism series
+(issue #14, 2026-07-19 onward; findings F13-F17), scripts `07_glitch_alignment.py`
+through `11_suppression_test.py`.
 
 ## 2. Principal findings
 
@@ -463,6 +477,144 @@ phenomenon, a probability-weighted lexical field under a peaked readout,
 remains exclusive to GPT-2 Small's language regime among the models tested.
 Record: `chordness_formal.md`.
 
+---
+
+### The mechanism series (issue #14, 2026-07-19 onward)
+
+*Findings F13-F17 follow the `Divine` period-2 cycle (F9, F10) down to its
+mechanism: which embedding-space directions its flip axis connects (F13), the
+eigenvalue and the single attention head that produce the inversion (F14), the
+engine change that lets the convergence gate recognise the cycle (F15), where the
+two phases and the flip axis sit relative to the J-lens subspace (F16), and
+whether the head that drives the cycle belongs to the copy-suppression class
+(F17). All five follow the one audited `Divine` trajectory (the Syntactic prompt)
+from the committed iteration-1000 checkpoint; whether the other 33 period-2
+prompts share the structure is blocked on the prompt library (issue #9, caveat
+14). Reports live beside their outputs: `output_glitch/glitch_alignment.md`,
+`output_hinge_eigen/hinge_eigenvalue.md`, `output_lagk/lagk_report.md`,
+`output_jlens_phase/jlens_phase.md`, `output_suppression/suppression_report.md`.*
+
+### F13: The flip axis connects the model's most-trained and least-trained token directions
+
+F10 identified the phase-B pole of the flip axis with the published GPT-2
+anomalous-token cluster (the SolidGoldMagikarp family) by inspection. Run 11
+measures it. Writing u for the unit direction from the global mean embedding to a
+cluster's centroid, the phase-B pole (-d) is aligned with the geometric core of
+under-trained tokens (the control-byte and undecodable-byte tokens plus named
+family members): **cos(-d, u_core) = +0.596**, against 1000 random sets (mean
+|cos| 0.065, max 0.30) and 1000 norm-matched sets, p < 0.001 under both. The
+norm-matched null is the sharp control: sets matching the core's embedding-norm
+profile point the *opposite* way (mean +0.48, toward phase A), so the alignment
+is about which tokens these are, not their norms. The curated SolidGoldMagikarp
+family agrees independently (cos +0.456, p < 0.001 both nulls). The -d ray is
+saturated with cluster members: of the top 50 vocabulary tokens by cos(row, -d),
+45 are in the 0.1% geometric core and all 50 within the 0.5% shell (a 200-fold
+enrichment). The phase-A pole (+d) is the opposite corner: its top 50 tokens are
+the highest-frequency function words (`the`, `,`, `in`, `and`, `a`), contain no
+cluster member, and 42 of 50 lie in the bottom 0.5% by embedding norm;
+cos(u_core, u_function-word) = -0.68. So each pass, the normalised map throws the
+state toward the least-trained corner of embedding space and back toward the
+most-trained corner. The alignment is a strong tilt, not an identity (0.46-0.60,
+not 0.9), and the flip axis also carries a large pivot component, so the
+informative pole is -d specifically. It holds identically at all 10 positions
+(the flip axis is one global direction), and cluster membership is
+basis-independent (Jaccard 1.0, raw vs processed). Record: `glitch_alignment.md`.
+
+### F14: The inversion is one overshooting eigenvalue, executed by a single attention head, L11.H8
+
+F10 conjectured the flip axis carries an effective eigenvalue near -1. Run 12
+measures the linearised ATR map by forward-mode autodiff (`torch.func.jvp`,
+agreeing with central finite differences to 3-4 significant figures) and reports
+two corrections. **Magnitude:** at the symmetric pivot the flip-axis eigenvalue is
+not -1 but **-4.3** (an overshooting reflection, cos(Jd, -d) = 0.991), while
+around the composed two-step map the projected multiplier along the axis is
+**+0.10** (perturbations off the orbit decay by about 90% per period, which is why
+the cycle reproduces to machine precision). This is a period-doubling
+configuration: a near-fixed pivot (one forward pass returns it 0.995 aligned with
+itself) that is flip-unstable along exactly one direction and sheds a stable
+finite-amplitude period-2 orbit. **Locality:** the flip axis passes through blocks
+0-10 upright (its cosine to itself never falls below +0.88) and is inverted
+entirely inside block 11; within block 11 attention outweighs the MLP 12 to 1, and
+one head, **L11.H8, carries 99.1% of the attention flip** (per-head d-component
+-1.981; no other head exceeds 0.014). Random control directions pass through
+upright (eigenvalue near +1). The inversion is thus real, direction-specific, and
+localised to a single OV circuit. Frame note: the literal -1 of the original
+conjecture appears only for the frame-mixed "committed" flip axis (lambda -0.864);
+the physical on-shell axis d_sym carries the -4.3, and the two reconcile once the
+loop's renormalisation strips the committed axis's radial part (leaving it 0.973
+aligned with d_sym; caveat 15). Record: `hinge_eigenvalue.md`.
+
+### F15: A lag-2 convergence gate recognises the period-2 cycle; the engine now supports it
+
+F9's standing correction (the 34 non-converging prompts are period-2 cycles
+"pending re-gate") is now implemented and demonstrated for the one audited
+trajectory. `atr_engine.run_atr_gated` gained a **`gate_lag`** parameter (compare
+iterate t with t-k; default 1, verified bit-identical to the pre-change engine on
+matched runs) and a `lag_scan` helper reporting mean cosine at every lag over a
+dense continuation. On a 24-iteration continuation from the committed
+iteration-1000 states, three signatures separate cleanly: the `prolet` fixed point
+passes at every lag (flat 1.0000000); the `Divine` state fails every odd lag
+(0.6849) and passes every even lag (1.0000000), the parity signature of an exact
+period-2 cycle, so it is **converged under `gate_lag = 2` and unconvergeable under
+`gate_lag = 1`**; the noise control decays monotonically with lag (no period).
+Both phases decode to the same argmax (` Divine`, p 0.505 / 0.225). Two honest
+limits are recorded. First, the lag-2 gate inherits the same aliasing one octave
+up: a period-4 cycle would fail lags 1-3, 5-7 and pass only 4 and 8, invisible
+again under lag 2; the recommended 34-prompt re-gate therefore runs the full lag
+table on a short dense continuation and gates each state at its smallest passing
+lag, rather than swapping one fixed lag for another. Second, the lag-k gate
+corrects cycle aliasing but not threshold-blindness to slow drift: the
+still-drifting noise control nominally clears 0.999 at every lag in this
+decelerated late window. The other 33 period-2 prompts remain blocked on the
+prompt library (issue #9); one, the Syntactic prompt, is now re-gated as
+converged. Record: `lagk_report.md`.
+
+### F16: Phase-aware J-lens: the phases straddle the `prolet` level, the pivot is the most lens-expressible state probed, and the physical flip axis is almost entirely outside the lens
+
+The J-lens pilot (F11) saw only phase A. Run 14 re-runs the same restricted pilot
+lens (193 tokens; every F11 limitation inherited, caveat 13) on both phases, the
+pivot M, and the flip axis. The pilot's reversal ("`Divine` at least as
+lens-expressible as `prolet`") holds for phase A, **strengthens at the pivot M**
+(the most lens-expressible object probed, above phase A at every layer), and
+**reverses for phase B** (less lens-expressible than the `prolet` attractor at
+every layer on both the span and sparse probes). So the cycle is not "inside" or
+"outside" the lens as one object: it swings between a more-verbalizable phase and a
+less-verbalizable phase, pivoting on the most-verbalizable state in the system.
+The physical flip axis d_sym is almost entirely outside the lens: least-squares
+span share **0.013 at L11 against a 0.252 chance level** (5% of chance; mean over
+layers 0.021 vs 0.249), never above 0.029 at any depth, and its readout-quiet bulk
+(97.0% of its energy) is outside the lens at essentially every layer. This
+restates F10's readout-muteness in the lens frame. The frame-mixed committed
+axis's milder deficit (0.145 at L11, 58% of chance) is pivot contamination (caveat
+15). The language-vs-noise boundary (F4, F11) survives but is now a sparse-probe
+story: on the span probe, phase B sits at or below converged-noise level until the
+final layer. This is not a null: the phase-blind pilot could not tell the phases
+apart, and they are materially distinguishable to the lens. Record:
+`jlens_phase.md`.
+
+### F17: L11.H8 is load-bearing for the cycle but is a copy promoter, not a copy-suppression head
+
+The suppression-head hypothesis read L11.H8 (F14) as an instance of the documented
+copy-suppression class (like GPT-2 Small's L10.H7), the closed loop recycling its
+one-shot negative correction into a sustained oscillation. Run 15 ran three tests.
+(1) Among all 144 heads, L11.H8's OV inverts the flip axis d_sym most strongly (cos
+-0.9619, gain 63.68, rank 1; per-unit d-component -61 against the runner-up's -1.2,
+a different magnitude class). (2) Ablating L11.H8 inside the loop collapses the
+cycle to a fixed point within about 10 iterations (the readout going from
+` Divine` at p 0.5 to a flat ` the`), while a same-layer control ablation (L11.H0)
+leaves a period-2 cycle running, so the head is load-bearing and specifically so.
+(3) On ordinary text (no loop), L11.H8 *raises* the attended token's logit at 91.4%
+of positions (mean delta +5.97), the opposite of copy suppression, while the L10.H7
+positive control shows the documented suppression (87.1% negative, mean -3.62), so
+the protocol detects suppression where it exists. **Verdict: (1) supported, (2)
+supported, (3) refuted with the opposite sign.** L11.H8 sustains the cycle by
+inverting the flip axis, but it is a copy promoter, not a suppressor; the "learned
+copy-suppression function" reading is unsupported, and the structural-accident
+reading (the cycle exploits a strongly negative direction that happens to sit in
+this head's OV spectrum but is not exercised as suppression in ordinary next-token
+service) is strengthened. Open: whether d_sym relates to some non-token content the
+head suppresses in contexts not sampled here. Record: `suppression_report.md`.
+
 ## 3. Hypothesis dispositions
 
 | ID | Hypothesis | Disposition |
@@ -475,7 +627,10 @@ Record: `chordness_formal.md`.
 | H-fingerprint | Basin profiles read training-data bias without data access | **Refuted as stated** (F3, F4). |
 | H-till | `till` is a slow transient | **Refuted** (F1: 19/19 stable). |
 | H-D1 | `Divine`'s late-stage motion lies mostly in readout-flattened directions | **Supported in a weakened, more precise form (2026-07-19)**: the motion is an exact period-2 cycle whose per-step readout response is 0.295 of the equal-norm random baseline and whose flip axis responds at 0.054, but the distribution visibly breathes (p(top-1) swings 0.505 to 0.225 each half-cycle) while the argmax stays fixed (F9, F10). |
-| H-J1 | `prolet` sits inside the verbalizable (J-lens) subspace, `Divine` outside | **Not supported at pilot confidence (2026-07-19)**: the point estimate runs slightly the other way (`Divine` at least as lens-expressible as `prolet` at every layer), and the boundary that did appear is language-vs-noise (F11). Full, phase-aware build pending (issue #8). |
+| H-J1 | `prolet` sits inside the verbalizable (J-lens) subspace, `Divine` outside | **Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)**: the point estimate runs slightly the other way at pilot confidence (`Divine` at least as lens-expressible as `prolet`), and the boundary that appears is language-vs-noise (F11). The phase-aware re-probe (F16) splits it: the reversal holds for phase A, strengthens at the pivot M (most lens-expressible), and reverses for phase B (below `prolet` at every layer); the physical flip axis is almost entirely outside the lens (span 0.013 vs 0.252 chance at L11). Full build still pending (issue #8). |
+| H-glitch | The `Divine` flip axis aligns with the anomalous-token (SolidGoldMagikarp) cluster | **Supported as a structural alignment (2026-07-19, F13)**: cos(-d, under-trained core) = +0.60, p < 0.001 under random and norm-matched nulls; the swing runs between the most-trained (function-word) corner and the least-trained (glitch) corner. A strong tilt (0.46-0.60), not an identity. |
+| H-flip | The flip axis carries an effective eigenvalue near -1, localisable to a block | **Refined (2026-07-19, F14)**: real, direction-specific, and localised (one direction; one head, L11.H8, does 99%), but the pivot eigenvalue is -4.3 (overshooting), not -1; a period-doubling configuration (composed-cycle multiplier +0.10). The literal -1 was a frame-mix artifact of the committed axis. |
+| H-supp | L11.H8 is a copy-suppression head whose one-shot negative correction the loop recycles | **Refuted with the opposite sign (2026-07-19, F17)**: L11.H8 inverts the flip axis (rank 1 of 144) and is load-bearing (ablation collapses the cycle), but on ordinary text it raises the attended token's logit at 91% of positions (a copy promoter), where the documented L10.H7 suppressor lowers it. The learned-function reading is unsupported; the structural-accident reading is strengthened. |
 
 ## 4. Caveats {#caveats}
 
@@ -533,6 +688,25 @@ Record: `chordness_formal.md`.
     one `Divine` sample; a low-rank lens dictionary against a full-rank random
     control (raw span comparisons uninterpretable as a membership test); and the
     probe saw phase A only (F11).
+14. **The mechanism series is one trajectory.** F13-F17 all follow the single
+    audited `Divine` trajectory (the Syntactic prompt) from the committed
+    iteration-1000 checkpoint, with derivatives evaluated at one point per state.
+    Whether the other 33 period-2 prompts share the flip axis, the flip head
+    (L11.H8), the eigenvalue, and the anomalous-token alignment is untested
+    (prompt library pending, issue #9).
+15. **Frame mixing in the committed flip axis.** `06_bell_anatomy.py` built its
+    flip axis by subtracting shell-frame `B` from raw-frame `A`, so the committed
+    axis is about 83% radial (pivot-aligned). The physical on-shell axis `d_sym`
+    carries the mechanism; all headline numbers in F14, F16, and F17 use `d_sym`.
+    The earlier "phase A norm 1612, phase B 464" contrast (F10) is the two frames,
+    not an energy redistribution: on the shell both phases have equal row norms.
+16. **Small text sample for the suppression test.** F17's copy-suppression test
+    (test 3) uses 12 sentences, 116 positions. The sign of the verdict
+    (fraction-negative 0.086 for L11.H8 vs 0.871 for the L10.H7 control) is far
+    from the decision boundary, so the sample fixes the direction of the result
+    but not fine effect sizes; and it measures copy suppression in the
+    token-unembedding sense only, so suppression of non-token content would not
+    register.
 
 ## 5. What ATR is, after this series
 
@@ -548,6 +722,17 @@ readout-mute axis (F9, F10). The anomaly is sharpened rather than removed: GPT-2
 Small still stands alone in resolving language into few, semantically coherent
 attractors, and that coherence is now known to live in the full readout
 distribution (chords, F8), carried at a quiet argmax (F7).
+
+*Updated 2026-07-19 onward (mechanism series, issue #14):* the period-2 cycle is
+now traced to its cause. One attention head (L11.H8) executes an overshooting
+eigenvalue (-4.3 at the pivot) along a single flip axis (F14); that axis connects
+the most-trained and least-trained token directions (F13) and lies almost
+entirely outside both the readout and the J-lens (F16); the head is load-bearing
+for the cycle but is a copy promoter, not a copy-suppression head (F17); and the
+convergence gate now takes a `gate_lag` parameter that recognises the cycle (F15,
+demonstrated for the one audited trajectory, the other 33 pending issue #9). What
+is now most open on the `Divine` object is whether those other 33 period-2 prompts
+share this structure. The larger anomaly (why GPT-2 Small alone) is unchanged.
 
 Open directions, in rough order of leverage: why GPT-2 Small (the anomaly, now
 with quiet coherent chords as the thing to explain); the lag-2 re-gate of the 34
