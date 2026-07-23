@@ -133,7 +133,7 @@ Reading, in decreasing order of confidence:
    the prolet level.
 2. **The pivot M is the most lens-expressible object probed**: above A at every layer on
    both probes (span +0.007 to +0.011, sparse +0.003 to +0.007). The stable ` Divine`
-   readout was shown in the bell anatomy to be the shadow of M; M is also the most
+   readout was shown in the cycle anatomy to be the shadow of M; M is also the most
    verbalizable-adjacent state the instrument has seen.
 3. **The language-vs-noise boundary survives on the sparse probe, and weakens for B on
    the span probe.** On sparse, every language-derived state including B stays above the
@@ -198,7 +198,7 @@ contamination, not cycle motion.
 The W_U singular split of d_sym: the top-100 (readout-visible) component carries 1.2
 percent of its energy and the bottom-100 (readout-quiet) component 97.0 percent;
 together the two subsets cover 98.2 percent of the energy, and the middle 568 singular
-directions hold the remaining 1.8 percent. The split restates the bell anatomy's
+directions hold the remaining 1.8 percent. The split restates the cycle anatomy's
 invisibility-to-the-readout result in the clean frame: the physical swing is almost wholly readout-quiet.
 
 - The quiet bulk (97.0 percent of d_sym's energy) is essentially outside the lens at
@@ -238,7 +238,7 @@ and the deficit deepens with depth (ratio to chance falls from about 0.71 at L0-
 0.57 at L10). Per section 4a, this milder deficit is a pivot-diluted version of the
 d_sym result.
 
-The decomposition connects to the bell anatomy's invisibility-to-the-readout result:
+The decomposition connects to the cycle anatomy's invisibility-to-the-readout result:
 
 - The readout-QUIET bulk of d_committed (bottom-100 W_U component, 73.2 percent of
   d_committed's energy) is essentially outside the lens at every layer: span 0.066 at

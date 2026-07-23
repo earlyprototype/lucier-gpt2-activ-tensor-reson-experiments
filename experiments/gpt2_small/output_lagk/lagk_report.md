@@ -39,7 +39,7 @@ Smallest passing lag: prolet 1, Divine 2, noise 1 (nominal: see the caveat secti
 
 At the standard threshold (0.999, the engine default): the Divine state's lag-2 mean-vector cosine over the window is 1.0000000 (mean), 0.9999999 (minimum pair). Every possible lag-2 check clears the threshold, so any `patience` and `check_every` schedule locks in. Under `gate_lag = 1` the same state reads 0.6849117 at every check, 0.31 below threshold, forever. **Verdict: Divine is converged under `gate_lag = 2`; it is unconvergeable under `gate_lag = 1`.**
 
-Both phases decode to the same token, as the bell anatomy requires: iterate 1023 (phase B) argmax ` Divine` (id 13009) at p = 0.2252, entropy 4.62 nats; iterate 1024 (phase A) argmax ` Divine` (id 13009) at p = 0.5046, entropy 3.05 nats. One token, two probabilities, one gate verdict.
+Both phases decode to the same token, as the cycle anatomy requires: iterate 1023 (phase B) argmax ` Divine` (id 13009) at p = 0.2252, entropy 4.62 nats; iterate 1024 (phase A) argmax ` Divine` (id 13009) at p = 0.5046, entropy 3.05 nats. One token, two probabilities, one gate verdict.
 
 This is the first concrete instance of the canon correction "34 prompts ring, pending re-gate": one of the 34, the Syntactic prompt, is now re-gated as converged at its own period.
 
