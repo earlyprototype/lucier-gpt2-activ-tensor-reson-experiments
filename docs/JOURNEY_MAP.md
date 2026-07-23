@@ -49,7 +49,7 @@
 - **Cross-model sweeps (gpt2-medium, pythia-160m, pythia-410m):** landscapes are model-specific: one empty-token funnel (`D`), one near-total funnel (`questioned`), one non-consolidating scatter. Fingerprint hypothesis refuted (same corpus ≠ same landscape).
 - **Null model:** random tensors converge to 18 non-semantic basins, ~zero overlap with the real five: basins belong to the language-driven regime, not the weights in general.
 - **Convergence-gated re-sweep:** basins survive proper convergence; `Anarch` was over-counted at iter 100 (corrected shares: prolet 43.2 / Divine 27.2 / till 15.2 / Anarch 13.6 / solidarity 0.8). Pre-registered `till`-transient hypothesis refuted (19/19 stable).
-- **The `Divine` dissociation:** the 34 never-converging prompts are exactly the `Divine` prompts: stable readout over a non-settling tensor.
+- **The `Divine` dissociation:** the 34 prompts that fail the lag-1 convergence gate are exactly the `Divine` prompts: stable readout over a tensor later resolved as an exact period-2 limit cycle (FINDINGS.md F9), converged under a lag-2 gate for the audited trajectory (F15).
 - **Artefact attribution:** normalisation exonerated; readout secondary; cross-model differences are tensor-level, intrinsic. Canonical record: [FINDINGS.md](FINDINGS.md).
 
 ---
@@ -68,12 +68,12 @@
 | 8 | Dissolution has a structural→semantic phase transition | Session 01 | Early tokens generic (BPE/typographic), late tokens semantic |
 | 9 | All attractor tokens occupy same compact subspace (all-warm matrix) | Session 01 | Cross-similarity 0.18–0.47, no negative values. *Retired 2026-07-11: permutation test shows this is embedding-space anisotropy, not a special subspace.* |
 | 10 | The all-warm property is consistent with a compact "thematic-centre-of-mass" interpretation | Session 02 | All 91 off-diagonal pairs positively correlated in W_E (0.18–0.47). *Series close: the cross-model evidence arrived and refuted the corpus-causal reading (see 13); permutation test still pending.* |
-| 11 | All normalised transformers must have basins (Brouwer fixed-point theorem) | Session 02 | Continuous map on compact set (LayerNorm bounds): existence guaranteed; count and shape are empirical questions |
+| 11 | All normalised transformers must have basins (Brouwer fixed-point theorem) | Session 02 | Continuous map on compact set (LayerNorm bounds): existence guaranteed; count and shape are empirical questions. *Corrected 2026-07-23: the Brouwer argument is inapplicable as stated. The theorem requires a compact convex domain; the L2 shell is a sphere, not convex. Attractor existence here is an empirical observation, not a theorem.* |
 | 12 | Basin landscapes are model-specific, not corpus-tracking | Cross-model (2026-07) | Same corpus (WebText): Small → 5 semantic basins; Medium → 1 empty token |
 | 13 | The five basins are regime-specific, not weight-universal | Null model (2026-07) | Noise → 18 non-semantic basins, ~0 overlap; real count 5 below random CI [11,17] |
 | 14 | Basin labels survive convergence gating, with one correction | Gated re-sweep (2026-07) | 73% hard-converge by iter 120; ~10 prompts move Anarch→prolet |
-| 15 | `Divine` is a readout-stable / tensor-unsettled object | Gated + diagnostic (2026-07) | 34/34 non-convergers are `Divine`; decode constant while tensor moves |
-| 16 | Cross-model differences are intrinsic dynamics, not apparatus | Diagnostics (2026-07) | cos_sim_mean verdicts are tensor-level; normalisation provably inert |
+| 15 | `Divine` is a readout-stable / tensor-unsettled object | Gated + diagnostic (2026-07) | 34/34 lag-1 gate failures are `Divine`; decode constant while tensor moves. *Resolved 2026-07-19: an exact period-2 limit cycle (FINDINGS F9); fails the lag-1 gate by construction, converged at lag 2 for the audited trajectory (F15).* |
+| 16 | Cross-model differences are intrinsic dynamics, not apparatus | Diagnostics (2026-07) | cos_sim_mean verdicts are tensor-level; normalisation inert up to LayerNorm's epsilon term |
 
 ---
 
@@ -83,7 +83,7 @@
 |---|---|---|---|
 | H0 | Results are deterministic | Repeatability supported | EXP_009d0: N=2 same-machine runs produce identical terminal basins. Independent re-implementation pending. |
 | H1 | `prolet` is the dominant basin | Supported, revised upward | 43.2% at convergence (gated re-sweep); was 35.2% at iter 100. `Anarch` was over-counted pre-convergence. Per-prompt prediction remained poor (~25%). |
-| H2 | `Divine` is a genuine secondary basin | Supported with qualification | 27.2%; readout-stable over a never-settling tensor: dynamics and decoding dissociate (FINDINGS.md F2). |
+| H2 | `Divine` is a genuine secondary basin | Supported with qualification | 27.2%; fails the lag-1 gate by construction: an exact period-2 limit cycle, argmax stable in both phases (FINDINGS.md F9); converged under a lag-2 gate for the audited trajectory (F15). |
 | H3 | Intermediate tokens reflect training corpus topology | Partially supported; generality refuted | Semantic clustering in W_E holds (permutation test pending). The corpus-causal reading failed cross-model: GPT-2 Medium, same corpus, no semantic basins (FINDINGS.md F3). Null model run: basins are regime-specific (F4). |
 | H4 | Per-head resonance ≈ SVD dominant singular vector | Untested | Scaffold only: `experiments/gpt2_small/spectral_resonance.ipynb` |
 | H-fingerprint | Basin profiles read training bias from any model | **Refuted** | FINDINGS.md F3, F4 |
@@ -98,7 +98,7 @@ Canonical dispositions with full evidence: [FINDINGS.md](FINDINGS.md) §3.
 |---|---|---|
 | **Linear Algebra** | Power iteration | ATR is the nonlinear analogue: iterated operator application converges to dominant modes |
 | **Dynamical Systems** | Fixed-point theory, basin of attraction | The mathematical framework for what ATR reveals |
-| **Topology** | Brouwer fixed-point theorem | Guarantees every normalised transformer has at least one ATR attractor |
+| **Topology** | Brouwer fixed-point theorem | Motivating analogy only: its hypotheses do not hold on the L2 shell; attractor existence here is empirical, not guaranteed |
 | **Acoustics** | Mixing time (T_mix) | Isomorphic to ATR's structural→semantic phase transition |
 | **Acoustics** | Impulse response / room modes | Lucier's room ↔ transformer weight matrices |
 | **Fractal Geometry** | Fractal dimensional analysis | Potential metric for basin characterisation (untested) |

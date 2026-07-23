@@ -172,8 +172,9 @@ fixed points of the weight geometry.
 
 Three attribution results ([SCALING_ARTEFACT_ANALYSIS.md](SCALING_ARTEFACT_ANALYSIS.md)):
 
-1. **Normalisation exonerated:** the global L2 rescale is invisible to the forward
-   pass (layer-0 LayerNorm scale-invariance).
+1. **Normalisation exonerated:** the global L2 rescale is effectively invisible to
+   the forward pass (layer-0 LayerNorm scale-invariance, exact only up to
+   LayerNorm's epsilon term and floating-point precision).
 2. **Convergence verdicts are tensor-level:** `cos_sim_mean` never passes through
    token decoding, so Medium/160m saturation and 410m non-convergence are properties
    of the dynamics, not the readout.
@@ -374,10 +375,12 @@ negative-eigenvalue reading of the cycle nearly literal.
   A's, in nearly the same order, at different probabilities: `Divine` falls from 0.505
   to 0.225 while `【` rises from 0.064 to 0.126; coherence is 0.318 in both
   phases and at the midpoint. There is no hidden second coherent cluster.
-- **Energy redistributes between positions.** The last token position carries norm
-  1612 in phase A and 464 in phase B; the full-tensor norm is conserved by
-  construction, so the oscillation redistributes energy across positions and the
-  loop's re-normalisation pumps it back.
+- **The recorded norm contrast is a frame artifact, not an energy redistribution.**
+  The last token position was recorded at norm 1612 in phase A and 464 in phase B,
+  but the two numbers were taken in different frames (phase A in the raw frame,
+  phase B in the shell frame), an artifact of how `06_bell_anatomy.py` built the
+  states. On the loop's energy shell both phases carry identical row norms, so the
+  oscillation does not redistribute energy across positions. See caveat 15.
 - **The flip axis is about 95 percent invisible to the readout.** The axis d produces a
   logit response of 33 against 612 for equal-norm random directions: ratio
   0.054, far more suppressed than the full per-step delta (0.295, F9).
@@ -658,8 +661,8 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
    (final-layer `resid_post` → layer-0 `resid_pre`). Alternative windows (including a
    Pythia-410m depth control, layers 0–11 vs 0–23) are designed but not run.
 7. **Normalisation scheme.** Global L2 rescale only; per-position/per-dimension
-   schemes unexplored (though the global scheme is provably inert through layer-0
-   LayerNorm, see F5.1).
+   schemes unexplored (though the global scheme is inert through layer-0
+   LayerNorm up to the epsilon term and floating-point precision, see F5.1).
 8. **BPE granularity.** Basin identities are single BPE tokens (`prolet`, `Anarch`);
    multi-token structure is invisible to the current readout.
 9. **Readout is logit-lens-style.** Decoding applies `ln_final → W_U` to

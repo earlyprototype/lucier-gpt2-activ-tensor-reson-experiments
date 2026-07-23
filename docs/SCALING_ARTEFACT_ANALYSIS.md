@@ -2,7 +2,7 @@
 
 ## Context
 
-Activation Tensor Resonance (ATR) takes a language model's output activations, the raw internal state after processing a prompt, and feeds them back in as input, repeating the cycle hundreds of times. Like Alvin Lucier recording his voice into a room until only the room's resonant frequencies remain, ATR dissolves the original prompt until only the model's dominant internal modes are left. In GPT-2 Small, this revealed five semantic attractor basins (`prolet`, `Divine`, `Anarch`, `till`, `solidarity`) that map to the political and theological centre of mass of its Reddit 2018 training data.
+Activation Tensor Resonance (ATR) takes a language model's output activations, the raw internal state after processing a prompt, and feeds them back in as input, repeating the cycle hundreds of times. Like Alvin Lucier recording his voice into a room until only the room's resonant frequencies remain, ATR dissolves the original prompt until only the model's dominant internal modes are left. In GPT-2 Small, this revealed five attractor basins (`prolet`, `Divine`, `Anarch`, `till`, `solidarity`), four of them semantically coherent clusters of political and theological vocabulary in embedding space. The founding hypothesis read the basins as the thematic centre of mass of the Reddit 2018 training data; that corpus-causal reading was later refuted (GPT-2 Medium, trained on the same corpus, produces no semantic basins; [FINDINGS.md](FINDINGS.md) F3, F4).
 
 The question that follows naturally: what happens when you do this to larger models?
 
@@ -35,11 +35,11 @@ The per-iteration L2 rescale multiplies the entire tensor by one scalar (same ra
 
 **Why it was suspected:** A single scalar on a wider model (e.g. 1024-d vs 768-d) was briefly framed as possibly “reviving” weak dimensions by restoring total energy. That story fails: the scalar preserves the mix exactly: if one dimension is 500× another before rescale, it still is after.
 
-**Why it is not a distortion source:** Layer 0 applies LayerNorm first; LayerNorm output is invariant to global scale. The forward pass therefore does not distinguish pre-rescale vs post-rescale tensors.
+**Why it is not a distortion source:** Layer 0 applies LayerNorm first, and LayerNorm output is invariant to positive global rescaling up to its epsilon term: because of the epsilon in the denominator, LayerNorm(c·x) equals LayerNorm(x) exactly only in the limit epsilon → 0. At the tensor norms involved here the differences are at epsilon and floating-point scale, so the forward pass is effectively, though not bit-exactly, indifferent to pre-rescale vs post-rescale tensors.
 
 **Caveat on alternatives:** Per-dimension or max-dimension rescales are a different intervention: they can distort the relative geometry LayerNorm then sees. They are not equivalent to the current global L2 step.
 
-**Definitive position:** Normalisation is numerically essential but computationally cosmetic for the forward map. It is not the source of the Pythia-410m fragmentation pattern.
+**Definitive position:** Normalisation is numerically essential and approximately inert for the forward map: inert up to LayerNorm's epsilon term and floating-point precision, not exactly. It is not the source of the Pythia-410m fragmentation pattern.
 
 ### 1.2 Readout (unembedding): OPEN ARTEFACT CANDIDATE
 
@@ -161,7 +161,7 @@ The attribution tests proposed above were run at series close ([FINDINGS.md](FIN
 
 - **Test 1 (cross-model cos_sim chart): executed.** GPT-2 Medium and Pythia-160m saturate to 1.0000 by iteration 10: their single-token collapses are real tensor attractors. Pythia-410m plateaus at ~0.85 through 250 iterations: non-convergence is internal dynamics, not readout.
 - **Test 3 (long horizon): executed.** Pythia-410m at 1000 iterations (8-prompt subset): still fragmented, cross-prompt similarity 0.21. Structural, not under-iterated.
-- **ATR-R1/R3 (confidence-aware readout): implemented and demonstrated** (single-prompt audit; margin rises and entropy falls as trajectories settle). The sharpest dissociation found: GPT-2 Small's `Divine` basin, readout constant while the tensor never passes the convergence gate.
+- **ATR-R1/R3 (confidence-aware readout): implemented and demonstrated** (single-prompt audit; margin rises and entropy falls as trajectories settle). The sharpest dissociation found: GPT-2 Small's `Divine` basin, readout constant over what is now resolved as an exact period-2 limit cycle: it fails the lag-1 convergence gate by construction (a lag-1 gate cannot pass a period-2 cycle) and is converged under a lag-2 gate for the audited trajectory ([FINDINGS.md](FINDINGS.md) F9, F15).
 - **Test 2 (depth control, layers 0–11 vs 0–23): still not run.** The cleanest remaining attribution test.
 
-**Final position:** the guiding principle at the top of this document was applied and the answer landed on the intrinsic side: readout ambiguity is real but secondary; normalisation is inert; the cross-model landscape differences are properties of the models. The one place the readout-first principle earns its keep permanently is `Divine`, where dynamics and decoding genuinely come apart.
+**Final position:** the guiding principle at the top of this document was applied and the answer landed on the intrinsic side: readout ambiguity is real but secondary; normalisation is inert up to LayerNorm's epsilon term; the cross-model landscape differences are properties of the models. The one place the readout-first principle earns its keep permanently is `Divine`, where dynamics and decoding genuinely come apart.

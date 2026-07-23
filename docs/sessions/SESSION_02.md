@@ -60,6 +60,8 @@ In a 768-dimensional space, random token pairs cluster around cosine similarity 
 2. **The dissolution pathway stays within one region of embedding space.** The pathway doesn't bounce wildly; it *deepens into* the cluster, moving from weak alignment (structural) to strong alignment (semantic). The phase transition is not spatial but semantic.
 3. **The full attractor landscape is geometrically compact.** This means the model's "default state" under iteration is a small region of the possible embedding space, the region shaped by the training corpus.
 
+*Retired 2026-07-11: the geometric reading above (a shared compact subspace, a pathway that deepens within one region) does not stand. The permutation test showed the all-warm matrix is an embedding-space anisotropy artifact: 9,994/10,000 random 14-token sets are also all-positive (FINDINGS.md, caveat 4). The recorded similarity values stand as observed; the compact-subspace interpretation is withdrawn.*
+
 ### 2e. Bias Interpretation
 
 The all-warm matrix has a direct reading as **inherent bias made geometrically visible:**
@@ -72,6 +74,8 @@ The all-warm matrix has a direct reading as **inherent bias made geometrically v
 > **The attractor basins ARE the bias.** Not metaphorically. Geometrically. The dominant modes of the weight matrix's nonlinear eigenstructure correspond to the dominant themes of the training data.
 
 **Implication for the field:** ATR could function as a **bias auditing tool**. Iterate any model to convergence, examine the attractor basins, and you have a geometric fingerprint of the training data's thematic biases, without needing access to the training data itself.
+
+*Refuted 2026-07-10 (series close): this corpus-causal reading was the project's founding hypothesis, and it failed cross-model: GPT-2 Medium, trained on the same corpus, produces no semantic basins (FINDINGS.md F3, F4). Read this section as the hypothesis held at the time of writing, not as an established result.*
 
 ### 2f. Slonski Prediction (From Cross-Similarity)
 
@@ -177,6 +181,8 @@ The PI raised whether Slonski's work warrants significant attention given other 
 ### 7a. Do All Models Have Basins?
 
 **Yes, by theorem.** Any continuous map on a compact set has at least one fixed point (Brouwer). LayerNorm constrains the residual stream; the transformer forward pass is continuous. Every normalised transformer must have attractor basins under ATR. The question is always: how many, how deep, how distributed.
+
+*Corrected 2026-07-23: the theorem does not apply as stated. Brouwer requires a compact convex domain, and the L2-normalised states live on a sphere, which is not convex; the normalised map is also undefined at zero. Attractor existence is an empirical observation in these models, not a guarantee.*
 
 ### 7b. Cross-Model ATR (High Priority)
 

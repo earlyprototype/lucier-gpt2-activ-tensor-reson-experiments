@@ -13,13 +13,13 @@ s₀ = record(speech)
 sₙ₊₁ = H(sₙ)                     # Play sₙ into the room, record the output
 ```
 
-This is matrix-vector power iteration: *Hⁿs₀*. By the spectral theorem, after sufficient iterations:
+This is matrix-vector power iteration: *Hⁿs₀*. For a well-behaved operator (diagonalisable, with a unique largest-magnitude eigenvalue), after sufficient iterations:
 
 ```
 sₙ → c · v₁     as   n → ∞
 ```
 
-where *v₁* is the eigenvector corresponding to the dominant eigenvalue of *H*, the room's resonant mode. All other frequency components decay exponentially at rates determined by their eigenvalue magnitudes.
+where *v₁* is the eigenvector corresponding to the dominant eigenvalue of *H*, the room's resonant mode. All other frequency components decay exponentially at rates determined by their eigenvalue magnitudes. This convergence is conditional, not automatic: power iteration singles out one dominant mode only for operators with a unique largest-magnitude eigenvalue, and the spectral picture assumes a well-behaved (e.g. diagonalisable) operator. For a real room, as for the transformer below, the power-iteration account is an analogy and an empirical pattern, not a theorem.
 
 The tape recorder serves as the re-injection mechanism: it captures the output state (the reverberant audio) and feeds it back as the next input, closing the loop.
 
@@ -48,10 +48,10 @@ Unlike Lucier's *H*, the transformer *f* includes:
 
 This means:
 - **No spectral theorem guarantee.** The system is not guaranteed to converge to a single dominant eigenvector.
-- **Multiple fixed points are possible.** Nonlinear maps can have several attractors with distinct basins of attraction.
-- **Basin boundaries may be fractal or sensitive to initial conditions.** Whether a prompt converges to `prolet` or `Divine` depends on the geometry of the input relative to the basin boundaries in ℝ^(T×768).
+- **Multiple attractors are possible, and not only fixed points.** Nonlinear maps can have several attractors with distinct basins of attraction, including limit cycles. In this experiment the `prolet` prompts settle to a fixed point, while the `Divine` prompts do not settle: they enter an exact period-2 limit cycle, the tensor alternating between two states with the readout argmax stable in both phases (FINDINGS.md, F9).
+- **Basin boundaries may be fractal or sensitive to initial conditions.** Whether a prompt reaches the `prolet` fixed point or the `Divine` cycle depends on the geometry of the input relative to the basin boundaries in ℝ^(T×768).
 
-**Result**: Instead of a single pure tone (one eigenvector), the system reveals a *landscape* of attractors: multiple "resonant modes" of the weight geometry.
+**Result**: Instead of a single pure tone (one eigenvector), the system reveals a *landscape* of attractors: fixed points and at least one period-2 limit cycle latent in the weight geometry.
 
 ## The Isomorphism
 
@@ -60,14 +60,14 @@ This means:
 | Room | Transformer weight matrices (W_Q, W_K, W_V, W_O, W_in, W_out × 12 layers) | The operator being iterated |
 | Audio signal | Residual stream tensor `[T, 768]` | The state vector |
 | Tape recorder | TransformerLens hook (extract → normalise → re-inject) | The feedback mechanism |
-| Room resonant frequency | Attractor state (`prolet`, `Divine`, ...) | Fixed point of the iterated map |
+| Room resonant frequency | Attractor state (`prolet`, `Divine`, ...) | Attractor of the iterated map (fixed point, or period-2 limit cycle for `Divine`) |
 | Spectral decay of non-resonant frequencies | Dissolution of semantic content through iterative passes | Transient dynamics before convergence |
 | Pure drone | Terminal token sequence (uniform across positions) | The converged state |
 | Linear operator *H* | Nonlinear map *f* | Class of the operator |
-| Guaranteed single dominant eigenmode | Multiple basins with distinct attractors | Consequence of (non)linearity |
+| Single dominant eigenmode (given a unique largest-magnitude eigenvalue) | Multiple basins with distinct attractors | Consequence of (non)linearity |
 
 ## Key Insight
 
-Lucier's room can only have **one** dominant resonant mode (the largest eigenvalue wins). A transformer, by virtue of its nonlinearity, can have **many**. This is why the experiment reveals an *attractor landscape* rather than a single fixed point, and why mapping this landscape (via systematic prompt variation) is scientifically productive.
+In the idealised linear model, Lucier's room converges to **one** dominant mode, provided the operator is well-behaved (e.g. diagonalisable) and its largest-magnitude eigenvalue is unique. For the physical room, as for the transformer, the single-dominant-mode account is an analogy and an empirical pattern, not a theorem. A transformer, by virtue of its nonlinearity, can have **many** attractors. This is why the experiment reveals an *attractor landscape* rather than a single fixed point, and why mapping this landscape (via systematic prompt variation) is scientifically productive.
 
-The transition from linear to nonlinear power iteration is the transition from **one voice** to **a chorus of voices** latent in the architecture. Which voice emerges depends on where in the activation space you begin, which is precisely what the 125-prompt sweep (Stage 1) is designed to map.
+The transition from linear to nonlinear iteration is the transition from a single dominant mode to multiple attractors latent in the architecture. Which attractor a run reaches depends on where in the activation space it begins, which is precisely what the 125-prompt sweep (Stage 1) is designed to map.
