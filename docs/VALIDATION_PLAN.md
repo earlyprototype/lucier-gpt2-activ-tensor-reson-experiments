@@ -1,7 +1,7 @@
-# EXP_009 Validation Series — From Observation to Hypothesis
+# EXP_009 Validation Series: From Observation to Hypothesis
 
 **Date:** 20 March 2026
-**Status:** HISTORICAL RECORD — this is the validation design as pre-registered in March 2026, kept unmodified as a record of what was predicted before the data arrived. Outcomes: Stage 0 passed (repeatability); Stages 1–3 ran as the 125-prompt sweep; the series then extended beyond this plan (cross-model, null model, convergence gating). Dispositions of every hypothesis, including the refuted ones: [FINDINGS.md](FINDINGS.md). File paths named below refer to the original lab workspace, not this repository.
+**Status:** HISTORICAL RECORD. This is the validation design as pre-registered in March 2026, kept unmodified as a record of what was predicted before the data arrived. Outcomes: Stage 0 passed (repeatability); Stages 1–3 ran as the 125-prompt sweep; the series then extended beyond this plan (cross-model, null model, convergence gating). Dispositions of every hypothesis, including the refuted ones: [FINDINGS.md](FINDINGS.md). File paths named below refer to the original lab workspace, not this repository.
 **Depends on:** EXP_009aFIX results (the exploratory Lucier Resonance experiment)
 
 ---
@@ -38,7 +38,7 @@ EXP_009aFIX was an exploratory experiment with no hypothesis under test. It prod
 **Test:** Run the resonance loop with a substantially larger and more diverse prompt set (10–15 new prompts spanning different registers, topics, and syntactic structures).
 **Notebook:** `EXP_009d1_Attractor_Dominance.ipynb`
 
-**Operational note:** We now know convergence occurs by iteration ~100. The iteration schedule can be tightened: `[0, 2, 3, 5, 10, 20, 50, 100]` — no need for 250/500 unless divergence is observed.
+**Operational note:** We now know convergence occurs by iteration ~100. The iteration schedule can be tightened: `[0, 2, 3, 5, 10, 20, 50, 100]`; no need for 250/500 unless divergence is observed.
 
 **Candidate prompts (predicted → `prolet`):**
 | Label | Prompt | Type | Rationale |
@@ -66,8 +66,8 @@ EXP_009aFIX was an exploratory experiment with no hypothesis under test. It prod
 
 **Observation:** We observed one secondary attractor basin (`Divine`).
 **Question:** Are there more? Is `Divine` the only alternative, or does the landscape contain additional basins?
-**Test:** Same experiment as Stage 1 — examine outputs for variance. Any prompt that reaches a terminal state other than `prolet` or `Divine` indicates a previously unknown basin.
-**Notebook:** Same as Stage 1 (`EXP_009d1_Attractor_Dominance.ipynb`) — this is an observational outcome of the same run.
+**Test:** Same experiment as Stage 1: examine outputs for variance. Any prompt that reaches a terminal state other than `prolet` or `Divine` indicates a previously unknown basin.
+**Notebook:** Same as Stage 1 (`EXP_009d1_Attractor_Dominance.ipynb`): this is an observational outcome of the same run.
 
 **What to look for:**
 - Terminal tokens that are neither `prolet` nor `Divine`
@@ -80,7 +80,7 @@ EXP_009aFIX was an exploratory experiment with no hypothesis under test. It prod
 
 **Observation:** We observed topic-adjacent tokens (e.g., `Femminus Fem`) in the dissolution pathway that appear to reflect Reddit discourse topology.
 **Question:** Is this a consistent phenomenon? Do different prompts trace different but internally coherent pathways to the same attractor?
-**Test:** Same experiment as Stage 1 — detailed analysis of the intermediate tokens at each dissolution phase.
+**Test:** Same experiment as Stage 1: detailed analysis of the intermediate tokens at each dissolution phase.
 **Notebook:** Same as Stage 1, with additional analysis cells.
 
 **Methodological question:** Would per-iteration token logging (every iteration, not just the scheduled snapshots) improve pathway resolution? This would increase compute but give a much finer-grained view of the dissolution sequence.
