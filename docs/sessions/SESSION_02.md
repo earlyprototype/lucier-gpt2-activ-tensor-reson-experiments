@@ -1,6 +1,6 @@
 *AI-assisted review session (a reviewer persona run against the repo); not institutional supervision.*
 
-# Session 02 — Experimental Results Discussion
+# Session 02: Experimental Results Discussion
 
 **Date:** 2026-03-20
 **Context:** Discussion of Priority Analysis 01 results (embedding neighbourhood test) and emergent research directions.
@@ -17,7 +17,7 @@ This work sits at the intersection of three fields:
 | **Dynamical Systems Theory** | Fixed-point analysis, basin structure, attractor topology, spectral decomposition | The mathematical framework |
 | **Activation Tensor Resonance (ATR)** | Our specific method — iterative re-injection of the residual stream to reveal weight geometry | Our contribution |
 
-The specific technique — iterating the forward map to convergence and studying the resulting attractor landscape — is best described as **nonlinear power iteration on the transformer's residual stream**. It is analogous to how power iteration finds the dominant eigenvector of a matrix, but with nonlinearities (attention, MLP, LayerNorm) introducing multiple fixed points.
+The specific technique, iterating the forward map to convergence and studying the resulting attractor landscape, is best described as **nonlinear power iteration on the transformer's residual stream**. It is analogous to how power iteration finds the dominant eigenvector of a matrix, but with nonlinearities (attention, MLP, LayerNorm) introducing multiple fixed points.
 
 ---
 
@@ -33,13 +33,13 @@ The specific technique — iterating the forward map to convergence and studying
 - `till` → functional/temporal (the outlier)
 
 ### 2b. The `capit` Correction
-**Critical finding.** `capit` clusters as **capitulation/surrender** (`acquiesce`, `surrender`, `succumb`), not capitalism. The model disagrees with our initial human reading. This demonstrates why the neighbourhood test exists — it provides mechanistic grounding that overrides intuitive interpretation.
+**Critical finding.** `capit` clusters as **capitulation/surrender** (`acquiesce`, `surrender`, `succumb`), not capitalism. The model disagrees with our initial human reading. This demonstrates why the neighbourhood test exists: it provides mechanistic grounding that overrides intuitive interpretation.
 
 ### 2c. Dissolution Phase Transition
 The pathway splits cleanly into:
-1. **Structural phase** (early iterations) — generic, typographic, geographic tokens
-2. **Semantic phase** (late iterations) — politically/thematically loaded tokens
-3. **Transition** — approximately at `capit`, where prompt-specific information is lost
+1. **Structural phase** (early iterations): generic, typographic, geographic tokens
+2. **Semantic phase** (late iterations): politically/thematically loaded tokens
+3. **Transition**: approximately at `capit`, where prompt-specific information is lost
 
 ### 2d. Cross-Similarity Matrix: The "All Warm" Finding
 
@@ -48,17 +48,17 @@ The 14×14 cross-similarity matrix between all basin and waypoint tokens reveals
 In a 768-dimensional space, random token pairs cluster around cosine similarity ≈ 0. Finding 91 off-diagonal pairs ALL positive is statistically extraordinary.
 
 **Key values:**
-- `prolet` ↔ `Anarch`: 0.47 (highest — political siblings)
+- `prolet` ↔ `Anarch`: 0.47 (highest: political siblings)
 - `prolet` ↔ `solidarity`: 0.45
 - `solidarity` ↔ `injustice`: 0.45
-- `Divine` max: 0.33 (geometrically isolated — theology occupies its own subspace)
-- `till` max: 0.33 (most isolated basin — functional, not semantic)
-- `ash` range: 0.18–0.24 (coldest — maximally generic, earliest waypoint)
+- `Divine` max: 0.33 (geometrically isolated: theology occupies its own subspace)
+- `till` max: 0.33 (most isolated basin: functional, not semantic)
+- `ash` range: 0.18–0.24 (coldest: maximally generic, earliest waypoint)
 
 **Three implications:**
 1. **The ATR attractors are a family, not strangers.** All 5 basins share a subspace. They are related fixed points within a compact region, not isolated anomalies.
-2. **The dissolution pathway stays within one region of embedding space.** The pathway doesn't bounce wildly — it *deepens into* the cluster, moving from weak alignment (structural) to strong alignment (semantic). The phase transition is not spatial but semantic.
-3. **The full attractor landscape is geometrically compact.** This means the model's "default state" under iteration is a small region of the possible embedding space — the region shaped by the training corpus.
+2. **The dissolution pathway stays within one region of embedding space.** The pathway doesn't bounce wildly; it *deepens into* the cluster, moving from weak alignment (structural) to strong alignment (semantic). The phase transition is not spatial but semantic.
+3. **The full attractor landscape is geometrically compact.** This means the model's "default state" under iteration is a small region of the possible embedding space, the region shaped by the training corpus.
 
 ### 2e. Bias Interpretation
 
@@ -67,11 +67,11 @@ The all-warm matrix has a direct reading as **inherent bias made geometrically v
 - The training corpus (WebText, 2018 Reddit) was dominated by political polarisation, identity politics, and moral discourse
 - These themes are encoded as a **dense cluster** in the weight geometry
 - ATR strips away prompt-specific content and reveals what the model converges to when input influence is exhausted
-- The attractor basins — `prolet`, `Divine`, `Anarch`, `solidarity` — are the literal geometric fixed points of the training data's dominant discourse
+- The attractor basins, `prolet`, `Divine`, `Anarch`, `solidarity`, are the literal geometric fixed points of the training data's dominant discourse
 
-> **The attractor basins ARE the bias.** Not metaphorically — geometrically. The dominant modes of the weight matrix's nonlinear eigenstructure correspond to the dominant themes of the training data.
+> **The attractor basins ARE the bias.** Not metaphorically. Geometrically. The dominant modes of the weight matrix's nonlinear eigenstructure correspond to the dominant themes of the training data.
 
-**Implication for the field:** ATR could function as a **bias auditing tool**. Iterate any model to convergence, examine the attractor basins, and you have a geometric fingerprint of the training data's thematic biases — without needing access to the training data itself.
+**Implication for the field:** ATR could function as a **bias auditing tool**. Iterate any model to convergence, examine the attractor basins, and you have a geometric fingerprint of the training data's thematic biases, without needing access to the training data itself.
 
 ### 2f. Slonski Prediction (From Cross-Similarity)
 
@@ -102,7 +102,7 @@ The PI asked about the current state of T_mix research. Key developments since t
 - **Statistical room acoustics** (Kuttruff lineage) remains the primary theoretical framework
 - **The core difficulty persists:** T_mix is easier to **measure** in a specific room than to **predict** from room parameters
 
-> **Key insight for our work:** If T_mix is hard to predict from first principles in acoustics, it may also be hard to predict for a given model/prompt pair — but it may be **measurable** from the `.pt` data. We are in the fortunate position of having already computed the impulse response; we just need to find the transition point in it.
+> **Key insight for our work:** If T_mix is hard to predict from first principles in acoustics, it may also be hard to predict for a given model/prompt pair, but it may be **measurable** from the `.pt` data. We are in the fortunate position of having already computed the impulse response; we just need to find the transition point in it.
 
 ### 3c. Proposed T_mix_LLM Definition
 
@@ -113,14 +113,14 @@ T_mix_LLM = iteration n at which:
 where τ ≈ 0.95 (to be calibrated empirically)
 ```
 
-**Measurable from existing data** — `mean_vectors` at each snapshot in `stage1_results.pt`.
+**Measurable from existing data**: `mean_vectors` at each snapshot in `stage1_results.pt`.
 
 ### 3d. Direction: Fractal Dimensional Analysis
 
 Noted for future investigation: **fractal dimension of convergence trajectories** as a function of iteration may vary by basin. If so:
 - It would provide a quantitative signature for basin membership
 - It would connect the PI's two research programmes (acoustics ↔ ML)
-- It could serve as a **transition indicator** — the fractal dimension may shift at T_mix_LLM
+- It could serve as a **transition indicator**: the fractal dimension may shift at T_mix_LLM
 
 > **Status:** Directional note. Not yet actionable. Revisit after T_mix_LLM measurement.
 
@@ -140,7 +140,7 @@ The PI asked whether the shared mathematical substrate between acoustics and LLM
   
   This appears to be **novel territory**.
 
-- **Where value might flow:** Initially, acoustics → ML (bringing the T_mix framework and FD analysis tools to neural network dynamics). But if the LLM system is more tractable (we have full state access, unlike a physical room), insights might flow **back** to acoustics — using neural network experiments as a "computational laboratory" for testing theories about iterative signal processing in nonlinear systems.
+- **Where value might flow:** Initially, acoustics → ML (bringing the T_mix framework and FD analysis tools to neural network dynamics). But if the LLM system is more tractable (we have full state access, unlike a physical room), insights might flow **back** to acoustics, using neural network experiments as a "computational laboratory" for testing theories about iterative signal processing in nonlinear systems.
 
 ---
 
@@ -148,13 +148,13 @@ The PI asked whether the shared mathematical substrate between acoustics and LLM
 
 The PI raised whether Slonski's work warrants significant attention given other untouched prior art.
 
-**Assessment:** Slonski's Q-vector dichotomy is a useful reference point — it shows that binary polarisation exists in the static weight geometry. The proposed experiment (§7 of Session 01) would add one clean data point. But it should not become a research direction in itself.
+**Assessment:** Slonski's Q-vector dichotomy is a useful reference point: it shows that binary polarisation exists in the static weight geometry. The proposed experiment (§7 of Session 01) would add one clean data point. But it should not become a research direction in itself.
 
 **Recommended prioritisation:**
-1. **Own data first** — complete analysis of existing `.pt` data (sorted matrix, T_mix measurement)
-2. **Broad prior art survey** — mechanistic interpretability literature on fixed points, eigenstructure of transformers, training data topology
-3. **Slonski comparison** — one experiment, one result, documented and moved on from
-4. **Fractal direction** — exploratory, after core analysis is complete
+1. **Own data first**: complete analysis of existing `.pt` data (sorted matrix, T_mix measurement)
+2. **Broad prior art survey**: mechanistic interpretability literature on fixed points, eigenstructure of transformers, training data topology
+3. **Slonski comparison**: one experiment, one result, documented and moved on from
+4. **Fractal direction**: exploratory, after core analysis is complete
 
 ---
 
@@ -176,7 +176,7 @@ The PI raised whether Slonski's work warrants significant attention given other 
 
 ### 7a. Do All Models Have Basins?
 
-**Yes — by theorem.** Any continuous map on a compact set has at least one fixed point (Brouwer). LayerNorm constrains the residual stream; the transformer forward pass is continuous. Every normalised transformer must have attractor basins under ATR. The question is always: how many, how deep, how distributed.
+**Yes, by theorem.** Any continuous map on a compact set has at least one fixed point (Brouwer). LayerNorm constrains the residual stream; the transformer forward pass is continuous. Every normalised transformer must have attractor basins under ATR. The question is always: how many, how deep, how distributed.
 
 ### 7b. Cross-Model ATR (High Priority)
 
@@ -190,7 +190,7 @@ Run ATR on models of varying size and training data:
 
 ### 7c. ATR as Bias Auditing Tool
 
-**The statement:** ATR strips away prompt-specific content and reveals the weight geometry's dominant modes — which correspond to the training data's dominant themes.
+**The statement:** ATR strips away prompt-specific content and reveals the weight geometry's dominant modes, which correspond to the training data's dominant themes.
 
 **Assessment:** Fair as a hypothesis with supporting evidence from GPT-2 Small. Not yet generalisable to frontier models without multi-model validation. The public safety angle (auditing proprietary models without training data access) is the high-value application, but requires the cross-model programme first.
 
@@ -210,7 +210,7 @@ Run ATR on models of varying size and training data:
 
 ### 7e. The Smooth Surface Limit
 
-As basin count → ∞ and depth → uniform, the attractor landscape approaches a smooth surface — a model with no dominant themes. This is the geometric definition of an "unbiased model." Whether this is achievable or desirable (some structure is needed for coherent generation) is an open question.
+As basin count → ∞ and depth → uniform, the attractor landscape approaches a smooth surface, a model with no dominant themes. This is the geometric definition of an "unbiased model." Whether this is achievable or desirable (some structure is needed for coherent generation) is an open question.
 
 ---
 
@@ -235,7 +235,7 @@ As basin count → ∞ and depth → uniform, the attractor landscape approaches
 - H3 is supported: basin attractors cluster semantically in W_E, not by BPE substring
 - The dissolution pathway has a structural→semantic phase transition
 - All attractor tokens occupy a compact, positively-correlated region of embedding space
-- No glitch tokens, no anomalous embeddings — the attractor property is deeper than surface geometry
+- No glitch tokens, no anomalous embeddings: the attractor property is deeper than surface geometry
 
 ### What We Corrected
 - `capit` = capitulation, not capitalism (model corrected our reading)
