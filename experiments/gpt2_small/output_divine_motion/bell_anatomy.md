@@ -16,7 +16,7 @@
 
 **One token set, two probability levels.** Phase B's top-10 is the same token set as phase A's, in nearly the same order, at different probabilities: `Divine` falls from 0.505 to 0.225 while `【` rises from 0.064 to 0.126; coherence is 0.318 in both phases and at the midpoint. There is no hidden second coherent cluster of related tokens. The cycle has a single token set; the phases differ in probability, not content.
 
-**Energy shifts between positions.** At the last token position, phase A carries norm 1612 and phase B only 464 (full-tensor norm is conserved by construction). The oscillation redistributes energy across positions each step; the loop's re-normalisation pumps it back.
+**The phase-norm contrast is a frame artifact.** At the last token position as recorded here, phase A carries norm 1612 and phase B only 464. [Corrected 2026-07-23: the contrast reflects how `06_bell_anatomy.py` built the two states (phase A in the raw frame, phase B in the shell frame), not energy moving between positions; on the loop's energy shell both phases have identical row norms, and the physical cycle axis is d_sym. See [`../output_hinge_eigen/hinge_eigenvalue.md`](../output_hinge_eigen/hinge_eigenvalue.md), section "The map, the frames, and two flip axes".]
 
 **The oscillation has exactly one flip axis.** Writing A = M + d and B = M - d, the per-position flip axes are identical: mean pairwise cosine 1.0000 across all ten positions. The whole tensor tilts on a single global direction. This makes the negative-eigenvalue reading of the cycle nearly literal: one rank-1 direction that the normalised map inverts each pass.
 

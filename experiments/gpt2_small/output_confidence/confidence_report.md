@@ -49,6 +49,8 @@ Quantified as **coherence** (mean pairwise cosine similarity in embedding space,
 | Noise trials (n=15) | 0.267 - 0.313 (median ≈ 0.28), one outlier 0.511 |
 | Random tokens | 0.266 |
 
+[Note 2026-07-23: the coherence statistics above are the initial exploratory pass; the random-token baseline 0.266 was computed over only 50 draws. Superseded by the formalized analysis in [`chordness_formal.md`](chordness_formal.md): null mean 0.268 from 1000 draws, with a frequency-matched null and per-state p-values.]
+
 Two further notes. First, `Anarch`, a *separate basin* in the 125-prompt sweep, is the #3 token inside the `prolet` distribution: the prolet and Anarch basins are two peaks of the same coherent cluster of related tokens, consistent with their geometric proximity in the original convergence matrix. Second, the entropy trace shows the distribution itself is the fixed point: from iteration 100 to 500, entropy is pinned at 5.07-5.09 nats while the argmax never wavers. The coherent cluster of related tokens, not the winner, is what converged.
 
 ## Result 3: `Divine` Is a Single Token
@@ -65,6 +67,8 @@ The distribution under `Divine` (p = 0.505) is a different kind of object. Its r
 The 15 calibrated noise trials (Gaussian tensors, norm-matched, seed 42) reproduce the original null-model picture and add the confidence dimension. They converge into the familiar non-semantic attractors (`―` seven times, `ei`, `vertex`, `trader`, `instant`, `Hindu`) with confidence spanning the entire range (p from 0.02 to 0.73), but with coherence at random-baseline levels in 13 of 15 trials. Confidence alone does **not** separate language-driven attractors from noise attractors; **coherence does**, almost cleanly.
 
 The honest exceptions, reported because they are interesting: trial 11 fell into a genuinely coherent cluster of related tokens (`Hindu`, `Bombay`, `Hindus`, `Shiv`, `Brah`, `Kashmir`, `Gujarat`; coherence 0.511), and trial 10 into a philosophy-flavored one (`instant`, `relat`, `Rousse`, `justified`, `judgment`, `calculus`), containing `Rousse`, a waypoint on the language prompts' dissolution path. Noise *can* stumble into semantic wells; it just rarely does, while language always did.
+
+[Note 2026-07-23: this was the initial exploratory pass, superseded by [`chordness_formal.md`](chordness_formal.md) (null mean 0.268 from 1000 draws). Under its frequency-matched null the noise trials reaching p < 0.05 are 07, 11, and 12; trial 10's philosophy-flavored cluster does not reach significance (p = 0.263).]
 
 ## Interpretation
 

@@ -74,7 +74,7 @@ Charts render inline via `fig.show()`. Duration ~1–2 min. Deviation: fillcolor
 | Pythia-410m | 0.82 | 0.90 | 0.89 | 0.85 | 0.85 | 0.86 (σ .14) | **never converges (~0.85 plateau)** |
 
 Pythia-410m breakdown: only **9/125** prompts converge (cos > 0.99 from iter 100+);
-**116/125** oscillate.
+**116/125** remain non-convergent.
 
 **Decides:** *Did the tensor converge even where the token flickered?* GPT-2 Medium
 (`D`) and Pythia-160m (`questioned`) reach `cos_sim_mean = 1.0000`: their collapses
@@ -116,15 +116,19 @@ high_cos_high_margin: 0, lower_cos: 7}`.
 
 **Decides:** *Are the basins high-confidence attractors or low-confidence flicker?*
 For this gpt2-small prompt the answer is neither yet: 7/8 snapshots are "true ongoing
-dynamics" (`cos_sim_mean` never crosses 0.995 within 100 iters). But the readout
-signal is clean: as the trajectory settles toward the `Divine` basin (iters 50→100),
-**logit margin rises** (2.41, 1.91) and **entropy falls** (3.97→3.30): readout
-confidence grows even while the tensor is still moving. So where a basin label appears,
-it is high-confidence, not boundary flicker.
+dynamics" (`cos_sim_mean` never crosses 0.995 within 100 iters). As the trajectory
+settles toward the `Divine` basin (iters 50→100), **entropy falls monotonically**
+(3.97→3.30) while the **logit margin peaks near iteration 50 and then declines**
+(2.41→1.91). Falling entropy points to growing readout confidence while the tensor is
+still moving; the declining margin does not support that reading on its own. Where a
+basin label appears, it is moderately confident (margin well above the 0.2 threshold,
+entropy falling), not boundary flicker, but the case for confidence growing with
+settling rests on entropy alone.
 
 **Interpretation:** This notebook is scaffolded as a **single-prompt gpt2-small
-demonstration** of the R1/R3 metric machinery, and it now works end-to-end: margin and
-entropy track basin approach sensibly. It confirms the *method* is sound for the next
+demonstration** of the R1/R3 metric machinery, and it now works end-to-end: entropy
+tracks basin approach cleanly, and the margin is captured at every snapshot
+(informative, though non-monotonic). It confirms the *method* is sound for the next
 step: applying it at scale to GPT-2 Medium's `D` and Pythia-410m's fragments.
 
 **Open questions:** The notebook does not itself run gpt2-medium or pythia-410m, so the
@@ -246,7 +250,11 @@ was read *before* convergence: are the five basins stable or stop-time artefacts
   gate can fire). The other **34/125 (27%) never reach `cos > 0.999`** and run to 1000.
 - **The 34 non-convergers are *exactly* the 34 `Divine` prompts.** Every `Divine` prompt
   fails the tensor gate yet reads `Divine` the whole way, a stable **readout** attractor
-  over a **non-settling tensor**. The other four basins converge cleanly.
+  over a **non-settling tensor**. The other four basins converge cleanly. [Update
+  2026-07-23: "non-settling" means "not a fixed point under the lag-1 gate". The audited
+  `Divine` trajectory is an exact period-2 limit cycle (cos(A, f(f(A))) = 1.000000,
+  argmax stable in both phases), which a lag-1 gate cannot pass by construction; it is
+  converged under `gate_lag = 2` (`gpt2_small/output_lagk/lagk_report.md`).]
 
 Basin shares, iter 100 (published) → at lock-in:
 
@@ -259,10 +267,11 @@ Basin shares, iter 100 (published) → at lock-in:
 | `solidarity` | 2 (1.6%) | 1 (0.8%) | loses 1 to Anarch |
 
 **Decides:** *Are the five basins stable under proper convergence, or stop-time artefacts?*
-**Mostly stable, with one real correction.** `prolet`, `Divine`, and `till` are exactly
-stable; the published table's error is confined to **`Anarch`, which was over-counted at
-iter 100**: 10 of its 26 prompts are still drifting Anarch→prolet at iter 100 and settle on
-`prolet` by their lock-in (iter 120, all converged). Corrected shares: prolet ~43%,
+**Mostly stable, with two recorded transitions.** `prolet`, `Divine`, and `till` keep
+every member; the published table's errors sit in **`Anarch` (over-counted at iter 100)
+and `solidarity`**: 10 of Anarch's 26 prompts are still drifting Anarch→prolet at iter
+100 and settle on `prolet` by their lock-in (iter 120, all converged), and 1 of
+solidarity's 2 prompts moves solidarity→Anarch. Corrected shares: prolet ~43%,
 Anarch ~14%.
 
 **The addendum's specific hypothesis is refuted.** `till` is **not** a slow transient: all
@@ -274,7 +283,8 @@ stop-time noise: 73% of prompts reach a hard fixed point (`cos > 0.999`) within 
 iterations and keep their label. (2) The one basin that never settles at the tensor level,
 `Divine`, is precisely the one whose *readout* is most stable, the sharpest single example
 in this study of dynamics and decoding coming apart (the analysis doc's central caveat).
-The published basin table needs one edit: shift ~10 prompts from `Anarch` to `prolet`.
+The published basin table needs two edits: shift ~10 prompts from `Anarch` to `prolet`,
+and 1 prompt from `solidarity` to `Anarch`.
 
 **Open questions:** `Divine`'s readout-stable / tensor-unsettled split is the natural target
 for the ATR-R1/R3 confidence audit (Notebook 2's machinery): is its readout high-margin
@@ -312,10 +322,12 @@ Four independent lines of evidence converge:
    never passes through token readout, this cleanly separates *dynamics* from *decoding*:
    Pythia-410m's non-convergence is in the dynamics.
 
-2. **Where a basin label appears, it is high-confidence (Notebook 2).** The R1/R3 machinery
-   shows readout confidence (logit margin, entropy) rising as GPT-2 Small settles toward a
-   basin. Flicker near boundaries exists, but it is not manufacturing the basins: the
-   labelled attractors are confident, not decoding noise.
+2. **Where a basin label appears, it is confident on the entropy evidence (Notebook 2).**
+   The R1/R3 machinery shows entropy falling monotonically as GPT-2 Small settles toward
+   a basin, while the logit margin peaks near iteration 50 and then declines. Flicker
+   near boundaries exists, but it is not manufacturing the basins: the labelled attractor
+   reads out well clear of the low-margin regime, though the margin trend itself does not
+   strengthen with settling.
 
 3. **The basins are language-shaped, not weight-universal (null model, Notebook 3).** Random
    tensors iterated through GPT-2 Small converge (positions collapse) but into 18 scattered
@@ -330,10 +342,11 @@ Four independent lines of evidence converge:
 
 5. **GPT-2 Small's basins survive proper convergence (gated re-sweep).** 73% of prompts
    hit a hard fixed point (`cos > 0.999`) by iter 120 and keep their basin label; the
-   published table needs only one correction (≈10 prompts move Anarch→prolet: Anarch was
-   over-counted pre-convergence; the hypothesised `till` transient is in fact 100% stable).
-   And the one basin whose tensor never settles, `Divine`, is exactly the one whose *readout*
-   is perfectly stable, the study's sharpest single case of dynamics and decoding diverging.
+   published table needs two corrections (≈10 prompts move Anarch→prolet, and 1 prompt
+   moves solidarity→Anarch: Anarch was over-counted pre-convergence; the hypothesised
+   `till` transient is in fact 100% stable). And the one basin whose tensor never settles
+   under the lag-1 gate, `Divine`, is exactly the one whose *readout* is perfectly stable,
+   the study's sharpest single case of dynamics and decoding diverging.
 
 **Bottom line for the original question.** GPT-2 Medium's single `D` basin is a *real* tensor
 attractor. Pythia-410m's fragmentation is *genuine structural non-convergence* rooted in the
@@ -353,12 +366,13 @@ outstanding test is Control 2 (depth control) to pin the effect to depth per se.
   tokenizer/corpus constant. Not built; the plan says note only. Still the cleanest test to
   attribute Pythia-410m's fragmentation to depth per se.
 - **ATR-R1/R3 on the `Divine` cohort.** Section 5 found `Divine` is readout-stable while its
-  tensor never settles. Run Notebook 2's margin/entropy audit on those 34 GPT-2 Small
+  tensor fails the lag-1 gate (since resolved as an exact period-2 limit cycle; see the
+  Section 5 update note). Run Notebook 2's margin/entropy audit on those 34 GPT-2 Small
   prompts (and across GPT-2 Medium / Pythia-410m at full prompt sets) to confirm the readout
   stays high-confidence while `cos_sim_mean` wanders.
 - **Public README update**: the basin table should be corrected (Anarch ~21%→~14%,
-  prolet ~35%→~43%; `till` and `Divine` unchanged). Per the run plan, that public-claims
-  pass is a separate session.
+  prolet ~35%→~43%, solidarity ~1.6%→~0.8%; `till` and `Divine` unchanged). Per the run
+  plan, that public-claims pass is a separate session.
 
 _Done since the original plan:_ Section 5 (convergence-gated GPT-2 Small re-sweep), the plan
 addendum, is complete; results above.
