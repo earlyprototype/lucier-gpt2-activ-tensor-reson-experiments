@@ -47,6 +47,8 @@ The 14×14 cross-similarity matrix between all basin and waypoint tokens reveals
 
 In a 768-dimensional space, random token pairs cluster around cosine similarity ≈ 0. Finding 91 off-diagonal pairs ALL positive is statistically extraordinary.
 
+*Retired 2026-07-11: it is not extraordinary. The permutation test showed 9,994/10,000 random 14-token sets are also all-positive, a property of the embedding space's anisotropy, not of these tokens (FINDINGS.md caveat 4).*
+
 **Key values:**
 - `prolet` ↔ `Anarch`: 0.47 (highest: political siblings)
 - `prolet` ↔ `solidarity`: 0.45
@@ -80,6 +82,8 @@ The all-warm matrix has a direct reading as **inherent bias made geometrically v
 ### 2f. Slonski Prediction (From Cross-Similarity)
 
 The all-warm matrix generates a testable prediction: since all attractor tokens are mutually positively correlated, they likely all sit **within one of Slonski's two Q-vector macro-groups**. The 5 basins may be fine-grained structure within one half of the binary dichotomy, visible only under iteration.
+
+*Note 2026-07-23: the all-warm premise of this prediction was retired 2026-07-11 as an anisotropy artifact, so the prediction is unsupported as derived. The Q-vector experiment itself remains runnable on its own terms.*
 
 ---
 
@@ -180,7 +184,7 @@ The PI raised whether Slonski's work warrants significant attention given other 
 
 ### 7a. Do All Models Have Basins?
 
-**Yes, by theorem.** Any continuous map on a compact set has at least one fixed point (Brouwer). LayerNorm constrains the residual stream; the transformer forward pass is continuous. Every normalised transformer must have attractor basins under ATR. The question is always: how many, how deep, how distributed.
+**Yes, by theorem** (the answer as recorded; see the correction below). Any continuous map on a compact set has at least one fixed point (Brouwer). LayerNorm constrains the residual stream; the transformer forward pass is continuous. Every normalised transformer must have attractor basins under ATR. The question is always: how many, how deep, how distributed.
 
 *Corrected 2026-07-23: the theorem does not apply as stated. Brouwer requires a compact convex domain, and the L2-normalised states live on a sphere, which is not convex; the normalised map is also undefined at zero. Attractor existence is an empirical observation in these models, not a guarantee.*
 

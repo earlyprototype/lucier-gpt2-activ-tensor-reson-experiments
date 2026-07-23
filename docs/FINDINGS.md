@@ -107,7 +107,7 @@ Basin shares classified **at lock-in** (cosine similarity of successive mean ten
 | `Anarch` | 26 (20.8%) | **17 (13.6%)** | political philosophy |
 | `solidarity` | 2 (1.6%) | **1 (0.8%)** | collective action |
 
-91/125 prompts (73%) reach a hard fixed point, all at lock-in iteration 120 (the
+91/125 prompts (73%) lock in under the lag-1 convergence gate, all at iteration 120 (the
 gate's earliest firing point; the true settling iteration lies between 100 and 120,
 finer cadence not measured). The iteration-100 table published earlier over-counted
 `Anarch` by ~10 prompts that were still drifting `Anarch`→`prolet`. A pre-registered
@@ -147,7 +147,7 @@ phase A only.
 
 | Model | Params | Corpus | Landscape | Tensor verdict (cos_sim_mean) |
 |---|---|---|---|---|
-| GPT-2 Small | 124M | WebText | 5 semantic basins | partial at 100 (0.91, σ0.15); 73% hard-converged by 120 (gated) |
+| GPT-2 Small | 124M | WebText | 5 semantic basins | partial at 100 (0.91, σ0.15); 73% gate-converged by 120 (lag-1) |
 | GPT-2 Medium | 345M | WebText | 1 basin: `D` (100%) | saturated 1.0000 by iter 10 |
 | Pythia-160m | 160M | The Pile | 1 basin: `questioned` (94.4%) | saturated 1.0000 by iter 10 |
 | Pythia-410m | 410M | The Pile | no consolidation (40+ fragments) | never converges (~0.85 plateau; 9/125 prompts converge; 8-prompt subset at 1000 iters: 8 distinct terminals, cross-prompt sim 0.21) |

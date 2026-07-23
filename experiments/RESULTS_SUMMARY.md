@@ -279,7 +279,7 @@ Anarch ~14%.
 `Anarch`, not `till`.
 
 **Interpretation:** Two clean facts fall out. (1) GPT-2 Small's basins are genuine, not
-stop-time noise: 73% of prompts reach a hard fixed point (`cos > 0.999`) within 120
+stop-time noise: 73% of prompts pass the lag-1 convergence gate (`cos > 0.999`) within 120
 iterations and keep their label. (2) The one basin that never settles at the tensor level,
 `Divine`, is precisely the one whose *readout* is most stable, the sharpest single example
 in this study of dynamics and decoding coming apart (the analysis doc's central caveat).
@@ -341,7 +341,7 @@ Four independent lines of evidence converge:
    under-iteration. Structural.
 
 5. **GPT-2 Small's basins survive proper convergence (gated re-sweep).** 73% of prompts
-   hit a hard fixed point (`cos > 0.999`) by iter 120 and keep their basin label; the
+   pass the lag-1 convergence gate (`cos > 0.999`) by iter 120 and keep their basin label; the
    published table needs two corrections (≈10 prompts move Anarch→prolet, and 1 prompt
    moves solidarity→Anarch: Anarch was over-counted pre-convergence; the hypothesised
    `till` transient is in fact 100% stable). And the one basin whose tensor never settles

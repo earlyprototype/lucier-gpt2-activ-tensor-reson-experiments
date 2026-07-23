@@ -1,7 +1,7 @@
 # Project ATR: Complete Journey Map
 
 **Purpose:** Continuity document. Pick up the intellectual thread from any point.
-**Last updated:** 2026-07-10 (series close)
+**Last updated:** 2026-07-23 (post-close corrections; series closed 2026-07-10)
 
 ---
 
@@ -67,11 +67,11 @@
 | 7 | `capit` = capitulation, not capitalism | Session 01 | Nearest neighbours: surrender, succumb, acquiesce |
 | 8 | Dissolution has a structural→semantic phase transition | Session 01 | Early tokens generic (BPE/typographic), late tokens semantic |
 | 9 | All attractor tokens occupy same compact subspace (all-warm matrix) | Session 01 | Cross-similarity 0.18–0.47, no negative values. *Retired 2026-07-11: permutation test shows this is embedding-space anisotropy, not a special subspace.* |
-| 10 | The all-warm property is consistent with a compact "thematic-centre-of-mass" interpretation | Session 02 | All 91 off-diagonal pairs positively correlated in W_E (0.18–0.47). *Series close: the cross-model evidence arrived and refuted the corpus-causal reading (see 13); permutation test still pending.* |
+| 10 | The all-warm property is consistent with a compact "thematic-centre-of-mass" interpretation | Session 02 | All 91 off-diagonal pairs positively correlated in W_E (0.18–0.47). *Retired: the corpus-causal reading was refuted cross-model at series close (see 13), and the permutation test (2026-07-11) showed the all-warm property is an anisotropy artifact (see 9). Only the recorded cosine values stand.* |
 | 11 | All normalised transformers must have basins (Brouwer fixed-point theorem) | Session 02 | Continuous map on compact set (LayerNorm bounds): existence guaranteed; count and shape are empirical questions. *Corrected 2026-07-23: the Brouwer argument is inapplicable as stated. The theorem requires a compact convex domain; the L2 shell is a sphere, not convex. Attractor existence here is an empirical observation, not a theorem.* |
 | 12 | Basin landscapes are model-specific, not corpus-tracking | Cross-model (2026-07) | Same corpus (WebText): Small → 5 semantic basins; Medium → 1 empty token |
 | 13 | The five basins are regime-specific, not weight-universal | Null model (2026-07) | Noise → 18 non-semantic basins, ~0 overlap; real count 5 below random CI [11,17] |
-| 14 | Basin labels survive convergence gating, with one correction | Gated re-sweep (2026-07) | 73% hard-converge by iter 120; ~10 prompts move Anarch→prolet |
+| 14 | Basin labels survive convergence gating, with two corrections | Gated re-sweep (2026-07) | 73% pass the lag-1 gate by iter 120; ~10 prompts move Anarch→prolet, 1 moves solidarity→Anarch |
 | 15 | `Divine` is a readout-stable / tensor-unsettled object | Gated + diagnostic (2026-07) | 34/34 lag-1 gate failures are `Divine`; decode constant while tensor moves. *Resolved 2026-07-19: an exact period-2 limit cycle (FINDINGS F9); fails the lag-1 gate by construction, converged at lag 2 for the audited trajectory (F15).* |
 | 16 | Cross-model differences are intrinsic dynamics, not apparatus | Diagnostics (2026-07) | cos_sim_mean verdicts are tensor-level; normalisation inert up to LayerNorm's epsilon term |
 
@@ -174,12 +174,12 @@ The bottleneck is always phase 2. Automation of interpretation is the scaling ch
 | Question | Status | Next Step |
 |---|---|---|
 | Why does GPT-2 Small, alone in this set, resolve language into few semantic basins? | **The open question of the series** | New experimental stage |
-| What is the `Divine` object: limit cycle, wandering attractor, decode-region plateau? | Open (FINDINGS.md F2) | Confidence audit at scale; trajectory analysis |
+| ~~What is the `Divine` object: limit cycle, wandering attractor, decode-region plateau?~~ | Answered (2026-07-19): an exact period-2 limit cycle (FINDINGS.md F9), converged under a lag-2 gate for the audited trajectory (F15) | Re-gate the other 33 prompts (blocked on issue #9) |
 | Does the landscape depend on where the loop is cut (layer window / depth)? | Designed, not run | Pythia-410m depth control (0–11 vs 0–23); window sweeps |
 | ~~W_E semantic-clustering statistics~~ | Answered (2026-07-11): all-warm matrix is an anisotropy artifact: 99.9% of random 14-token sets are also all-positive; compact-subspace reading withdrawn. Neighbourhood claim remains qualitative | - |
 | True lock-in iterations (gate fired at its floor, 120) | Pending | Finer gate cadence |
 | What is T_mix_LLM for each basin? | Measurable from existing data | Compute from `.pt` |
-| Are all basins in one Slonski macro-group? | Predicted (from all-warm) | One Q-vector experiment |
+| Are all basins in one Slonski macro-group? | Untested; the all-warm premise of the prediction was retired 2026-07-11 (anisotropy artifact) | One Q-vector experiment, on its own terms |
 | Is the fractal dimension of convergence trajectories basin-specific? | Speculative | Requires T_mix first |
 | ~~Does ATR scale to larger models?~~ | Answered: the operation runs; the landscape changes qualitatively | - |
 | ~~Do different models have different basin profiles?~~ | Answered: yes, drastically (FINDINGS.md F3) | - |
@@ -187,4 +187,4 @@ The bottleneck is always phase 2. Automation of interpretation is the scaling ch
 
 ---
 
-*This document is a living map. Updated at series close, 2026-07-10.*
+*This document is a living map. Series closed 2026-07-10; corrections applied 2026-07-23.*
