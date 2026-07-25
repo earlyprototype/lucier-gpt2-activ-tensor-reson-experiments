@@ -585,7 +585,7 @@
       "id": "h-j1",
       "label": "H-J1: prolet sits inside the verbalizable (J-lens) subspace, Divine outside",
       "type": "hypothesis",
-      "status": "qualified",
+      "status": "not-supported",
       "description": "prolet sits inside the verbalizable (J-lens) subspace, Divine outside. Disposition: Not supported at pilot confidence (2026-07-19); now phase-qualified (F16): the point estimate runs slightly the other way at pilot confidence (Divine at least as lens-expressible as prolet), and the boundary that appears is language-vs-noise (F11). The phase-aware re-probe (F16) splits it: the reversal holds for phase A, strengthens at the pivot M (most lens-expressible), and reverses for phase B (below prolet at every layer); the physical flip axis is almost entirely outside the lens (span 0.013 vs 0.252 chance at L11). Full build still pending (issue #8).",
       "phase": "phase-5",
       "asserted": "2026-07-19",

@@ -16,6 +16,7 @@
   "status_colors": {
     "supported": "#2E7D5B",
     "refuted": "#B3423F",
+    "not-supported": "#8F5A57",
     "qualified": "#B9812F",
     "retired": "#8A8F94",
     "corrected": "#5B7DB1",

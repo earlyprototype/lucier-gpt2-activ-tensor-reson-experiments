@@ -125,11 +125,27 @@ Status is the colour of a node. It says how the claim stands *now*, not how it w
 |:---|:---|:---|
 | `supported` | `#2E7D5B` | Evidence points at it and nothing has knocked it down |
 | `refuted` | `#B3423F` | Evidence points against it; it does not stand |
+| `not-supported` | `#8F5A57` | A null result: the evidence failed to back it, without contradicting it |
 | `qualified` | `#B9812F` | It stands, but not in the form first stated |
 | `retired` | `#8A8F94` | Withdrawn — not disproved so much as no longer claimed |
 | `corrected` | `#5B7DB1` | The claim was wrong in a specific, identified way, and the correction is recorded |
 | `open` | `#6B4C8A` | Asked, not answered |
 | `untested` | `#9AA3A8` | Designed, never run |
+
+The table is ordered as a severity gradient, and the three negative values are not
+interchangeable. `refuted` is for evidence that *contradicts* a claim (H-supp: "Refuted with
+the opposite sign"). `not-supported` is for a claim the evidence simply failed to back —
+H-J1's disposition literally opens "**Not supported at pilot confidence**", and before this
+value existed it had to be filed as `qualified`, which put a null result in the same bucket as
+genuine partial support. `qualified` is for a claim that survives in a narrowed or mixed form,
+including the mixed case where one half fails and another is strengthened — that is why H3
+("Weakened further at close; **coherence half upgraded**") stays `qualified` and is *not* a
+null: its semantic-coherence half gained permutation support (F8), even as its corpus-causal
+half failed cross-model (F3).
+
+A status outside this vocabulary is not dropped from the interface: the viewer appends any
+unrecognised value it finds in the data to the legend and filter chips, and colours it with the
+default grey `#7f8c8d`.
 
 ### Edge types
 

@@ -31,14 +31,45 @@ CLAIM_TYPES = {"hypothesis", "finding", "concept"}
 RUN_TYPES = {"run", "model", "null-model"}
 SOURCE_TYPES = {"doc", "artefact", "prior-work"}
 
+# Eight values, ordered as a severity gradient. The three negative ones are
+# distinct: "refuted" = the evidence contradicts the claim; "not-supported" =
+# the evidence failed to back it, without contradicting it (a null result);
+# "qualified" = it survives in a narrowed or mixed form.
 CLAIM_STATUSES = {
     "supported",
     "refuted",
+    "not-supported",
     "qualified",
     "retired",
     "corrected",
     "open",
     "untested",
+}
+
+# Canonical order, shared by viewer.html's STATUS_ORDER, visual_config.json's
+# status_colors and the README table. "not-supported" sits immediately after
+# "refuted" so the list reads as a severity gradient.
+STATUS_ORDER = [
+    "supported",
+    "refuted",
+    "not-supported",
+    "qualified",
+    "retired",
+    "corrected",
+    "open",
+    "untested",
+]
+
+STATUS_COLOURS = {
+    "supported": "#2E7D5B",
+    "refuted": "#B3423F",
+    "not-supported": "#8F5A57",
+    "qualified": "#B9812F",
+    "retired": "#8A8F94",
+    "corrected": "#5B7DB1",
+    "open": "#6B4C8A",
+    "untested": "#9AA3A8",
+    "default": "#7f8c8d",
 }
 
 EPISTEMIC_EDGES = {
@@ -634,6 +665,63 @@ def test_content_other_refuted_hypotheses_from_findings_section_3(entities):
     assert _claim(entities, "h-supp")["status"] == "refuted"
 
 
+def test_content_h_j1_is_not_supported_not_refuted_and_not_qualified(entities):
+    """FINDINGS.md section 3: H-J1's disposition opens with the literal words
+    "**Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)**".
+
+    This is a null result, not a contradiction: "the point estimate runs slightly
+    the other way at pilot confidence", so "refuted" would overstate it. Nor is it
+    partial survival of the stated claim - the "phase-qualified" clause names a
+    different, phase-indexed claim raised by the later F16 re-probe, with the full
+    build still pending (issue #8). It was filed as "qualified" only because the
+    vocabulary had no null value; it now has one.
+    """
+    h_j1 = _claim(entities, "h-j1")
+    assert h_j1["status"] == "not-supported"
+    assert h_j1["status"] != "qualified", "regression: the pre-vocabulary compression"
+
+
+def test_content_h3_stays_qualified_because_it_is_mixed_not_null(entities):
+    """DELIBERATE: H3 is *not* "not-supported". Do not "fix" this.
+
+    FINDINGS.md section 3 reads "**Weakened further at close; coherence half
+    upgraded 2026-07-19**". Half of it failed - the all-warm matrix "was
+    permutation-tested and found to be an anisotropy artifact" and "the
+    corpus-causal reading had already failed cross-model (F3)". But the other
+    half was strengthened, not merely retained: the semantic-coherence
+    observation "no longer stands as qualitative only", holding "in the full
+    readout distribution, with permutation support (coherence 0.41-0.47 vs 0.27,
+    p = 0.001 under both nulls; F8)".
+
+    A claim that lost one half and had the other upgraded is the textbook case
+    for "qualified". "not-supported" would assert the evidence failed to back it,
+    which the F8 permutation result directly contradicts.
+    """
+    assert _claim(entities, "h3-corpus-topology")["status"] == "qualified"
+
+
+def test_content_not_supported_claims_are_only_the_ones_audited(entities):
+    """The 2026-07 status-vocabulary sweep read all 12 dispositions in
+    FINDINGS.md section 3 and all 33 findings, and moved exactly one claim.
+    If a builder adds another, that is a judgement call and belongs in this pin.
+    """
+    nulls = sorted(c["id"] for c in entities["claims"]
+                   if c["status"] == "not-supported")
+    assert nulls == ["h-j1"], f"unaudited not-supported claims: {nulls}"
+
+
+def test_content_f11_is_qualified_because_a_null_finding_still_stands(entities):
+    """F11 records a null, but the *finding* is not "not-supported".
+
+    The distinction the vocabulary draws is about how a claim stands, and F11 -
+    "the restricted J-lens pilot did not support the prolet-inside/Divine-outside
+    prediction" - is a real measured result that stands, narrowed by its own
+    limits ("the probe saw phase A only"). The null it reports is carried by
+    H-J1's status, not by F11's; marking both would double-count it.
+    """
+    assert _claim(entities, "f11-jlens-pilot-null")["status"] == "qualified"
+
+
 def test_content_gpt2_medium_dissolution_is_a_single_token(dissolution):
     """FINDINGS.md F3: GPT-2 Medium -> '1 basin: `D` (100%)'."""
     medium = dissolution["models"]["gpt2-medium"]
@@ -697,4 +785,69 @@ def test_content_isomorphism_records_where_the_analogy_breaks(isomorphism):
     for rel in breaks:
         assert str(rel.get("description", "")).strip(), (
             "a breaks-down-at edge must state the reason the analogy fails"
+        )
+
+
+# ===========================================================================
+# Status vocabulary: the builder, the config it emits and the viewer must agree
+# ===========================================================================
+
+
+def test_visual_config_status_colours_match_the_canonical_map():
+    """visual_config.json is what all three graphs read at load time."""
+    config = _load("visual_config.json")
+    assert config.get("status_colors") == STATUS_COLOURS
+
+
+def test_visual_config_status_colours_are_in_canonical_order():
+    """Dict order is preserved through JSON and drives the emitted legend."""
+    config = _load("visual_config.json")
+    assert list(config["status_colors"]) == STATUS_ORDER + ["default"]
+
+
+def test_viewer_status_order_matches_the_canonical_order():
+    """viewer.html hardcodes STATUS_ORDER as its legend and filter-chip order."""
+    viewer = (REPO_ROOT / "docs" / "graph" / "viewer.html").read_text(encoding="utf-8")
+    match = re.search(r"const STATUS_ORDER = \[(.*?)\];", viewer, re.S)
+    assert match, "viewer.html must declare a STATUS_ORDER array"
+    order = re.findall(r"'([^']+)'", match.group(1))
+    assert order == STATUS_ORDER
+
+
+def test_viewer_status_colours_match_the_canonical_map():
+    """The viewer's built-in defaults must not disagree with visual_config.json;
+    a graph that fails to load the config should still colour correctly."""
+    viewer = (REPO_ROOT / "docs" / "graph" / "viewer.html").read_text(encoding="utf-8")
+    match = re.search(r"const STATUS_COLORS = \{(.*?)\};", viewer, re.S)
+    assert match, "viewer.html must declare a STATUS_COLORS object"
+    pairs = re.findall(r'"([^"]+)":\s*"(#[0-9A-Fa-f]{6})"', match.group(1))
+    assert dict(pairs) == STATUS_COLOURS
+    assert [name for name, _ in pairs] == STATUS_ORDER + ["default"]
+
+
+def test_not_supported_colour_is_perceptually_distinct():
+    """#8F5A57 must not be confusable at a glance with any other status swatch.
+    Nearest neighbours are refuted (dE76 ~28.8) and retired (~30.4)."""
+    def _lab(hex_colour):
+        rgb = [int(hex_colour.lstrip("#")[i:i + 2], 16) / 255.0 for i in (0, 2, 4)]
+        lin = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in rgb]
+        r, g, b = lin
+        xyz = (
+            (r * 0.4124564 + g * 0.3575761 + b * 0.1804375) / 0.95047,
+            (r * 0.2126729 + g * 0.7151522 + b * 0.0721750) / 1.00000,
+            (r * 0.0193339 + g * 0.1191920 + b * 0.9503041) / 1.08883,
+        )
+        f = [t ** (1 / 3) if t > (6 / 29) ** 3 else t / (3 * (6 / 29) ** 2) + 4 / 29
+             for t in xyz]
+        return (116 * f[1] - 16, 500 * (f[0] - f[1]), 200 * (f[1] - f[2]))
+
+    target = _lab(STATUS_COLOURS["not-supported"])
+    for name, colour in STATUS_COLOURS.items():
+        if name == "not-supported":
+            continue
+        other = _lab(colour)
+        delta = sum((a - b) ** 2 for a, b in zip(target, other)) ** 0.5
+        assert delta >= 20.0, (
+            f"not-supported {STATUS_COLOURS['not-supported']} is only dE76 "
+            f"{delta:.1f} from {name} {colour}; pick a more distinct value"
         )

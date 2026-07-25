@@ -990,6 +990,7 @@
         const STATUS_COLORS = {
             "supported": "#2E7D5B",
             "refuted": "#B3423F",
+            "not-supported": "#8F5A57",
             "qualified": "#B9812F",
             "retired": "#8A8F94",
             "corrected": "#5B7DB1",
@@ -1123,7 +1124,14 @@
         // Isomorphism side layout: acoustic left, transformer right.
         const SIDE_X = { acoustic: -700, shared: 0, transformer: 700 };
 
-        const STATUS_ORDER = ['supported', 'refuted', 'qualified', 'retired', 'corrected', 'open', 'untested'];
+        // Severity gradient. "not-supported" sits immediately after "refuted":
+        // "refuted" means the evidence contradicts the claim, "not-supported"
+        // means the evidence simply failed to back it (a null result), and
+        // "qualified" means the claim survives in a narrowed or mixed form.
+        // A status not listed here is not dropped: collectPresentValues() and
+        // buildChips() append any unrecognised value they find in the data, and
+        // statusColour() falls back to STATUS_COLORS.default for it.
+        const STATUS_ORDER = ['supported', 'refuted', 'not-supported', 'qualified', 'retired', 'corrected', 'open', 'untested'];
         const TYPE_ORDER = ['hypothesis', 'finding', 'concept', 'run', 'model', 'null-model', 'doc', 'artefact', 'prior-work'];
 
         const EPISTEMIC_TYPES = ['supports', 'refutes', 'qualifies', 'corrects', 'retires', 'supersedes', 'tests'];
@@ -1240,8 +1248,20 @@
             return String(text || '').replace(/[-_]/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
         }
 
+        // Statuses render as their raw vocabulary token ("not-supported"), not a
+        // prettified label. That keeps one string doing all the work — chip id,
+        // data-status, filter value, legend row and pill all agree — and it is what
+        // the smoke test keys its legend assertions on. The kit template's viewer
+        // title-cases instead, because its legend is styled for prose labels.
+
+        // Unknown / unmapped statuses fall back to the default colour rather than
+        // returning undefined (which would render as a black swatch) or picking up
+        // an inherited Object.prototype member for names like "constructor".
         function statusColour(status) {
-            return STATUS_COLORS[status] || STATUS_COLORS.default;
+            if (status && Object.prototype.hasOwnProperty.call(STATUS_COLORS, status)) {
+                return STATUS_COLORS[status];
+            }
+            return STATUS_COLORS.default;
         }
 
         function typeColour(type) {

@@ -64,7 +64,7 @@ D_SUPERVISORY = "2026-03-20"   # JOURNEY_MAP Phase 4 heading
 D_EXPLORATORY = "2026-03-01"   # month anchor: FINDINGS "Original exploratory work: 2026-03"
 
 ALLOWED_STATUS = {
-    "supported", "refuted", "qualified", "retired",
+    "supported", "refuted", "not-supported", "qualified", "retired",
     "corrected", "open", "untested",
 }
 ALLOWED_REL = {
@@ -470,14 +470,31 @@ HYP_ID = {
 # docs/FINDINGS.md#3-hypothesis-dispositions; phase is where the hypothesis
 # was first put on the record (JOURNEY_MAP section 3 / the finding that raised it).
 #
-# The seven-word status vocabulary is coarser than the dispositions it compresses.
-# Two cases are recorded here so the compression is auditable rather than silent:
+# The status vocabulary is eight words, and the three negative ones are distinct:
+#   refuted        the evidence contradicts the claim
+#   not-supported  the evidence failed to back the claim, without contradicting it
+#                  (a null result)
+#   qualified      the claim survives, in a narrowed or mixed form
+# "not-supported" was added because H-J1 previously had to be filed as "qualified",
+# which put a pilot-confidence null in the same bucket as genuine partial support.
+# Cases where the one-word status still compresses a longer disposition are recorded
+# here so the compression is auditable rather than silent:
 #   H-D1  "Supported in a weakened, more precise form" -> supported, with the
 #         weakening carried by the F10 -> H-D1 `qualifies` edge.
-#   H-J1  "Not supported at pilot confidence; now phase-qualified" -> qualified,
-#         following the disposition's own closing word; "refuted" would overstate a
-#         pilot-confidence null. The F11 -> H-J1 `refutes` edge (weight 4) and the
-#         full disposition text in the node description carry the "not supported" half.
+#   H-J1  "Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)"
+#         -> not-supported. The hypothesis as stated (a static prolet-inside /
+#         Divine-outside split) failed: "the point estimate runs slightly the other
+#         way". "refuted" would overstate a pilot-confidence null. The "phase-qualified"
+#         clause is not partial survival of the stated claim; it is a different,
+#         phase-indexed claim raised by the later F16 re-probe, with the full build
+#         still pending (issue #8). The F16 -> H-J1 `qualifies` edge carries that half.
+#   H3    "Weakened further at close; coherence half upgraded 2026-07-19" -> stays
+#         qualified, deliberately. This one is NOT a null and must not be re-filed as
+#         not-supported: the corpus-causal half failed cross-model (F3) and the
+#         all-warm matrix was shown to be an anisotropy artifact, but the
+#         semantic-coherence half was UPGRADED with permutation support ("coherence
+#         0.41-0.47 vs 0.27, p = 0.001 under both nulls; F8"). A claim that lost one
+#         half and strengthened the other is the textbook "qualified", not a null.
 # The `asserted` dates below are NOT in the record: the documents date dispositions,
 # never the moment a hypothesis was raised. They are placements, not measurements;
 # see metadata.date_precision.
@@ -490,7 +507,7 @@ HYP_META = {
     "H-fingerprint": dict(status="refuted",   phase="phase-4", asserted=D_SUPERVISORY, retired=D_SERIES_CLOSE),
     "H-till":        dict(status="refuted",   phase="phase-5", asserted=D_SERIES_CLOSE, retired=D_SERIES_CLOSE),
     "H-D1":          dict(status="supported", phase="phase-5", asserted=D_SERIES_CLOSE, retired=None),
-    "H-J1":          dict(status="qualified", phase="phase-5", asserted=D_ACT_II_5, retired=None),
+    "H-J1":          dict(status="not-supported", phase="phase-5", asserted=D_ACT_II_5, retired=None),
     "H-glitch":      dict(status="supported", phase="phase-5", asserted=D_ACT_II_5, retired=None),
     "H-flip":        dict(status="corrected", phase="phase-5", asserted=D_ACT_II_5, retired=None),
     "H-supp":        dict(status="refuted",   phase="phase-5", asserted=D_ACT_II_5, retired=D_ACT_II_5),
@@ -2132,6 +2149,10 @@ def visual_config():
         ("status_colors", OrderedDict([
             ("supported", "#2E7D5B"),
             ("refuted", "#B3423F"),
+            # Muted, desaturated brick: negative in hue like "refuted" but
+            # visibly weaker. Nearest neighbours are refuted (dE76 28.8) and
+            # retired (30.4), both comfortably above the ~20 confusion floor.
+            ("not-supported", "#8F5A57"),
             ("qualified", "#B9812F"),
             ("retired", "#8A8F94"),
             ("corrected", "#5B7DB1"),

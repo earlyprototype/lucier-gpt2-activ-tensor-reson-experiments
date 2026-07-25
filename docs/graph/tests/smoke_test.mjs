@@ -3,7 +3,7 @@
  * Headless browser smoke + interaction test for docs/graph/viewer.html.
  *
  * Serves docs/graph on a free port, drives the viewer with Playwright's
- * bundled Chromium, and asserts eight things:
+ * bundled Chromium, and asserts eleven things:
  *
  *   1. viewer.html loads with ZERO pageerror and ZERO console-error events
  *   2. a <canvas> exists and vis-network has actually rendered nodes
@@ -12,7 +12,10 @@
  *   5. search surfaces a known id; clicking that node opens details + status pill
  *   6. the timeline scrubber hides nodes at min and restores them at max
  *   7. "copy evidence chain" produces a non-empty chain string
- *   8. no HTTP >= 400 responses for any requested asset
+ *   8. the "not-supported" status chip filters to exactly its nodes, in #8F5A57
+ *   9. the legend carries "not-supported" in its severity-gradient position
+ *  10. an unknown status still renders, gets a chip, and stays reachable
+ *  11. no HTTP >= 400 responses for any requested asset
  *
  * Run:  node docs/graph/tests/smoke_test.mjs
  * Exit: 0 = all pass, 1 = at least one failure.
@@ -139,6 +142,9 @@ function startServer(rootDir) {
 }
 
 // --- reporting -------------------------------------------------------------
+// Every assertion must run: a suite that silently stops short is a failure, not
+// a pass. Bump this when adding one.
+const TOTAL_ASSERTIONS = 11;
 const results = [];
 function record(n, title, ok, detail) {
     results.push({ n, title, ok, detail });
@@ -549,14 +555,213 @@ async function main() {
             (describeSince(snap7).join('\n') || 'no errors'));
 
         // ---------------------------------------------------------------- 8
+        // "not-supported" is the eighth status, added after this suite was
+        // written, so nothing above covers it. Assertions 8-10 pin the whole
+        // path — chip, filter, fill colour, legend — plus the unknown-status
+        // fallback that keeps older/newer vocabularies from losing nodes.
+        phase = 'not-supported-status';
+        const snap8 = snapshotErrors();
+        await typeSearch(page, '');                 // drop the test-7 search filter
+        await page.evaluate(() => {
+            const el = document.getElementById('timeline');
+            if (el) { el.value = el.max; el.dispatchEvent(new Event('input', { bubbles: true })); }
+            setAllStatusChips(true);
+        });
+        await page.waitForTimeout(250);
+
+        const NOT_SUPPORTED = 'not-supported';
+        const NOT_SUPPORTED_HEX = '#8F5A57';
+        const DEFAULT_HEX = '#7F8C8D';
+        // Ground truth is the regenerated entities.json, never the page.
+        const expectedNotSupported = (entities.claims || [])
+            .filter(c => c.status === NOT_SUPPORTED).map(c => c.id).sort();
+
+        const chipState = await page.evaluate((st) => {
+            const chip = document.getElementById('chip-status-' + st);
+            const order = typeof STATUS_ORDER !== 'undefined' ? STATUS_ORDER : [];
+            return {
+                exists: !!chip,
+                text: chip ? chip.textContent.trim() : null,
+                order,
+                afterRefuted: order.indexOf(st) >= 0 &&
+                    order.indexOf(st) === order.indexOf('refuted') + 1,
+                palette: typeof statusColour === 'function' ? statusColour(st) : null
+            };
+        }, NOT_SUPPORTED);
+
+        // Click the chip for real with every other status off. Runs, models and
+        // sources carry no status and are deliberately never gated by the status
+        // chips, so the exact-match check is over status-carrying nodes only.
+        const filtered = await page.evaluate((st) => {
+            setAllStatusChips(false);
+            const chip = document.getElementById('chip-status-' + st);
+            if (chip) chip.click();                 // exercises the real onclick
+            const byId = {};
+            allNodes.forEach(n => { byId[n.id] = n; });
+            const items = nodesDataSet.get();
+            const colours = {};
+            items.filter(n => byId[n.id] && byId[n.id].status === st)
+                .forEach(n => { colours[n.id] = n.color.background; });
+            return {
+                clickable: !!chip,
+                chipActive: !!chip && chip.classList.contains('active'),
+                visibleWithStatus: items
+                    .filter(n => n.hidden !== true && byId[n.id] && byId[n.id].status)
+                    .map(n => n.id).sort(),
+                otherStatusesHidden: items
+                    .filter(n => n.hidden !== true && byId[n.id] &&
+                        byId[n.id].status && byId[n.id].status !== st).length,
+                colours
+            };
+        }, NOT_SUPPORTED);
+
+        const colourVals = Object.values(filtered.colours).map(c => String(c).toUpperCase());
+        // A dataset carrying no not-supported claims is a legitimate case (that is
+        // the backward-compatibility requirement), so the per-node colour check is
+        // conditional on there being nodes. The vocabulary checks — chip, gradient
+        // position, palette entry — are unconditional and hold for any dataset.
+        const colourOk = colourVals.length === expectedNotSupported.length &&
+            colourVals.every(c => c === NOT_SUPPORTED_HEX && c !== DEFAULT_HEX);
+        const sameSet = JSON.stringify(filtered.visibleWithStatus) ===
+            JSON.stringify(expectedNotSupported);
+        const ok8 = chipState.exists && chipState.afterRefuted &&
+            String(chipState.palette).toUpperCase() === NOT_SUPPORTED_HEX &&
+            filtered.clickable && filtered.chipActive &&
+            sameSet && filtered.otherStatusesHidden === 0 && colourOk &&
+            cleanSince(snap8);
+        record(8, '"not-supported" chip filters to exactly its nodes, drawn in #8F5A57', ok8,
+            `chip present=${chipState.exists} text="${chipState.text}" ` +
+            `clickable=${filtered.clickable} active-after-click=${filtered.chipActive}\n` +
+            `STATUS_ORDER=[${chipState.order.join(', ')}] -> immediately after "refuted"=` +
+            `${chipState.afterRefuted}\n` +
+            `entities.json says not-supported = [${expectedNotSupported.join(', ')}] ` +
+            `(${expectedNotSupported.length}); status-carrying nodes visible after filtering = ` +
+            `[${filtered.visibleWithStatus.join(', ')}] (${filtered.visibleWithStatus.length}) ` +
+            `-> match=${sameSet}, other-status leakage=${filtered.otherStatusesHidden}\n` +
+            `rendered fills: ${JSON.stringify(filtered.colours)} ` +
+            `(expected ${NOT_SUPPORTED_HEX}, must not be default ${DEFAULT_HEX})\n` +
+            (describeSince(snap8).join('\n') || 'no errors'));
+
+        // ---------------------------------------------------------------- 9
+        phase = 'not-supported-legend';
+        const snap9 = snapshotErrors();
+        const legend = await page.evaluate((st) => {
+            setAllStatusChips(true);
+            if (typeof setColourMode === 'function') setColourMode('status');
+            const toHex = (rgb) => {
+                const m = String(rgb).match(/(\d+)\D+(\d+)\D+(\d+)/);
+                if (!m) return String(rgb).toUpperCase();
+                return '#' + [1, 2, 3].map(i => Number(m[i]).toString(16).padStart(2, '0'))
+                    .join('').toUpperCase();
+            };
+            const rows = [...document.querySelectorAll('#legend .legend-row')]
+                .map(r => ({
+                    label: r.textContent.trim(),
+                    swatch: r.querySelector('.legend-swatch')
+                        ? toHex(r.querySelector('.legend-swatch').style.background) : null
+                }));
+            const statusRows = rows.slice(0, rows.findIndex(r => r.label === 'untested') + 1);
+            const idx = statusRows.findIndex(r => r.label === st);
+            return {
+                statusRows,
+                idx,
+                refutedIdx: statusRows.findIndex(r => r.label === 'refuted'),
+                swatch: idx >= 0 ? statusRows[idx].swatch : null
+            };
+        }, NOT_SUPPORTED);
+        // The legend lists only statuses the loaded data actually carries, so on a
+        // dataset with no not-supported claims the correct expectation is that the
+        // row is absent and the other seven are unchanged — that is the
+        // "renders identically" half of backward compatibility.
+        const legendExpected = expectedNotSupported.length > 0;
+        const ok9 = legendExpected
+            ? (legend.idx >= 0 && legend.idx === legend.refutedIdx + 1 &&
+               legend.swatch === NOT_SUPPORTED_HEX && cleanSince(snap9))
+            : (legend.idx === -1 && legend.refutedIdx >= 0 && cleanSince(snap9));
+        record(9, 'legend carries a "not-supported" entry, in gradient position, correct swatch', ok9,
+            `legend status block: ` +
+            legend.statusRows.map(r => `${r.label}=${r.swatch}`).join(', ') + '\n' +
+            (legendExpected
+                ? `"${NOT_SUPPORTED}" at index ${legend.idx} (refuted at ${legend.refutedIdx}), ` +
+                  `swatch=${legend.swatch} (expected ${NOT_SUPPORTED_HEX})`
+                : `dataset carries no ${NOT_SUPPORTED} claims; legend correctly omits the row ` +
+                  `(idx=${legend.idx}) and keeps the other statuses intact`) + '\n' +
+            (describeSince(snap9).join('\n') || 'no errors'));
+
+        // ---------------------------------------------------------------- 10
+        // Forward compatibility: a status this build of the viewer has never
+        // heard of must still get a chip, a legend row, the default fill, and
+        // must stay visible and searchable. Injected into the in-memory model
+        // only — the committed JSON is not touched.
+        phase = 'unknown-status-fallback';
+        const snap10 = snapshotErrors();
+        const UNKNOWN_STATUS = 'quantum-undecided';
+        const injected = await page.evaluate((st) => {
+            const victim = allNodes.find(n => n.status === 'supported');
+            if (!victim) return { error: 'no supported node to re-label' };
+            const original = victim.status;
+            victim.status = st;
+            buildChips(); syncChipClasses(); applyVisualState();
+            const chip = document.getElementById('chip-status-' + st);
+            const item = nodesDataSet.get(victim.id);
+            const legendLabels = [...document.querySelectorAll('#legend .legend-row')]
+                .map(r => r.textContent.trim());
+            return {
+                id: victim.id,
+                original,
+                chipExists: !!chip,
+                chipText: chip ? chip.textContent.trim() : null,
+                chipAppendedLast: !!chip && chip === [...document.querySelectorAll(
+                    '#status-chips .chip[data-status]')].pop(),
+                hidden: item.hidden === true,
+                fill: String(item.color.background).toUpperCase(),
+                legendHasIt: legendLabels.includes(st),
+                // Object.prototype keys must not be mistaken for palette entries.
+                protoSafe: statusColour('constructor') === statusColour('toString') &&
+                    String(statusColour('constructor')).toUpperCase() === '#7F8C8D'
+            };
+        }, UNKNOWN_STATUS);
+
+        let reach = { visible: 0, includes: false };
+        if (injected.id) {
+            await typeSearch(page, injected.id);
+            reach = await page.evaluate((id) => {
+                const items = nodesDataSet.get().filter(n => n.hidden !== true).map(n => n.id);
+                return { visible: items.length, includes: items.includes(id) };
+            }, injected.id);
+            await typeSearch(page, '');
+            // Put the in-memory model back the way we found it.
+            await page.evaluate((o) => {
+                const n = allNodes.find(x => x.id === o.id);
+                if (n) n.status = o.original;
+                buildChips(); syncChipClasses(); applyVisualState();
+            }, { id: injected.id, original: injected.original });
+        }
+        const ok10 = !injected.error && injected.chipExists && injected.chipAppendedLast &&
+            injected.hidden === false && injected.fill === DEFAULT_HEX &&
+            injected.legendHasIt && injected.protoSafe &&
+            reach.includes && cleanSince(snap10);
+        record(10, 'a status the viewer has never seen still renders, filters and is reachable', ok10,
+            `injected status="${UNKNOWN_STATUS}" onto ${injected.id} (was "${injected.original}") ` +
+            `via page.evaluate; entities.json untouched\n` +
+            `chip="${injected.chipText}" appended after the canonical eight=` +
+            `${injected.chipAppendedLast}; legend row present=${injected.legendHasIt}\n` +
+            `node hidden=${injected.hidden}, fill=${injected.fill} ` +
+            `(expected default ${DEFAULT_HEX})\n` +
+            `prototype-key safety (statusColour('constructor')/('toString') -> default)=` +
+            `${injected.protoSafe}\n` +
+            `search "${injected.id}" -> ${reach.visible} visible, target present=${reach.includes}\n` +
+            (describeSince(snap10).join('\n') || 'no errors'));
+
+        // ---------------------------------------------------------------- 11
         phase = 'summary';
-        const ok8 = badResponses.length === 0;
+        const ok11 = badResponses.length === 0;
         const byStatus = {};
         allResponses.forEach(r => { byStatus[r.status] = (byStatus[r.status] || 0) + 1; });
-        record(8, 'no HTTP 404s (or any >=400) for any requested asset', ok8,
+        record(11, 'no HTTP 404s (or any >=400) for any requested asset', ok11,
             `${allResponses.length} responses recorded: ` +
             Object.entries(byStatus).sort().map(([s, c]) => `${s}x${c}`).join(', ') +
-            (ok8 ? '' : '\n' + badResponses.map(r => `  ${r.status} [${r.phase}] ${r.url}`).join('\n')));
+            (ok11 ? '' : '\n' + badResponses.map(r => `  ${r.status} [${r.phase}] ${r.url}`).join('\n')));
 
     } catch (err) {
         console.error('\n\x1b[31mHARNESS ERROR\x1b[0m:', err && err.stack || err);
@@ -572,7 +777,8 @@ async function main() {
     console.log('\n--- summary ---');
     for (const r of results) console.log(`  ${r.ok ? 'PASS' : 'FAIL'}  ${r.n}. ${r.title}`);
     console.log(`\n${results.length - failed.length}/${results.length} assertions passed` +
-        (results.length < 8 ? `  (only ${results.length}/8 assertions ran)` : ''));
+        (results.length < TOTAL_ASSERTIONS
+            ? `  (only ${results.length}/${TOTAL_ASSERTIONS} assertions ran)` : ''));
     if (pageErrors.length) {
         console.log(`\nAll pageerrors (${pageErrors.length}):`);
         pageErrors.forEach(e => console.log(`  [${e.phase}] ${e.text}`));
@@ -585,7 +791,7 @@ async function main() {
         console.log(`\nAll >=400 responses (${badResponses.length}):`);
         badResponses.forEach(e => console.log(`  ${e.status} [${e.phase}] ${e.url}`));
     }
-    if (failed.length || results.length < 8) exitCode = 1;
+    if (failed.length || results.length < TOTAL_ASSERTIONS) exitCode = 1;
     process.exit(exitCode);
 }
 
