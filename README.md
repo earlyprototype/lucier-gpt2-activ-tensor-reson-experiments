@@ -176,8 +176,21 @@ ATR never set out to be a technique at all. It began as a thought experiment, an
     ├── VALIDATION_PLAN.md           ← the pre-registered validation design (historical)
     ├── ATR_METHOD_COMPARISON.md     ← ATR in the interpretability landscape
     ├── JOURNEY_MAP.md               ← project timeline, discoveries, glossary
+    ├── graph/                       ← the three interactive graphs (see below)
     └── sessions/                    ← AI-assisted review session records
 ```
+
+## The Knowledge Graph
+
+Everything above is linear, and the study is not. `docs/graph/` holds three interactive
+graphs that draw what the prose can only list: an *evidence* graph, in which every hypothesis,
+finding and run is a node and the arrows between them are the actual epistemic relations — so
+that the founding hypothesis appears as what it is, a red node with two independent refutations
+converging on it and nothing leading out; a *dissolution* graph, which draws the descent itself,
+prompts on the left and terminal basins on the right; and an *isomorphism* graph, which sets
+Lucier's apparatus against the transformer's and marks the five places the analogy stops holding.
+Serve the repository root and open `docs/graph/viewer.html`, or read
+[docs/graph/README.md](docs/graph/README.md) first.
 
 ## Notebooks — Quick Reference
 

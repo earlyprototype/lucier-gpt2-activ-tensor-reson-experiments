@@ -1,0 +1,1003 @@
+{
+  "metadata": {
+    "domain": "isomorphism",
+    "version": "1.0",
+    "created": "2026-07-25",
+    "last_updated": "2026-07-25",
+    "generated": "2026-07-25",
+    "title": "Lucier's room and the transformer: the correspondence, and where it breaks",
+    "subtitle": "Paired acoustic and transformer concepts joined by shared mathematical role, with the nonlinearities and findings that stop the analogy being an identity.",
+    "phases": [
+      {
+        "id": "phase-0",
+        "label": "Phase 0: The Inspiration (Pre-experiment)",
+        "start": "2026-03-01",
+        "doc_ref": "docs/JOURNEY_MAP.md#1-timeline-the-intellectual-arc"
+      },
+      {
+        "id": "phase-1",
+        "label": "Phase 1: The Exploratory Experiment (EXP_009aFIX)",
+        "start": "2026-03-01",
+        "doc_ref": "docs/JOURNEY_MAP.md#1-timeline-the-intellectual-arc"
+      },
+      {
+        "id": "phase-2",
+        "label": "Phase 2: Validation Design (VALIDATION_PLAN)",
+        "start": "2026-03-01",
+        "doc_ref": "docs/JOURNEY_MAP.md#1-timeline-the-intellectual-arc"
+      },
+      {
+        "id": "phase-3",
+        "label": "Phase 3: Validation Execution",
+        "start": "2026-03-01",
+        "doc_ref": "docs/JOURNEY_MAP.md#1-timeline-the-intellectual-arc"
+      },
+      {
+        "id": "phase-4",
+        "label": "Phase 4: Supervisory Analysis (Today, 2026-03-20)",
+        "start": "2026-03-20",
+        "doc_ref": "docs/JOURNEY_MAP.md#1-timeline-the-intellectual-arc"
+      },
+      {
+        "id": "phase-5",
+        "label": "Phase 5: Cross-Model Validation & Series Close (2026-07-10)",
+        "start": "2026-07-10",
+        "doc_ref": "docs/JOURNEY_MAP.md#1-timeline-the-intellectual-arc"
+      }
+    ],
+    "phase_note": "JOURNEY_MAP.md dates Phase 4 (2026-03-20) and Phase 5 (2026-07-10) only; phases 0-3 share a placeholder start of 2026-03-01, matching entities.json.",
+    "layout_hint": {
+      "columns": [
+        "acoustic",
+        "shared",
+        "transformer"
+      ],
+      "field": "side",
+      "note": "Nodes carry side (acoustic | transformer | shared) and role (pair | nonlinearity | breakdown). A two-column layout with the shared column between reads left-to-right as ISOMORPHISM.md does."
+    },
+    "generated_from": [
+      "docs/ISOMORPHISM.md",
+      "docs/TECHNICAL.md",
+      "docs/UNDERSTANDING.md",
+      "docs/MATH_PRIMER.md",
+      "docs/FINDINGS.md",
+      "docs/JOURNEY_MAP.md",
+      "README.md"
+    ],
+    "provenance_note": "Hand-authored from the documents listed above, not parsed from data. Every node's doc_ref names the passage it transcribes; no number or claim in this file originates here."
+  },
+  "claims": [
+    {
+      "id": "ac-room",
+      "label": "Room",
+      "type": "concept",
+      "status": "supported",
+      "side": "acoustic",
+      "role": "pair",
+      "phase": "phase-0",
+      "doc_ref": "docs/ISOMORPHISM.md#the-acoustic-case-linear-power-iteration",
+      "asserted": null,
+      "retired": null,
+      "description": "The physical space in Lucier's 1969 piece, modelled as a linear operator H acting on a discrete signal vector. Acoustic propagation obeys superposition — two sources sum to the sum of their reverberant responses — which is what makes H a genuine linear map."
+    },
+    {
+      "id": "ac-audio-signal",
+      "label": "Audio signal",
+      "type": "concept",
+      "status": "supported",
+      "side": "acoustic",
+      "role": "pair",
+      "phase": "phase-0",
+      "doc_ref": "docs/ISOMORPHISM.md#the-isomorphism",
+      "asserted": null,
+      "retired": null,
+      "description": "The recorded speech, s_n: the thing that is played, captured and played again. It is the state the iteration carries forward, and the only thing that changes from pass to pass."
+    },
+    {
+      "id": "ac-tape-recorder",
+      "label": "Tape recorder",
+      "type": "concept",
+      "status": "supported",
+      "side": "acoustic",
+      "role": "pair",
+      "phase": "phase-0",
+      "doc_ref": "docs/ISOMORPHISM.md#the-acoustic-case-linear-power-iteration",
+      "asserted": null,
+      "retired": null,
+      "description": "The re-injection mechanism: it captures the reverberant output and feeds it back as the next input, closing the loop. Without it there is no iteration, only a room."
+    },
+    {
+      "id": "ac-room-friction",
+      "label": "Room friction (energy loss per pass)",
+      "type": "concept",
+      "status": "qualified",
+      "side": "acoustic",
+      "role": "pair",
+      "phase": "phase-0",
+      "doc_ref": "README.md#how-atr-works",
+      "asserted": null,
+      "retired": null,
+      "description": "The README's name for what the L2 rescale stands in for: the loss that keeps a real room's replayed signal from growing without bound. Held loosely — real damping is frequency-dependent, whereas the ATR rescale is a single global factor applied to the whole tensor."
+    },
+    {
+      "id": "ac-resonant-frequency",
+      "label": "Room resonant frequency",
+      "type": "concept",
+      "status": "qualified",
+      "side": "acoustic",
+      "role": "pair",
+      "phase": "phase-0",
+      "doc_ref": "docs/ISOMORPHISM.md#the-acoustic-case-linear-power-iteration",
+      "asserted": null,
+      "retired": null,
+      "description": "The dominant eigenmode v1 of H, the direction the normalised iterates approach. ISOMORPHISM.md is explicit that this convergence is conditional, not automatic: for a real room the single-dominant-mode account is an analogy and an empirical pattern, not a theorem."
+    },
+    {
+      "id": "ac-spectral-decay",
+      "label": "Spectral decay of non-resonant frequencies",
+      "type": "concept",
+      "status": "supported",
+      "side": "acoustic",
+      "role": "pair",
+      "phase": "phase-0",
+      "doc_ref": "docs/ISOMORPHISM.md#the-isomorphism",
+      "asserted": null,
+      "retired": null,
+      "description": "The transient phase: every component other than the dominant one shrinks relative to it, at rates set by the eigenvalue ratios. This is what a listener hears as the words draining out of the recording."
+    },
+    {
+      "id": "ac-pure-drone",
+      "label": "Pure drone",
+      "type": "concept",
+      "status": "supported",
+      "side": "acoustic",
+      "role": "pair",
+      "phase": "phase-0",
+      "doc_ref": "docs/ISOMORPHISM.md#the-acoustic-case-linear-power-iteration",
+      "asserted": null,
+      "retired": null,
+      "description": "The end state of the piece: a steady tone at the room's resonant frequency. Speech has dissolved into architecture, and further passes change nothing audible."
+    },
+    {
+      "id": "ac-linear-operator-h",
+      "label": "Linear operator H",
+      "type": "concept",
+      "status": "supported",
+      "side": "acoustic",
+      "role": "pair",
+      "phase": "phase-0",
+      "doc_ref": "docs/ISOMORPHISM.md#the-acoustic-case-linear-power-iteration",
+      "asserted": null,
+      "retired": null,
+      "description": "H: R^n -> R^n, the room's transfer function. Fixed once the room is built, identical on every pass, and additive: H(a + b) = H(a) + H(b). Every guarantee on the acoustic side descends from those three properties."
+    },
+    {
+      "id": "ac-dominant-eigenmode",
+      "label": "Single dominant eigenmode",
+      "type": "concept",
+      "status": "qualified",
+      "side": "acoustic",
+      "role": "pair",
+      "phase": "phase-0",
+      "doc_ref": "docs/ISOMORPHISM.md#key-insight",
+      "asserted": null,
+      "retired": null,
+      "description": "The consequence of linearity: for a diagonalisable H with a unique largest-magnitude eigenvalue, and a start with a nonzero component along it, the normalised iterates approach one direction. One room, one answer — under those conditions, and only those."
+    },
+    {
+      "id": "tr-weights",
+      "label": "Transformer weight matrices",
+      "type": "concept",
+      "status": "supported",
+      "side": "transformer",
+      "role": "pair",
+      "phase": "phase-1",
+      "doc_ref": "docs/ISOMORPHISM.md#the-isomorphism",
+      "asserted": null,
+      "retired": null,
+      "description": "W_Q, W_K, W_V, W_O, W_in, W_out across all 12 layers of GPT-2 Small: the operator being iterated. The whole stack, layer 0 through layer 11, acts as the room."
+    },
+    {
+      "id": "tr-residual-stream",
+      "label": "Residual stream tensor [T, 768]",
+      "type": "concept",
+      "status": "supported",
+      "side": "transformer",
+      "role": "pair",
+      "phase": "phase-1",
+      "doc_ref": "docs/TECHNICAL.md#formal-description",
+      "asserted": null,
+      "retired": null,
+      "description": "The state vector: the full [T, 768] residual stream across all token positions, read at blocks.11.hook_resid_post. Looping this rather than the decoded token is the design decision the whole project rests on."
+    },
+    {
+      "id": "tr-hook",
+      "label": "TransformerLens hook (extract, normalise, re-inject)",
+      "type": "concept",
+      "status": "supported",
+      "side": "transformer",
+      "role": "pair",
+      "phase": "phase-1",
+      "doc_ref": "docs/TECHNICAL.md#hook-mechanism",
+      "asserted": null,
+      "retired": null,
+      "description": "The feedback mechanism: a forward hook at blocks.0.hook_resid_pre overwrites the token embeddings with the normalised tensor extracted from the final layer. The prompt string is still passed on every iteration, but only as scaffolding for the computation graph."
+    },
+    {
+      "id": "tr-l2-normalisation",
+      "label": "L2 rescaling to initial energy",
+      "type": "concept",
+      "status": "supported",
+      "side": "transformer",
+      "role": "pair",
+      "phase": "phase-1",
+      "doc_ref": "docs/TECHNICAL.md#normalisation",
+      "asserted": null,
+      "retired": null,
+      "description": "normalise(x) = x * (||x0|| / ||x||), applied to the whole tensor every pass. Without it the norm reaches about 1.5M by iteration 500 and saturates the nonlinearities; with it the iteration is energy-conservative and confined to a fixed-radius shell."
+    },
+    {
+      "id": "tr-attractor-state",
+      "label": "Attractor state (prolet, Divine, ...)",
+      "type": "concept",
+      "status": "qualified",
+      "side": "transformer",
+      "role": "pair",
+      "phase": "phase-1",
+      "doc_ref": "docs/ISOMORPHISM.md#the-isomorphism",
+      "asserted": null,
+      "retired": null,
+      "description": "What the iteration settles into: a fixed point for the prolet-class prompts, and an exact period-2 limit cycle for Divine. 'Attractor' here has to be read in the dynamical-systems sense, not as a synonym for fixed point."
+    },
+    {
+      "id": "tr-dissolution",
+      "label": "Iterative dissolution of semantic content",
+      "type": "concept",
+      "status": "supported",
+      "side": "transformer",
+      "role": "pair",
+      "phase": "phase-1",
+      "doc_ref": "docs/ISOMORPHISM.md#the-isomorphism",
+      "asserted": null,
+      "retired": null,
+      "description": "The transient: connection goes, then meaning, then grammar, along a shared pathway of decoded waypoints (ash -> Canad -> Ag -> FT -> capit -> injustice -> Rousse -> prolet) before the state reaches a fixed point or cycle."
+    },
+    {
+      "id": "tr-terminal-token",
+      "label": "Terminal token sequence (uniform across positions)",
+      "type": "concept",
+      "status": "supported",
+      "side": "transformer",
+      "role": "pair",
+      "phase": "phase-1",
+      "doc_ref": "docs/TECHNICAL.md#observed-dynamics",
+      "asserted": null,
+      "retired": null,
+      "description": "The readout at the attractor: by iteration ~10 all T positions have collapsed to near-identical vectors, so the decode is one token repeated across the sequence. The drone, in text."
+    },
+    {
+      "id": "tr-nonlinear-map-f",
+      "label": "Nonlinear map f",
+      "type": "concept",
+      "status": "supported",
+      "side": "transformer",
+      "role": "pair",
+      "phase": "phase-1",
+      "doc_ref": "docs/ISOMORPHISM.md#the-transformer-case-nonlinear-power-iteration",
+      "asserted": null,
+      "retired": null,
+      "description": "f: R^(T x 768) -> R^(T x 768), the full forward pass from layer 0 to layer 11. Same structural position as H, but it contains LayerNorm, softmax attention, GeLU and dynamically recomputed QKV, none of which are matrix multiplies."
+    },
+    {
+      "id": "tr-multiple-basins",
+      "label": "Multiple basins with distinct attractors",
+      "type": "concept",
+      "status": "supported",
+      "side": "transformer",
+      "role": "pair",
+      "phase": "phase-5",
+      "doc_ref": "docs/FINDINGS.md#run-5",
+      "asserted": "2026-07-10",
+      "retired": null,
+      "description": "The consequence of nonlinearity: not one dominant mode but a landscape. GPT-2 Small resolves 125 language prompts into five basins at lock-in — prolet 43.2%, Divine 27.2%, till 15.2%, Anarch 13.6%, solidarity 0.8%."
+    },
+    {
+      "id": "nl-layernorm",
+      "label": "LayerNorm",
+      "type": "concept",
+      "status": "supported",
+      "side": "transformer",
+      "role": "nonlinearity",
+      "phase": "phase-1",
+      "doc_ref": "docs/ISOMORPHISM.md#the-transformer-case-nonlinear-power-iteration",
+      "asserted": null,
+      "retired": null,
+      "description": "Rescaling and recentring, applied before every sublayer. The first place in the stack where the additivity that makes the acoustic account work is lost."
+    },
+    {
+      "id": "nl-softmax-attention",
+      "label": "Attention (softmax)",
+      "type": "concept",
+      "status": "supported",
+      "side": "transformer",
+      "role": "nonlinearity",
+      "phase": "phase-1",
+      "doc_ref": "docs/ISOMORPHISM.md#the-transformer-case-nonlinear-power-iteration",
+      "asserted": null,
+      "retired": null,
+      "description": "Data-dependent gating over value vectors: the softmax weights are a function of the state being processed, so the mixing pattern is different on every pass."
+    },
+    {
+      "id": "nl-qkv-recompute",
+      "label": "QKV computation (recomputed each iteration)",
+      "type": "concept",
+      "status": "supported",
+      "side": "transformer",
+      "role": "nonlinearity",
+      "phase": "phase-1",
+      "doc_ref": "docs/ISOMORPHISM.md#the-transformer-case-nonlinear-power-iteration",
+      "asserted": null,
+      "retired": null,
+      "description": "Queries, keys and values are recomputed at each iteration from the current state. The operator applied at step n+1 is not the operator applied at step n."
+    },
+    {
+      "id": "nl-gelu-mlp",
+      "label": "MLP (GeLU)",
+      "type": "concept",
+      "status": "supported",
+      "side": "transformer",
+      "role": "nonlinearity",
+      "phase": "phase-1",
+      "doc_ref": "docs/ISOMORPHISM.md#the-transformer-case-nonlinear-power-iteration",
+      "asserted": null,
+      "retired": null,
+      "description": "Element-wise nonlinear activation inside every block's feedforward layer: a pointwise bend applied 12 times per pass."
+    },
+    {
+      "id": "nl-residual-connections",
+      "label": "Residual connections",
+      "type": "concept",
+      "status": "supported",
+      "side": "transformer",
+      "role": "nonlinearity",
+      "phase": "phase-1",
+      "doc_ref": "docs/ISOMORPHISM.md#the-transformer-case-nonlinear-power-iteration",
+      "asserted": null,
+      "retired": null,
+      "description": "The additive skip path. Linear in itself — the one component that behaves like air — but it composes with the nonlinear sublayers, so it carries no guarantees of its own."
+    },
+    {
+      "id": "concept-no-spectral-guarantee",
+      "label": "No spectral theorem guarantee",
+      "type": "concept",
+      "status": "supported",
+      "side": "shared",
+      "role": "breakdown",
+      "phase": "phase-1",
+      "doc_ref": "docs/ISOMORPHISM.md#the-transformer-case-nonlinear-power-iteration",
+      "asserted": null,
+      "retired": null,
+      "description": "The load-bearing break. Power iteration's convergence proof is a theorem about matrices; f is not a matrix, so the system is not guaranteed to converge to a single dominant eigenvector, or to converge at all. What the acoustic side gets by theorem, the transformer side has to earn by measurement."
+    },
+    {
+      "id": "f9-divine-period-2",
+      "label": "F9: Divine is an exact period-2 limit cycle",
+      "type": "finding",
+      "status": "supported",
+      "side": "transformer",
+      "role": "breakdown",
+      "phase": "phase-5",
+      "doc_ref": "docs/FINDINGS.md#f9-the-divine-anomaly-resolved-an-exact-period-2-limit-cycle-hidden-by-aliasing",
+      "asserted": "2026-07-19",
+      "retired": null,
+      "description": "The Divine state alternates between two phases separated by L2 1249 (cosine 0.685), returning to itself exactly every second pass: cos(A, f(f(A))) = 1.000000. Every earlier snapshot schedule sampled only even iterations and so recorded one phase, which is why it looked frozen for four months.",
+      "evidence": [
+        "run-08-divine-motion"
+      ]
+    },
+    {
+      "id": "concept-regime-dependence",
+      "label": "The attractors belong to a regime, not to the weights",
+      "type": "finding",
+      "status": "supported",
+      "side": "transformer",
+      "role": "breakdown",
+      "phase": "phase-5",
+      "doc_ref": "docs/FINDINGS.md#f4-the-five-basins-belong-to-the-language-driven-regime-not-the-weights-in-general-null-model",
+      "asserted": "2026-07-10",
+      "retired": null,
+      "description": "Drive the same weights with pure noise instead of language and the loop still converges, but into eighteen non-semantic attractors with essentially no overlap with the five. The basins are properties of the model as driven by language-shaped input, not of the model.",
+      "evidence": [
+        "run-03-random-baseline"
+      ]
+    },
+    {
+      "id": "concept-readout-bypass",
+      "label": "The loop is closed before the readout, not after it",
+      "type": "concept",
+      "status": "supported",
+      "side": "shared",
+      "role": "breakdown",
+      "phase": "phase-0",
+      "doc_ref": "docs/UNDERSTANDING.md#the-lucier-loop-bypasses-this-bottleneck",
+      "asserted": null,
+      "retired": null,
+      "description": "Lucier's loop passes through the air, carrying everything the room emitted. ATR's loop is cut upstream of the unembedding, deliberately bypassing the argmax that would collapse 50,257 candidates to one token. The two apparatuses re-inject different kinds of object."
+    },
+    {
+      "id": "claim-brouwer-basins",
+      "label": "Every normalised transformer must have basins (Brouwer)",
+      "type": "hypothesis",
+      "status": "corrected",
+      "side": "shared",
+      "role": "breakdown",
+      "phase": "phase-4",
+      "doc_ref": "docs/JOURNEY_MAP.md#2-key-discoveries-chronological",
+      "asserted": "2026-03-20",
+      "retired": "2026-07-23",
+      "description": "Session 02's attempt to promote the room analogy into a theorem: a continuous map on a compact set has a fixed point, LayerNorm bounds the state, therefore attractors are guaranteed and only their number and depth are empirical. Corrected 2026-07-23; kept in the graph because the correction is the interesting part."
+    },
+    {
+      "id": "concept-l2-shell-not-convex",
+      "label": "The L2 shell is a sphere, and a sphere is not convex",
+      "type": "concept",
+      "status": "supported",
+      "side": "transformer",
+      "role": "breakdown",
+      "phase": "phase-5",
+      "doc_ref": "docs/JOURNEY_MAP.md#2-key-discoveries-chronological",
+      "asserted": "2026-07-23",
+      "retired": null,
+      "description": "Brouwer's theorem requires a compact convex domain. L2 rescaling confines the state to a fixed-radius sphere in R^(T x 768), which is not convex, and the normalised map is undefined at zero. Attractor existence in these models is an observation, not a guarantee."
+    }
+  ],
+  "runs": [
+    {
+      "id": "model-gpt2-small",
+      "label": "GPT-2 Small (124M)",
+      "type": "model",
+      "description": "12 layers, 12 heads, d_model 768, 50,257 BPE tokens, trained on WebText. The room whose acoustics this graph maps."
+    },
+    {
+      "id": "run-03-random-baseline",
+      "label": "Run 3: random-noise null model",
+      "type": "null-model",
+      "description": "125 Gaussian tensors (seed 42) iterated through GPT-2 Small in place of prompts. Converges into 18 non-semantic attractors with essentially no overlap with the five language-driven basins.",
+      "script": "experiments/gpt2_small/03_random_baseline.ipynb",
+      "output_dir": "experiments/gpt2_small/output_random_baseline/",
+      "n": "125 Gaussian tensors, seed 42"
+    },
+    {
+      "id": "run-08-divine-motion",
+      "label": "Run 8: Divine motion audit (lag-10 + lag-1 probe)",
+      "type": "run",
+      "description": "Three trajectories to 1000 iterations with a dense lag-1 probe from the saved iteration-1000 state. Found the alternation the log-spaced schedules had aliased away, and verified the cycle exactly: cos(A, f(f(A))) = 1.000000.",
+      "script": "experiments/gpt2_small/05_divine_motion.py",
+      "output_dir": "experiments/gpt2_small/output_divine_motion/",
+      "n": "3 trajectories x 1000 iters, + 20 lag-1 iters",
+      "date": "2026-07-19"
+    }
+  ],
+  "sources": [
+    {
+      "id": "doc-isomorphism",
+      "title": "ISOMORPHISM.md — Lucier's room and iterative activation re-injection",
+      "type": "doc",
+      "path": "docs/ISOMORPHISM.md",
+      "description": "The correspondence itself: the linear acoustic case, the nonlinear transformer case, the nonlinearity table and the isomorphism table this graph is a transcription of."
+    },
+    {
+      "id": "doc-technical",
+      "title": "TECHNICAL.md — method specification",
+      "type": "doc",
+      "path": "docs/TECHNICAL.md",
+      "description": "Hook read/write points, the L2 rescaling rule, the formal iteration x_{n+1} = f(normalise(x_n)), and the gate_lag parameter."
+    },
+    {
+      "id": "doc-understanding",
+      "title": "UNDERSTANDING.md — the feedback mechanism",
+      "type": "doc",
+      "path": "docs/UNDERSTANDING.md",
+      "description": "Why the loop is closed before the unembedding rather than after it, and the correction about what the attractors are not."
+    },
+    {
+      "id": "doc-math-primer",
+      "title": "MATH_PRIMER.md — the maths from scratch",
+      "type": "doc",
+      "path": "docs/MATH_PRIMER.md",
+      "description": "Iterated maps, fixed points, basins, and power iteration as the linear ancestor of ATR, with its guarantees spelled out."
+    },
+    {
+      "id": "doc-findings",
+      "title": "FINDINGS.md — the canonical record",
+      "type": "doc",
+      "path": "docs/FINDINGS.md",
+      "description": "Run inventory, principal findings F1-F17, hypothesis dispositions and caveats. F4, F9 and F15 anchor the breakdown points in this graph."
+    },
+    {
+      "id": "doc-journey-map",
+      "title": "JOURNEY_MAP.md — timeline, discoveries, glossary",
+      "type": "doc",
+      "path": "docs/JOURNEY_MAP.md",
+      "description": "Key Discoveries table (including number 11, the Brouwer claim and its 2026-07-23 correction) and the adjacent-mathematics table."
+    },
+    {
+      "id": "doc-readme",
+      "title": "README.md — the piece",
+      "type": "doc",
+      "path": "README.md",
+      "description": "The narrative account of the operation, including the description of the L2 rescale as 'the room's friction'."
+    },
+    {
+      "id": "prior-lucier-1969",
+      "title": "Lucier, A. (1969). I Am Sitting in a Room",
+      "type": "prior-work",
+      "path": "https://en.wikipedia.org/wiki/I_Am_Sitting_in_a_Room",
+      "description": "The source piece: speech recorded, replayed into a room, re-recorded, repeated, until only the room's resonances remain."
+    },
+    {
+      "id": "prior-transformerlens",
+      "title": "Nanda, N. & Bloom, J. (2022). TransformerLens",
+      "type": "prior-work",
+      "path": "https://github.com/TransformerLensOrg/TransformerLens",
+      "description": "The hook library that supplies the re-injection mechanism: the apparatus standing in for Lucier's tape recorder."
+    }
+  ],
+  "relationships": [
+    {
+      "from": "ac-room",
+      "to": "tr-weights",
+      "type": "analogous-to",
+      "description": "Shared role: the operator being iterated. A room is fixed once built and the weights are fixed once trained; in both cases the iteration applies the same object over and over to whatever is handed to it.",
+      "weight": 8
+    },
+    {
+      "from": "ac-audio-signal",
+      "to": "tr-residual-stream",
+      "type": "analogous-to",
+      "description": "Shared role: the state vector. Both are the quantity that changes from pass to pass and gets carried forward — a signal in R^n there, a [T, 768] tensor here.",
+      "weight": 8
+    },
+    {
+      "from": "ac-tape-recorder",
+      "to": "tr-hook",
+      "type": "analogous-to",
+      "description": "Shared role: the feedback mechanism. Both capture the output state and present it as the next input; without either device the system is not iterated at all.",
+      "weight": 8
+    },
+    {
+      "from": "ac-room-friction",
+      "to": "tr-l2-normalisation",
+      "type": "analogous-to",
+      "description": "Shared role: the energy budget that keeps the iteration bounded. The README names the L2 rescale 'the room's friction' — in both systems the state would otherwise grow without limit under repeated re-injection.",
+      "weight": 5
+    },
+    {
+      "from": "ac-resonant-frequency",
+      "to": "tr-attractor-state",
+      "type": "analogous-to",
+      "description": "Shared role: attractor of the iterated map. The room mode is the direction the acoustic iterates approach; prolet, Divine and the rest are what the transformer iterates settle into (a fixed point, or a period-2 cycle for Divine).",
+      "weight": 8
+    },
+    {
+      "from": "ac-spectral-decay",
+      "to": "tr-dissolution",
+      "type": "analogous-to",
+      "description": "Shared role: transient dynamics before the attractor. Non-dominant acoustic components shrink at rates set by eigenvalue ratios; semantic content drains through the dissolution pathway. Both are the part of the process you can hear happening.",
+      "weight": 8
+    },
+    {
+      "from": "ac-pure-drone",
+      "to": "tr-terminal-token",
+      "type": "analogous-to",
+      "description": "Shared role: the stable attractor readout. A steady tone at the room's resonance; a single token repeated across every position once the state stops moving.",
+      "weight": 8
+    },
+    {
+      "from": "ac-linear-operator-h",
+      "to": "tr-nonlinear-map-f",
+      "type": "analogous-to",
+      "description": "Shared role: the map being iterated — and the row where the correspondence changes character. Same structural position, different class of operator: H is linear, f is not, and every break recorded in this graph descends from that difference.",
+      "weight": 9
+    },
+    {
+      "from": "ac-dominant-eigenmode",
+      "to": "tr-multiple-basins",
+      "type": "analogous-to",
+      "description": "Shared role: the consequence of (non)linearity. Linearity buys one dominant mode under stated conditions; nonlinearity permits several coexisting attractors with distinct basins, which is the landscape the 125-prompt sweep maps.",
+      "weight": 9
+    },
+    {
+      "from": "ac-linear-operator-h",
+      "to": "nl-layernorm",
+      "type": "breaks-down-at",
+      "description": "H is additive by the acoustic superposition principle. LayerNorm recentres and rescales its input, so f(a + b) is not f(a) + f(b), and the transfer-function reading of the stack fails before the first attention head runs.",
+      "weight": 7
+    },
+    {
+      "from": "ac-room",
+      "to": "nl-softmax-attention",
+      "type": "breaks-down-at",
+      "description": "A room does not listen. Softmax attention gates the value vectors on the data itself, so the mixing pattern the 'room' applies is a function of what is being played into it — the operator is state-dependent in a way no acoustic space is.",
+      "weight": 7
+    },
+    {
+      "from": "ac-room",
+      "to": "nl-qkv-recompute",
+      "type": "breaks-down-at",
+      "description": "The room's geometry is fixed for the duration of the piece. Q, K and V are recomputed at every iteration from the current state, so the transformer is not one room played many times but a different room on each pass.",
+      "weight": 7
+    },
+    {
+      "from": "ac-linear-operator-h",
+      "to": "nl-gelu-mlp",
+      "type": "breaks-down-at",
+      "description": "GeLU applies a pointwise bend to every coordinate, twelve times per pass. Air is linear to a very good approximation at these amplitudes, so this component has no acoustic counterpart at all.",
+      "weight": 7
+    },
+    {
+      "from": "ac-linear-operator-h",
+      "to": "nl-residual-connections",
+      "type": "breaks-down-at",
+      "description": "The one near-miss: the skip path is additive, so it behaves like superposition. But it composes with the nonlinear sublayers rather than replacing them, so the linear-looking part of the architecture does not restore the linear model.",
+      "weight": 5
+    },
+    {
+      "from": "nl-layernorm",
+      "to": "concept-no-spectral-guarantee",
+      "type": "supports",
+      "description": "Rescaling and recentring break additivity, and the spectral theorem is a statement about additive maps.",
+      "weight": 5
+    },
+    {
+      "from": "nl-softmax-attention",
+      "to": "concept-no-spectral-guarantee",
+      "type": "supports",
+      "description": "Data-dependent gating means there is no single matrix whose eigenvectors could be the thing the iteration converges to.",
+      "weight": 5
+    },
+    {
+      "from": "nl-qkv-recompute",
+      "to": "concept-no-spectral-guarantee",
+      "type": "supports",
+      "description": "Recomputing QKV each pass makes the effective operator state-dependent, so 'the dominant eigenvalue of H' has no fixed referent.",
+      "weight": 5
+    },
+    {
+      "from": "nl-gelu-mlp",
+      "to": "concept-no-spectral-guarantee",
+      "type": "supports",
+      "description": "An element-wise nonlinear activation puts the composite map outside the class the power-iteration proof covers.",
+      "weight": 5
+    },
+    {
+      "from": "nl-residual-connections",
+      "to": "concept-no-spectral-guarantee",
+      "type": "supports",
+      "description": "Additive in isolation, but composed with nonlinear sublayers, so it cannot be used to recover a linear reading of the stack.",
+      "weight": 3
+    },
+    {
+      "from": "ac-dominant-eigenmode",
+      "to": "concept-no-spectral-guarantee",
+      "type": "breaks-down-at",
+      "description": "Power iteration singles out one direction only for a diagonalisable operator with a unique largest-magnitude eigenvalue and a start that overlaps it. None of those hypotheses can be checked for f, so the single-mode expectation does not transfer.",
+      "weight": 8
+    },
+    {
+      "from": "concept-no-spectral-guarantee",
+      "to": "tr-multiple-basins",
+      "type": "supports",
+      "description": "With no theorem forcing one dominant direction, several attractors with distinct basins become possible — and five of them are what GPT-2 Small actually shows.",
+      "weight": 6
+    },
+    {
+      "from": "tr-l2-normalisation",
+      "to": "tr-multiple-basins",
+      "type": "supports",
+      "description": "The rescaling is what makes the landscape visible at all: unnormalised, the norm reaches ~1.5M and saturates the nonlinearities, and no basin structure can be read off the result.",
+      "weight": 5
+    },
+    {
+      "from": "ac-resonant-frequency",
+      "to": "f9-divine-period-2",
+      "type": "breaks-down-at",
+      "description": "A room mode is a fixed point: play the drone back into the room and the drone comes out again. The Divine state returns to itself only every second pass, alternating between two phases 1249 apart in L2. Nothing in the resonance picture predicts an object that needs two passes to come home.",
+      "weight": 9
+    },
+    {
+      "from": "f9-divine-period-2",
+      "to": "tr-attractor-state",
+      "type": "qualifies",
+      "description": "The attractor set is not only fixed points. Divine is a genuine attractor of f that no lag-1 convergence gate can ever pass, which is why 34 prompts were reported for months as never converging.",
+      "weight": 7
+    },
+    {
+      "from": "f9-divine-period-2",
+      "to": "ac-pure-drone",
+      "type": "qualifies",
+      "description": "The drone survives at the readout — the argmax is Divine in both phases — but the distribution beneath it shifts by about 0.25 nats KL per half-cycle. A steady readout no longer licenses the inference that the state is steady.",
+      "weight": 6
+    },
+    {
+      "from": "f9-divine-period-2",
+      "to": "run-08-divine-motion",
+      "type": "evidenced-by",
+      "description": "The lag-1 probe from the saved iteration-1000 state: L2 distance from the base state alternates 1249.43, 0.000, 1249.43, 0.001, and the cycle-anatomy run then verified cos(A, f(f(A))) = 1.000000.",
+      "weight": 6
+    },
+    {
+      "from": "ac-resonant-frequency",
+      "to": "concept-regime-dependence",
+      "type": "breaks-down-at",
+      "description": "Excite a room with anything broadband and the same modes rise: they are a property of the space. GPT-2 Small's five basins fail that test — noise through the same weights gives eighteen different, non-semantic attractors — so they belong to the language-driven regime, not to the room.",
+      "weight": 9
+    },
+    {
+      "from": "concept-regime-dependence",
+      "to": "run-03-random-baseline",
+      "type": "evidenced-by",
+      "description": "125 Gaussian tensors iterated in place of prompts: convergence still happens, into 18 non-semantic basins with essentially zero overlap with the real five.",
+      "weight": 6
+    },
+    {
+      "from": "ac-tape-recorder",
+      "to": "concept-readout-bypass",
+      "type": "breaks-down-at",
+      "description": "The tape recorder re-injects the fully rendered signal, everything the room emitted through the air. The hook re-injects the residual stream before the unembedding, deliberately skipping the argmax bottleneck — so the ATR loop has no acoustic counterpart at the point where it is actually closed.",
+      "weight": 7
+    },
+    {
+      "from": "claim-brouwer-basins",
+      "to": "ac-resonant-frequency",
+      "type": "builds-on",
+      "description": "The Session 02 argument tried to turn the room analogy into a theorem: if a room always has modes, a normalised transformer must always have attractors.",
+      "weight": 4
+    },
+    {
+      "from": "concept-l2-shell-not-convex",
+      "to": "claim-brouwer-basins",
+      "type": "corrects",
+      "description": "Brouwer requires a compact convex domain. L2 rescaling puts the state on a sphere, which is not convex, and the normalised map is undefined at zero — so the fixed-point theorem cannot be invoked here. Corrected 2026-07-23.",
+      "weight": 9
+    },
+    {
+      "from": "concept-l2-shell-not-convex",
+      "to": "tr-l2-normalisation",
+      "type": "relates-to",
+      "description": "The surface the argument founders on is exactly the constraint the L2 rescaling imposes: the design decision that makes the dynamics legible is the same one that denies them a fixed-point guarantee.",
+      "weight": 5
+    },
+    {
+      "from": "ac-tape-recorder",
+      "to": "prior-lucier-1969",
+      "type": "cites",
+      "description": "The re-injection mechanism is Lucier's: record, play back into the room, re-record, repeat.",
+      "weight": 2
+    },
+    {
+      "from": "tr-hook",
+      "to": "prior-transformerlens",
+      "type": "cites",
+      "description": "The read and write points (blocks.11.hook_resid_post, blocks.0.hook_resid_pre) are TransformerLens hooks; the library is what makes the loop a few lines of code.",
+      "weight": 2
+    },
+    {
+      "from": "run-08-divine-motion",
+      "to": "model-gpt2-small",
+      "type": "run-on",
+      "description": "The motion audit and its lag-1 probe were run on GPT-2 Small, the model the whole isomorphism is stated for.",
+      "weight": 2
+    },
+    {
+      "from": "run-03-random-baseline",
+      "to": "model-gpt2-small",
+      "type": "run-on",
+      "description": "The null model uses the same weights as the language sweep, changing only what is fed into them.",
+      "weight": 2
+    },
+    {
+      "from": "ac-room",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#the-acoustic-case-linear-power-iteration — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "ac-audio-signal",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#the-isomorphism — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "ac-tape-recorder",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#the-acoustic-case-linear-power-iteration — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "ac-room-friction",
+      "to": "doc-readme",
+      "type": "documented-in",
+      "description": "Stated in README.md#how-atr-works — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "ac-resonant-frequency",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#the-acoustic-case-linear-power-iteration — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "ac-spectral-decay",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#the-isomorphism — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "ac-pure-drone",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#the-acoustic-case-linear-power-iteration — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "ac-linear-operator-h",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#the-acoustic-case-linear-power-iteration — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "ac-dominant-eigenmode",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#key-insight — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "tr-weights",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#the-isomorphism — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "tr-residual-stream",
+      "to": "doc-technical",
+      "type": "documented-in",
+      "description": "Stated in docs/TECHNICAL.md#formal-description — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "tr-hook",
+      "to": "doc-technical",
+      "type": "documented-in",
+      "description": "Stated in docs/TECHNICAL.md#hook-mechanism — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "tr-l2-normalisation",
+      "to": "doc-technical",
+      "type": "documented-in",
+      "description": "Stated in docs/TECHNICAL.md#normalisation — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "tr-attractor-state",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#the-isomorphism — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "tr-dissolution",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#the-isomorphism — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "tr-terminal-token",
+      "to": "doc-technical",
+      "type": "documented-in",
+      "description": "Stated in docs/TECHNICAL.md#observed-dynamics — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "tr-nonlinear-map-f",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#the-transformer-case-nonlinear-power-iteration — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "tr-multiple-basins",
+      "to": "doc-findings",
+      "type": "documented-in",
+      "description": "Stated in docs/FINDINGS.md#run-5 — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "nl-layernorm",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#the-transformer-case-nonlinear-power-iteration — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "nl-softmax-attention",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#the-transformer-case-nonlinear-power-iteration — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "nl-qkv-recompute",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#the-transformer-case-nonlinear-power-iteration — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "nl-gelu-mlp",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#the-transformer-case-nonlinear-power-iteration — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "nl-residual-connections",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#the-transformer-case-nonlinear-power-iteration — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "concept-no-spectral-guarantee",
+      "to": "doc-isomorphism",
+      "type": "documented-in",
+      "description": "Stated in docs/ISOMORPHISM.md#the-transformer-case-nonlinear-power-iteration — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "f9-divine-period-2",
+      "to": "doc-findings",
+      "type": "documented-in",
+      "description": "Stated in docs/FINDINGS.md#f9-the-divine-anomaly-resolved-an-exact-period-2-limit-cycle-hidden-by-aliasing — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "concept-regime-dependence",
+      "to": "doc-findings",
+      "type": "documented-in",
+      "description": "Stated in docs/FINDINGS.md#f4-the-five-basins-belong-to-the-language-driven-regime-not-the-weights-in-general-null-model — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "concept-readout-bypass",
+      "to": "doc-understanding",
+      "type": "documented-in",
+      "description": "Stated in docs/UNDERSTANDING.md#the-lucier-loop-bypasses-this-bottleneck — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "claim-brouwer-basins",
+      "to": "doc-journey-map",
+      "type": "documented-in",
+      "description": "Stated in docs/JOURNEY_MAP.md#2-key-discoveries-chronological — the sentence this node is a transcription of.",
+      "weight": 2
+    },
+    {
+      "from": "concept-l2-shell-not-convex",
+      "to": "doc-journey-map",
+      "type": "documented-in",
+      "description": "Stated in docs/JOURNEY_MAP.md#2-key-discoveries-chronological — the sentence this node is a transcription of.",
+      "weight": 2
+    }
+  ]
+}
