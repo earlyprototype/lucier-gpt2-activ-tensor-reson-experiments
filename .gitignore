@@ -42,3 +42,15 @@ README_ORIGINAL.md
 
 # Local agent session config
 .claude/
+
+# 2026-07-25: EXP_009 artifact regeneration (issue #25). These specific regenerated
+# outputs MUST be committed — the March originals were lost precisely because they
+# were local-only. Negations below override the `_DATA/` and `*.pt` rules above.
+!experiments/_DATA/
+experiments/_DATA/*
+!experiments/_DATA/EXP_009/
+experiments/_DATA/EXP_009/*
+!experiments/_DATA/EXP_009/009bFIX_head_loop_results.pt
+!experiments/_DATA/EXP_009/009bFIX_convergence_grid.pt
+!experiments/_DATA/EXP_009/009c_spectral_data.pt
+!experiments/_DATA/EXP_009/009c_validation_grid.pt
