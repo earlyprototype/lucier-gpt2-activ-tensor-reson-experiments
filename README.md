@@ -213,7 +213,7 @@ A suggested listening order:
 4. [`03_random_baseline.ipynb`](experiments/gpt2_small/03_random_baseline.ipynb): the null model. Noise instead of language.
 5. [`cos_sim_diagnostic.ipynb`](experiments/cos_sim_diagnostic.ipynb) and [`readout_guardrails.ipynb`](experiments/readout_guardrails.ipynb): the measurement checks behind the claims.
 
-> **Note:** the 125-prompt sweep notebooks (`01_*`), `gated_resweep.py` and the Pythia-410m deep run import `prompt_library.py`, which is temporarily absent from the repository and will be restored shortly. Steps 1, 2, 4 and 5 run without it.
+> **Note on `prompt_library.py`:** the 125-prompt sweep notebooks (`01_*`), `gated_resweep.py` and the Pythia-410m deep run import `prompt_library.py`. The file is a provenance-flagged reconstruction (issue #24): all 125 prompts were recovered verbatim from committed records — the original file's deleted git blob and the `dissolution_sentences.md` dissolution record, which agree byte-for-byte — so every entry is flagged `original` and there are zero `reconstructed-new` prompts. Because the library is a faithful full restoration of the exact original 125, a sweep run against it is a genuine reproduction of the published Stage 1 basin-share table. Each prompt carries its provenance flag in the module's `PROVENANCE` dict; if any entry were ever replaced with a re-authored (`reconstructed-new`) prompt, a sweep including it would be a *new experiment*, not a reproduction, and downstream reporting inherits the flags to say so.
 
 ## Citing This Work
 
