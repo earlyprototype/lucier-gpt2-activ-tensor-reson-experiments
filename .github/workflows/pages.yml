@@ -1,0 +1,181 @@
+name: pages
+
+# Publishes the knowledge graph at
+#   https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/
+#
+# The site is assembled rather than served straight from a directory, because the
+# viewer and the documents it cites live in different places in the repository.
+# The layout below puts the viewer at the site root and the repo's markdown one
+# level under it, which is exactly what the viewer's own path resolution expects:
+# a provenance link recorded as `docs/FINDINGS.md` resolves with no prefix at all.
+#
+# Requires one manual step, once: Settings -> Pages -> Source -> "GitHub Actions".
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'experiments/**/*.png'
+      - 'README.md'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish rather than cancelling it half-published.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # The three builders parse docs/FINDINGS.md, docs/JOURNEY_MAP.md,
+      # docs/ISOMORPHISM.md and the experiments' dissolution tables. Regenerating
+      # here means the published graph can never drift from the record it
+      # describes: if a document is reshuffled such that parsing breaks, or a
+      # relationship endpoint stops resolving, the builders exit non-zero and this
+      # deploy fails loudly instead of shipping a stale or dangling graph.
+      # They are pure standard library, so there is nothing to install.
+      - name: Regenerate graph data from the source documents
+        working-directory: docs/graph
+        run: |
+          python3 build_evidence_graph.py
+          python3 build_dissolution_graph.py
+          python3 build_isomorphism_graph.py
+
+      - name: Assemble site
+        run: |
+          set -euo pipefail
+          SITE="$RUNNER_TEMP/site"
+          mkdir -p "$SITE/_data"
+
+          # The viewer, at the site root. Also kept as viewer.html so the local
+          # development URL (python3 -m http.server, then /viewer.html) and the
+          # published URL are the same page.
+          cp docs/graph/viewer.html "$SITE/index.html"
+          cp docs/graph/viewer.html "$SITE/viewer.html"
+          cp docs/graph/_data/*.json "$SITE/_data/"
+
+          # Every markdown document, plus the images those documents embed, and the
+          # run reports and figures under experiments/. Text and images only — the
+          # tensor checkpoints are large and nothing links to them.
+          # `cp --parents` reproduces each file's repo-relative path under the site,
+          # which is what makes a link recorded as `docs/FINDINGS.md` resolve.
+          find docs -name '*.md' -exec cp --parents {} "$SITE/" \;
+          find docs/assets -type f -exec cp --parents {} "$SITE/" \;
+          find experiments \( -name '*.md' -o -name '*.png' \) \
+            -exec cp --parents {} "$SITE/" \;
+          cp README.md "$SITE/README.md"
+
+          # Catch-all: copy anything the graph cites that the rules above missed.
+          # Driven from entities.json rather than a hand-maintained list, so a
+          # builder that starts citing a new kind of file does not silently ship a
+          # dead link — the site follows the graph instead of tracking it by hand.
+          python3 - "$SITE" <<'PY'
+          import json, pathlib, shutil, sys
+          site = pathlib.Path(sys.argv[1])
+          data = json.loads(pathlib.Path("docs/graph/_data/entities.json").read_text())
+          cited = {s.get("path") for s in data.get("sources", [])}
+          cited |= {c.get("doc_ref") for c in data.get("claims", [])}
+          copied = 0
+          for raw in sorted(p for p in cited if p):
+              if raw.startswith(("http://", "https://")):
+                  continue
+              rel = raw.split("#", 1)[0]
+              source, target = pathlib.Path(rel), site / rel
+              if source.is_file() and not target.exists():
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  shutil.copy2(source, target)
+                  copied += 1
+          print(f"copied {copied} additional cited file(s)")
+          PY
+
+          # Pages runs Jekyll by default, which silently drops directories whose
+          # names begin with an underscore. That would delete _data/ — the graph
+          # itself. This file is what stops that.
+          touch "$SITE/.nojekyll"
+
+          echo "site assembled:"
+          du -sh "$SITE"
+          find "$SITE" -name '*.json' -o -name '*.md' | wc -l
+
+      # The viewer loads vis-network and marked from a CDN, which is fine when a
+      # person opens the file locally. For the published site we vendor both at
+      # build time and rewrite the two script tags in the built copy only — the
+      # repository's viewer.html is untouched. This makes the deployed page
+      # self-contained: no third-party request at view time, and no exposure to an
+      # unpinned "latest" CDN URL shipping a breaking change under the site.
+      # If a CDN is unreachable the build fails here, loudly, rather than the site
+      # silently rendering a blank canvas for visitors.
+      - name: Vendor front-end libraries
+        run: |
+          set -euo pipefail
+          SITE="$RUNNER_TEMP/site"
+          curl -sSfL --retry 3 --retry-delay 2 \
+            https://unpkg.com/vis-network/standalone/umd/vis-network.min.js \
+            -o "$SITE/vis-network.min.js"
+          curl -sSfL --retry 3 --retry-delay 2 \
+            https://cdn.jsdelivr.net/npm/marked/marked.min.js \
+            -o "$SITE/marked.min.js"
+          for page in index.html viewer.html; do
+            sed -i \
+              -e 's#https://unpkg.com/vis-network/standalone/umd/vis-network.min.js#vis-network.min.js#' \
+              -e 's#https://cdn.jsdelivr.net/npm/marked/marked.min.js#marked.min.js#' \
+              "$SITE/$page"
+          done
+          grep -q 'src="vis-network.min.js"' "$SITE/index.html" \
+            || { echo "vis-network script tag was not rewritten"; exit 1; }
+          grep -q 'src="marked.min.js"' "$SITE/index.html" \
+            || { echo "marked script tag was not rewritten"; exit 1; }
+
+      - name: Check every cited path is actually present in the site
+        run: |
+          set -euo pipefail
+          python3 - "$RUNNER_TEMP/site" <<'PY'
+          import json, sys, pathlib
+          site = pathlib.Path(sys.argv[1])
+          data = json.loads((site / "_data" / "entities.json").read_text())
+          missing = []
+          for source in data.get("sources", []):
+              path = source.get("path") or ""
+              if not path or path.startswith(("http://", "https://")):
+                  continue
+              if not (site / path.split("#", 1)[0]).exists():
+                  missing.append(path)
+          for claim in data.get("claims", []):
+              ref = (claim.get("doc_ref") or "").split("#", 1)[0]
+              if ref and not (site / ref).exists():
+                  missing.append(ref)
+          if missing:
+              print("cited paths absent from the assembled site:")
+              for path in sorted(set(missing)):
+                  print("  ", path)
+              sys.exit(1)
+          print("every cited path resolves in the site")
+          PY
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ runner.temp }}/site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
