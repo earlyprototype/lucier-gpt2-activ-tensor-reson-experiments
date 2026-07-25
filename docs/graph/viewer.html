@@ -3112,7 +3112,10 @@
 
             const options = {
                 physics: buildPhysicsOptions(),
-                layout: { randomSeed: 42, improvedLayout: true },
+                // hierarchical is stated explicitly rather than omitted: a mode
+                // that switches it on must not be able to leave it on for the
+                // next graph simply by failing to mention it.
+                layout: { randomSeed: 42, improvedLayout: true, hierarchical: { enabled: false } },
                 interaction: {
                     hover: true,
                     tooltipDelay: 120,
@@ -3750,6 +3753,14 @@
                 renderMode = 'evidence';
                 dissolutionData = null;
                 currentModelKey = null;
+
+                // Clearing this is load-bearing, twice over. Left set, the
+                // dissolution override would apply its hierarchical layout and
+                // physics:false to the evidence graph — and because the layout
+                // signature below is derived from this value, an unchanged
+                // signature would also skip the destroy/recreate and quietly
+                // reuse the hierarchical network via setData().
+                layoutOverride = null;
 
                 phases = Array.isArray(metadata.phases) ? metadata.phases.slice() : [];
                 phases.sort(function (a, b) {

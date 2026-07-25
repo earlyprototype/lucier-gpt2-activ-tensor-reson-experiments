@@ -3,7 +3,7 @@
  * Headless browser smoke + interaction test for docs/graph/viewer.html.
  *
  * Serves docs/graph on a free port, drives the viewer with Playwright's
- * bundled Chromium, and asserts eleven things:
+ * bundled Chromium, and asserts thirteen things:
  *
  *   1. viewer.html loads with ZERO pageerror and ZERO console-error events
  *   2. a <canvas> exists and vis-network has actually rendered nodes
@@ -17,10 +17,12 @@
  *  10. an unknown status still renders, gets a chip, and stays reachable
  *  11. no HTTP >= 400 responses for any requested asset
  *  12. on a phone-sized viewport the graph, not the chrome, owns the screen
+ *  13. returning to evidence from another graph restores force-directed layout
  *
- * Assertions 1-11 run at 1600x1000. Assertion 12 opens a second, phone-sized
- * context (393x830, isMobile + hasTouch) so the narrow-screen layout is pinned
- * without disturbing the desktop measurements the other eleven depend on.
+ * Assertions 1-11 and 13 run at 1600x1000. Assertion 12 opens a second,
+ * phone-sized context (393x830, isMobile + hasTouch) so the narrow-screen
+ * layout is pinned without disturbing the desktop measurements the others
+ * depend on.
  *
  * Run:  node docs/graph/tests/smoke_test.mjs
  * Exit: 0 = all pass, 1 = at least one failure.
@@ -149,7 +151,7 @@ function startServer(rootDir) {
 // --- reporting -------------------------------------------------------------
 // Every assertion must run: a suite that silently stops short is a failure, not
 // a pass. Bump this when adding one.
-const TOTAL_ASSERTIONS = 12;
+const TOTAL_ASSERTIONS = 13;
 
 // --- mobile budget (assertion 12) ------------------------------------------
 // A real device (Nothing Phone 2a) showed the header + chip rows eating 66% of
@@ -897,6 +899,76 @@ async function main() {
                     `${r.toggled ? '' : ' <-- no usable #mobile-filter-toggle'}`).join('\n')
                 : 'no measurements taken') +
             '\n' + (describeSince(snap12).join('\n') || 'no errors'));
+
+        // ------------------------------------------------------------------
+        // 13. Returning from dissolution restores the force-directed layout.
+        //
+        // Dissolution renders hierarchically with physics off. That override
+        // used to survive the trip back, so the evidence graph re-rendered as
+        // hierarchical columns with physics disabled — 163 nodes collapsed onto
+        // 9 distinct x positions instead of ~155. The distinct-x count is the
+        // signal that actually catches it: the mode flags could be restored
+        // while stale pinned positions still left the graph stacked.
+        // ------------------------------------------------------------------
+        phase = 'layout-restore';
+        const snap13 = snapshotErrors();
+
+        const readLayout = () => page.evaluate(() => {
+            const xs = Object.values(network.getPositions()).map(p => Math.round(p.x));
+            return {
+                hierarchical: !!network.layoutEngine.options.hierarchical.enabled,
+                physics: !!network.physics.options.enabled,
+                overrideCleared: typeof layoutOverride === 'undefined' || layoutOverride === null,
+                distinctX: new Set(xs).size,
+                nodes: xs.length
+            };
+        });
+
+        await page.selectOption('#graph-select', 'evidence');
+        await waitLoaded(page);
+        await sleep(1500);
+        const baseline = await readLayout();
+
+        const roundTrips = [];
+        for (const via of ['dissolution', 'isomorphism']) {
+            await page.selectOption('#graph-select', via);
+            await waitLoaded(page);
+            await sleep(1200);
+            const detour = await readLayout();
+
+            await page.selectOption('#graph-select', 'evidence');
+            await waitLoaded(page);
+            await sleep(1500);
+            const back = await readLayout();
+
+            roundTrips.push({
+                via,
+                detour,
+                back,
+                ok: !back.hierarchical && back.physics && back.overrideCleared &&
+                    back.nodes === baseline.nodes &&
+                    // Allow generous drift: physics is stochastic run to run, but
+                    // the failure mode collapses this by an order of magnitude.
+                    back.distinctX >= Math.floor(baseline.distinctX * 0.5)
+            });
+        }
+
+        const ok13 = !baseline.hierarchical && baseline.physics &&
+            roundTrips.length === 2 && roundTrips.every(r => r.ok) && cleanSince(snap13);
+        record(13,
+            'returning to evidence from another graph restores force-directed layout ' +
+            '(hierarchical off, physics on, nodes not stacked)',
+            ok13,
+            `baseline evidence: hierarchical=${baseline.hierarchical} physics=${baseline.physics} ` +
+            `distinctX=${baseline.distinctX}/${baseline.nodes}\n` +
+            roundTrips.map(r =>
+                `via ${r.via.padEnd(12)} -> back: hierarchical=${r.back.hierarchical}` +
+                `${r.back.hierarchical ? ' <-- LEAKED' : ''} ` +
+                `physics=${r.back.physics}${r.back.physics ? '' : ' <-- DISABLED'} ` +
+                `overrideCleared=${r.back.overrideCleared} ` +
+                `distinctX=${r.back.distinctX}/${r.back.nodes}` +
+                `${r.ok ? '' : ' <-- STACKED'}`).join('\n') +
+            '\n' + (describeSince(snap13).join('\n') || 'no errors'));
 
     } catch (err) {
         console.error('\n\x1b[31mHARNESS ERROR\x1b[0m:', err && err.stack || err);
