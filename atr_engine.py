@@ -244,7 +244,8 @@ def run_atr_loop(model, prompt, layer_start, layer_end, max_iter, schedule, verb
 
 def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
                   threshold=0.999, patience=3, check_every=10, check_start=100,
-                  verbose=False, gate_lag=1):
+                  verbose=False, gate_lag=1, capture_terminal=False,
+                  inject_hook_name=None, renorm="seed_j"):
     """Convergence-gated ATR loop (early-stop variant of run_atr_loop).
 
     Iterates the full-tensor re-injection until the tensor stops moving, then
@@ -262,6 +263,18 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
     lag-1 cosine at 0.685 forever (never passes) but reads 1.0 at
     ``gate_lag=2``. ``check_start`` must be >= ``gate_lag`` (enforced).
 
+    ``capture_terminal`` (default False): when True the return dict also
+    carries ``terminal_mean_vec``, ``terminal_last_vec`` and ``lag_scan``
+    (``{lag: mean cosine}`` over the last 9 mean-vector iterates, for periodic
+    -attractor census). ``inject_hook_name`` (default None) overrides the
+    injection hook point (an injection-site sanity control). ``renorm``
+    (``"seed_j"`` default, or ``"natural_i"``) selects the rescale target:
+    ``"seed_j"`` uses the seed norm at the extraction layer (the historical
+    path); ``"natural_i"`` uses the natural ``resid_pre`` norm at the
+    injection layer. These three parameters were developed for the Stage 2
+    layer-window experiments (EXP_010c); the defaults reproduce the registered
+    single-window path exactly, so existing callers are unaffected.
+
     Lean by design (one readout decode, at the end) so a 125-prompt × 1000-iter
     sweep stays forward-pass-bound.
 
@@ -269,7 +282,10 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
         terminal_token, terminal_token_id, terminal_prob,
         lock_in_iter (None if never locked), converged (bool),
         n_iters (iterations actually run), final_cos_sim_mean,
-        top_logit_margin, entropy.
+        top_logit_margin, entropy, and always the injection/renorm metadata
+        inject_hook, renorm, target_norm, seed_norm_at_j; plus, when
+        ``capture_terminal`` is set, terminal_mean_vec, terminal_last_vec and
+        lag_scan.
     """
     if gate_lag < 1:
         raise ValueError(f"gate_lag must be >= 1, got {gate_lag}")
@@ -277,18 +293,30 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
         raise ValueError(
             f"check_start ({check_start}) must be >= gate_lag ({gate_lag}) "
             "for the lagged comparison to be well-formed")
+    if renorm not in ("seed_j", "natural_i"):
+        raise ValueError(f"renorm must be 'seed_j' or 'natural_i', got {renorm!r}")
     hook_point_read = f"blocks.{layer_end}.hook_resid_post"
-    hook_point_write = f"blocks.{layer_start}.hook_resid_pre"
+    hook_point_write = inject_hook_name or f"blocks.{layer_start}.hook_resid_pre"
+    # Control B (renorm="natural_i") needs the natural resid_pre norm at the
+    # injection layer; the initial pass is un-hooked, so its resid_pre at
+    # layer_start IS the natural value for this prompt.
+    natural_pre_name = f"blocks.{layer_start}.hook_resid_pre"
+    cache_names = {hook_point_read} | ({natural_pre_name} if renorm == "natural_i" else set())
 
     with torch.no_grad():
         _, cache = model.run_with_cache(
-            prompt, names_filter=lambda n: n == hook_point_read
+            prompt, names_filter=lambda n: n in cache_names
         )
     current_tensor = cache[hook_point_read][0].clone()
     initial_norm = current_tensor.norm().item()
+    if renorm == "natural_i":
+        target_norm = cache[natural_pre_name][0].norm().item()
+    else:
+        target_norm = initial_norm
     # Oldest-first buffer of the last gate_lag mean vectors: entry 0 is the
     # iterate gate_lag steps back once i >= gate_lag.
     mean_history = [current_tensor.mean(dim=0).clone()]
+    recent_means = []  # capture_terminal only: last 9 iterates for lag_scan
 
     consecutive = 0
     lock_in_iter = None
@@ -298,7 +326,7 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
     for i in range(1, max_iter + 1):
         current_norm = current_tensor.norm().item()
         if current_norm > 0:
-            current_tensor = current_tensor * (initial_norm / current_norm)
+            current_tensor = current_tensor * (target_norm / current_norm)
 
         inject_tensor = current_tensor.clone()
 
@@ -317,6 +345,10 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
 
         current_tensor = cache[hook_point_read][0].clone()
         mean_vec = current_tensor.mean(dim=0).clone()
+        if capture_terminal:
+            recent_means.append(mean_vec)
+            if len(recent_means) > 9:
+                recent_means.pop(0)
 
         if i >= check_start and i % check_every == 0:
             cos = F.cosine_similarity(
@@ -337,7 +369,7 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
     last_vec = current_tensor[-1, :].clone()
     top = get_top_tokens(model, last_vec, k=1)[0]
     detail = get_readout_detail(model, last_vec)
-    return {
+    out = {
         "terminal_token": top[0],
         "terminal_token_id": detail["top_token_ids"][0],
         "terminal_prob": top[1],
@@ -347,7 +379,19 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
         "final_cos_sim_mean": final_cos,
         "top_logit_margin": detail["top_logit_margin"],
         "entropy": detail["entropy"],
+        "inject_hook": hook_point_write,
+        "renorm": renorm,
+        "target_norm": target_norm,
+        "seed_norm_at_j": initial_norm,
     }
+    if capture_terminal:
+        out["terminal_mean_vec"] = current_tensor.mean(dim=0).clone()
+        out["terminal_last_vec"] = last_vec
+        out["lag_scan"] = (
+            {k: float(v) for k, v in lag_scan(recent_means).items()}
+            if len(recent_means) > 1 else None
+        )
+    return out
 
 
 def lag_scan(iterates, max_lag=8):
