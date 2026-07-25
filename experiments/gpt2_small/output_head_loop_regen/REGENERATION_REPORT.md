@@ -131,3 +131,22 @@ Plus the two executed notebooks themselves (outputs embedded in-place).
 
 Assessment of these numbers against H4 is the operator's call on review;
 `docs/FINDINGS.md` and `docs/JOURNEY_MAP.md` were deliberately not edited.
+
+## Post-review addendum (2026-07-25, PR #29 review)
+
+Known issue, recorded not patched: `spectral_resonance.ipynb`'s
+`get_top_tokens` decodes without applying `ln_final` before unembedding
+(unlike the fixed sibling in `head_resonance.ipynb`). This affects ONLY the
+qualitative token map (section 4d) and the `top_tokens` field persisted in
+`009c_spectral_data.pt` — the near-uniform `,`/`the` map is consistent with
+unnormalized logits collapsing onto high-frequency tokens. It does NOT
+affect the cosine-similarity validation (section 4c) or the `NOT SUPPORTED`
+classifier output, which compare raw vectors. Per the regeneration scope
+(execution-blocking fixes only, no result patching), the corrected decode is
+deferred to a tracked follow-up re-run (issue #25).
+
+Housekeeping applied in the same review round: pip version specs quoted in
+both recovered notebooks (removes the `=4.2.0` junk-file byproduct and its
+gitignore workaround); `.gitignore` negation added for
+`009a2_layer_scan_results.pt` so a future layer_resonance run cannot be
+silently untracked.
