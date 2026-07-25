@@ -14,7 +14,7 @@ have been checked.
 ## What is here and why it may be redistributed
 
 This repository is public, so only works that are openly posted by their authors
-or carry an explicit redistribution licence are included. Three named works are
+or carry an explicit redistribution licence are included. Two named works are
 deliberately **absent**; see *Not included* below.
 
 ### Explicit open licence (strongest basis)
@@ -62,12 +62,14 @@ authorship. All three are here so the call can be made from the sources:
 ### Author-posted preprints and manuscripts
 
 Taken from the authors' own publication pages
-([danielwagenaar.net](https://danielwagenaar.net/pubs.html),
+([barak.net.technion.ac.il](https://barak.net.technion.ac.il/),
+[danielwagenaar.net](https://danielwagenaar.net/pubs.html),
 [potterlab.org](https://potterlab.org/publications/)), preprint versions where
 the published version is under publisher copyright.
 
 | File | Work | Source |
 |:---|:---|:---|
+| `sussillo_barak2013_opening_the_black_box.pdf` | Sussillo & Barak (2013), *Opening the Black Box: Low-Dimensional Dynamics in High-Dimensional Recurrent Neural Networks*, Neural Computation 25(3):626–649 | author copy, Barak lab page |
 | `wagenaar2005_controlling_bursting_closed_loop.pdf` | Wagenaar, Madhavan, Pine & Potter (2005), *Controlling Bursting in Cortical Cultures with Closed-Loop Multi-Electrode Stimulation*, J. Neurosci. 25(3):680–688 | author preprint |
 | `wagenaar2006_persistent_dynamic_attractors.pdf` | Wagenaar, Nadasdy & Potter (2006), *Persistent dynamic attractors in activity patterns of cultured neuronal networks*, Phys. Rev. E 73:051907 | author preprint |
 | `chao2005_random_background_stimulation.pdf` | Chao, Bakkum, Wagenaar & Potter (2005), *Effects of Random External Background Stimulation on Network Synaptic Stability After Tetanization: A Modeling Study*, Neuroinformatics 3(3):263–280 | author preprint |
@@ -75,19 +77,32 @@ the published version is under publisher copyright.
 
 ## Not included
 
-Three named works are absent from this directory. Cite them by link.
+Two named works are absent from this directory. **Both are freely readable** —
+they are excluded because they may not be redistributed from a public repo, not
+because they are hard to obtain. Cite them by link.
 
-| Work | Why absent | Where to get it |
+| Work | Why absent | Read it here |
 |:---|:---|:---|
-| Sussillo & Barak (2013), *Opening the Black Box*, Neural Computation 25(3):626–649 | **Paywalled, no open-access copy exists.** Needs library access. This is the blocker on the first task in #26. | DOI [10.1162/NECO_a_00409](https://doi.org/10.1162/NECO_a_00409) |
-| Hopfield (1982), *Neural networks and physical systems with emergent collective computational abilities*, PNAS 79(8):2554–2558 | Freely readable but under publisher copyright; not ours to republish. | [PNAS](https://doi.org/10.1073/pnas.79.8.2554) · [PMC346238](https://pmc.ncbi.nlm.nih.gov/articles/PMC346238/) |
-| Chao, Bakkum & Potter (2007), *Region-specific network plasticity … center of activity trajectory (CAT) …*, J. Neural Eng. 4(3):294–308 | Publisher reprint (IOP); no author preprint or open licence found. | DOI [10.1088/1741-2560/4/3/015](https://doi.org/10.1088/1741-2560/4/3/015) · [PMC2577565](https://pmc.ncbi.nlm.nih.gov/articles/PMC2577565/) |
+| Hopfield (1982), *Neural networks and physical systems with emergent collective computational abilities*, PNAS 79(8):2554–2558 | Publisher copyright; not ours to republish. | [PNAS PDF](https://www.pnas.org/doi/pdf/10.1073/pnas.79.8.2554) · [PMC346238](https://pmc.ncbi.nlm.nih.gov/articles/PMC346238/) |
+| Chao, Bakkum & Potter (2007), *Region-specific network plasticity … center of activity trajectory (CAT) …*, J. Neural Eng. 4(3):294–308 | Publisher reprint (IOP), no author preprint or open licence found. | [Potter lab reprint](https://potterlab.org/wp-content/uploads/2010/10/ChaoCAT_JNE2007reprint.pdf) · [PMC2577565](https://pmc.ncbi.nlm.nih.gov/articles/PMC2577565/) · DOI [10.1088/1741-2560/4/3/015](https://doi.org/10.1088/1741-2560/4/3/015) |
 
-The CAT paper is the one that stings — it is the direct input to gate design
-(#9). Read it via PMC.
+The CAT paper matters most of the two — it is the direct input to gate design
+(#9).
+
+### Note on finding these
+
+An earlier version of this file recorded Sussillo & Barak (2013) as paywalled
+with no open copy in existence. That was wrong: it is free on Barak's own lab
+page and is now in this directory. The error came from probing guessed filenames
+on author sites rather than searching for the paper. For anything else that
+looks gated, **check the authors' lab pages first** — six of the Potter-lab items
+here came from [danielwagenaar.net](https://danielwagenaar.net/pubs.html) and
+[potterlab.org](https://potterlab.org/publications/), several as preprints
+predating any paywall. Note also that PMC serves a proof-of-work challenge on
+direct PDF links, so scripted fetches fail there while a browser works fine.
 
 ## Note on size
 
-This directory is ~56 MB. If that becomes a problem for clone times, the natural
+This directory is ~57 MB. If that becomes a problem for clone times, the natural
 move is `git lfs track "docs/papers/*.pdf"`, or dropping the directory and
 reverting to links — the issues carry a full link set either way.
