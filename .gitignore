@@ -54,3 +54,7 @@ experiments/_DATA/EXP_009/*
 !experiments/_DATA/EXP_009/009bFIX_convergence_grid.pt
 !experiments/_DATA/EXP_009/009c_spectral_data.pt
 !experiments/_DATA/EXP_009/009c_validation_grid.pt
+
+# 2026-07-25: junk byproduct of head_resonance.ipynb cell 0 (unquoted
+# `pip install nbformat>=4.2.0` — the shell redirects into a file `=4.2.0`)
+=4.2.0
