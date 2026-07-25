@@ -866,6 +866,458 @@
         .mode-hidden {
             display: none !important;
         }
+
+        /* =====================================================================
+           Keyboard focus. Outlines never affect layout, so this is safe at
+           every width and keeps the new disclosure buttons operable by keyboard.
+           ===================================================================== */
+        button:focus-visible,
+        select:focus-visible,
+        input:focus-visible,
+        textarea:focus-visible,
+        .chip:focus-visible,
+        .breadcrumb-item:focus-visible,
+        .node-link:focus-visible {
+            outline: 3px solid #f1c40f;
+            outline-offset: 2px;
+        }
+
+        /* =====================================================================
+           Mobile-only chrome. Inert above the 768px breakpoint: the toolbar and
+           the details close button generate no boxes, and #header-secondary is
+           display:contents so its children remain flex items of #controls in the
+           original order. Desktop layout is therefore byte-for-byte unchanged.
+           ===================================================================== */
+        #mobile-toolbar {
+            display: none;
+        }
+
+        #details-close {
+            display: none;
+        }
+
+        #header-secondary {
+            display: contents;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #details-panel,
+            #markdown-panel,
+            #chat-panel,
+            #toast,
+            .chip,
+            button {
+                transition: none !important;
+            }
+        }
+
+        /* =====================================================================
+           Narrow screens (phones). Everything below this line is scoped to
+           max-width: 768px and never applies to the desktop layout.
+
+           Shape of the change:
+             - the header keeps only the graph selector and the search box;
+             - Show All / Reset View / Refresh Data / Chat / Colour by / Model
+               move into the "More" overflow menu (#header-secondary);
+             - the status/type/register/basin chip rows move behind the
+               "Filters" disclosure (#chip-bar), which overlays the graph;
+             - the legend becomes a "Legend" overlay toggle;
+             - the breadcrumb hides while it holds only placeholder text;
+             - the details panel becomes a bottom sheet with its own scroll;
+             - the timeline bar compacts from 58px to 46px but stays put.
+           ===================================================================== */
+        @media (max-width: 768px) {
+            body {
+                /* keeps the graph clear of the compacted timeline bar */
+                padding-bottom: 46px;
+                height: 100vh;
+                height: 100dvh;
+            }
+
+            /* ---- header ---- */
+            #header {
+                padding: 8px 12px;
+                position: relative;
+                z-index: 330;
+            }
+
+            #header h1 {
+                font-size: 15px;
+                margin-bottom: 6px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                min-width: 0;
+            }
+
+            #graph-title {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+            }
+
+            .status-badge {
+                margin-left: 0;
+                flex: 0 0 auto;
+                font-size: 10px;
+                padding: 2px 8px;
+            }
+
+            #controls {
+                gap: 6px;
+                flex-wrap: nowrap;
+            }
+
+            /* the "Graph" caption; the select is self-explanatory on a phone */
+            #controls > .control-label {
+                display: none;
+            }
+
+            #graph-select {
+                flex: 0 0 auto;
+                max-width: 44%;
+                min-height: 40px;
+                border: none;
+                border-radius: 4px;
+                background: white;
+                color: #2c3e50;
+                font-size: 14px;
+                padding: 0 6px;
+            }
+
+            #search {
+                flex: 1 1 auto;
+                width: auto;
+                min-width: 0;
+                min-height: 40px;
+                font-size: 16px; /* >=16px stops iOS zoom-on-focus */
+            }
+
+            /* ---- disclosure toolbar ---- */
+            #mobile-toolbar {
+                display: flex;
+                gap: 6px;
+                margin-top: 6px;
+            }
+
+            .mobile-toggle {
+                flex: 1 1 0;
+                min-width: 40px;
+                min-height: 40px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 3px;
+                padding: 0 6px;
+                font-size: 13px;
+                background: #34495e;
+                border: 1px solid rgba(255,255,255,0.22);
+                border-radius: 6px;
+                color: #ecf0f1;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .mobile-toggle:hover {
+                background: #3d566e;
+            }
+
+            .mobile-toggle.mobile-open,
+            .mobile-toggle.mobile-open:hover {
+                background: #3498db;
+                border-color: #5dade2;
+            }
+
+            /* "Filters (3 of 8)" — a shut panel must never hide the fact that
+               the view is being narrowed. */
+            .mobile-toggle.narrowed {
+                border-color: #f1c40f;
+                color: #f9e79f;
+            }
+
+            /* ---- filters disclosure: overlays the graph, never pushes it ---- */
+            #chip-bar {
+                position: fixed;
+                left: 0;
+                right: 0;
+                top: var(--mobile-chrome-bottom, 132px);
+                z-index: 320;
+                display: none;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                padding: 12px;
+                max-height: 58vh;
+                overflow-y: auto;
+                overscroll-behavior: contain;
+                -webkit-overflow-scrolling: touch;
+                box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+            }
+
+            #chip-bar.mobile-open {
+                display: flex;
+            }
+
+            #chip-bar .chip-group {
+                gap: 8px;
+            }
+
+            .chip-group-label {
+                flex: 0 0 100%;
+                margin-right: 0;
+            }
+
+            .chip {
+                min-width: 40px;
+                min-height: 40px;
+                justify-content: center;
+                padding: 8px 12px;
+                font-size: 13px;
+                border-radius: 20px;
+            }
+
+            /* ---- overflow menu ---- */
+            #header-secondary {
+                display: none;
+                position: fixed;
+                left: 8px;
+                right: 8px;
+                top: var(--mobile-chrome-bottom, 132px);
+                z-index: 320;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                padding: 12px;
+                background: #34495e;
+                border-radius: 8px;
+                box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+                max-height: 58vh;
+                overflow-y: auto;
+                overscroll-behavior: contain;
+            }
+
+            #header-secondary.mobile-open {
+                display: flex;
+            }
+
+            #header-secondary > button {
+                width: 100%;
+                min-height: 44px;
+                font-size: 15px;
+            }
+
+            #colour-mode-controls,
+            #model-controls {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            #colour-mode,
+            #model-select {
+                flex: 1 1 auto;
+                min-width: 0;
+                min-height: 44px;
+                font-size: 15px;
+                border: none;
+                border-radius: 4px;
+                background: white;
+                color: #2c3e50;
+                padding: 0 8px;
+            }
+
+            /* ---- legend: a real toggle, not a 26px stub ---- */
+            #legend {
+                display: none;
+                top: 8px;
+                left: 8px;
+                right: 8px;
+                max-width: none;
+                max-height: 52%;
+                z-index: 310;
+                font-size: 13px;
+            }
+
+            #legend.mobile-open {
+                display: block;
+            }
+
+            /* ---- breadcrumb: gone until there is a real path ---- */
+            #breadcrumb {
+                padding: 0 12px;
+            }
+
+            #breadcrumb.is-empty {
+                display: none;
+            }
+
+            #breadcrumb .breadcrumb-item {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 40px;
+                /* dissolution labels are single tokens ("the", "-"), which
+                   otherwise leave a 4-20px wide tap target */
+                min-width: 40px;
+                padding: 0 2px;
+            }
+
+            /* ---- details panel: bottom sheet ---- */
+            #details-panel {
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 46px;
+                top: auto;
+                width: auto;
+                height: 62vh;
+                max-height: 62vh;
+                padding: 16px 16px 28px;
+                border-radius: 14px 14px 0 0;
+                z-index: 500;
+                box-shadow: 0 -6px 22px rgba(0,0,0,0.28);
+                overflow-y: auto;
+                overscroll-behavior: contain;
+                -webkit-overflow-scrolling: touch;
+                transform: translateY(0);
+            }
+
+            #details-panel.hidden {
+                transform: translateY(110%);
+                width: auto;
+                padding: 16px 16px 28px;
+                overflow: hidden;
+                pointer-events: none;
+            }
+
+            #details-close {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: sticky;
+                top: -16px;
+                width: 44px;
+                height: 44px;
+                margin: -16px -16px 2px auto;
+                padding: 0;
+                font-size: 28px;
+                line-height: 1;
+                background: #ecf0f1;
+                color: #566573;
+                border-radius: 0 0 0 12px;
+                z-index: 2;
+            }
+
+            #details-close:hover {
+                background: #dfe4e6;
+            }
+
+            #details-panel .node-link {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 40px;
+                /* same reason as .breadcrumb-item above */
+                min-width: 40px;
+            }
+
+            .action-button {
+                min-height: 44px;
+            }
+
+            /* ---- timeline: compacted, still a headline control ---- */
+            #timeline-bar {
+                height: 46px;
+                gap: 8px;
+                padding: 0 10px;
+            }
+
+            #timeline-label {
+                display: none;
+            }
+
+            #timeline-play {
+                min-width: 52px;
+                min-height: 40px;
+                padding: 0 10px;
+                font-size: 13px;
+            }
+
+            #timeline {
+                height: 40px;
+                min-width: 60px;
+            }
+
+            #timeline-readout {
+                min-width: 0;
+                flex: 0 1 auto;
+                max-width: 44%;
+                font-size: 11px;
+                line-height: 1.2;
+                overflow: hidden;
+            }
+
+            #timeline-date,
+            #timeline-phase {
+                display: block;
+                font-size: 11px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            #timeline-phase {
+                font-size: 10px;
+            }
+
+            #toast {
+                bottom: 60px;
+                max-width: 88vw;
+            }
+
+            /* ---- full-width slide-over panels ---- */
+            #markdown-panel {
+                width: 100vw;
+                max-width: 100vw;
+                left: -100vw;
+            }
+
+            #markdown-panel.visible {
+                left: 0;
+            }
+
+            #chat-panel {
+                width: 100vw;
+                max-width: 100vw;
+                right: -100vw;
+            }
+
+            #chat-panel.visible {
+                right: 0;
+            }
+
+            #markdown-close,
+            #chat-close {
+                width: 44px;
+                height: 44px;
+                font-size: 28px;
+            }
+
+            .markdown-tab {
+                min-height: 44px;
+            }
+
+            .chat-control-btn {
+                min-height: 40px;
+            }
+
+            #chat-send,
+            #chat-input {
+                min-height: 44px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -883,21 +1335,38 @@
                 <option value="isomorphism">Isomorphism</option>
             </select>
             <input type="text" id="search" placeholder="Search claims, descriptions, ids...">
-            <span id="colour-mode-controls">
-                <span class="control-label">Colour by</span>
-                <select id="colour-mode" onchange="setColourMode(this.value)">
-                    <option value="status">Status</option>
-                    <option value="type">Type</option>
-                </select>
+            <!-- display:contents above 768px, so these stay flex items of #controls
+                 exactly as before; below it the wrapper becomes the overflow menu. -->
+            <span id="header-secondary">
+                <span id="colour-mode-controls">
+                    <span class="control-label">Colour by</span>
+                    <select id="colour-mode" onchange="setColourMode(this.value)">
+                        <option value="status">Status</option>
+                        <option value="type">Type</option>
+                    </select>
+                </span>
+                <span id="model-controls" class="mode-hidden">
+                    <span class="control-label">Model</span>
+                    <select id="model-select" onchange="selectDissolutionModel(this.value)"></select>
+                </span>
+                <button id="btn-show-all" onclick="filterNodes('all')">Show All</button>
+                <button id="btn-reset" onclick="resetView()">Reset View</button>
+                <button id="btn-reload" onclick="reloadData()">Refresh Data</button>
+                <button id="chat-button" onclick="toggleChatPanel()">Chat with AI</button>
             </span>
-            <span id="model-controls" class="mode-hidden">
-                <span class="control-label">Model</span>
-                <select id="model-select" onchange="selectDissolutionModel(this.value)"></select>
-            </span>
-            <button id="btn-show-all" onclick="filterNodes('all')">Show All</button>
-            <button id="btn-reset" onclick="resetView()">Reset View</button>
-            <button id="btn-reload" onclick="reloadData()">Refresh Data</button>
-            <button id="chat-button" onclick="toggleChatPanel()">Chat with AI</button>
+        </div>
+        <!-- Narrow-screen disclosure bar. display:none at >=769px, so desktop
+             geometry is untouched. -->
+        <div id="mobile-toolbar">
+            <button type="button" class="mobile-toggle" id="mobile-filter-toggle"
+                    aria-expanded="false" aria-controls="chip-bar"
+                    onclick="toggleDisclosure('mobile-filter-toggle')">Filters<span id="mobile-filter-count"></span></button>
+            <button type="button" class="mobile-toggle" id="mobile-menu-toggle"
+                    aria-expanded="false" aria-controls="header-secondary"
+                    onclick="toggleDisclosure('mobile-menu-toggle')">More</button>
+            <button type="button" class="mobile-toggle" id="mobile-legend-toggle"
+                    aria-expanded="false" aria-controls="legend"
+                    onclick="toggleDisclosure('mobile-legend-toggle')">Legend</button>
         </div>
     </div>
 
@@ -916,7 +1385,7 @@
         </div>
     </div>
 
-    <div id="breadcrumb">
+    <div id="breadcrumb" class="is-empty">
         <span id="breadcrumb-path">Click a node to start exploring</span>
     </div>
 
@@ -925,6 +1394,8 @@
             <div id="legend"></div>
         </div>
         <div id="details-panel" class="hidden">
+            <button type="button" id="details-close" aria-label="Close details"
+                    onclick="closeDetailsPanel()">&times;</button>
             <h2 id="detail-title">Select a node</h2>
             <div id="detail-content"></div>
         </div>
@@ -1782,6 +2253,8 @@
                 html += '<button class="chip" id="chip-basin-none" onclick="setAllBasinChips(false)">none</button>';
                 basinBar.innerHTML = html;
             }
+
+            updateFilterToggleLabel();
         }
 
         function syncDissolutionChipClasses() {
@@ -1793,6 +2266,7 @@
                 const el = document.getElementById('chip-basin-' + slugify(basin));
                 if (el) el.classList.toggle('active', activeBasins[basin] !== false);
             });
+            updateFilterToggleLabel();
         }
 
         function toggleRegisterChip(register) {
@@ -1838,6 +2312,12 @@
             // The timeline scrubs asserted dates; dissolution nodes have none.
             toggle('timeline-bar', dissolution);
             toggle('colour-mode-controls', dissolution);
+            // Switching graphs swaps which chip groups are live, so the
+            // "Filters (n of m)" count has to be recomputed, and any open
+            // disclosure closed before its contents change underneath it.
+            closeAllDisclosures();
+            updateFilterToggleLabel();
+            positionMobileOverlays();
         }
 
         async function selectGraph(key) {
@@ -2123,6 +2603,8 @@
             thtml += '<button class="chip active" id="chip-type-all" onclick="setAllTypeChips(true)">all</button>';
             thtml += '<button class="chip" id="chip-type-none" onclick="setAllTypeChips(false)">none</button>';
             typeBar.innerHTML = thtml;
+
+            updateFilterToggleLabel();
         }
 
         function syncChipClasses() {
@@ -2134,6 +2616,7 @@
                 const el = document.getElementById('chip-type-' + type);
                 if (el) el.classList.toggle('active', activeTypes[type] !== false);
             });
+            updateFilterToggleLabel();
         }
 
         function toggleStatusChip(status) {
@@ -2185,6 +2668,136 @@
             applyVisualState();
             if (network) network.fit({ animation: true });
         }
+
+        // =====================================================================
+        // Narrow-screen disclosures
+        //
+        // All of this is a no-op above 768px: the toolbar buttons and the
+        // details close button have display:none there, so nothing can be
+        // toggled and no desktop geometry moves. The chips, the secondary
+        // controls and the legend keep their ids and handlers; only where they
+        // are painted changes.
+        // =====================================================================
+        const MOBILE_QUERY = '(max-width: 768px)';
+
+        // toggle button id -> the panel it discloses
+        const DISCLOSURES = {
+            'mobile-filter-toggle': 'chip-bar',
+            'mobile-menu-toggle': 'header-secondary',
+            'mobile-legend-toggle': 'legend'
+        };
+
+        function isMobileLayout() {
+            return typeof window.matchMedia === 'function' &&
+                window.matchMedia(MOBILE_QUERY).matches;
+        }
+
+        // The overlays are position:fixed and must open directly under the
+        // header, whose height depends on how the title wraps. One custom
+        // property, recomputed whenever it could have changed.
+        function positionMobileOverlays() {
+            const header = document.getElementById('header');
+            if (!header) return;
+            const bottom = Math.round(header.getBoundingClientRect().bottom);
+            document.documentElement.style.setProperty('--mobile-chrome-bottom', bottom + 'px');
+        }
+
+        function setDisclosure(toggleId, open) {
+            const toggle = document.getElementById(toggleId);
+            const panel = document.getElementById(DISCLOSURES[toggleId]);
+            if (!toggle || !panel) return;
+            if (open) positionMobileOverlays();
+            panel.classList.toggle('mobile-open', !!open);
+            toggle.classList.toggle('mobile-open', !!open);
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+
+        // One panel at a time; they all occupy the same strip of screen.
+        function toggleDisclosure(toggleId) {
+            const toggle = document.getElementById(toggleId);
+            const open = !(toggle && toggle.getAttribute('aria-expanded') === 'true');
+            Object.keys(DISCLOSURES).forEach(function (id) {
+                setDisclosure(id, id === toggleId ? open : false);
+            });
+        }
+
+        function closeAllDisclosures() {
+            Object.keys(DISCLOSURES).forEach(function (id) { setDisclosure(id, false); });
+        }
+
+        // How many of the chips that apply to the current graph are on. The
+        // "Filters" button reports this so a shut panel can never leave a user
+        // wondering why nodes are missing.
+        function activeFilterCounts() {
+            const groups = renderMode === 'dissolution'
+                ? [activeRegisters, activeBasins]
+                : [activeStatuses, activeTypes];
+            let total = 0;
+            let on = 0;
+            groups.forEach(function (group) {
+                Object.keys(group || {}).forEach(function (key) {
+                    total += 1;
+                    if (group[key] !== false) on += 1;
+                });
+            });
+            return { on: on, total: total };
+        }
+
+        function updateFilterToggleLabel() {
+            const toggle = document.getElementById('mobile-filter-toggle');
+            const count = document.getElementById('mobile-filter-count');
+            if (!toggle || !count) return;
+            const counts = activeFilterCounts();
+            const narrowed = counts.total > 0 && counts.on < counts.total;
+            count.textContent = narrowed ? ' (' + counts.on + ' of ' + counts.total + ')' : '';
+            toggle.classList.toggle('narrowed', narrowed);
+            toggle.setAttribute('aria-label', narrowed
+                ? 'Filters — ' + counts.on + ' of ' + counts.total + ' active'
+                : 'Filters — all active');
+        }
+
+        function closeDetailsPanel() {
+            const panel = document.getElementById('details-panel');
+            if (panel) panel.classList.add('hidden');
+            if (network) {
+                try { network.unselectAll(); } catch (e) { /* older vis builds */ }
+            }
+        }
+
+        window.addEventListener('resize', function () {
+            if (!isMobileLayout()) {
+                closeAllDisclosures();
+                return;
+            }
+            positionMobileOverlays();
+        });
+
+        // A secondary action fires and the overflow menu has done its job.
+        // Selects are left alone so the menu survives a mis-tap on a dropdown.
+        document.addEventListener('click', function (e) {
+            if (!isMobileLayout()) return;
+            const target = e.target;
+            if (!target || typeof target.closest !== 'function') return;
+            const button = target.closest('#header-secondary button');
+            if (button) closeAllDisclosures();
+        });
+
+        // Escape closes whatever is open, innermost first.
+        document.addEventListener('keydown', function (e) {
+            if (e.key !== 'Escape') return;
+            const anyOpen = Object.keys(DISCLOSURES).some(function (id) {
+                const el = document.getElementById(id);
+                return el && el.getAttribute('aria-expanded') === 'true';
+            });
+            if (anyOpen) {
+                closeAllDisclosures();
+                return;
+            }
+            const panel = document.getElementById('details-panel');
+            if (isMobileLayout() && panel && !panel.classList.contains('hidden')) {
+                closeDetailsPanel();
+            }
+        });
 
         // =====================================================================
         // Legend
@@ -2663,6 +3276,9 @@
             if (!node) return;
 
             currentNodeId = nodeId;
+            // On a phone the sheet and the disclosures share the same screen;
+            // opening one closes the others. No-op above the breakpoint.
+            closeAllDisclosures();
             const panel = document.getElementById('details-panel');
             const title = document.getElementById('detail-title');
             const content = document.getElementById('detail-content');
@@ -2818,6 +3434,12 @@
         function updateBreadcrumb() {
             const breadcrumbPath = document.getElementById('breadcrumb-path');
             if (!breadcrumbPath) return;
+
+            // `is-empty` marks the placeholder state. It is styled only below
+            // 768px, where a row of unusable filler text is 31px the graph
+            // needs more than the user does.
+            const bar = document.getElementById('breadcrumb');
+            if (bar) bar.classList.toggle('is-empty', navigationHistory.length === 0);
 
             if (navigationHistory.length === 0) {
                 breadcrumbPath.innerHTML = 'Click a node to start exploring';
@@ -3155,6 +3777,8 @@
             const titleEl = document.getElementById('graph-title');
             if (titleEl) titleEl.textContent = heading;
             document.title = heading;
+            // The heading is what decides the header's height on a phone.
+            positionMobileOverlays();
 
             const visNodes = allNodes.map(function (node) {
                 const record = {

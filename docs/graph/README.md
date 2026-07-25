@@ -254,6 +254,35 @@ reloading the page. It defaults to Evidence.
   timeline scrubber is hidden here — dissolution is ordered by iteration count, not by date, so a
   date cursor would mean nothing. The status and type chips are hidden for the same reason.
 
+### On a phone
+
+At 768 CSS px and below the same page rearranges itself so the graph gets the screen instead of
+the controls. Nothing is removed — every control is still reachable, and the desktop layout at
+769px and above is byte-for-byte what it always was.
+
+- The header keeps only the **Graph** selector and the search box. The title truncates.
+- **Filters** opens the status/type chips — or, in dissolution mode, the register and basin chips
+  — as a panel that *overlays* the graph rather than pushing it down. Closed by default. The
+  button reports how much is being hidden: plain `Filters` when every chip is on, `Filters (14 of
+  16)` when it is not, so a shut panel can never leave you wondering where the nodes went.
+- **More** holds the secondary controls: Show All, Reset View, Refresh Data, Chat with AI, the
+  **Colour by** select and — in dissolution mode — the **Model** select.
+- **Legend** opens the legend as an overlay; it is closed by default rather than being squeezed
+  into an unreadable stub.
+- The breadcrumb appears once you have actually navigated somewhere; its placeholder row is
+  hidden.
+- Tapping a node opens the details panel as a **bottom sheet** with its own scroll and a close
+  button, over the full-width graph, instead of a 380px side panel that pushed the graph off the
+  edge.
+- The timeline bar stays where it is, compacted from 58px to 46px.
+
+All three disclosures are `<button aria-expanded>`, so they work from the keyboard; `Escape`
+closes whichever is open, then the details sheet. Every touch target is at least 40x40 CSS px, and
+the expand/collapse transitions respect `prefers-reduced-motion`.
+
+Measured at 393x830 (a Nothing Phone 2a viewport), in all three graph modes: 125px of chrome above
+the graph, a 659px graph — 79% of the viewport — and no horizontal page scroll.
+
 ### Run order
 
 `_data/visual_config.json` — the shared colours, shapes and edge styles all three graphs read — is

@@ -16,6 +16,11 @@
  *   9. the legend carries "not-supported" in its severity-gradient position
  *  10. an unknown status still renders, gets a chip, and stays reachable
  *  11. no HTTP >= 400 responses for any requested asset
+ *  12. on a phone-sized viewport the graph, not the chrome, owns the screen
+ *
+ * Assertions 1-11 run at 1600x1000. Assertion 12 opens a second, phone-sized
+ * context (393x830, isMobile + hasTouch) so the narrow-screen layout is pinned
+ * without disturbing the desktop measurements the other eleven depend on.
  *
  * Run:  node docs/graph/tests/smoke_test.mjs
  * Exit: 0 = all pass, 1 = at least one failure.
@@ -144,7 +149,16 @@ function startServer(rootDir) {
 // --- reporting -------------------------------------------------------------
 // Every assertion must run: a suite that silently stops short is a failure, not
 // a pass. Bump this when adding one.
-const TOTAL_ASSERTIONS = 11;
+const TOTAL_ASSERTIONS = 12;
+
+// --- mobile budget (assertion 12) ------------------------------------------
+// A real device (Nothing Phone 2a) showed the header + chip rows eating 66% of
+// the screen. These are the numbers that made the graph usable again; they are
+// a budget, not a description, so tightening the layout is free but loosening
+// it has to be a deliberate edit here.
+const MOBILE_VIEWPORT = { width: 393, height: 830 };
+const MAX_CHROME_PX = 160;     // everything above #graph
+const MIN_GRAPH_SHARE = 0.60;  // #graph height / viewport height
 const results = [];
 function record(n, title, ok, detail) {
     results.push({ n, title, ok, detail });
@@ -762,6 +776,127 @@ async function main() {
             `${allResponses.length} responses recorded: ` +
             Object.entries(byStatus).sort().map(([s, c]) => `${s}x${c}`).join(', ') +
             (ok11 ? '' : '\n' + badResponses.map(r => `  ${r.status} [${r.phase}] ${r.url}`).join('\n')));
+
+        // ---------------------------------------------------------------- 12
+        // Phone layout. A separate context so assertions 1-11 keep measuring
+        // the desktop layout they were written against.
+        phase = 'mobile-layout';
+        const snap12 = snapshotErrors();
+        const mobileContext = await browser.newContext({
+            viewport: MOBILE_VIEWPORT,
+            deviceScaleFactor: 2.75,
+            isMobile: true,
+            hasTouch: true
+        });
+        const mobileRows = [];
+        try {
+            const mPage = await mobileContext.newPage();
+            await mPage.route('**/*', async (route) => {
+                const url = route.request().url();
+                for (const asset of CDN_ASSETS) {
+                    if (url === asset.url || url.startsWith(asset.url.split('?')[0])) {
+                        await route.fulfill({
+                            status: 200,
+                            contentType: 'text/javascript; charset=utf-8',
+                            body: mirror[asset.url]
+                        });
+                        return;
+                    }
+                }
+                await route.continue();
+            });
+            mPage.on('pageerror', (err) => {
+                pageErrors.push({ phase, text: (err && err.stack) || String(err) });
+            });
+            mPage.on('console', (msg) => {
+                if (msg.type() === 'error') consoleErrors.push({ phase, text: msg.text() });
+            });
+            mPage.on('response', (res) => {
+                const rec = { phase, status: res.status(), url: res.url() };
+                allResponses.push(rec);
+                if (rec.status >= 400) badResponses.push(rec);
+            });
+
+            await mPage.goto(`${base}/viewer.html`, { waitUntil: 'domcontentloaded' });
+            await waitLoaded(mPage);
+
+            // Measure the resting layout, then again with the Filters
+            // disclosure open: opening it must overlay the graph, never push it
+            // down. Both states are held to the same budget.
+            const measure = () => mPage.evaluate(() => {
+                const g = document.getElementById('graph').getBoundingClientRect();
+                return {
+                    chrome: Math.round(g.top),
+                    graphHeight: Math.round(g.height),
+                    graphWidth: Math.round(g.width),
+                    viewportHeight: window.innerHeight,
+                    viewportWidth: window.innerWidth,
+                    scrollWidth: document.documentElement.scrollWidth
+                };
+            });
+
+            // The disclosure is the mechanism the budget depends on, so a
+            // missing toggle is a failure in its own right -- but report it as
+            // one instead of letting page.click() time out and abort the run.
+            const toggle = () => mPage.evaluate(() => {
+                const el = document.getElementById('mobile-filter-toggle');
+                if (!el || getComputedStyle(el).display === 'none') return false;
+                el.click();
+                return true;
+            });
+
+            for (const key of ['evidence', 'dissolution', 'isomorphism']) {
+                phase = `mobile-layout-${key}`;
+                if (key !== 'evidence') {
+                    await mPage.selectOption('#graph-select', key);
+                    await waitLoaded(mPage);
+                }
+                for (const filtersOpen of [false, true]) {
+                    let toggled = true;
+                    if (filtersOpen) {
+                        toggled = await toggle();
+                        await sleep(400);
+                    }
+                    const m = await measure();
+                    mobileRows.push({
+                        key,
+                        filtersOpen,
+                        toggled,
+                        ...m,
+                        share: m.graphHeight / m.viewportHeight,
+                        chromeOk: m.chrome <= MAX_CHROME_PX,
+                        shareOk: m.graphHeight / m.viewportHeight >= MIN_GRAPH_SHARE,
+                        widthOk: m.scrollWidth <= m.viewportWidth
+                    });
+                    if (filtersOpen && toggled) {
+                        await toggle();
+                        await sleep(300);
+                    }
+                }
+            }
+        } finally {
+            await mobileContext.close().catch(() => {});
+        }
+        phase = 'mobile-layout';
+        const ok12 = mobileRows.length === 6 &&
+            mobileRows.every(r => r.chromeOk && r.shareOk && r.widthOk && r.toggled) &&
+            cleanSince(snap12);
+        record(12,
+            `on a ${MOBILE_VIEWPORT.width}x${MOBILE_VIEWPORT.height} phone the graph owns the ` +
+            `screen (chrome <= ${MAX_CHROME_PX}px, graph >= ${Math.round(MIN_GRAPH_SHARE * 100)}% ` +
+            `of viewport height, no horizontal scroll)`,
+            ok12,
+            (mobileRows.length
+                ? mobileRows.map(r =>
+                    `${r.key.padEnd(12)} filters=${r.filtersOpen ? 'open  ' : 'closed'} ` +
+                    `chrome=${String(r.chrome).padStart(3)}px${r.chromeOk ? '' : ' <-- OVER BUDGET'} ` +
+                    `graph=${r.graphWidth}x${r.graphHeight} ` +
+                    `(${(r.share * 100).toFixed(1)}%${r.shareOk ? '' : ' <-- UNDER BUDGET'}) ` +
+                    `scrollWidth=${r.scrollWidth}/${r.viewportWidth}` +
+                    `${r.widthOk ? '' : ' <-- HORIZONTAL SCROLL'}` +
+                    `${r.toggled ? '' : ' <-- no usable #mobile-filter-toggle'}`).join('\n')
+                : 'no measurements taken') +
+            '\n' + (describeSince(snap12).join('\n') || 'no errors'));
 
     } catch (err) {
         console.error('\n\x1b[31mHARNESS ERROR\x1b[0m:', err && err.stack || err);
