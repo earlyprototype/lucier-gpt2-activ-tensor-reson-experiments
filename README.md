@@ -176,6 +176,7 @@ ATR never set out to be a technique at all. It began as a thought experiment, an
     ├── JSPACE_READING_GUIDE.md      ← page-keyed map of the 133-page paper PDF
     ├── ISOMORPHISM.md               ← Lucier ↔ transformer correspondence
     ├── SCALING_ARTEFACT_ANALYSIS.md ← artefact-vs-intrinsic attribution
+    ├── PYTHIA_INTERPRETABILITY_REVIEW.md ← the Pythia suite: structure, versions, MI literature
     ├── VALIDATION_PLAN.md           ← the pre-registered validation design (historical)
     ├── ATR_METHOD_COMPARISON.md     ← ATR in the interpretability landscape
     ├── JOURNEY_MAP.md               ← project timeline, discoveries, glossary
