@@ -40,7 +40,7 @@ From cell 9 of `experiments/gpt2_small/spectral_resonance.ipynb`:
 
 Meanwhile the committed prose still says it was never run:
 
-- [`README.md`:215](../../README.md) &mdash; \| [`spectral_resonance.ipynb`](experiments/gpt2_small/spectral_resonance.ipynb) \| SVD-predicted per-head resonance (H4) \| 🔬 scaffold, not run \|
+- [`README.md`:216](../../README.md) &mdash; \| [`spectral_resonance.ipynb`](experiments/gpt2_small/spectral_resonance.ipynb) \| SVD-predicted per-head resonance (H4) \| 🔬 scaffold, not run \|
 - [`docs/ATR_METHOD_COMPARISON.md`:173](../../docs/ATR_METHOD_COMPARISON.md) &mdash; - [ ] SVD/spectral-gap prediction of per-head resonant states vs. observed convergence (scaffolded in `spectral_resonance.ipynb`; not yet run)
 - [`docs/FINDINGS.md`:629](../../docs/FINDINGS.md) &mdash; \| H4 \| Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector) \| **Untested**: protocol scaffolded (`experiments/gpt2_small/spectral_resonance.ipynb`), not run. \|
 - [`docs/JOURNEY_MAP.md`:88](../../docs/JOURNEY_MAP.md) &mdash; \| H4 \| Per-head resonance ≈ SVD dominant singular vector \| Untested \| Scaffold only: `experiments/gpt2_small/spectral_resonance.ipynb` \|

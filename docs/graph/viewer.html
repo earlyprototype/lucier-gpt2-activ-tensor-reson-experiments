@@ -21,8 +21,11 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            /* keeps the graph clear of the fixed timeline bar */
-            padding-bottom: 58px;
+            /* The timeline used to be a fixed bar pinned to the bottom of the
+               window and this padding kept the graph clear of it. It now lives
+               inside #chip-bar as one filter axis among the others, so the
+               bottom of the window belongs to the graph again. */
+            padding-bottom: 0;
         }
 
         #header {
@@ -34,9 +37,9 @@
         }
 
         #header h1 {
-            font-size: 22px;
+            font-size: 21px;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .status-badge {
@@ -58,12 +61,46 @@
             align-items: center;
         }
 
+        /* =====================================================================
+           Search is the primary affordance, not the fifth control in a row.
+           `flex-basis: 100%` inside the wrapping #controls row gives it a line
+           of its own above everything else; the phone breakpoint puts it back
+           on one line with the graph selector so the mobile chrome budget is
+           untouched.
+           ===================================================================== */
         #search {
-            padding: 8px 12px;
+            flex: 1 1 100%;
+            width: auto;
+            min-width: 240px;
+            padding: 12px 16px;
             border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            width: 280px;
+            border-radius: 6px;
+            font-size: 17px;
+            line-height: 1.2;
+            color: #2c3e50;
+            box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35);
+        }
+
+        #search::placeholder {
+            color: #95a5a6;
+        }
+
+        #search:focus {
+            outline: none;
+            box-shadow: inset 0 0 0 2px #3498db, 0 0 0 3px rgba(52,152,219,0.35);
+        }
+
+        /* Live "what am I looking at" readout under the search box. */
+        #search-status {
+            flex: 1 1 100%;
+            font-size: 12px;
+            color: #bdc3c7;
+            line-height: 1.25;
+            min-height: 15px;
+            margin-top: -2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         button {
@@ -104,10 +141,11 @@
         /* ---- filter chips ---- */
         #chip-bar {
             background: #34495e;
-            padding: 8px 20px;
+            padding: 7px 20px;
             display: flex;
             flex-wrap: wrap;
-            gap: 14px;
+            row-gap: 7px;
+            column-gap: 14px;
             align-items: center;
             flex: 0 0 auto;
         }
@@ -158,6 +196,29 @@
             border-radius: 50%;
             display: inline-block;
             border: 1px solid rgba(0,0,0,0.25);
+        }
+
+        /* ---- front matter: entry points ----
+           These are not filters. A filter narrows what you already have; an
+           entry point *sets* the whole state — chips, focus and view — so the
+           graph opens on a question. They read as navigation, never as the
+           half-lit "off" state of a filter chip. */
+        .entry-chip {
+            opacity: 1;
+            background: rgba(255,255,255,0.10);
+            border-color: rgba(255,255,255,0.34);
+            font-weight: 600;
+        }
+
+        .entry-chip:hover {
+            background: rgba(255,255,255,0.24);
+        }
+
+        .entry-chip.entry-active,
+        .entry-chip.entry-active:hover {
+            background: #3498db;
+            border-color: #5dade2;
+            color: #ffffff;
         }
 
         #container {
@@ -492,6 +553,13 @@
             white-space: nowrap;
         }
 
+        /* The placeholder state carries no information and costs the graph a
+           whole row. It was already hidden on phones; there is no reason the
+           desktop should pay for it either. A real path brings the bar back. */
+        #breadcrumb.is-empty {
+            display: none;
+        }
+
         #breadcrumb .breadcrumb-item {
             color: #3498db;
             cursor: pointer;
@@ -506,21 +574,20 @@
             color: #95a5a6;
         }
 
-        /* ---- timeline ---- */
+        /* ---- timeline ----
+           Demoted, not weakened. It used to be a fixed 58px bar across the
+           bottom of the window — the loudest instrument on the page, and the
+           one that needs you to already know which node to watch. It is now a
+           group inside #chip-bar, sitting alongside the status and type
+           filters as one more axis you can slice by. Every id, handler and
+           behaviour is unchanged. */
         #timeline-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 58px;
-            background: #2c3e50;
-            color: #ecf0f1;
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 0 20px;
-            z-index: 400;
-            box-shadow: 0 -2px 8px rgba(0,0,0,0.15);
+            gap: 10px;
+            flex: 1 1 340px;
+            min-width: 260px;
+            color: #ecf0f1;
         }
 
         #timeline-bar.disabled {
@@ -530,14 +597,16 @@
 
         #timeline {
             flex: 1;
-            min-width: 120px;
+            min-width: 110px;
             accent-color: #27ae60;
             cursor: pointer;
         }
 
         #timeline-play {
             background: #27ae60;
-            min-width: 74px;
+            min-width: 58px;
+            padding: 5px 10px;
+            font-size: 12px;
         }
 
         #timeline-play:hover {
@@ -545,9 +614,19 @@
         }
 
         #timeline-readout {
-            font-size: 13px;
-            min-width: 240px;
-            line-height: 1.35;
+            font-size: 12px;
+            min-width: 140px;
+            max-width: 220px;
+            line-height: 1.2;
+            overflow: hidden;
+        }
+
+        #timeline-date,
+        #timeline-phase {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         #timeline-date {
@@ -590,7 +669,7 @@
 
         #toast {
             position: fixed;
-            bottom: 76px;
+            bottom: 28px;
             left: 50%;
             transform: translateX(-50%) translateY(12px);
             background: #2c3e50;
@@ -1034,12 +1113,15 @@
              - the legend becomes a "Legend" overlay toggle;
              - the breadcrumb hides while it holds only placeholder text;
              - the details panel becomes a bottom sheet with its own scroll;
-             - the timeline bar compacts from 58px to 46px but stays put.
+             - the timeline and the index entry points ride inside the same
+               "Filters" disclosure as the chips, so neither costs a pixel of
+               the chrome budget.
            ===================================================================== */
         @media (max-width: 768px) {
             body {
-                /* keeps the graph clear of the compacted timeline bar */
-                padding-bottom: 46px;
+                /* The timeline is no longer a fixed bottom bar, so nothing
+                   below the graph needs clearing. */
+                padding-bottom: 0;
                 height: 100vh;
                 height: 100dvh;
             }
@@ -1096,12 +1178,23 @@
                 padding: 0 6px;
             }
 
+            /* Back on one line with the graph selector: a second full-width
+               row here would cost ~46px of a 160px chrome budget. Search is
+               still the widest thing in the header. */
             #search {
                 flex: 1 1 auto;
                 width: auto;
                 min-width: 0;
                 min-height: 40px;
+                padding: 0 10px;
                 font-size: 16px; /* >=16px stops iOS zoom-on-focus */
+                box-shadow: none;
+            }
+
+            /* The readout is a desktop nicety; on a phone the graph needs the
+               pixels more than the reader needs the count. */
+            #search-status {
+                display: none;
             }
 
             /* ---- disclosure toolbar ---- */
@@ -1290,7 +1383,7 @@
                 position: fixed;
                 left: 0;
                 right: 0;
-                bottom: 46px;
+                bottom: 0;
                 top: auto;
                 width: auto;
                 height: 62vh;
@@ -1348,11 +1441,11 @@
                 min-height: 44px;
             }
 
-            /* ---- timeline: compacted, still a headline control ---- */
+            /* ---- timeline: one row inside the Filters disclosure ---- */
             #timeline-bar {
-                height: 46px;
+                flex: 1 1 auto;
+                min-width: 0;
                 gap: 8px;
-                padding: 0 10px;
             }
 
             #timeline-label {
@@ -1394,7 +1487,7 @@
             }
 
             #toast {
-                bottom: 60px;
+                bottom: 24px;
                 max-width: 88vw;
             }
 
@@ -1449,6 +1542,14 @@
     <div id="header">
         <h1><span id="graph-title">Evidence Graph</span> <span id="live-badge" class="status-badge">LIVE</span></h1>
         <div id="controls">
+            <!-- Looking something up is what an index is FOR, so search leads:
+                 its own line above every other control on desktop, still the
+                 widest thing in the header on a phone. It matches labels, ids
+                 AND description text. -->
+            <input type="text" id="search" autocomplete="off" spellcheck="false"
+                   aria-label="Search the index"
+                   placeholder="Search the index — a label, an id, or any word in a description">
+            <span id="search-status"></span>
             <span class="control-label">Graph</span>
             <select id="graph-select" onchange="selectGraph(this.value)">
                 <option value="evidence">Evidence</option>
@@ -1456,7 +1557,6 @@
                 <option value="isomorphism">Isomorphism</option>
                 <option value="threads">Threads</option>
             </select>
-            <input type="text" id="search" placeholder="Search claims, descriptions, ids...">
             <!-- display:contents above 768px, so these stay flex items of #controls
                  exactly as before; below it the wrapper becomes the overflow menu. -->
             <span id="header-secondary">
@@ -1471,6 +1571,7 @@
                     <span class="control-label">Model</span>
                     <select id="model-select" onchange="selectDissolutionModel(this.value)"></select>
                 </span>
+                <button id="btn-explore" onclick="toggleExplore()">Explore</button>
                 <button id="btn-show-all" onclick="filterNodes('all')">Show All</button>
                 <button id="btn-reset" onclick="resetView()">Reset View</button>
                 <button id="btn-reload" onclick="reloadData()">Refresh Data</button>
@@ -1493,6 +1594,27 @@
     </div>
 
     <div id="chip-bar">
+        <!-- Front matter: an index's contents page. Each of these SETS the
+             graph's state rather than navigating away. The last three are
+             computed from _data/threads.json and from the corrects / retires /
+             supersedes edges; buildEntryPoints() hides any that have nothing
+             behind them, so a missing threads.json degrades to four entry
+             points rather than to a broken row. -->
+        <div class="chip-group" id="entry-points">
+            <span class="chip-group-label">Index</span>
+            <button type="button" class="chip entry-chip entry-active" id="entry-claims"
+                    onclick="applyEntryPoint('claims')">by claim</button>
+            <button type="button" class="chip entry-chip" id="entry-questions"
+                    onclick="applyEntryPoint('questions')">by question</button>
+            <button type="button" class="chip entry-chip" id="entry-open"
+                    onclick="applyEntryPoint('open')">what's open</button>
+            <button type="button" class="chip entry-chip" id="entry-changed"
+                    onclick="applyEntryPoint('changed')">what changed</button>
+            <button type="button" class="chip entry-chip" id="entry-blocked"
+                    onclick="applyEntryPoint('blocked')">what's blocked</button>
+            <button type="button" class="chip entry-chip" id="entry-everything"
+                    onclick="applyEntryPoint('everything')">everything</button>
+        </div>
         <div class="chip-group" id="status-chips">
             <span class="chip-group-label">Status</span>
         </div>
@@ -1507,6 +1629,17 @@
         </div>
         <div class="chip-group mode-hidden" id="basin-chips">
             <span class="chip-group-label">Basin</span>
+        </div>
+        <!-- The scrubber, demoted to one axis among the filters. Same ids,
+             same handlers, same behaviour — a different altitude. -->
+        <div id="timeline-bar">
+            <span id="timeline-label">Timeline</span>
+            <button id="timeline-play" onclick="toggleTimelinePlay()">Play</button>
+            <input type="range" id="timeline" min="0" max="0" step="1" value="0" oninput="onTimelineInput(this.value)">
+            <div id="timeline-readout">
+                <span id="timeline-date">--</span>
+                <span id="timeline-phase">no dated entities</span>
+            </div>
         </div>
     </div>
 
@@ -1529,16 +1662,6 @@
                     onclick="closeDetailsPanel()">&times;</button>
             <h2 id="detail-title">Select a node</h2>
             <div id="detail-content"></div>
-        </div>
-    </div>
-
-    <div id="timeline-bar">
-        <span id="timeline-label">Timeline</span>
-        <button id="timeline-play" onclick="toggleTimelinePlay()">Play</button>
-        <input type="range" id="timeline" min="0" max="0" step="1" value="0" oninput="onTimelineInput(this.value)">
-        <div id="timeline-readout">
-            <span id="timeline-date">--</span>
-            <span id="timeline-phase">no dated entities</span>
         </div>
     </div>
 
@@ -1739,6 +1862,53 @@
         // Isomorphism side layout: acoustic left, transformer right.
         const SIDE_X = { acoustic: -700, shared: 0, transformer: 700 };
 
+        // =====================================================================
+        // ORDERED ARRIVAL — the index grid.
+        //
+        // A force-directed cloud is exhaustive and nothing else: no order to
+        // navigate by, no way to scan it, and a different picture every load.
+        // The arrival layout replaces it with a grid that means something:
+        //
+        //     x = entity type      one lane per type, claims first
+        //     y = assertion date   ascending downward, undated last
+        //
+        // so findings run in date order down their lane, the hypotheses of the
+        // same week sit level with them, and their colour (= status) is the
+        // disposition. Within one (type, date) cell nodes wrap into a small
+        // block, sorted by id, so the arrangement is a pure function of the
+        // data — the same bytes in, the same pixels out, every load.
+        //
+        // Positions are pinned with `fixed`, exactly the mechanism
+        // applySideLayout() already uses for isomorphism. Deliberately NOT a
+        // layoutOverride: `layoutOverride` must stay null for the evidence
+        // family, both because the dissolution override is the thing that has
+        // leaked before and because the network-rebuild signature is derived
+        // from it. See the comment above `layoutOverride = null`.
+        // =====================================================================
+        const ORDERED_LANES = [
+            'hypothesis', 'finding', 'question', 'concept',
+            'run', 'model', 'null-model',
+            'doc', 'artefact', 'prior-work', 'blocker'
+        ];
+        // What "by claim" means: the four types that carry an assertion.
+        const ORDERED_CLAIM_TYPES = ['hypothesis', 'finding', 'question', 'concept'];
+        // The pitch numbers are tuned so the claims-only arrival comes out at
+        // roughly the aspect ratio of a desktop viewport: wide lanes and short
+        // bands, so fit() is limited by neither axis and the grid fills the
+        // screen instead of sitting in a letterboxed strip.
+        const ORDERED_COL = 220;          // px between columns inside a lane
+        const ORDERED_ROW = 128;          // px between rows inside a date band
+        const ORDERED_LANE_GAP = 110;     // px of air between type lanes
+        const ORDERED_DATE_GAP = 70;      // px of air between date bands
+        const ORDERED_MAX_LANE_COLS = 8;  // a lane never grows wider than this
+        const ORDERED_CELL_ROWS = 3;      // target rows before a cell widens
+        const ORDERED_LABEL_CHARS = 26;   // full text stays in the tooltip/panel
+        // vis sizes these shapes to fit their label, so an unconstrained one
+        // inflates past 200 layout units and swallows its neighbours' cells.
+        // Everything else draws its label underneath and stays node-sized.
+        const LABEL_INSIDE_SHAPES = ['box', 'circle', 'database', 'ellipse', 'text'];
+        const ORDERED_INSIDE_LABEL_WIDTH = 96;
+
         // Severity gradient. "not-supported" sits immediately after "refuted":
         // "refuted" means the evidence contradicts the claim, "not-supported"
         // means the evidence simply failed to back it (a null result), and
@@ -1885,6 +2055,29 @@
         let activeRegisters = {};          // register -> bool
         let activeBasins = {};             // terminal basin -> bool
         let basinColours = {};             // basin -> hex, rebuilt per model
+
+        // ---- ordered arrival / explore state --------------------------------
+        // True once applyOrderedLayout() has pinned this graph's nodes. False
+        // for dissolution (hierarchical) and isomorphism (side-pinned), which
+        // keep the layouts they already had.
+        let orderedLayoutActive = false;
+        // Shape of the live ordered layout (lanes, bands, extent), for the
+        // legend. null while another render mode supplies its own layout.
+        let orderedLayout = null;
+        // The reader ENTERS physics; they do not arrive in it. While this is
+        // false every node is pinned, so the physics solver has no degrees of
+        // freedom to move and the picture cannot wobble.
+        let exploreMode = false;
+
+        // ---- front matter ---------------------------------------------------
+        // threads.json read for the entry points. Deliberately a separate
+        // global from `threadsReport`: threads mode owns that one and the
+        // evidence graph must leave it null, so the front matter cannot be
+        // mistaken for a threads-mode overlay that failed to clear.
+        let indexOverlay = null;
+        let indexOverlayTried = false;
+        let entryPointIds = {};            // entry key -> {nodeId: true} or null
+        let activeEntryPoint = 'claims';
 
         // ---- threads state -------------------------------------------------
         let threadsReport = null;          // parsed threads.json, or null
@@ -2269,6 +2462,247 @@
                 });
             });
             return true;
+        }
+
+        // =====================================================================
+        // Ordered arrival layout. See the ORDERED_* block above for why.
+        //
+        // Every decision here is a total order over data that is already on
+        // the node record — lane order from ORDERED_LANES, band order from the
+        // parsed date, position inside a cell from the id. Nothing consults a
+        // random seed, the viewport, the clock or the previous render, which is
+        // what makes two consecutive loads produce identical coordinates.
+        //
+        // Returns true when it pinned something.
+        // =====================================================================
+        function orderedDateKey(node) {
+            const t = node ? node.asserted : null;
+            return (t === null || t === undefined || !isFinite(t)) ? '' : String(t);
+        }
+
+        function orderedLanesFor(nodes) {
+            const lanes = ORDERED_LANES.filter(function (type) {
+                return nodes.some(function (n) { return (n.entityType || '') === type; });
+            });
+            // A type the vocabulary has never seen still gets a lane of its
+            // own rather than being dropped into someone else's: appended in
+            // sorted order, so it is deterministic too.
+            const extra = [];
+            nodes.forEach(function (n) {
+                const type = n.entityType || 'unknown';
+                if (lanes.indexOf(type) === -1 && extra.indexOf(type) === -1) extra.push(type);
+            });
+            extra.sort();
+            return lanes.concat(extra);
+        }
+
+        function orderedDateBands(nodes) {
+            const keys = [];
+            nodes.forEach(function (n) {
+                const key = orderedDateKey(n);
+                if (keys.indexOf(key) === -1) keys.push(key);
+            });
+            // Undated last: "we never wrote down when" belongs after the record.
+            keys.sort(function (a, b) {
+                if (a === b) return 0;
+                if (a === '') return 1;
+                if (b === '') return -1;
+                return Number(a) - Number(b);
+            });
+            return keys;
+        }
+
+        function applyOrderedLayout(nodes) {
+            if (!nodes || !nodes.length) return false;
+
+            const lanes = orderedLanesFor(nodes);
+            const bands = orderedDateBands(nodes);
+            if (!lanes.length || !bands.length) return false;
+
+            // Bucket into (lane, band) cells, each sorted by id.
+            const cells = {};
+            nodes.forEach(function (node) {
+                const lane = lanes.indexOf(node.entityType || 'unknown');
+                const band = bands.indexOf(orderedDateKey(node));
+                const key = lane + '|' + band;
+                if (!cells[key]) cells[key] = [];
+                cells[key].push(node);
+            });
+            Object.keys(cells).forEach(function (key) {
+                cells[key].sort(function (a, b) {
+                    return a.id < b.id ? -1 : (a.id > b.id ? 1 : 0);
+                });
+            });
+
+            // A lane is as wide as its busiest cell needs to stay ~4 rows tall,
+            // capped so no single lane can run away with the canvas.
+            const laneCols = lanes.map(function (type, lane) {
+                let max = 0;
+                bands.forEach(function (b, band) {
+                    const cell = cells[lane + '|' + band];
+                    if (cell) max = Math.max(max, cell.length);
+                });
+                return clamp(Math.ceil(max / ORDERED_CELL_ROWS), 1, ORDERED_MAX_LANE_COLS);
+            });
+
+            // A band is as tall as the tallest cell in it, so bands never overlap.
+            const bandRows = bands.map(function (b, band) {
+                let max = 1;
+                lanes.forEach(function (type, lane) {
+                    const cell = cells[lane + '|' + band];
+                    if (cell) max = Math.max(max, Math.ceil(cell.length / laneCols[lane]));
+                });
+                return max;
+            });
+
+            const laneX = [];
+            let width = 0;
+            lanes.forEach(function (type, lane) {
+                laneX.push(width);
+                width += laneCols[lane] * ORDERED_COL + ORDERED_LANE_GAP;
+            });
+            width = Math.max(0, width - ORDERED_LANE_GAP);
+
+            const bandY = [];
+            let height = 0;
+            bands.forEach(function (b, band) {
+                bandY.push(height);
+                height += bandRows[band] * ORDERED_ROW + ORDERED_DATE_GAP;
+            });
+            height = Math.max(0, height - ORDERED_DATE_GAP);
+
+            // Centred on the origin: vis has nothing left to shift.
+            Object.keys(cells).forEach(function (key) {
+                const parts = key.split('|');
+                const lane = Number(parts[0]);
+                const band = Number(parts[1]);
+                const cols = laneCols[lane];
+                cells[key].forEach(function (node, i) {
+                    node.x = Math.round(laneX[lane] + (i % cols) * ORDERED_COL - width / 2);
+                    node.y = Math.round(bandY[band] + Math.floor(i / cols) * ORDERED_ROW - height / 2);
+                    node.fixed = { x: true, y: true };
+                });
+            });
+
+            orderedLayout = {
+                lanes: lanes,
+                laneCols: laneCols,
+                bands: bands,
+                bandRows: bandRows,
+                width: width,
+                height: height
+            };
+            return true;
+        }
+
+        // In the ordered arrival the label is a scanning aid, so it is clipped
+        // and wrapped to a fixed column width. The untruncated text is still on
+        // the node record, in the tooltip and in the details panel — nothing is
+        // lost, it is only not shouted. Explore mode restores the full label.
+        function nodeDisplayLabel(node) {
+            if (!orderedLayoutActive || exploreMode) return node.label;
+            return truncate(node.label, ORDERED_LABEL_CHARS);
+        }
+
+        function nodeWidthConstraint(node) {
+            if (!orderedLayoutActive || exploreMode) return false;
+            return (LABEL_INSIDE_SHAPES.indexOf(node.shape) !== -1)
+                ? { maximum: ORDERED_INSIDE_LABEL_WIDTH }
+                : false;
+        }
+
+        // =====================================================================
+        // Explore: the mode the reader ENTERS.
+        //
+        // On the way in every node is released and the solver takes over. On
+        // the way out the pinned coordinates computed at load are written back
+        // verbatim, so the ordered arrangement returns exactly — the same
+        // integers, not merely the same shape. `physics.enabled` itself is
+        // never switched off: with every node fixed the solver has nothing to
+        // integrate, which is what "physics off on arrival" means in practice
+        // and what keeps the network's own options honest for the round-trip
+        // assertions.
+        // =====================================================================
+        function exploreAvailable() {
+            return orderedLayoutActive && !!network && !!nodesDataSet;
+        }
+
+        function updateExploreButton() {
+            const btn = document.getElementById('btn-explore');
+            if (!btn) return;
+            btn.textContent = exploreMode ? 'Back to the index' : 'Explore';
+            btn.setAttribute('aria-pressed', exploreMode ? 'true' : 'false');
+            btn.classList.toggle('mode-hidden', !orderedLayoutActive);
+        }
+
+        function setExploreMode(on) {
+            const want = !!on;
+            if (!exploreAvailable()) {
+                exploreMode = false;
+                updateExploreButton();
+                return;
+            }
+            exploreMode = want;
+
+            const updates = allNodes.map(function (node) {
+                const record = {
+                    id: node.id,
+                    label: nodeDisplayLabel(node),
+                    widthConstraint: nodeWidthConstraint(node)
+                };
+                if (exploreMode) {
+                    record.fixed = false;
+                } else {
+                    if (node.x !== undefined) record.x = node.x;
+                    if (node.y !== undefined) record.y = node.y;
+                    record.fixed = (node.fixed === undefined) ? false : node.fixed;
+                }
+                return record;
+            });
+            nodesDataSet.update(updates);
+
+            network.setOptions({ physics: { enabled: true } });
+            if (exploreMode) {
+                try { network.startSimulation(); } catch (e) { /* older vis builds */ }
+                showToast('Explore: physics on. Drag nodes; "Back to the index" restores the order.');
+            } else {
+                try { network.stopSimulation(); } catch (e) { /* older vis builds */ }
+                fitOrderedLayout();
+                showToast('Back to the ordered index');
+            }
+            updateExploreButton();
+            updateSearchStatus();
+        }
+
+        function toggleExplore(force) {
+            setExploreMode(force === undefined ? !exploreMode : !!force);
+        }
+
+        // #legend is an overlay pinned to the top-left corner of the canvas, and
+        // fit() knows nothing about it — so the leftmost lane (hypotheses, the
+        // thing a reader most wants first) lands underneath it. Shift the
+        // camera left by half the legend's width so the grid starts clear of
+        // it. This moves the VIEW, never a node: getPositions() is untouched
+        // and the arrival stays byte-identical.
+        function fitOrderedLayout() {
+            if (!network) return;
+            network.fit({ animation: false });
+            if (isMobileLayout()) return;   // the legend is a closed disclosure there
+            const legend = document.getElementById('legend');
+            const graph = document.getElementById('graph');
+            if (!legend || !graph) return;
+            if (getComputedStyle(legend).display === 'none') return;
+            const overlay = legend.getBoundingClientRect().width;
+            const canvas = graph.getBoundingClientRect().width;
+            if (!overlay || !canvas || overlay > canvas * 0.45) return;
+            const scale = network.getScale();
+            if (!isFinite(scale) || scale <= 0) return;
+            const centre = network.getViewPosition();
+            network.moveTo({
+                position: { x: centre.x - ((overlay + 24) / 2) / scale, y: centre.y },
+                scale: scale,
+                animation: false
+            });
         }
 
         // =====================================================================
@@ -2895,6 +3329,7 @@
 
         function toggleReadinessChip(key) {
             activeReadiness[key] = activeReadiness[key] === false;
+            releaseEntryPoint();
             focusedNodeIds = null;
             syncReadinessChipClasses();
             applyVisualState();
@@ -2961,6 +3396,8 @@
                     }).join(', ')) + '.</div>';
             }
             html += '<div class="legend-note">No timeline here: readiness is a statement about now.</div></div>';
+
+            html += orderedLayoutLegendHtml();
 
             // Things the graph does not know about at all. They have no node to
             // colour, so the legend is the only place they can appear.
@@ -3230,6 +3667,10 @@
             // and readiness is a statement about the tree as it is right now.
             toggle('timeline-bar', dissolution || threads);
             toggle('colour-mode-controls', dissolution || threads);
+            // Dissolution is not an index of claims: it has no types, no dates
+            // and no threads report to point at.
+            toggle('entry-points', dissolution);
+            updateExploreButton();
             // Switching graphs swaps which chip groups are live, so the
             // "Filters (n of m)" count has to be recomputed, and any open
             // disclosure closed before its contents change underneath it.
@@ -3457,7 +3898,8 @@
 
                 nodeUpdates.push({
                     id: node.id,
-                    label: node.label,
+                    label: nodeDisplayLabel(node),
+                    widthConstraint: nodeWidthConstraint(node),
                     title: nodeTooltip(node),
                     shape: node.shape,
                     size: node.size,
@@ -3483,6 +3925,10 @@
                 return { id: edge.id, hidden: !(endpointsVisible && timeOk) };
             });
             edgesDataSet.update(edgeUpdates);
+
+            let shown = 0;
+            Object.keys(visible).forEach(function (id) { if (visible[id]) shown += 1; });
+            updateSearchStatus(shown);
 
             renderLegend();
         }
@@ -3559,6 +4005,12 @@
             thtml += '<button class="chip" id="chip-type-none" onclick="setAllTypeChips(false)">none</button>';
             typeBar.innerHTML = thtml;
 
+            // The arrival state of the type row: claims only on the evidence
+            // graph, everything elsewhere. Done here rather than in
+            // loadAndInitialize() so any later rebuild of the chips
+            // re-establishes it instead of silently widening the view.
+            applyDefaultTypeSelection();
+            syncChipClasses();
             updateFilterToggleLabel();
         }
 
@@ -3576,6 +4028,7 @@
 
         function toggleStatusChip(status) {
             activeStatuses[status] = activeStatuses[status] === false;
+            releaseEntryPoint();
             focusedNodeIds = null;
             syncChipClasses();
             applyVisualState();
@@ -3583,6 +4036,7 @@
 
         function toggleTypeChip(type) {
             activeTypes[type] = activeTypes[type] === false;
+            releaseEntryPoint();
             focusedNodeIds = null;
             syncChipClasses();
             applyVisualState();
@@ -3600,6 +4054,225 @@
             focusedNodeIds = null;
             syncChipClasses();
             applyVisualState();
+        }
+
+        // =====================================================================
+        // Front matter: entry points.
+        //
+        // An index has a contents page. Each of these sets the graph's whole
+        // state — type chips, status chips, focus set, timeline cursor — so the
+        // reader lands on a question instead of on a filter. None of them
+        // navigate away; all of them are undone by "everything", "Show All" or
+        // "Reset View".
+        //
+        // "what's open" and "what's blocked" come out of _data/threads.json;
+        // "what changed" comes out of the corrects / retires / supersedes edges
+        // the graph already carries. Any entry point with nothing behind it is
+        // hidden rather than left to disappoint.
+        // =====================================================================
+        const ENTRY_SET_KEYS = ['open', 'changed', 'blocked'];
+
+        // Read once per page. A missing or unreadable overlay is not an error:
+        // it costs two entry points and nothing else, so warn and carry on.
+        async function loadIndexOverlay() {
+            if (indexOverlayTried) return indexOverlay;
+            indexOverlayTried = true;
+            try {
+                const response = await fetch('_data/threads.json');
+                if (!response.ok) throw new Error(response.status + ' ' + response.statusText);
+                const payload = await response.json();
+                if (!payload || typeof payload !== 'object') throw new Error('not a JSON object');
+                indexOverlay = payload;
+            } catch (error) {
+                console.warn('Front matter: no usable _data/threads.json (' + error.message +
+                    ') — hiding the entry points that depend on it.');
+                indexOverlay = null;
+            }
+            return indexOverlay;
+        }
+
+        function setEntryChipVisible(id, visible) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('mode-hidden', !visible);
+        }
+
+        // A manual narrowing supersedes the entry point that produced it: the
+        // focus set the entry point installed is dropped by the chip handlers,
+        // so the label must not keep claiming it is still in force.
+        function releaseEntryPoint() {
+            if (ENTRY_SET_KEYS.indexOf(activeEntryPoint) === -1) return;
+            activeEntryPoint = 'everything';
+            syncEntryChipClasses();
+        }
+
+        function syncEntryChipClasses() {
+            const ids = ['entry-claims', 'entry-questions', 'entry-open',
+                         'entry-changed', 'entry-blocked', 'entry-everything'];
+            ids.forEach(function (id) {
+                const el = document.getElementById(id);
+                if (el) el.classList.toggle('entry-active', id === 'entry-' + activeEntryPoint);
+            });
+        }
+
+        function buildEntryPoints() {
+            entryPointIds = {};
+
+            // "what changed": both ends of every edge that revises the record.
+            const changed = {};
+            allEdges.forEach(function (edge) {
+                if (['corrects', 'retires', 'supersedes'].indexOf(edge.relType) === -1) return;
+                if (nodeIndex[edge.from]) changed[edge.from] = true;
+                if (nodeIndex[edge.to]) changed[edge.to] = true;
+            });
+            entryPointIds.changed = Object.keys(changed).length ? changed : null;
+
+            const report = indexOverlay || {};
+
+            const open = {};
+            asArray(report.open_threads).forEach(function (thread) {
+                if (thread && thread.claim && nodeIndex[thread.claim]) open[thread.claim] = true;
+            });
+            entryPointIds.open = Object.keys(open).length ? open : null;
+
+            // "what's blocked": the gated claims AND the blockers gating them,
+            // so the fan-out is visible rather than implied.
+            const blocked = {};
+            asArray(report.blockers).forEach(function (blocker) {
+                if (!blocker || !blocker.key) return;
+                const own = blockerNodeId(blocker, nodeIndex);
+                if (nodeIndex[own]) blocked[own] = true;
+                asArray(blocker.gates).forEach(function (gate) {
+                    if (gate && gate.claim && nodeIndex[gate.claim]) blocked[gate.claim] = true;
+                });
+            });
+            allEdges.forEach(function (edge) {
+                if (GATE_EDGE_TYPES.indexOf(edge.relType) === -1) return;
+                if (nodeIndex[edge.from]) blocked[edge.from] = true;
+                if (nodeIndex[edge.to]) blocked[edge.to] = true;
+            });
+            entryPointIds.blocked = Object.keys(blocked).length ? blocked : null;
+
+            const hasQuestions = allNodes.some(function (n) { return n.entityType === 'question'; });
+            setEntryChipVisible('entry-questions', hasQuestions);
+            setEntryChipVisible('entry-open', !!entryPointIds.open);
+            setEntryChipVisible('entry-changed', !!entryPointIds.changed);
+            setEntryChipVisible('entry-blocked', !!entryPointIds.blocked);
+            syncEntryChipClasses();
+        }
+
+        function claimTypesAvailable() {
+            return ORDERED_CLAIM_TYPES.filter(function (t) {
+                return activeTypes[t] !== undefined;
+            });
+        }
+
+        // The arrival shows claims only: 93 assertions read better as an index
+        // than 175 nodes do, and runs, models, documents and artefacts are one
+        // chip (or one entry point) away. Applied to the evidence graph itself;
+        // isomorphism and threads open on everything they have.
+        function indexDefaultsToClaims() {
+            return renderMode === 'evidence' && currentGraphKey === 'evidence' &&
+                claimTypesAvailable().length > 0;
+        }
+
+        function applyClaimsOnlyTypes() {
+            Object.keys(activeTypes).forEach(function (type) {
+                activeTypes[type] = ORDERED_CLAIM_TYPES.indexOf(type) !== -1;
+            });
+        }
+
+        function applyDefaultTypeSelection() {
+            if (indexDefaultsToClaims()) {
+                applyClaimsOnlyTypes();
+                activeEntryPoint = 'claims';
+            } else {
+                Object.keys(activeTypes).forEach(function (type) { activeTypes[type] = true; });
+                activeEntryPoint = 'everything';
+            }
+            syncEntryChipClasses();
+        }
+
+        function applyEntryPoint(key) {
+            if (!activeTypes || !Object.keys(activeTypes).length) return;
+
+            focusedNodeIds = null;
+            searchTerm = '';
+            const searchEl = document.getElementById('search');
+            if (searchEl) searchEl.value = '';
+            stopTimelinePlay();
+
+            // An entry point is a statement about now, so it always opens at
+            // the present end of the timeline.
+            timelineValue = timelineDays;
+            const slider = document.getElementById('timeline');
+            if (slider) slider.value = String(timelineValue);
+            updateTimelineReadout();
+
+            Object.keys(activeStatuses).forEach(function (s) { activeStatuses[s] = true; });
+            Object.keys(activeReadiness).forEach(function (k) { activeReadiness[k] = true; });
+
+            if (key === 'questions') {
+                Object.keys(activeTypes).forEach(function (t) { activeTypes[t] = (t === 'question'); });
+            } else if (ENTRY_SET_KEYS.indexOf(key) !== -1) {
+                const set = entryPointIds[key];
+                if (!set) {
+                    showToast('Nothing recorded for that entry point');
+                    return;
+                }
+                // The id set decides membership here, not the type row.
+                Object.keys(activeTypes).forEach(function (t) { activeTypes[t] = true; });
+                focusedNodeIds = Object.assign({}, set);
+            } else if (key === 'everything') {
+                Object.keys(activeTypes).forEach(function (t) { activeTypes[t] = true; });
+            } else {
+                key = 'claims';
+                if (claimTypesAvailable().length) {
+                    applyClaimsOnlyTypes();
+                } else {
+                    Object.keys(activeTypes).forEach(function (t) { activeTypes[t] = true; });
+                }
+            }
+
+            activeEntryPoint = key;
+            syncChipClasses();
+            syncReadinessChipClasses();
+            syncEntryChipClasses();
+            applyVisualState();
+            if (orderedLayoutActive) fitOrderedLayout();
+            else if (network) network.fit({ animation: true });
+        }
+
+        // The count under the search box: an index says how big it is and how
+        // much of it you are currently looking at.
+        const ENTRY_LABELS = {
+            claims: 'the claims',
+            questions: 'the open questions',
+            open: 'open threads',
+            changed: 'claims the record has revised',
+            blocked: 'blocked claims and their blockers',
+            everything: 'everything'
+        };
+
+        function updateSearchStatus(visibleCount) {
+            const el = document.getElementById('search-status');
+            if (!el) return;
+            const total = allNodes.length;
+            const shown = (visibleCount === undefined)
+                ? (nodesDataSet ? nodesDataSet.get().filter(function (n) { return n.hidden !== true; }).length : 0)
+                : visibleCount;
+            let text;
+            if (searchTerm) {
+                text = shown + ' of ' + total + ' match “' + searchTerm + '” — label, id or description';
+            } else {
+                text = shown + ' of ' + total + ' nodes — ' +
+                    (ENTRY_LABELS[activeEntryPoint] || 'everything');
+            }
+            if (orderedLayoutActive) {
+                text += exploreMode
+                    ? ' · explore mode: physics on'
+                    : ' · ordered: type across, date down';
+            }
+            el.textContent = text;
         }
 
         // Legacy-compatible filter entry point: filterNodes('all') or a type name.
@@ -3621,9 +4294,12 @@
                     setAllStatusChips(true);
                 }
                 Object.keys(activeTypes).forEach(function (t) { activeTypes[t] = true; });
+                activeEntryPoint = 'everything';
             } else {
                 Object.keys(activeTypes).forEach(function (t) { activeTypes[t] = (t === type); });
+                activeEntryPoint = (type === 'question') ? 'questions' : 'everything';
             }
+            syncEntryChipClasses();
             syncChipClasses();
             applyVisualState();
             if (network) network.fit({ animation: true });
@@ -3865,7 +4541,33 @@
                 '; border:2px solid ' + esc(statusColour('refuted')) + '; opacity:0.6"></span>' +
                 '<span>retired as of the cursor (rim keeps its status colour)</span></div></div>';
 
+            html += orderedLayoutLegendHtml();
+
             legend.innerHTML = html;
+        }
+
+        // How to read the ordered arrival. Deliberately legend-note markup and
+        // deliberately last: the status/shape/edge legend rows above are what
+        // the smoke test keys its gradient assertions on, and nothing here adds
+        // a .legend-row to that sequence.
+        function orderedLayoutLegendHtml() {
+            if (!orderedLayoutActive || !orderedLayout) return '';
+            const lanes = orderedLayout.lanes.join(' · ');
+            const dated = orderedLayout.bands.filter(function (b) { return b !== ''; });
+            let html = '<div class="legend-section"><h4>Arrangement</h4>' +
+                '<div class="legend-note"><b>Across:</b> entity type — ' + esc(lanes) + '.</div>' +
+                '<div class="legend-note"><b>Down:</b> the date the claim was asserted' +
+                (dated.length
+                    ? ', ' + esc(formatDate(Number(dated[0]))) + ' at the top through ' +
+                      esc(formatDate(Number(dated[dated.length - 1]))) + ' at the bottom'
+                    : '') +
+                (orderedLayout.bands.indexOf('') === -1 ? '' : '; undated last') + '.</div>' +
+                '<div class="legend-note">The layout is computed from the data, not settled by ' +
+                'physics: identical on every load, and nothing moves under you. ' +
+                (exploreMode
+                    ? 'You are in <b>Explore</b>; "Back to the index" restores it exactly.'
+                    : 'Press <b>Explore</b> to release it into physics.') + '</div></div>';
+            return html;
         }
 
         // =====================================================================
@@ -4416,12 +5118,20 @@
                 setAllStatusChips(true);
                 setAllTypeChips(true);
             }
+            // "Reset view" means the state the reader arrived in, which is the
+            // ordered index — not physics, and not everything at once.
+            if (exploreMode) setExploreMode(false);
+            if (renderMode !== 'dissolution') {
+                applyDefaultTypeSelection();
+                syncChipClasses();
+            }
             stopTimelinePlay();
             setTimelineValue(timelineDays);
             navigationHistory = [];
             updateBreadcrumb();
             applyVisualState();
-            if (network) network.fit({ animation: true });
+            if (orderedLayoutActive) fitOrderedLayout();
+            else if (network) network.fit({ animation: true });
         }
 
         function updateBreadcrumb() {
@@ -4723,6 +5433,10 @@
             const loading = document.getElementById('loading');
             loading.classList.remove('hidden');
             loading.textContent = 'Reloading evidence graph...';
+            // "Refresh Data" has to refresh the front matter too, or a
+            // regenerated threads.json would not reach the entry points until
+            // the page itself was reloaded.
+            indexOverlayTried = false;
             try {
                 await loadAndInitialize();
                 showToast('Data reloaded');
@@ -4736,6 +5450,15 @@
             const graph = GRAPHS[currentGraphKey] || GRAPHS[DEFAULT_GRAPH_KEY];
             const payload = await loadEntities();
             await loadVisualConfig();
+            // Read once, for the front matter only. Never assigned to
+            // threadsReport — that global belongs to threads mode.
+            await loadIndexOverlay();
+
+            // Every graph arrives in its own arrival state; nothing about the
+            // previous one survives the switch.
+            exploreMode = false;
+            orderedLayoutActive = false;
+            orderedLayout = null;
 
             const select = document.getElementById('graph-select');
             if (select && select.value !== currentGraphKey) select.value = currentGraphKey;
@@ -4816,11 +5539,15 @@
                 buildAdjacency();
 
                 // Isomorphism claims carry a `side`; pin acoustic left and
-                // transformer right when they do.
-                applySideLayout(allNodes);
+                // transformer right when they do. A graph that pins sides
+                // keeps that layout — the ordered grid is for the graphs that
+                // would otherwise arrive as a physics cloud.
+                const sided = applySideLayout(allNodes);
+                orderedLayoutActive = sided ? false : applyOrderedLayout(allNodes);
 
                 buildChips();
                 if (renderMode === 'threads') buildReadinessChips();
+                buildEntryPoints();
             }
 
             applyModeVisibility();
@@ -4840,7 +5567,8 @@
             const visNodes = allNodes.map(function (node) {
                 const record = {
                     id: node.id,
-                    label: node.label,
+                    label: nodeDisplayLabel(node),
+                    widthConstraint: nodeWidthConstraint(node),
                     title: nodeTooltip(node),
                     shape: node.shape,
                     size: node.size,
@@ -4886,6 +5614,7 @@
             }
 
             applyVisualState();
+            updateExploreButton();
 
             // Layered layouts settle instantly; fit once the DOM has painted.
             if (renderMode === 'dissolution' && network) {
@@ -4894,6 +5623,20 @@
                     const el = document.getElementById('loading');
                     if (el) el.classList.add('hidden');
                 }, 60);
+            }
+
+            // The ordered arrival is settled the instant it is drawn: every
+            // node is pinned, so there is nothing to stabilise and nothing to
+            // wait for. Frame it (after initNetwork's own 100ms physics kick,
+            // which with pinned nodes is a no-op) and drop the overlay rather
+            // than leaving the reader on a progress bar for a layout that is
+            // already finished.
+            if (orderedLayoutActive && network) {
+                setTimeout(function () {
+                    fitOrderedLayout();
+                    const el = document.getElementById('loading');
+                    if (el) el.classList.add('hidden');
+                }, 180);
             }
 
             if (renderMode === 'dissolution') {
@@ -4932,9 +5675,14 @@
             }
         });
 
-        // Search: matches labels, descriptions and ids.
+        // Search: matches labels, ids AND description text (see
+        // nodeMatchesSearch, which also reaches into paths, scripts, sides,
+        // roles, dissolution tokens and the threads report's own wording).
         document.getElementById('search').addEventListener('input', function (e) {
             searchTerm = e.target.value.trim().toLowerCase();
+            // Searching is a lookup over the whole index, so it supersedes any
+            // entry point that had narrowed it.
+            releaseEntryPoint();
             focusedNodeIds = null;
             applyVisualState();
         });

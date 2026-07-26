@@ -3,7 +3,7 @@
  * Headless browser smoke + interaction test for docs/graph/viewer.html.
  *
  * Serves docs/graph on a free port, drives the viewer with Playwright's
- * bundled Chromium, and asserts fourteen things:
+ * bundled Chromium, and asserts fifteen things:
  *
  *   1. viewer.html loads with ZERO pageerror and ZERO console-error events
  *   2. a <canvas> exists and vis-network has actually rendered nodes
@@ -24,11 +24,26 @@
  *      leaks: after threads -> dissolution -> evidence the hub nodes are gone,
  *      status colours are back, gate edges are undashed and evidence is still
  *      clickable
+ *  15. the evidence graph ARRIVES as a deterministic ordered index: two
+ *      independent loads in separate browser contexts put every node on the
+ *      same coordinates, nothing drifts after arrival (physics is off in the
+ *      only sense the reader can perceive — every node pinned, zero
+ *      displacement over a settle window), and a round trip out to another
+ *      graph and back restores those coordinates EXACTLY, not approximately
  *
  * Assertions 1-11, 13 and 14 run at 1600x1000. Assertion 12 opens a second,
  * phone-sized context (393x830, isMobile + hasTouch) so the narrow-screen
  * layout is pinned without disturbing the desktop measurements the others
- * depend on.
+ * depend on. Assertion 15 opens two further desktop contexts, because "the
+ * same every load" is only testable across genuinely separate loads.
+ *
+ * Assertion 13 and assertion 15 are deliberately complementary, and both are
+ * load-bearing. 13 pins the mode flags on the way back from another graph
+ * (hierarchical off, physics option on, override cleared) and tolerates
+ * generous positional drift, because it was written against a stochastic
+ * force-directed arrival. 15 pins the thing 13 cannot see: that the arrival is
+ * a pure function of the data, to the integer. Weakening 15 to "approximately
+ * the same" would silently re-admit the physics cloud 13 already tolerates.
  *
  * Run:  node docs/graph/tests/smoke_test.mjs
  * Exit: 0 = all pass, 1 = at least one failure.
@@ -159,7 +174,18 @@ function startServer(rootDir) {
 // --- reporting -------------------------------------------------------------
 // Every assertion must run: a suite that silently stops short is a failure, not
 // a pass. Bump this when adding one.
-const TOTAL_ASSERTIONS = 14;
+const TOTAL_ASSERTIONS = 15;
+
+// --- ordered arrival budget (assertion 15) ---------------------------------
+// The index property is "the same bytes in, the same pixels out". These are
+// exact-match budgets on purpose: one unit of tolerance is one unit of physics,
+// and the whole point of the ordered arrival is that there is none. The settle
+// window is the interval over which an unpinned solver would visibly move
+// things (the force-directed arrival this replaced was still travelling
+// hundreds of units at t=3s).
+const ORDERED_SETTLE_WINDOW_MS = 2500;
+const ORDERED_MAX_DRIFT_UNITS = 0;   // total |dx|+|dy| across every node
+const ORDERED_MAX_RELOAD_DELTA = 0;  // nodes allowed to differ between loads
 
 // --- mobile budget (assertion 12) ------------------------------------------
 // A real device (Nothing Phone 2a) showed the header + chip rows eating 66% of
@@ -1299,6 +1325,239 @@ async function main() {
                 `${evDetail.pill === null ? 'MISSING' : '"' + evDetail.pill + '"'}\n` +
                 (describeSince(snap14).join('\n') || 'no errors'));
         }
+
+        // ---------------------------------------------------------------- 15
+        // The evidence graph arrives as a deterministic ordered index.
+        //
+        // This is the single property the ordered-arrival change rests on, and
+        // it is the one thing none of assertions 1-14 can see. Assertion 13
+        // checks the mode FLAGS after a round trip and tolerates half the
+        // distinct-x count drifting away, because it was written when the
+        // arrival was a physics cloud. If the ordered layout silently stopped
+        // being applied — a stale `fixed`, an early return in
+        // applyOrderedLayout(), a solver left running — 13 would still pass
+        // while the front door went back to being a different picture every
+        // load. So 15 measures the property directly, in three parts:
+        //
+        //   a. TWO LOADS, TWO CONTEXTS, IDENTICAL COORDINATES. Separate browser
+        //      contexts, so nothing is shared: no cache, no storage, no
+        //      surviving vis instance. Every node must land on exactly the same
+        //      integer pair. Comparing within one page would prove nothing —
+        //      it is the second *load* that has to agree.
+        //
+        //   b. NOTHING MOVES AFTER ARRIVAL. "Physics off" is asserted as the
+        //      reader experiences it rather than as an options flag, because
+        //      the viewer deliberately leaves physics.enabled true (assertion
+        //      13 requires it) and instead pins every node. Both halves are
+        //      checked: every node carries fixed.x && fixed.y, AND total
+        //      displacement over a settle window is zero. Either alone is
+        //      forgeable — a pinned node whose coordinates are recomputed on a
+        //      timer would pass the first, and a solver that happens to be at
+        //      rest on this data would pass the second.
+        //
+        //   c. THE ROUND TRIP RESTORES IT EXACTLY. Out to dissolution — the
+        //      hierarchical override that has leaked before — and back. Not
+        //      "roughly the same shape": the same integers. This is the
+        //      layout-leak bug's second incarnation, and an ordered layout that
+        //      comes back 3 units off is an ordered layout that is being
+        //      recomputed from something other than the data.
+        // ------------------------------------------------------------------
+        phase = 'ordered-arrival';
+        const snap15 = snapshotErrors();
+
+        // Read every node's coordinates as integers, plus what the layout says
+        // about itself. Rounding is the caller's problem nowhere: vis stores
+        // these as floats and the ordered layout writes Math.round()ed ints, so
+        // an exact comparison is legitimate here and would not be if physics
+        // had ever touched them.
+        const readOrdered = (p) => p.evaluate(() => {
+            const pos = network.getPositions();
+            const ids = Object.keys(pos).sort();
+            const items = nodesDataSet.get();
+            const pinned = items.filter(n => n.fixed && n.fixed.x === true && n.fixed.y === true).length;
+            return {
+                graphKey: typeof currentGraphKey !== 'undefined' ? currentGraphKey : null,
+                orderedLayoutActive: typeof orderedLayoutActive !== 'undefined'
+                    ? !!orderedLayoutActive : null,
+                exploreMode: typeof exploreMode !== 'undefined' ? !!exploreMode : null,
+                overrideCleared: typeof layoutOverride === 'undefined' || layoutOverride === null,
+                hierarchical: !!(network.layoutEngine && network.layoutEngine.options &&
+                    network.layoutEngine.options.hierarchical &&
+                    network.layoutEngine.options.hierarchical.enabled),
+                physicsOption: !!network.physics.options.enabled,
+                nodeCount: ids.length,
+                totalNodes: items.length,
+                pinnedNodes: pinned,
+                distinctX: new Set(ids.map(id => Math.round(pos[id].x))).size,
+                coords: ids.map(id => `${id}:${Math.round(pos[id].x)},${Math.round(pos[id].y)}`)
+            };
+        });
+
+        // Total displacement between two coordinate readings, plus the worst
+        // offenders by name — a count alone does not tell you whether one node
+        // slipped or the whole grid re-flowed.
+        const displacement = (a, b) => {
+            const parse = (rows) => {
+                const m = new Map();
+                rows.forEach(r => {
+                    const i = r.lastIndexOf(':');
+                    const [x, y] = r.slice(i + 1).split(',').map(Number);
+                    m.set(r.slice(0, i), [x, y]);
+                });
+                return m;
+            };
+            const ma = parse(a), mb = parse(b);
+            let total = 0;
+            const movers = [];
+            const missing = [];
+            for (const [id, pa] of ma) {
+                const pb = mb.get(id);
+                if (!pb) { missing.push(id); continue; }
+                const d = Math.abs(pa[0] - pb[0]) + Math.abs(pa[1] - pb[1]);
+                if (d) { total += d; movers.push({ id, from: pa, to: pb, d }); }
+            }
+            for (const id of mb.keys()) if (!ma.has(id)) missing.push(id);
+            movers.sort((x, y) => y.d - x.d);
+            return {
+                total, movedCount: movers.length, missingCount: missing.length,
+                worst: movers.slice(0, 4).map(m =>
+                    `${m.id} (${m.from[0]},${m.from[1]})->(${m.to[0]},${m.to[1]}) d=${m.d}`),
+                missing: missing.slice(0, 4)
+            };
+        };
+
+        let arrivalA = null, arrivalB = null, afterDrift = null, afterTrip = null;
+        let driftDelta = null, reloadDelta = null, tripDelta = null;
+        const orderedNotes = [];
+
+        for (const which of ['A', 'B']) {
+            const oCtx = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
+            try {
+                const oPage = await oCtx.newPage();
+                await oPage.route('**/*', async (route) => {
+                    const url = route.request().url();
+                    for (const asset of CDN_ASSETS) {
+                        if (url === asset.url || url.startsWith(asset.url.split('?')[0])) {
+                            await route.fulfill({
+                                status: 200,
+                                contentType: 'text/javascript; charset=utf-8',
+                                body: mirror[asset.url]
+                            });
+                            return;
+                        }
+                    }
+                    await route.continue();
+                });
+                oPage.on('pageerror', (err) => {
+                    pageErrors.push({ phase, text: (err && err.stack) || String(err) });
+                });
+                oPage.on('console', (msg) => {
+                    if (msg.type() === 'error') consoleErrors.push({ phase, text: msg.text() });
+                });
+                oPage.on('response', (res) => {
+                    const rec = { phase, status: res.status(), url: res.url() };
+                    allResponses.push(rec);
+                    if (rec.status >= 400) badResponses.push(rec);
+                });
+
+                await oPage.goto(`${base}/viewer.html`, { waitUntil: 'domcontentloaded' });
+                await waitLoaded(oPage);
+
+                if (which === 'A') {
+                    arrivalA = await readOrdered(oPage);
+                    // (b) nothing moves. Deliberately NOT preceded by another
+                    // settle() call: this window starts the moment the arrival
+                    // is declared done, which is exactly when a reader is
+                    // looking at it.
+                    await sleep(ORDERED_SETTLE_WINDOW_MS);
+                    afterDrift = await readOrdered(oPage);
+                    driftDelta = displacement(arrivalA.coords, afterDrift.coords);
+
+                    // (c) out through the hierarchical override and back.
+                    await oPage.selectOption('#graph-select', 'dissolution');
+                    await waitLoaded(oPage);
+                    await sleep(1200);
+                    const viaDiss = await readOrdered(oPage);
+                    orderedNotes.push(
+                        `detour dissolution: hierarchical=${viaDiss.hierarchical} ` +
+                        `physicsOption=${viaDiss.physicsOption} ordered=${viaDiss.orderedLayoutActive}`);
+                    await oPage.selectOption('#graph-select', 'evidence');
+                    await waitLoaded(oPage);
+                    await sleep(1500);
+                    afterTrip = await readOrdered(oPage);
+                    tripDelta = displacement(arrivalA.coords, afterTrip.coords);
+                } else {
+                    arrivalB = await readOrdered(oPage);
+                    reloadDelta = displacement(arrivalA.coords, arrivalB.coords);
+                }
+            } finally {
+                await oCtx.close().catch(() => {});
+            }
+        }
+        phase = 'ordered-arrival';
+
+        const shapeOk = !!arrivalA && arrivalA.graphKey === 'evidence' &&
+            arrivalA.orderedLayoutActive === true && arrivalA.exploreMode === false &&
+            arrivalA.overrideCleared && !arrivalA.hierarchical &&
+            // Every node pinned — not "most", and not merely the visible ones:
+            // an unpinned hidden node is a node that will have moved by the
+            // time a type chip reveals it.
+            arrivalA.pinnedNodes === arrivalA.totalNodes && arrivalA.totalNodes > 0 &&
+            // An ordered grid has lanes. One distinct x is a stack, and one per
+            // node is a cloud; the arrival is neither.
+            arrivalA.distinctX > 1 && arrivalA.distinctX < arrivalA.nodeCount;
+
+        const determinismOk = !!reloadDelta &&
+            reloadDelta.missingCount === 0 &&
+            reloadDelta.movedCount <= ORDERED_MAX_RELOAD_DELTA &&
+            reloadDelta.total <= ORDERED_MAX_RELOAD_DELTA;
+        const stillOk = !!driftDelta && driftDelta.total <= ORDERED_MAX_DRIFT_UNITS;
+        const tripOk = !!afterTrip && !!tripDelta &&
+            tripDelta.missingCount === 0 && tripDelta.total <= ORDERED_MAX_DRIFT_UNITS &&
+            !afterTrip.hierarchical && afterTrip.physicsOption &&
+            afterTrip.overrideCleared && afterTrip.orderedLayoutActive === true &&
+            afterTrip.pinnedNodes === afterTrip.totalNodes;
+
+        const ok15 = shapeOk && determinismOk && stillOk && tripOk && cleanSince(snap15);
+        record(15,
+            'the evidence graph arrives as a deterministic ordered index ' +
+            '(identical coordinates across two loads, nothing moving on arrival, ' +
+            'restored exactly after a round trip)',
+            ok15,
+            (arrivalA
+                ? `arrival: graph=${arrivalA.graphKey} ordered=${arrivalA.orderedLayoutActive} ` +
+                  `explore=${arrivalA.exploreMode} override=${arrivalA.overrideCleared ? 'null' : 'SET'} ` +
+                  `hierarchical=${arrivalA.hierarchical} ` +
+                  `pinned=${arrivalA.pinnedNodes}/${arrivalA.totalNodes} ` +
+                  `placed=${arrivalA.nodeCount} distinctX=${arrivalA.distinctX}` +
+                  `${shapeOk ? '' : ' <-- NOT AN ORDERED ARRIVAL'}\n`
+                : 'arrival: NOT MEASURED\n') +
+            (driftDelta
+                ? `physics off on arrival: over ${ORDERED_SETTLE_WINDOW_MS}ms ` +
+                  `${driftDelta.movedCount} nodes moved, total drift ${driftDelta.total} units ` +
+                  `(budget ${ORDERED_MAX_DRIFT_UNITS})${stillOk ? '' : ' <-- STILL SETTLING'}` +
+                  `${driftDelta.worst.length ? '\n  ' + driftDelta.worst.join('\n  ') : ''}\n`
+                : 'physics off on arrival: NOT MEASURED\n') +
+            (reloadDelta
+                ? `second load in a fresh context: ${arrivalB.nodeCount} nodes placed, ` +
+                  `${reloadDelta.movedCount} differ, ${reloadDelta.missingCount} missing, ` +
+                  `total delta ${reloadDelta.total} units (budget ${ORDERED_MAX_RELOAD_DELTA})` +
+                  `${determinismOk ? '' : ' <-- NOT DETERMINISTIC'}` +
+                  `${reloadDelta.worst.length ? '\n  ' + reloadDelta.worst.join('\n  ') : ''}` +
+                  `${reloadDelta.missing.length ? '\n  missing: ' + reloadDelta.missing.join(', ') : ''}\n`
+                : 'second load: NOT MEASURED\n') +
+            orderedNotes.map(n => n + '\n').join('') +
+            (tripDelta
+                ? `back from dissolution: ${tripDelta.movedCount} nodes differ, ` +
+                  `total delta ${tripDelta.total} units, ` +
+                  `hierarchical=${afterTrip.hierarchical} physicsOption=${afterTrip.physicsOption} ` +
+                  `override=${afterTrip.overrideCleared ? 'null' : 'SET'} ` +
+                  `ordered=${afterTrip.orderedLayoutActive} ` +
+                  `pinned=${afterTrip.pinnedNodes}/${afterTrip.totalNodes}` +
+                  `${tripOk ? '' : ' <-- ORDERED LAYOUT LEAKED OR LOST'}` +
+                  `${tripDelta.worst.length ? '\n  ' + tripDelta.worst.join('\n  ') : ''}\n`
+                : 'round trip: NOT MEASURED\n') +
+            (describeSince(snap15).join('\n') || 'no errors'));
 
     } catch (err) {
         console.error('\n\x1b[31mHARNESS ERROR\x1b[0m:', err && err.stack || err);
