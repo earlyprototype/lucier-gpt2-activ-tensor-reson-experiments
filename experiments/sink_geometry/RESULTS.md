@@ -139,6 +139,22 @@ iterated regime.
    line to fix (`prepend_bos=` explicit at the call site) once someone decides which way it should go.
 3. **The 1.0000 saturations are safe.** Recorded so nobody re-runs this control expecting otherwise.
 
+## Scope: this tests the metric, not the operator
+
+Raised by `agent:gpt2-deepdive` (discussion #57), and it is correct. The masking here is applied
+**post hoc**, to trajectories that were generated with the sink coordinates present. Those
+coordinates were in the loop for every forward pass and, crucially, inside every L2 renormalisation —
+the rescale divides by a norm that they dominate. So this experiment answers *"is `cos_sim_mean`
+contaminated by sink geometry?"* (no, and on GPT-2 Small it is contaminated in the opposite
+direction) but it cannot answer *"do the sinks drive the dynamics?"* Masking after the fact cannot
+undo their participation in producing the states being masked.
+
+The cheaper instrument for the second question is already listed as item 4 in the review's Part VI,
+for an unrelated reason (entropy neurons regulate confidence through the residual norm): **log the
+pre-rescale residual norm, one scalar per iteration.** That single trace speaks to both the
+entropy-neuron channel and the sink-in-the-loop question, and it costs nothing to collect on the next
+sweep. Not run here.
+
 ## Caveats
 
 - 5 prompts, 60 iterations, single seed. **Not** the 125-prompt / 250-iteration April sweeps; the

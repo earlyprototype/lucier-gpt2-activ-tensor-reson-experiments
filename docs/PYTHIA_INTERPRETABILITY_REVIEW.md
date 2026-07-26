@@ -129,6 +129,11 @@ Two anomalies in that table are load-bearing and easy to miss:
   column, and what varies is training corpus (WebText vs Pile), tokenizer, positional scheme
   (learned absolute vs rotary), sublayer arrangement (sequential vs parallel), and embedding tying
   (tied vs untied). Any cross-model difference is attributable to that list and not to capacity.
+  **The match is tighter than shape alone.** `agent:gpt2-deepdive` computed the GPT-2 non-embedding
+  totals from the `12d² + 13d` per-block inventory — which GPT-NeoX blocks share — and gets
+  **85,056,000** and **302,311,424** against Pythia's 85.1M and 302.3M in the table above. So the
+  2×2 is matched on **exact non-embedding parameter count**, not merely on layer count, width and
+  head count (discussion #57; §2.2 of [GPT2_DEEP_DIVE.md](GPT2_DEEP_DIVE.md)).
 
 Training: Adam (β₁=0.9, β₂=0.95, ε=1e-8, weight decay 0.01), ~300B tokens (143,000 × 2,097,152 ≈
 299.9B), matching GPT-3 and OPT's token budget. Deduplicated Pile is ~207B tokens, so the deduped
@@ -249,12 +254,16 @@ models. Three consequences worth recording in the results summaries:
 
 Three properties, in descending order of importance to the field:
 
-- **Checkpoints** make *developmental* claims testable — when does a circuit form, and does it
-  form in stages? No other open suite of this size offered 154.
 - **The dataloader index** makes *data-attribution* claims testable — this behaviour appeared at
-  step *k*; what was in the data before step *k*?
+  step *k*; what was in the data before step *k*? **This is the one property nothing else replicates**,
+  and on the evidence below it carries more of Pythia's uniqueness than the checkpoints do.
 - **The scale ladder with everything else held fixed** makes *scaling* claims testable — the same
   probe, the same corpus, the same order, eight sizes.
+- **Checkpoints** make *developmental* claims testable — when does a circuit form, and does it form
+  in stages? No other open suite of this size offered 154 *across a scale ladder*. But dense
+  checkpoints alone are not unique to Pythia: the five Stanford CRFM GPT-2 Small replications each
+  carry ~604–609, step 0 to 400,000 (see Part VI). Pythia's claim is the **combination** — dense
+  checkpoints *and* a known data order *and* eight sizes — not any one leg of it.
 
 GPT-2 remains the substrate for single-model circuit archaeology (IOI, greater-than, copy
 suppression) because it is small, ubiquitous, and heavily tooled. Pythia is the substrate for
@@ -767,13 +776,22 @@ Ordered by decisiveness per unit cost. None requires retraining.
    flagged as "the cleanest remaining attribution test") is a Pythia-410m experiment — 24 layers is
    what makes the half-depth comparison available at all.
 
-A sixth item, larger, noted without recommendation: **Pythia's checkpoints make ATR a developmental
+A sixth item, larger, noted without recommendation: **checkpoints make ATR a developmental
 question.** "At which checkpoint does attractor structure appear, and at the same relative point
-across sizes?" is the Pythia-shaped version of this project's central question, and it cannot be
-asked of GPT-2 at all — no public checkpoint series exists. It is also expensive: a sweep per
-checkpoint, on CPU. If it is ever run, the Pythia paper's own template applies — the interesting
-answer is not *whether* but *at which step*, and the log-spaced early checkpoints are where phase
-changes have historically been found.
+across sizes?" is the Pythia-shaped version of this project's central question. It is expensive — a
+sweep per checkpoint, on CPU — and if it is ever run, the Pythia paper's own template applies: the
+interesting answer is not *whether* but *at which step*, and the log-spaced early checkpoints are
+where phase changes have historically been found.
+
+> **Correction (raised by `agent:gpt2-deepdive`, discussion #57; verified here).** An earlier version
+> of this item said the developmental question "cannot be asked of GPT-2 at all — no public
+> checkpoint series exists." **That is false.** The five Stanford CRFM GPT-2 Small replications each
+> carry a full `checkpoint-{step}` series; querying the Hugging Face refs endpoint returns **609 tags
+> for `alias-x21`, `battlestar-x49`, `caprica-x81` and `darkmatter-x343`, and 604 for `expanse-x777`,
+> spanning step 0 to 400,000**. The five Medium seeds carry **none**, which is why the claim survived
+> a casual look. So the developmental question *can* be asked on the GPT-2 Small arm — and the CRFM
+> seeds serve double duty, since they are also the seed control in item 1. See §3.2 of
+> [GPT2_DEEP_DIVE.md](GPT2_DEEP_DIVE.md).
 
 ---
 
