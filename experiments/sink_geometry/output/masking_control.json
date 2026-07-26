@@ -67,6 +67,7 @@
       "top50": 0.993938475847,
       "energy_top10": 0.70808,
       "unmasked_1_minus_cos": 0.083274222612,
+      "masked_ref_k": 10,
       "masked_top10_1_minus_cos": 0.01526597619
     },
     "d_model": 768,
@@ -140,6 +141,7 @@
       "top50": 1.000000042916,
       "energy_top10": 0.9227,
       "unmasked_1_minus_cos": 7.391e-08,
+      "masked_ref_k": 10,
       "masked_top10_1_minus_cos": -4.8876e-08
     },
     "d_model": 1024,
@@ -213,6 +215,7 @@
       "top50": 0.999999914169,
       "energy_top10": 0.05482,
       "unmasked_1_minus_cos": -5.96e-09,
+      "masked_ref_k": 10,
       "masked_top10_1_minus_cos": 6.7949e-08
     },
     "d_model": 768,
@@ -286,6 +289,7 @@
       "top50": 0.75863488555,
       "energy_top10": 0.11396,
       "unmasked_1_minus_cos": 0.244771746993,
+      "masked_ref_k": 10,
       "masked_top10_1_minus_cos": 0.230966526866
     },
     "d_model": 1024,

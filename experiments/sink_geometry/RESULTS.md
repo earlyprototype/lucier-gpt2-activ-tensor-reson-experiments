@@ -52,11 +52,16 @@ across prompts, max only 1.5× the median.
 any particular metric.
 
 **The sink is coordinate-structured, not position-structured.** Position-0 norm relative to the mean
-over remaining positions is 1.003× (gpt2) and 0.369× (gpt2-medium) — the BOS position carries no
-unusual norm in either. "The L2 renormalisation rescales whatever sits at position 0" is not the
-sharp worry; "the L2 renormalisation is dominated by ten coordinates" is. (For the Pythia models the
-same ratio is 0.65 and 0.60, but there position 0 is an ordinary content token, so it is not a
-statement about sinks at all.)
+over remaining positions is 1.003× (gpt2) and 0.369× (gpt2-medium). To be precise about what that
+does and does not show: **neither BOS position is an unusually *large* norm**, which is the specific
+thing a position-sink would look like. GPT-2 Medium's 0.369× is a real departure from the rest of
+the sequence — materially *smaller*, not larger — so "carries no unusual norm" would be wrong; the
+claim is only that the anomaly does not run in the direction that would make position 0 the sink.
+
+So "the L2 renormalisation rescales whatever sits at position 0" is not the sharp worry; "the L2
+renormalisation is dominated by ten coordinates" is. (For the Pythia models the same ratio is 0.65
+and 0.60, but there position 0 is an ordinary content token, so it is not a statement about sinks at
+all — those ratios most likely just reflect the first token having less context to integrate.)
 
 ---
 
@@ -135,8 +140,22 @@ iterated regime.
    for most of the gap. A trajectory a lag-1 gate scores at 0.92 sits at 0.99 once that coordinate
    is removed. This bears on gating thresholds and basin-membership decisions for the model with the
    five semantic basins — plausibly tightening them.
-2. **The BOS asymmetry is a live confound** in any position-indexed cross-model claim, and is one
-   line to fix (`prepend_bos=` explicit at the call site) once someone decides which way it should go.
+2. **The BOS asymmetry is a live confound** in any position-indexed cross-model claim. Fixing it
+   needs no engine change — but it is *not* `prepend_bos=` at the experiment call site either, which
+   is what an earlier version of this document said. `run_atr_loop` forwards `prompt` straight to
+   `model.run_with_cache(prompt, …)` in two places (`atr_engine.py:125` and `:184`) and exposes no
+   such parameter. What works is **pre-tokenising and passing the tensor**, since `run_with_cache`
+   accepts either:
+
+   ```python
+   toks = model.to_tokens(text, prepend_bos=False)   # or True
+   snaps = run_atr_loop(model, toks, 0, model.cfg.n_layers - 1, max_iter, schedule)
+   ```
+
+   Verified on `gpt2`: `prepend_bos=True` → `seq_len=7`, position 0 `'<|endoftext|>'`;
+   `prepend_bos=False` → `seq_len=6`, starting at `'The'`. So it is a call-site decision after all —
+   but every existing notebook passes a bare string and therefore silently inherits the per-family
+   default.
 3. **The 1.0000 saturations are safe.** Recorded so nobody re-runs this control expecting otherwise.
 
 ## Scope: this tests the metric, not the operator
@@ -170,12 +189,28 @@ sweep. Not run here.
 
 ## Reproducing
 
+Pinned to what this run actually used. Floating installs are not safe here: `transformers` 5.x
+renamed GPTNeoX's `embed_out`, and `transformer-lens` changes `default_prepend_bos` handling across
+releases — both of which this document makes claims about.
+
 ```bash
-pip install torch --index-url https://download.pytorch.org/whl/cpu
-pip install transformer-lens
+pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cpu
+pip install transformer-lens==3.5.1 transformers==5.14.1 numpy==2.4.6
 python3 experiments/sink_geometry/01_sink_profile.py      # ~10 min CPU, downloads 4 models
 python3 experiments/sink_geometry/02_masking_control.py   # reuses output/trajectories.pt if present
 ```
+
+| package | version used |
+|---|---|
+| `torch` | 2.13.0+cpu |
+| `transformer-lens` | 3.5.1 |
+| `transformers` | 5.14.1 |
+| `numpy` | 2.4.6 |
+
+Model revisions are **not** pinned in the scripts — `from_pretrained` resolves to whatever the
+Hugging Face default branch holds. For the four models used here that is stable in practice, but it
+is the same unpinned-revision gap flagged in `docs/PYTHIA_INTERPRETABILITY_REVIEW.md` §II.5, and it
+applies to this experiment too.
 
 `02` caches trajectories to `output/trajectories.pt` (committed, ~4.2 MB) so the masking analysis can
 be re-run without another sweep. The cache carries a **manifest** — model list, `MAX_ITER`, prompt

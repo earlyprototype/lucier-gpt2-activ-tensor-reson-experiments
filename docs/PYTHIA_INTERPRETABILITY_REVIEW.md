@@ -789,9 +789,13 @@ where phase changes have historically been found.
 > carry a full `checkpoint-{step}` series; querying the Hugging Face refs endpoint returns **609 tags
 > for `alias-x21`, `battlestar-x49`, `caprica-x81` and `darkmatter-x343`, and 604 for `expanse-x777`,
 > spanning step 0 to 400,000**. The five Medium seeds carry **none**, which is why the claim survived
-> a casual look. So the developmental question *can* be asked on the GPT-2 Small arm — and the CRFM
-> seeds serve double duty, since they are also the seed control in item 1. See §3.2 of
-> [GPT2_DEEP_DIVE.md](GPT2_DEEP_DIVE.md).
+> a casual look. So the developmental question *can* be asked on the GPT-2 Small arm.
+>
+> To be precise about what that does **not** mean: the CRFM seeds are not a substitute for item 1,
+> which proposes `pythia-{160m,410m}-seed{1..9}`. They are the *same kind* of control on the *other*
+> arm — GPT-2 Small seed variation, plus a developmental series Pythia's seed models do not have.
+> The two compose: run both and the seed question is answered on both arms of the 2×2; run either
+> alone and it is answered on one. See §3.2 of [GPT2_DEEP_DIVE.md](GPT2_DEEP_DIVE.md).
 
 ---
 

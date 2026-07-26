@@ -121,15 +121,19 @@ for name in MODELS:
     for key in ["unmasked"] + [f"top{k}" for k in KS] + ["energy_top10"]:
         agg[key] = round(sum(r[key] for r in rows) / len(rows), 12)
     # Distance from 1 for the saturating cases, where the leading digits hide it.
+    # Keyed off KS rather than a hardcoded 10, so changing KS cannot break reporting.
     agg["unmasked_1_minus_cos"] = round(1.0 - agg["unmasked"], 12)
-    agg["masked_top10_1_minus_cos"] = round(1.0 - agg["top10"], 12)
+    ref_k = 10 if 10 in KS else max(KS)
+    agg["masked_ref_k"] = ref_k
+    agg[f"masked_top{ref_k}_1_minus_cos"] = round(1.0 - agg[f"top{ref_k}"], 12)
     report[name] = {"per_prompt": rows, "mean": agg,
                     "d_model": d["d_model"], "n_layers": d["n_layers"]}
 
     print(f"\n{name}  (d_model={d['d_model']}, {d['n_layers']} layers)")
     print(f"  energy in top-10 coords: {agg['energy_top10']:.1%}")
+    rk = agg["masked_ref_k"]
     print(f"  1-cos: unmasked {agg['unmasked_1_minus_cos']:.3e}   "
-          f"mask-top10 {agg['masked_top10_1_minus_cos']:.3e}")
+          f"mask-top{rk} {agg[f'masked_top{rk}_1_minus_cos']:.3e}")
     print(f"  {'unmasked':>10}: {agg['unmasked']:.9f}")
     for k in KS:
         delta = agg[f"top{k}"] - agg["unmasked"]
