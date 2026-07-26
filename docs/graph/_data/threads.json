@@ -311,14 +311,14 @@
         }
       ],
       "gate_count": 5,
-      "still_holds": true,
+      "still_holds": false,
       "resolution": {
-        "holds": true,
+        "holds": false,
         "resolution_evidence": [
           {
-            "file": "README.md",
-            "line": 153,
-            "text": "`prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree"
+            "file": "prompt_library.py",
+            "line": null,
+            "text": "`prompt_library.py` is present in the working tree (17193 bytes)"
           }
         ],
         "checked": [
@@ -327,7 +327,14 @@
           "prompt_library.pt",
           "prompt_library.md"
         ],
-        "found": [],
+        "found": [
+          {
+            "name": "prompt_library.py",
+            "paths": [
+              "prompt_library.py"
+            ]
+          }
+        ],
         "issue_prose": [
           {
             "issue": "9",
@@ -351,28 +358,6 @@
                 "file": "experiments/gpt2_small/output_hinge_eigen/hinge_eigenvalue.md",
                 "line": 91,
                 "text": "- One trajectory, one prompt, one model, derivatives evaluated at one point per state. Whether the other Divine prompts share the same flip head is open (blocked on prompt_library restoration, issue #9)."
-              }
-            ]
-          }
-        ],
-        "named_but_absent": [
-          {
-            "name": "prompt_library.py",
-            "mentions": [
-              {
-                "file": "README.md",
-                "line": 153,
-                "text": "├── prompt_library.py ← 125 prompts across 7 categories"
-              },
-              {
-                "file": "README.md",
-                "line": 229,
-                "text": "> **Note:** the 125-prompt sweep notebooks (`01_*`), `gated_resweep.py` and the Pythia-410m deep run import `prompt_library.py`, which is temporarily absent from the repository and will be restored shortly. Steps 1, 2, 4 and 5 run without it."
-              },
-              {
-                "file": "experiments/gpt2_small/output_lagk/lagk_report.md",
-                "line": 56,
-                "text": "The other 33 cycling prompts exist in the sweep records only as ids and terminal tokens; their texts live in `prompt_library.py`, which exists only on Thom's home machine (issue #9, his errand). Until it is restored they cannot be re-run, so \"34 prompts ring, pending re-gate\" resolves today to: 1 re"
               }
             ]
           }
@@ -766,6 +751,290 @@
       "rank_tier": 0
     },
     {
+      "claim": "f10-cycle-anatomy-flip-axis",
+      "label": "F10: Anatomy of the period-2 cycle: one nearly readout-invisible flip axis between a game-vocabulary pole and the glitch-token pole",
+      "type": "finding",
+      "status": "corrected",
+      "asserted": "2026-07-19",
+      "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole",
+      "description": "Writing the phases as A = M + d and B = M - d, the flip axis d is a single global rank-1 direction (per-position axes agree at mean pairwise cosine 1.0000) that is about 95% invisible to the readout (logit response ratio 0.054, 73% of its energy in W_U's bottom-100 directions). Its poles run between a game/elemental vocabulary and the published GPT-2 anomalous-token cluster, identified by inspection against published lists, not by a systematic test. One trajectory: whether all 34 Divine prompts share this flip axis is open, blocked on the prompt library (issue #9, caveat 11).",
+      "pending_language": [
+        "blocked on",
+        "is open",
+        "issue #9"
+      ],
+      "blockers": [
+        {
+          "key": "issue-9",
+          "label": "prompt library (issue #9)",
+          "still_holds": false
+        }
+      ],
+      "runs": [
+        "run-9-cycle-anatomy"
+      ],
+      "evidence": [
+        {
+          "run": "run-9-cycle-anatomy",
+          "run_label": "Run 9: Cycle anatomy",
+          "graph_says": "1 Divine trajectory, iteration-1000 states",
+          "date": "2026-07-19",
+          "script": "experiments/gpt2_small/06_bell_anatomy.py",
+          "script_exists": true,
+          "script_state": {
+            "kind": "script",
+            "readable": true,
+            "cells_total": null,
+            "code_cells": null,
+            "cells_with_outputs": null,
+            "executed": null,
+            "verdict_quotes": [],
+            "banner": null,
+            "saves": [
+              "bell_anatomy.json"
+            ],
+            "loads": [
+              "\\nsaved bell_anatomy.json",
+              "bell_anatomy.json",
+              "state_divine.pt"
+            ]
+          },
+          "output_dir": "experiments/gpt2_small/output_divine_motion/",
+          "output_dir_exists": true,
+          "output_dir_files": [
+            "experiments/gpt2_small/output_divine_motion/bell_anatomy.json",
+            "experiments/gpt2_small/output_divine_motion/bell_anatomy.md",
+            "experiments/gpt2_small/output_divine_motion/divine_motion_report.md",
+            "experiments/gpt2_small/output_divine_motion/divine_motion_results.json",
+            "experiments/gpt2_small/output_divine_motion/divine_motion_tables.md",
+            "experiments/gpt2_small/output_divine_motion/probe_lag1_results.json",
+            "experiments/gpt2_small/output_divine_motion/snapshots_divine.pt",
+            "experiments/gpt2_small/output_divine_motion/snapshots_noise.pt",
+            "experiments/gpt2_small/output_divine_motion/snapshots_prolet.pt",
+            "experiments/gpt2_small/output_divine_motion/state_divine.pt",
+            "experiments/gpt2_small/output_divine_motion/state_noise.pt",
+            "experiments/gpt2_small/output_divine_motion/state_prolet.pt"
+          ],
+          "declared_inputs": [
+            {
+              "name": "\\nsaved bell_anatomy.json",
+              "found": []
+            },
+            {
+              "name": "bell_anatomy.json",
+              "found": [
+                "experiments/gpt2_small/output_divine_motion/bell_anatomy.json"
+              ]
+            },
+            {
+              "name": "state_divine.pt",
+              "found": [
+                "experiments/gpt2_small/output_divine_motion/state_divine.pt"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            "\\nsaved bell_anatomy.json"
+          ],
+          "saved_artefacts": [
+            {
+              "name": "bell_anatomy.json",
+              "found": [
+                "experiments/gpt2_small/output_divine_motion/bell_anatomy.json"
+              ],
+              "size": 1868
+            }
+          ],
+          "missing_local_modules": [],
+          "graph_artefacts": [
+            {
+              "id": "art-bell-anatomy",
+              "path": "experiments/gpt2_small/output_divine_motion/bell_anatomy.md",
+              "exists": true
+            }
+          ]
+        }
+      ],
+      "verdict": "newly-unblocked",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "rank_tier": 1
+    },
+    {
+      "claim": "f15-lag2-gate",
+      "label": "F15: A lag-2 convergence gate recognises the period-2 cycle; the engine now supports it",
+      "type": "finding",
+      "status": "supported",
+      "asserted": "2026-07-19",
+      "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
+      "description": "atr_engine.run_atr_gated gained a gate_lag parameter and a lag_scan helper, and a dense 24-iteration continuation separates three signatures cleanly: the prolet fixed point passes at every lag, the Divine state fails every odd lag (0.6849) and passes every even one, and the noise control decays monotonically. The audited Divine trajectory is converged under gate_lag = 2 and unconvergeable under gate_lag = 1. Two honest limits: a fixed lag-2 gate inherits the same aliasing one octave up (a period-4 cycle would be invisible again), so the recommended re-gate runs the full lag table and gates at the smallest passing lag; and the lag-k gate does not fix threshold-blindness to slow drift. The other 33 period-2 prompts remain blocked on the prompt library (issue #9).",
+      "pending_language": [
+        "blocked on",
+        "issue #9"
+      ],
+      "blockers": [
+        {
+          "key": "issue-9",
+          "label": "prompt library (issue #9)",
+          "still_holds": false
+        }
+      ],
+      "runs": [
+        "run-13-lagk-regate"
+      ],
+      "evidence": [
+        {
+          "run": "run-13-lagk-regate",
+          "run_label": "Run 13: Lag-k re-gate + engine gate_lag",
+          "graph_says": "3 states × 25 dense iters",
+          "date": "2026-07-19",
+          "script": "experiments/gpt2_small/09_lagk_gate.py",
+          "script_exists": true,
+          "script_state": {
+            "kind": "script",
+            "readable": true,
+            "cells_total": null,
+            "code_cells": null,
+            "cells_with_outputs": null,
+            "executed": null,
+            "verdict_quotes": [],
+            "banner": null,
+            "saves": [],
+            "loads": [
+              "bell_anatomy.json",
+              "lagk_results.json",
+              "state_{key}.pt"
+            ]
+          },
+          "output_dir": "experiments/gpt2_small/output_lagk/",
+          "output_dir_exists": true,
+          "output_dir_files": [
+            "experiments/gpt2_small/output_lagk/lagk_report.md",
+            "experiments/gpt2_small/output_lagk/lagk_results.json"
+          ],
+          "declared_inputs": [
+            {
+              "name": "bell_anatomy.json",
+              "found": [
+                "experiments/gpt2_small/output_divine_motion/bell_anatomy.json"
+              ]
+            },
+            {
+              "name": "lagk_results.json",
+              "found": [
+                "experiments/gpt2_small/output_lagk/lagk_results.json"
+              ]
+            },
+            {
+              "name": "state_{key}.pt",
+              "found": []
+            }
+          ],
+          "missing_inputs": [
+            "state_{key}.pt"
+          ],
+          "saved_artefacts": [],
+          "missing_local_modules": [],
+          "graph_artefacts": [
+            {
+              "id": "art-atr-engine",
+              "path": "atr_engine.py",
+              "exists": true
+            },
+            {
+              "id": "art-lagk-report",
+              "path": "experiments/gpt2_small/output_lagk/lagk_report.md",
+              "exists": true
+            }
+          ]
+        }
+      ],
+      "verdict": "newly-unblocked",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "rank_tier": 1
+    },
+    {
+      "claim": "q-flip-axis-generality",
+      "label": "Q: Do all 34 Divine prompts share the F10 flip axis, head and eigenvalue?",
+      "type": "question",
+      "status": "open",
+      "asserted": "2026-07-19",
+      "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole",
+      "description": "F10 states it in as many words: \"Open: whether all 34 Divine prompts share this flip axis (blocked on the prompt-library restoration, issue #9).\" Caveat 14 widens it to the whole mechanism series: \"Whether the other 33 period-2 prompts share the flip axis, the flip head (L11.H8), the eigenvalue, and the anomalous-token alignment is untested (prompt library pending, issue #9).\" FINDINGS section 5 calls this \"what is now most open on the Divine object\".",
+      "pending_language": [
+        "blocked on",
+        "issue #9",
+        "pending",
+        "untested"
+      ],
+      "blockers": [
+        {
+          "key": "issue-9",
+          "label": "prompt library (issue #9)",
+          "still_holds": false
+        }
+      ],
+      "runs": [],
+      "evidence": [],
+      "verdict": "newly-unblocked",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "rank_tier": 1
+    },
+    {
+      "claim": "q-lag2-regate-33",
+      "label": "Q: Do the other 33 period-2 prompts re-gate as converged?",
+      "type": "question",
+      "status": "open",
+      "asserted": "2026-07-19",
+      "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
+      "description": "F15 demonstrates the lag-k gate for one trajectory and records the rest as outstanding: \"The other 33 period-2 prompts remain blocked on the prompt library (issue #9); one, the Syntactic prompt, is now re-gated as converged.\" The procedure is on record too - the re-gate \"runs the full lag table on a short dense continuation and gates each state at its smallest passing lag\" - so this is blocked on an artefact, not on a method. JOURNEY_MAP section 7 gives the same next step: \"Re-gate the other 33 prompts (blocked on issue #9)\".",
+      "pending_language": [
+        "blocked on",
+        "issue #9"
+      ],
+      "blockers": [
+        {
+          "key": "issue-9",
+          "label": "prompt library (issue #9)",
+          "still_holds": false
+        },
+        {
+          "key": "phrase-artefact",
+          "label": "an artefact",
+          "still_holds": null
+        }
+      ],
+      "runs": [],
+      "evidence": [],
+      "verdict": "newly-unblocked",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "rank_tier": 1
+    },
+    {
+      "claim": "q-prompt-library",
+      "label": "Q: Is the 125-prompt library restored (issue #9)?",
+      "type": "question",
+      "status": "open",
+      "asserted": "2026-07-19",
+      "doc_ref": "docs/FINDINGS.md#caveats",
+      "description": "Caveats 11 and 14 both file the same gate in the same three words, \"prompt library pending, issue #9\", and FINDINGS section 5 names it as the blocker on two separate directions at once: the re-gate of the 34 cycling prompts and the flip-axis generality question are \"blocked in part on the prompt-library restoration, issue #9\". This node is a restoration task rather than a question about the model; it is in the graph so that the two threads it gates point at one blocker instead of repeating one sentence in two descriptions, where nothing can pair them.",
+      "pending_language": [
+        "issue #9",
+        "pending"
+      ],
+      "blockers": [
+        {
+          "key": "issue-9",
+          "label": "prompt library (issue #9)",
+          "still_holds": false
+        }
+      ],
+      "runs": [],
+      "evidence": [],
+      "verdict": "newly-unblocked",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "rank_tier": 1
+    },
+    {
       "claim": "q-tmix-llm",
       "label": "Q: What is T_mix_LLM for each basin?",
       "type": "question",
@@ -934,9 +1203,7 @@
               "size": 1022346
             }
           ],
-          "missing_local_modules": [
-            "prompt_library.py"
-          ],
+          "missing_local_modules": [],
           "graph_artefacts": [
             {
               "id": "art-basin-distribution-small",
@@ -992,9 +1259,7 @@
           "declared_inputs": [],
           "missing_inputs": [],
           "saved_artefacts": [],
-          "missing_local_modules": [
-            "prompt_library.py"
-          ],
+          "missing_local_modules": [],
           "graph_artefacts": [
             {
               "id": "art-gated-report",
@@ -1256,208 +1521,6 @@
       "rank_tier": 3
     },
     {
-      "claim": "f10-cycle-anatomy-flip-axis",
-      "label": "F10: Anatomy of the period-2 cycle: one nearly readout-invisible flip axis between a game-vocabulary pole and the glitch-token pole",
-      "type": "finding",
-      "status": "corrected",
-      "asserted": "2026-07-19",
-      "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole",
-      "description": "Writing the phases as A = M + d and B = M - d, the flip axis d is a single global rank-1 direction (per-position axes agree at mean pairwise cosine 1.0000) that is about 95% invisible to the readout (logit response ratio 0.054, 73% of its energy in W_U's bottom-100 directions). Its poles run between a game/elemental vocabulary and the published GPT-2 anomalous-token cluster, identified by inspection against published lists, not by a systematic test. One trajectory: whether all 34 Divine prompts share this flip axis is open, blocked on the prompt library (issue #9, caveat 11).",
-      "pending_language": [
-        "blocked on",
-        "is open",
-        "issue #9"
-      ],
-      "blockers": [
-        {
-          "key": "issue-9",
-          "label": "prompt library (issue #9)",
-          "still_holds": true
-        }
-      ],
-      "runs": [
-        "run-9-cycle-anatomy"
-      ],
-      "evidence": [
-        {
-          "run": "run-9-cycle-anatomy",
-          "run_label": "Run 9: Cycle anatomy",
-          "graph_says": "1 Divine trajectory, iteration-1000 states",
-          "date": "2026-07-19",
-          "script": "experiments/gpt2_small/06_bell_anatomy.py",
-          "script_exists": true,
-          "script_state": {
-            "kind": "script",
-            "readable": true,
-            "cells_total": null,
-            "code_cells": null,
-            "cells_with_outputs": null,
-            "executed": null,
-            "verdict_quotes": [],
-            "banner": null,
-            "saves": [
-              "bell_anatomy.json"
-            ],
-            "loads": [
-              "\\nsaved bell_anatomy.json",
-              "bell_anatomy.json",
-              "state_divine.pt"
-            ]
-          },
-          "output_dir": "experiments/gpt2_small/output_divine_motion/",
-          "output_dir_exists": true,
-          "output_dir_files": [
-            "experiments/gpt2_small/output_divine_motion/bell_anatomy.json",
-            "experiments/gpt2_small/output_divine_motion/bell_anatomy.md",
-            "experiments/gpt2_small/output_divine_motion/divine_motion_report.md",
-            "experiments/gpt2_small/output_divine_motion/divine_motion_results.json",
-            "experiments/gpt2_small/output_divine_motion/divine_motion_tables.md",
-            "experiments/gpt2_small/output_divine_motion/probe_lag1_results.json",
-            "experiments/gpt2_small/output_divine_motion/snapshots_divine.pt",
-            "experiments/gpt2_small/output_divine_motion/snapshots_noise.pt",
-            "experiments/gpt2_small/output_divine_motion/snapshots_prolet.pt",
-            "experiments/gpt2_small/output_divine_motion/state_divine.pt",
-            "experiments/gpt2_small/output_divine_motion/state_noise.pt",
-            "experiments/gpt2_small/output_divine_motion/state_prolet.pt"
-          ],
-          "declared_inputs": [
-            {
-              "name": "\\nsaved bell_anatomy.json",
-              "found": []
-            },
-            {
-              "name": "bell_anatomy.json",
-              "found": [
-                "experiments/gpt2_small/output_divine_motion/bell_anatomy.json"
-              ]
-            },
-            {
-              "name": "state_divine.pt",
-              "found": [
-                "experiments/gpt2_small/output_divine_motion/state_divine.pt"
-              ]
-            }
-          ],
-          "missing_inputs": [
-            "\\nsaved bell_anatomy.json"
-          ],
-          "saved_artefacts": [
-            {
-              "name": "bell_anatomy.json",
-              "found": [
-                "experiments/gpt2_small/output_divine_motion/bell_anatomy.json"
-              ],
-              "size": 1868
-            }
-          ],
-          "missing_local_modules": [],
-          "graph_artefacts": [
-            {
-              "id": "art-bell-anatomy",
-              "path": "experiments/gpt2_small/output_divine_motion/bell_anatomy.md",
-              "exists": true
-            }
-          ]
-        }
-      ],
-      "verdict": "still-blocked",
-      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
-      "rank_tier": 4
-    },
-    {
-      "claim": "f15-lag2-gate",
-      "label": "F15: A lag-2 convergence gate recognises the period-2 cycle; the engine now supports it",
-      "type": "finding",
-      "status": "supported",
-      "asserted": "2026-07-19",
-      "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
-      "description": "atr_engine.run_atr_gated gained a gate_lag parameter and a lag_scan helper, and a dense 24-iteration continuation separates three signatures cleanly: the prolet fixed point passes at every lag, the Divine state fails every odd lag (0.6849) and passes every even one, and the noise control decays monotonically. The audited Divine trajectory is converged under gate_lag = 2 and unconvergeable under gate_lag = 1. Two honest limits: a fixed lag-2 gate inherits the same aliasing one octave up (a period-4 cycle would be invisible again), so the recommended re-gate runs the full lag table and gates at the smallest passing lag; and the lag-k gate does not fix threshold-blindness to slow drift. The other 33 period-2 prompts remain blocked on the prompt library (issue #9).",
-      "pending_language": [
-        "blocked on",
-        "issue #9"
-      ],
-      "blockers": [
-        {
-          "key": "issue-9",
-          "label": "prompt library (issue #9)",
-          "still_holds": true
-        }
-      ],
-      "runs": [
-        "run-13-lagk-regate"
-      ],
-      "evidence": [
-        {
-          "run": "run-13-lagk-regate",
-          "run_label": "Run 13: Lag-k re-gate + engine gate_lag",
-          "graph_says": "3 states × 25 dense iters",
-          "date": "2026-07-19",
-          "script": "experiments/gpt2_small/09_lagk_gate.py",
-          "script_exists": true,
-          "script_state": {
-            "kind": "script",
-            "readable": true,
-            "cells_total": null,
-            "code_cells": null,
-            "cells_with_outputs": null,
-            "executed": null,
-            "verdict_quotes": [],
-            "banner": null,
-            "saves": [],
-            "loads": [
-              "bell_anatomy.json",
-              "lagk_results.json",
-              "state_{key}.pt"
-            ]
-          },
-          "output_dir": "experiments/gpt2_small/output_lagk/",
-          "output_dir_exists": true,
-          "output_dir_files": [
-            "experiments/gpt2_small/output_lagk/lagk_report.md",
-            "experiments/gpt2_small/output_lagk/lagk_results.json"
-          ],
-          "declared_inputs": [
-            {
-              "name": "bell_anatomy.json",
-              "found": [
-                "experiments/gpt2_small/output_divine_motion/bell_anatomy.json"
-              ]
-            },
-            {
-              "name": "lagk_results.json",
-              "found": [
-                "experiments/gpt2_small/output_lagk/lagk_results.json"
-              ]
-            },
-            {
-              "name": "state_{key}.pt",
-              "found": []
-            }
-          ],
-          "missing_inputs": [
-            "state_{key}.pt"
-          ],
-          "saved_artefacts": [],
-          "missing_local_modules": [],
-          "graph_artefacts": [
-            {
-              "id": "art-atr-engine",
-              "path": "atr_engine.py",
-              "exists": true
-            },
-            {
-              "id": "art-lagk-report",
-              "path": "experiments/gpt2_small/output_lagk/lagk_report.md",
-              "exists": true
-            }
-          ]
-        }
-      ],
-      "verdict": "still-blocked",
-      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
-      "rank_tier": 4
-    },
-    {
       "claim": "h-j1",
       "label": "H-J1: prolet sits inside the verbalizable (J-lens) subspace, Divine outside",
       "type": "hypothesis",
@@ -1657,33 +1720,6 @@
       "rank_tier": 4
     },
     {
-      "claim": "q-flip-axis-generality",
-      "label": "Q: Do all 34 Divine prompts share the F10 flip axis, head and eigenvalue?",
-      "type": "question",
-      "status": "open",
-      "asserted": "2026-07-19",
-      "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole",
-      "description": "F10 states it in as many words: \"Open: whether all 34 Divine prompts share this flip axis (blocked on the prompt-library restoration, issue #9).\" Caveat 14 widens it to the whole mechanism series: \"Whether the other 33 period-2 prompts share the flip axis, the flip head (L11.H8), the eigenvalue, and the anomalous-token alignment is untested (prompt library pending, issue #9).\" FINDINGS section 5 calls this \"what is now most open on the Divine object\".",
-      "pending_language": [
-        "blocked on",
-        "issue #9",
-        "pending",
-        "untested"
-      ],
-      "blockers": [
-        {
-          "key": "issue-9",
-          "label": "prompt library (issue #9)",
-          "still_holds": true
-        }
-      ],
-      "runs": [],
-      "evidence": [],
-      "verdict": "still-blocked",
-      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
-      "rank_tier": 4
-    },
-    {
       "claim": "q-jlens-full-build",
       "label": "Q: What does the phase-aware full J-lens build show (issue #8)?",
       "type": "question",
@@ -1706,61 +1742,6 @@
       "evidence": [],
       "verdict": "still-blocked",
       "reason": "the record calls this blocked on issue #8; an issue number names no file, so the working tree cannot say whether it has been resolved and this report does not guess",
-      "rank_tier": 4
-    },
-    {
-      "claim": "q-lag2-regate-33",
-      "label": "Q: Do the other 33 period-2 prompts re-gate as converged?",
-      "type": "question",
-      "status": "open",
-      "asserted": "2026-07-19",
-      "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
-      "description": "F15 demonstrates the lag-k gate for one trajectory and records the rest as outstanding: \"The other 33 period-2 prompts remain blocked on the prompt library (issue #9); one, the Syntactic prompt, is now re-gated as converged.\" The procedure is on record too - the re-gate \"runs the full lag table on a short dense continuation and gates each state at its smallest passing lag\" - so this is blocked on an artefact, not on a method. JOURNEY_MAP section 7 gives the same next step: \"Re-gate the other 33 prompts (blocked on issue #9)\".",
-      "pending_language": [
-        "blocked on",
-        "issue #9"
-      ],
-      "blockers": [
-        {
-          "key": "issue-9",
-          "label": "prompt library (issue #9)",
-          "still_holds": true
-        },
-        {
-          "key": "phrase-artefact",
-          "label": "an artefact",
-          "still_holds": null
-        }
-      ],
-      "runs": [],
-      "evidence": [],
-      "verdict": "still-blocked",
-      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
-      "rank_tier": 4
-    },
-    {
-      "claim": "q-prompt-library",
-      "label": "Q: Is the 125-prompt library restored (issue #9)?",
-      "type": "question",
-      "status": "open",
-      "asserted": "2026-07-19",
-      "doc_ref": "docs/FINDINGS.md#caveats",
-      "description": "Caveats 11 and 14 both file the same gate in the same three words, \"prompt library pending, issue #9\", and FINDINGS section 5 names it as the blocker on two separate directions at once: the re-gate of the 34 cycling prompts and the flip-axis generality question are \"blocked in part on the prompt-library restoration, issue #9\". This node is a restoration task rather than a question about the model; it is in the graph so that the two threads it gates point at one blocker instead of repeating one sentence in two descriptions, where nothing can pair them.",
-      "pending_language": [
-        "issue #9",
-        "pending"
-      ],
-      "blockers": [
-        {
-          "key": "issue-9",
-          "label": "prompt library (issue #9)",
-          "still_holds": true
-        }
-      ],
-      "runs": [],
-      "evidence": [],
-      "verdict": "still-blocked",
-      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
       "rank_tier": 4
     },
     {
@@ -1939,9 +1920,7 @@
               "size": 1022346
             }
           ],
-          "missing_local_modules": [
-            "prompt_library.py"
-          ],
+          "missing_local_modules": [],
           "graph_artefacts": [
             {
               "id": "art-basin-distribution-small",
@@ -1997,9 +1976,7 @@
           "declared_inputs": [],
           "missing_inputs": [],
           "saved_artefacts": [],
-          "missing_local_modules": [
-            "prompt_library.py"
-          ],
+          "missing_local_modules": [],
           "graph_artefacts": [
             {
               "id": "art-gated-report",
@@ -2045,6 +2022,75 @@
       "rank": 1
     },
     {
+      "rank_tier": 1,
+      "tier_name": "newly-unblocked",
+      "claim": "f10-cycle-anatomy-flip-axis",
+      "label": "F10: Anatomy of the period-2 cycle: one nearly readout-invisible flip axis between a game-vocabulary pole and the glitch-token pole",
+      "status": "corrected",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole",
+      "cheap": true,
+      "scripts": [
+        "experiments/gpt2_small/06_bell_anatomy.py"
+      ],
+      "rank": 2
+    },
+    {
+      "rank_tier": 1,
+      "tier_name": "newly-unblocked",
+      "claim": "f15-lag2-gate",
+      "label": "F15: A lag-2 convergence gate recognises the period-2 cycle; the engine now supports it",
+      "status": "supported",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
+      "cheap": true,
+      "scripts": [
+        "experiments/gpt2_small/09_lagk_gate.py"
+      ],
+      "rank": 3
+    },
+    {
+      "rank_tier": 1,
+      "tier_name": "newly-unblocked",
+      "claim": "q-flip-axis-generality",
+      "label": "Q: Do all 34 Divine prompts share the F10 flip axis, head and eigenvalue?",
+      "status": "open",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole",
+      "cheap": true,
+      "scripts": [],
+      "rank": 4
+    },
+    {
+      "rank_tier": 1,
+      "tier_name": "newly-unblocked",
+      "claim": "q-lag2-regate-33",
+      "label": "Q: Do the other 33 period-2 prompts re-gate as converged?",
+      "status": "open",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
+      "cheap": true,
+      "scripts": [],
+      "rank": 5
+    },
+    {
+      "rank_tier": 1,
+      "tier_name": "newly-unblocked",
+      "claim": "q-prompt-library",
+      "label": "Q: Is the 125-prompt library restored (issue #9)?",
+      "status": "open",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#caveats",
+      "cheap": true,
+      "scripts": [],
+      "rank": 6
+    },
+    {
       "rank_tier": 2,
       "tier_name": "answerable-from-disk",
       "claim": "q-tmix-llm",
@@ -2055,7 +2101,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
       "cheap": true,
       "scripts": [],
-      "rank": 2
+      "rank": 7
     },
     {
       "rank_tier": 3,
@@ -2068,7 +2114,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#4-adjacent-science--mathematics",
       "cheap": false,
       "scripts": [],
-      "rank": 3
+      "rank": 8
     },
     {
       "rank_tier": 3,
@@ -2084,7 +2130,7 @@
         "experiments/gpt2_small/01_attractor_dominance.ipynb",
         "experiments/gpt2_small/gated_resweep.py"
       ],
-      "rank": 4
+      "rank": 9
     },
     {
       "rank_tier": 3,
@@ -2100,7 +2146,7 @@
         "experiments/gpt2_small/00_reproducibility_gate.ipynb",
         "experiments/gpt2_small/04_readout_confidence.py"
       ],
-      "rank": 5
+      "rank": 10
     },
     {
       "rank_tier": 3,
@@ -2113,7 +2159,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
       "cheap": false,
       "scripts": [],
-      "rank": 6
+      "rank": 11
     },
     {
       "rank_tier": 3,
@@ -2126,7 +2172,7 @@
       "doc_ref": "docs/FINDINGS.md#caveats",
       "cheap": false,
       "scripts": [],
-      "rank": 7
+      "rank": 12
     },
     {
       "rank_tier": 3,
@@ -2139,7 +2185,7 @@
       "doc_ref": "docs/FINDINGS.md#caveats",
       "cheap": false,
       "scripts": [],
-      "rank": 8
+      "rank": 13
     },
     {
       "rank_tier": 3,
@@ -2152,7 +2198,7 @@
       "doc_ref": "docs/FINDINGS.md#caveats",
       "cheap": false,
       "scripts": [],
-      "rank": 9
+      "rank": 14
     },
     {
       "rank_tier": 3,
@@ -2165,7 +2211,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
       "cheap": false,
       "scripts": [],
-      "rank": 10
+      "rank": 15
     },
     {
       "rank_tier": 3,
@@ -2178,37 +2224,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
       "cheap": false,
       "scripts": [],
-      "rank": 11
-    },
-    {
-      "rank_tier": 4,
-      "tier_name": "still-blocked",
-      "claim": "f10-cycle-anatomy-flip-axis",
-      "label": "F10: Anatomy of the period-2 cycle: one nearly readout-invisible flip axis between a game-vocabulary pole and the glitch-token pole",
-      "status": "corrected",
-      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
-      "quoted_result": null,
-      "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole",
-      "cheap": false,
-      "scripts": [
-        "experiments/gpt2_small/06_bell_anatomy.py"
-      ],
-      "rank": 12
-    },
-    {
-      "rank_tier": 4,
-      "tier_name": "still-blocked",
-      "claim": "f15-lag2-gate",
-      "label": "F15: A lag-2 convergence gate recognises the period-2 cycle; the engine now supports it",
-      "status": "supported",
-      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
-      "quoted_result": null,
-      "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
-      "cheap": false,
-      "scripts": [
-        "experiments/gpt2_small/09_lagk_gate.py"
-      ],
-      "rank": 13
+      "rank": 16
     },
     {
       "rank_tier": 4,
@@ -2224,20 +2240,7 @@
         "experiments/gpt2_small/05_jlens_pilot.py",
         "experiments/gpt2_small/10_jlens_phase.py"
       ],
-      "rank": 14
-    },
-    {
-      "rank_tier": 4,
-      "tier_name": "still-blocked",
-      "claim": "q-flip-axis-generality",
-      "label": "Q: Do all 34 Divine prompts share the F10 flip axis, head and eigenvalue?",
-      "status": "open",
-      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
-      "quoted_result": null,
-      "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole",
-      "cheap": false,
-      "scripts": [],
-      "rank": 15
+      "rank": 17
     },
     {
       "rank_tier": 4,
@@ -2248,32 +2251,6 @@
       "reason": "the record calls this blocked on issue #8; an issue number names no file, so the working tree cannot say whether it has been resolved and this report does not guess",
       "quoted_result": null,
       "doc_ref": "docs/FINDINGS.md#f11-j-lens-pilot-the-prolet-insidedivine-outside-prediction-did-not-hold-the-boundary-that-appeared-is-language-vs-noise",
-      "cheap": false,
-      "scripts": [],
-      "rank": 16
-    },
-    {
-      "rank_tier": 4,
-      "tier_name": "still-blocked",
-      "claim": "q-lag2-regate-33",
-      "label": "Q: Do the other 33 period-2 prompts re-gate as converged?",
-      "status": "open",
-      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
-      "quoted_result": null,
-      "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
-      "cheap": false,
-      "scripts": [],
-      "rank": 17
-    },
-    {
-      "rank_tier": 4,
-      "tier_name": "still-blocked",
-      "claim": "q-prompt-library",
-      "label": "Q: Is the 125-prompt library restored (issue #9)?",
-      "status": "open",
-      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
-      "quoted_result": null,
-      "doc_ref": "docs/FINDINGS.md#caveats",
       "cheap": false,
       "scripts": [],
       "rank": 18
