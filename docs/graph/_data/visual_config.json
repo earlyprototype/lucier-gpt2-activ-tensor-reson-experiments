@@ -5,6 +5,7 @@
     "hypothesis": "#6B4C8A",
     "finding": "#2E7D5B",
     "concept": "#B9812F",
+    "question": "#A8477A",
     "run": "#5B7DB1",
     "model": "#B3423F",
     "null-model": "#8A8F94",
@@ -28,6 +29,7 @@
     "hypothesis": "diamond",
     "finding": "dot",
     "concept": "hexagon",
+    "question": "circle",
     "run": "square",
     "model": "triangle",
     "null-model": "triangleDown",
@@ -169,12 +171,33 @@
       "color": "#B0B7BC",
       "arrow": true,
       "width": 1
+    },
+    "blocks": {
+      "style": "dashed",
+      "dashes": [
+        6,
+        3
+      ],
+      "color": "#A8477A",
+      "arrow": true,
+      "width": 2
+    },
+    "blocked-by": {
+      "style": "dashed",
+      "dashes": [
+        6,
+        3
+      ],
+      "color": "#A8477A",
+      "arrow": true,
+      "width": 2
     }
   },
   "node_sizes": {
     "hypothesis": 26,
     "finding": 22,
     "concept": 16,
+    "question": 20,
     "run": 18,
     "model": 24,
     "null-model": 18,

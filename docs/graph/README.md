@@ -13,17 +13,24 @@ JSON document into `_data/`, and `viewer.html` renders any of the three — pick
 **Graph** dropdown in the header. Regenerate freely — the scripts take no arguments and are
 idempotent.
 
+The dropdown has a fourth entry, **Threads**, which is not a fourth graph: it is the evidence
+graph re-coloured by readiness rather than by epistemic status. See
+[Threads](#threads--a-fourth-view-not-a-fourth-graph) below.
+
 ```
 docs/graph/
 ├── README.md                    ← you are here
-├── viewer.html                  ← the interactive viewer (graph selector: all three)
+├── viewer.html                  ← the interactive viewer (graph selector: three graphs + Threads)
 ├── build_evidence_graph.py      ← generator: the evidence graph
 ├── build_dissolution_graph.py   ← generator: the dissolution graph
 ├── build_isomorphism_graph.py   ← generator: the isomorphism graph
+├── build_threads_report.py      ← generator: the threads report (THREADS.md + threads.json)
+├── THREADS.md                   ← generated: open threads, blockers, ranked opportunities
 ├── _data/
 │   ├── entities.json            ← evidence graph
 │   ├── dissolution.json         ← dissolution graph
 │   ├── isomorphism.json         ← isomorphism graph
+│   ├── threads.json             ← readiness overlay for the evidence graph
 │   └── visual_config.json       ← shared colours, shapes, edge styles
 └── tests/
     ├── test_graphs.py           ← schema + content checks on the three JSON files
@@ -35,7 +42,7 @@ the graphs must be readable by someone who has cloned the repository and not run
 
 ---
 
-## The three graphs
+## The three graphs (and one view of the first)
 
 ### 1. The evidence graph — `entities.json`
 
@@ -88,6 +95,54 @@ the reason it fell over attached to it: the L2 shell is a sphere, and a sphere i
 The isomorphism graph is hand-authored rather than parsed. Every node carries a `doc_ref` naming
 the passage it transcribes, and the generator refuses to write a node whose `doc_ref` does not
 resolve to a registered source. Nothing in it originates in the graph.
+
+### Threads — a fourth view, not a fourth graph
+
+**What it shows:** the evidence graph's own nodes and edges, re-coloured by **readiness** instead
+of epistemic status. Not "is this true?" but "can this move, and what would it cost?". The colour
+classes are read out of `_data/threads.json`, which `build_threads_report.py` writes by walking
+the graph *and the working tree*:
+
+| Class | Means |
+|:---|:---|
+| answered, unrecorded | the evidence is already on disk; the record has not caught up |
+| unblocked | was blocked, and the blocker no longer holds on disk |
+| answerable from disk | the inputs are committed, the answer has not been extracted — analysis, not a run |
+| needs compute | open, and answering it takes a fresh run |
+| blocked | a named blocker still holds, or cannot be settled from the tree |
+| frontier | nothing downstream: no incoming `corrects` / `supersedes` / `qualifies` / `builds-on` |
+| undeveloped | introduced and dropped: degree ≤ 1, or no epistemic edge at all |
+| *(anything else)* | neutral and de-emphasised — the report says nothing about it |
+
+**Why it exists:** because the two things worth acting on are the two things prose hides.
+
+The first is a claim the record has fallen behind. H4 is the only hypothesis in the graph with a
+`tests` edge and no verdict edge — and the notebook that edge points at,
+`experiments/gpt2_small/spectral_resonance.ipynb`, has executed output in 8 of its 14 cells, with
+cell 9 reading `NOT SUPPORTED … Mean |cos sim| 0.2387 … Heads > 0.9: 5 / 144`. FINDINGS.md,
+JOURNEY_MAP.md and the notebook's own status banner all still say "not run". The graph could not
+catch this on its own — it is parsed *from* those documents, so it faithfully reproduced their
+staleness. Only the cross-check against the filesystem catches it, which is why the classification
+is an overlay and not a graph property. Clicking the node quotes the cell.
+
+The second is a shared blocker. `blocks` / `blocked-by` edges are drawn thick, dashed and purple,
+and a blocker the graph has no node of its own for — an issue number, an artefact named only in
+prose — is synthesised as a `database`-shaped node sized by how many claims it gates. Issue #9
+becomes a five-armed hub over F10, F15 and three of the question nodes; issue #8 a two-armed hub
+over H-J1 and the full J-lens build. Read linearly, F10 and F15 are eight findings apart and
+nothing pairs them.
+
+A ranked side list carries the report's `low_hanging_fruit` in the report's own order, cheapest
+tier first; clicking an entry opens it and narrows the graph to it and its neighbours. **Reset
+View** clears that focus.
+
+Threads has no timeline — readiness is a statement about the tree as it stands right now — and no
+**Colour by** control, because colour is the whole point of the mode. It swaps the status chip row
+for a readiness chip row and keeps the type chips, so the chip bar keeps its two groups and the
+desktop layout does not move.
+
+If `_data/threads.json` is missing, Threads still draws: every node goes neutral and the legend
+says to run the generator. The other three graphs are unaffected either way.
 
 ---
 
@@ -212,7 +267,10 @@ a regeneration cannot silently rewrite the epistemic record. It skips rather tha
 
 `smoke_test.mjs` serves the directory, drives `viewer.html` in headless Chromium and asserts that
 all three graphs actually draw, that the model switch re-renders, that search and the details panel
-and the timeline scrubber work, and that nothing lands in the console. It needs Playwright
+and the timeline scrubber work, that returning to Evidence from another graph restores the
+force-directed layout, that the phone budget holds — and that nothing lands in the console. Its
+thirteen assertions cover the three graphs; Threads mode is not among them yet, so a change there
+is on the person making it to drive. It needs Playwright
 (`npm i -D playwright`, or set `PLAYWRIGHT_PATH`); the two CDN scripts are served from a local
 mirror so a bad day at unpkg cannot turn into a red test.
 
@@ -240,8 +298,8 @@ not draw — vendor those two scripts locally if you need it to.
 
 ### The graph selector
 
-The **Graph** dropdown in the header swaps between Evidence, Dissolution and Isomorphism without
-reloading the page. It defaults to Evidence.
+The **Graph** dropdown in the header swaps between Evidence, Dissolution, Isomorphism and Threads
+without reloading the page. It defaults to Evidence.
 
 - **Evidence** and **Isomorphism** render in evidence mode: status colouring, status/type filter
   chips, the timeline scrubber, the details panel and copy-evidence-chain all apply. In the
@@ -253,6 +311,10 @@ reloading the page. It defaults to Evidence.
   dropdown picks between the six sweeps and a **Register** chip row filters by prompt register. The
   timeline scrubber is hidden here — dissolution is ordered by iteration count, not by date, so a
   date cursor would mean nothing. The status and type chips are hidden for the same reason.
+- **Threads** renders the evidence nodes in the same force-directed layout, coloured by readiness,
+  with a readiness chip row in place of the status row, a ranked low-hanging-fruit list at the top
+  right, and no timeline. Details, search, focus and the markdown reader work exactly as they do in
+  evidence mode; the readiness block sits above the epistemic record rather than instead of it.
 
 ### On a phone
 
@@ -268,7 +330,8 @@ the controls. Nothing is removed — every control is still reachable, and the d
 - **More** holds the secondary controls: Show All, Reset View, Refresh Data, Chat with AI, the
   **Colour by** select and — in dissolution mode — the **Model** select.
 - **Legend** opens the legend as an overlay; it is closed by default rather than being squeezed
-  into an unreadable stub.
+  into an unreadable stub. In Threads mode the ranked low-hanging-fruit list rides along inside it,
+  since its desktop panel has nowhere to go on a phone — no fourth toolbar button, no extra chrome.
 - The breadcrumb appears once you have actually navigated somewhere; its placeholder row is
   hidden.
 - Tapping a node opens the details panel as a **bottom sheet** with its own scroll and a close
@@ -280,8 +343,9 @@ All three disclosures are `<button aria-expanded>`, so they work from the keyboa
 closes whichever is open, then the details sheet. Every touch target is at least 40x40 CSS px, and
 the expand/collapse transitions respect `prefers-reduced-motion`.
 
-Measured at 393x830 (a Nothing Phone 2a viewport), in all three graph modes: 125px of chrome above
-the graph, a 659px graph — 79% of the viewport — and no horizontal page scroll.
+Measured at 393x830 (a Nothing Phone 2a viewport), in all three graph modes and in Threads, with
+the Filters panel both shut and open: 125px of chrome above the graph, a 659px graph — 79% of the
+viewport — and no horizontal page scroll.
 
 ### Run order
 

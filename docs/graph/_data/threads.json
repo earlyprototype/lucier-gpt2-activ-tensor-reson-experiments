@@ -1,0 +1,4201 @@
+{
+  "metadata": {
+    "title": "ATR threads, blockers and opportunities",
+    "description": "Open threads derived from the ATR evidence graph and cross-checked against the working tree. Generated; do not edit by hand.",
+    "generator": "docs/graph/build_threads_report.py",
+    "reads": [
+      "docs/graph/_data/entities.json",
+      "the repository working tree"
+    ],
+    "graph_source_last_updated": "2026-07-23",
+    "ranking_rule": [
+      {
+        "tier": 1,
+        "name": "answered-on-disk",
+        "rule": "The question has already been answered on disk and only the record is missing: the run's script exists, carries executed outputs or committed artefacts, and the graph still shows no verdict. Cost: read the numbers and write them down."
+      },
+      {
+        "tier": 2,
+        "name": "newly-unblocked",
+        "rule": "The claim names a blocker, and the blocker no longer appears to hold on disk. Cost: resume work that was correctly parked."
+      },
+      {
+        "tier": 3,
+        "name": "answerable-from-disk",
+        "rule": "The inputs are committed but the answer has not been extracted: either the script exists with every declared input present and has simply not been executed, or the record itself says the data is already on disk and the artefacts are where it says they are. Cost: analysis, not a model run."
+      },
+      {
+        "tier": 4,
+        "name": "needs-compute",
+        "rule": "A fresh model run is required: a script exists but its inputs do not, or no script exists at all. Cost: new compute, possibly new code."
+      },
+      {
+        "tier": 5,
+        "name": "still-blocked",
+        "rule": "The named blocker still holds on disk. Cost: unblock first."
+      },
+      {
+        "tier": 6,
+        "name": "cannot-determine",
+        "rule": "The graph names no run, script or artefact for this thread, so no honest disk verdict is available. Cost: unknown, and that is the finding."
+      }
+    ],
+    "detectors": [
+      "answered-but-unrecorded",
+      "blocked-grouped-by-blocker",
+      "needs-compute-vs-answerable-from-disk",
+      "frontier",
+      "undeveloped",
+      "unreferenced-artefacts",
+      "execution-ledger"
+    ]
+  },
+  "counts": {
+    "answered_but_unrecorded": 2,
+    "answered_on_disk_unrecorded": 1,
+    "blockers": 8,
+    "shared_blockers": 2,
+    "open_threads": 21,
+    "low_hanging_fruit": 21,
+    "frontier": 16,
+    "thin_concepts": 3,
+    "silent_claims": 32,
+    "unreferenced_artefacts": 39,
+    "orphan_scripts": 3
+  },
+  "open_status_audit": {
+    "concept": 22,
+    "question": 12
+  },
+  "answered_but_unrecorded": [
+    {
+      "claim": "h4-head-power-iteration",
+      "label": "H4: Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector)",
+      "type": "hypothesis",
+      "status": "untested",
+      "description": "Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector). Disposition: Untested: protocol scaffolded (experiments/gpt2_small/spectral_resonance.ipynb), not run.",
+      "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions",
+      "tested_by": [
+        {
+          "id": "run-spectral-scaffold",
+          "label": "Spectral resonance scaffold (H4, not run)",
+          "kind": "run",
+          "edge_note": "The scaffolded protocol for H4: per-head resonance against the top singular vector of W_OV. Retained as pre-registration, never executed."
+        }
+      ],
+      "verdict_edges": [],
+      "disk_evidence": [
+        {
+          "run": "run-spectral-scaffold",
+          "run_label": "Spectral resonance scaffold (H4, not run)",
+          "graph_says": "not run",
+          "date": null,
+          "script": "experiments/gpt2_small/spectral_resonance.ipynb",
+          "script_exists": true,
+          "script_state": {
+            "kind": "notebook",
+            "readable": true,
+            "cells_total": 14,
+            "code_cells": 8,
+            "cells_with_outputs": 8,
+            "executed": true,
+            "verdict_quotes": [
+              {
+                "cell": 9,
+                "lines": [
+                  "==================================================",
+                  "VALIDATION SUMMARY",
+                  "==================================================",
+                  "Mean |cos sim|:   0.2387",
+                  "Median |cos sim|: 0.1614",
+                  "Heads > 0.9:      5 / 144",
+                  "Heads > 0.95:     2 / 144",
+                  "NOT SUPPORTED: loop dynamics are dominated by nonlinear effects for most heads.",
+                  "  Per-head resonant state cannot be reduced to the static OV eigensystem alone."
+                ]
+              }
+            ],
+            "banner": "# EXP_009c: The Lucier Resonance — \"The Spectrum\" ## Status **Not yet run.** This notebook is a scaffolded, pre-registered protocol — code only, no executed results. It has not been run; no plots, numbers, or claims should be inferred from its presence in this repo. See [README.md — Caveats and Pending Work](../README.md#caveats-and-pending-work). --- ## Theoretical Premise `layer_resonance.ipynb`",
+            "saves": [
+              "009c_spectral_data.pt",
+              "009c_validation_grid.pt"
+            ],
+            "loads": [
+              "009bFIX_head_loop_results.pt"
+            ]
+          },
+          "output_dir": null,
+          "output_dir_exists": null,
+          "output_dir_files": [],
+          "declared_inputs": [
+            {
+              "name": "009bFIX_head_loop_results.pt",
+              "found": [
+                "experiments/_DATA/EXP_009/009bFIX_head_loop_results.pt"
+              ]
+            }
+          ],
+          "missing_inputs": [],
+          "saved_artefacts": [
+            {
+              "name": "009c_spectral_data.pt",
+              "found": [
+                "experiments/_DATA/EXP_009/009c_spectral_data.pt"
+              ],
+              "size": 1124241
+            },
+            {
+              "name": "009c_validation_grid.pt",
+              "found": [
+                "experiments/_DATA/EXP_009/009c_validation_grid.pt"
+              ],
+              "size": 3067
+            }
+          ],
+          "missing_local_modules": [],
+          "graph_artefacts": []
+        }
+      ],
+      "quoted_result": [
+        {
+          "script": "experiments/gpt2_small/spectral_resonance.ipynb",
+          "cell": 9,
+          "lines": [
+            "==================================================",
+            "VALIDATION SUMMARY",
+            "==================================================",
+            "Mean |cos sim|:   0.2387",
+            "Median |cos sim|: 0.1614",
+            "Heads > 0.9:      5 / 144",
+            "Heads > 0.95:     2 / 144",
+            "NOT SUPPORTED: loop dynamics are dominated by nonlinear effects for most heads.",
+            "  Per-head resonant state cannot be reduced to the static OV eigensystem alone."
+          ]
+        }
+      ],
+      "prose_says_not_run": [
+        {
+          "file": "README.md",
+          "line": 208,
+          "text": "| [`spectral_resonance.ipynb`](experiments/gpt2_small/spectral_resonance.ipynb) | SVD-predicted per-head resonance (H4) | 🔬 scaffold, not run |"
+        },
+        {
+          "file": "docs/ATR_METHOD_COMPARISON.md",
+          "line": 173,
+          "text": "- [ ] SVD/spectral-gap prediction of per-head resonant states vs. observed convergence (scaffolded in `spectral_resonance.ipynb`; not yet run)"
+        },
+        {
+          "file": "docs/FINDINGS.md",
+          "line": 629,
+          "text": "| H4 | Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector) | **Untested**: protocol scaffolded (`experiments/gpt2_small/spectral_resonance.ipynb`), not run. |"
+        },
+        {
+          "file": "docs/JOURNEY_MAP.md",
+          "line": 88,
+          "text": "| H4 | Per-head resonance ≈ SVD dominant singular vector | Untested | Scaffold only: `experiments/gpt2_small/spectral_resonance.ipynb` |"
+        },
+        {
+          "file": "docs/MATH_PRIMER.md",
+          "line": 144,
+          "text": "One caution to carry: because the map is nonlinear, do not over-interpret any single attractor as \"the dominant eigenvector of the model.\" The spectral comparison (`spectral_resonance.ipynb`, scaffolded but not run) is the project's designed test of how far the linear intuition transfers to the per-"
+        },
+        {
+          "file": "docs/PODCAST_SOURCES.md",
+          "line": 281,
+          "text": "| [`spectral_resonance.ipynb`](experiments/gpt2_small/spectral_resonance.ipynb) | SVD-predicted per-head resonance (H4) | 🔬 scaffold, not run |"
+        }
+      ],
+      "prose_says_was_run": [
+        {
+          "file": "experiments/gpt2_small/output_head_loop_regen/REGENERATION_REPORT.md",
+          "line": 11,
+          "text": "2. `experiments/gpt2_small/spectral_resonance.ipynb` (EXP_009c) — executed end"
+        }
+      ],
+      "assessment": "answered-on-disk-unrecorded-in-graph"
+    },
+    {
+      "claim": "concept-jspace-workspace",
+      "label": "J-space / the Jacobian lens",
+      "type": "concept",
+      "status": "open",
+      "description": "Anthropic's J-space proposal: a model's verbalizable states occupy a distinguished subspace, probed by a lens built from averaged Jacobians of the forward map. This repo's reading companion is docs/JSPACE_PRIMER.md.",
+      "doc_ref": "docs/FINDINGS.md#f11-j-lens-pilot-the-prolet-insidedivine-outside-prediction-did-not-hold-the-boundary-that-appeared-is-language-vs-noise",
+      "tested_by": [
+        {
+          "id": "f11-jlens-pilot-null",
+          "label": "F11: J-lens pilot: the prolet-inside/Divine-outside prediction did not hold; the boundary that appeared is language-vs-noise",
+          "kind": "claim",
+          "edge_note": "The pilot builds a restricted J-lens (193 tokens, 30 prompts, all 12 layers) and probes membership by least-squares span share and nonnegative sparse share."
+        },
+        {
+          "id": "f16-jlens-phase-probe",
+          "label": "F16: Phase-aware J-lens: the phases straddle the prolet level, the pivot is the most lens-expressible state probed, and the physical flip axis is almost entirely outside the lens",
+          "kind": "claim",
+          "edge_note": "The phase-aware re-probe puts both phases, the pivot and the flip axis against the same lens, and finds the pivot the most lens-expressible object in the system."
+        }
+      ],
+      "verdict_edges": [],
+      "disk_evidence": [],
+      "quoted_result": [],
+      "prose_says_not_run": [],
+      "prose_says_was_run": [],
+      "assessment": "no-run-node-cannot-determine"
+    }
+  ],
+  "blockers": [
+    {
+      "key": "issue-9",
+      "label": "prompt library (issue #9)",
+      "kind": "artefact",
+      "issues": [
+        "9"
+      ],
+      "artefact_phrases": [
+        "prompt library",
+        "prompt-library"
+      ],
+      "gates": [
+        {
+          "claim": "f10-cycle-anatomy-flip-axis",
+          "label": "F10: Anatomy of the period-2 cycle: one nearly readout-invisible flip axis between a game-vocabulary pole and the glitch-token pole",
+          "type": "finding",
+          "status": "corrected",
+          "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole",
+          "quotes": [
+            "One trajectory: whether all 34 Divine prompts share this flip axis is open, blocked on the prompt library (issue #9, caveat 11)."
+          ]
+        },
+        {
+          "claim": "f15-lag2-gate",
+          "label": "F15: A lag-2 convergence gate recognises the period-2 cycle; the engine now supports it",
+          "type": "finding",
+          "status": "supported",
+          "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
+          "quotes": [
+            "The other 33 period-2 prompts remain blocked on the prompt library (issue #9)."
+          ]
+        },
+        {
+          "claim": "q-flip-axis-generality",
+          "label": "Q: Do all 34 Divine prompts share the F10 flip axis, head and eigenvalue?",
+          "type": "question",
+          "status": "open",
+          "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole",
+          "quotes": [
+            "F10 states it in as many words: \"Open: whether all 34 Divine prompts share this flip axis (blocked on the prompt-library restoration, issue #9).\" Caveat 14 widens it to the whole mechanism series: \"Whether the other 33 period-2 prompts share the flip axis, the flip head (L11.H8), the eigenvalue, and the anomalous-token alignment is untested (prompt library pending, issue #9).\" FINDINGS section 5 c",
+            "graph edge `q-flip-axis-generality` blocked-by `q-prompt-library`: F10's own words: the flip-axis generality question is \"blocked on the prompt-library restoration, issue #9\", repeated in caveats 11 and 14 as \"prompt library pending, issue #9\"."
+          ]
+        },
+        {
+          "claim": "q-lag2-regate-33",
+          "label": "Q: Do the other 33 period-2 prompts re-gate as converged?",
+          "type": "question",
+          "status": "open",
+          "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
+          "quotes": [
+            "F15 demonstrates the lag-k gate for one trajectory and records the rest as outstanding: \"The other 33 period-2 prompts remain blocked on the prompt library (issue #9);",
+            "JOURNEY_MAP section 7 gives the same next step: \"Re-gate the other 33 prompts (blocked on issue #9)\".",
+            "graph edge `q-lag2-regate-33` blocked-by `q-prompt-library`: F15's own words: \"The other 33 period-2 prompts remain blocked on the prompt library (issue #9)\", and JOURNEY_MAP section 7 gives the next step as \"Re-gate the other 33 prompts (blocked on issue #9)\"."
+          ]
+        },
+        {
+          "claim": "q-prompt-library",
+          "label": "Q: Is the 125-prompt library restored (issue #9)?",
+          "type": "question",
+          "status": "open",
+          "doc_ref": "docs/FINDINGS.md#caveats",
+          "quotes": [
+            "Caveats 11 and 14 both file the same gate in the same three words, \"prompt library pending, issue #9\", and FINDINGS section 5 names it as the blocker on two separate directions at once: the re-gate of the 34 cycling prompts and the flip-axis generality question are \"blocked in part on the prompt-library restoration, issue #9\"."
+          ]
+        }
+      ],
+      "gate_count": 5,
+      "still_holds": true,
+      "resolution": {
+        "holds": true,
+        "resolution_evidence": [
+          {
+            "file": "README.md",
+            "line": 153,
+            "text": "`prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree"
+          }
+        ],
+        "checked": [
+          "prompt_library.py",
+          "prompt_library.json",
+          "prompt_library.pt",
+          "prompt_library.md"
+        ],
+        "found": [],
+        "issue_prose": [
+          {
+            "issue": "9",
+            "mentions": [
+              {
+                "file": "experiments/gpt2_small/output_lagk/lagk_report.md",
+                "line": 54,
+                "text": "## What Stays Blocked on Issue #9"
+              },
+              {
+                "file": "experiments/gpt2_small/output_lagk/lagk_report.md",
+                "line": 56,
+                "text": "The other 33 cycling prompts exist in the sweep records only as ids and terminal tokens; their texts live in `prompt_library.py`, which exists only on Thom's home machine (issue #9, his errand). Until it is restored they cannot be re-run, so \"34 prompts ring, "
+              },
+              {
+                "file": "experiments/gpt2_small/output_divine_motion/bell_anatomy.md",
+                "line": 33,
+                "text": "One trajectory, one prompt, one model. The glitch-token identification is by inspection against published lists, not a systematic test. Whether all 34 Divine prompts share this same flip axis remains open (blocked on prompt_library restoration, issue #9)."
+              },
+              {
+                "file": "experiments/gpt2_small/output_hinge_eigen/hinge_eigenvalue.md",
+                "line": 91,
+                "text": "- One trajectory, one prompt, one model, derivatives evaluated at one point per state. Whether the other Divine prompts share the same flip head is open (blocked on prompt_library restoration, issue #9)."
+              }
+            ]
+          }
+        ],
+        "named_but_absent": [
+          {
+            "name": "prompt_library.py",
+            "mentions": [
+              {
+                "file": "README.md",
+                "line": 153,
+                "text": "├── prompt_library.py ← 125 prompts across 7 categories"
+              },
+              {
+                "file": "README.md",
+                "line": 229,
+                "text": "> **Note:** the 125-prompt sweep notebooks (`01_*`), `gated_resweep.py` and the Pythia-410m deep run import `prompt_library.py`, which is temporarily absent from the repository and will be restored shortly. Steps 1, 2, 4 and 5 run without it."
+              },
+              {
+                "file": "experiments/gpt2_small/output_lagk/lagk_report.md",
+                "line": 56,
+                "text": "The other 33 cycling prompts exist in the sweep records only as ids and terminal tokens; their texts live in `prompt_library.py`, which exists only on Thom's home machine (issue #9, his errand). Until it is restored they cannot be re-run, so \"34 prompts ring, pending re-gate\" resolves today to: 1 re"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "issue-8",
+      "label": "issue #8",
+      "kind": "artefact",
+      "issues": [
+        "8"
+      ],
+      "artefact_phrases": [],
+      "gates": [
+        {
+          "claim": "h-j1",
+          "label": "H-J1: prolet sits inside the verbalizable (J-lens) subspace, Divine outside",
+          "type": "hypothesis",
+          "status": "not-supported",
+          "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions",
+          "quotes": [
+            "Full build still pending (issue #8).",
+            "graph edge `q-jlens-full-build` blocks `h-j1`: H-J1 cannot move past a pilot-confidence null while the instrument that would settle it is unbuilt: its disposition ends \"Full build still pending (issue #8)\", and F11 specifies that the build \"should be phase-aware: probe both phases and the pivot M\"."
+          ]
+        },
+        {
+          "claim": "q-jlens-full-build",
+          "label": "Q: What does the phase-aware full J-lens build show (issue #8)?",
+          "type": "question",
+          "status": "open",
+          "doc_ref": "docs/FINDINGS.md#f11-j-lens-pilot-the-prolet-insidedivine-outside-prediction-did-not-hold-the-boundary-that-appeared-is-language-vs-noise",
+          "quotes": [
+            "F11 specifies the outstanding work: \"The full build (issue #8) should be phase-aware: probe both phases and the pivot M.\" H-J1's disposition closes on the same debt - \"Full build still pending (issue #8)\" - and FINDINGS section 5 lists \"the phase-aware J-lens full build (F11, issue #8)\" among the open directions."
+          ]
+        }
+      ],
+      "gate_count": 2,
+      "still_holds": null,
+      "resolution": {
+        "holds": null,
+        "resolution_evidence": [
+          {
+            "file": null,
+            "line": null,
+            "text": "the blocker is recorded only as an issue number, which names no file; the working tree cannot settle it and this report does not guess"
+          }
+        ],
+        "checked": [],
+        "found": [],
+        "issue_prose": [
+          {
+            "issue": "8",
+            "mentions": [
+              {
+                "file": "experiments/gpt2_small/output_jlens_phase/jlens_phase.md",
+                "line": 7,
+                "text": "issue #8) probed the converged Divine (Syntactic) state before `06_bell_anatomy.py` showed"
+              },
+              {
+                "file": "docs/BELL_PRIMER.md",
+                "line": 152,
+                "text": "The pilot (issue #8) measured Divine before the cycle was known, so it measured one phase. Session 04 repeated the identical measurement on both phases and the midpoint. The replay of the pilot's own states reproduced its recorded numbers to 7 decimal places, "
+              },
+              {
+                "file": "docs/FINDINGS.md",
+                "line": 453,
+                "text": "build (issue #8) should be phase-aware: probe both phases and the pivot M."
+              },
+              {
+                "file": "docs/FINDINGS.md",
+                "line": 633,
+                "text": "| H-J1 | `prolet` sits inside the verbalizable (J-lens) subspace, `Divine` outside | **Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)**: the point estimate runs slightly the other way at pilot confidence (`Divine` at least as lens-ex"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "node-q-hook-window-depth",
+      "label": "Q: Does the landscape depend on where the loop is cut (window / depth)?",
+      "kind": "prerequisite",
+      "issues": [],
+      "artefact_phrases": [],
+      "gates": [
+        {
+          "claim": "q-why-gpt2-small",
+          "label": "Q: Why does GPT-2 Small alone resolve language into few semantic basins?",
+          "type": "question",
+          "status": "open",
+          "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
+          "quotes": [
+            "graph edge `q-hook-window-depth` blocks `q-why-gpt2-small`: FINDINGS section 6 assigns the depth control to the successor question explicitly: the depth control, the per-layer / per-head decomposition, the spectral test and readout upgrades \"do not test whether the result is real; they test why the models differ. That is the successor project's question.\""
+          ]
+        }
+      ],
+      "gate_count": 1,
+      "still_holds": null,
+      "resolution": {
+        "holds": null,
+        "resolution_evidence": [
+          {
+            "file": null,
+            "line": null,
+            "text": "the blocker is a phrase with no filename this tool can responsibly look for; not checked"
+          }
+        ],
+        "checked": [],
+        "found": [],
+        "issue_prose": []
+      }
+    },
+    {
+      "key": "node-q-independent-reimplementation",
+      "label": "Q: Does an independent re-implementation reproduce the result?",
+      "kind": "prerequisite",
+      "issues": [],
+      "artefact_phrases": [],
+      "gates": [
+        {
+          "claim": "h0-determinism",
+          "label": "H0: Results are deterministic",
+          "type": "hypothesis",
+          "status": "supported",
+          "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions",
+          "quotes": [
+            "graph edge `q-independent-reimplementation` blocks `h0-determinism`: H0 currently stands on repeatability plus one cross-hardware replication. Caveat 1's heading is the block: \"Repeatability plus one cross-hardware replication, not independent reproducibility\", and H0's disposition ends \"Independent re-implementation still not attempted\"."
+          ]
+        }
+      ],
+      "gate_count": 1,
+      "still_holds": null,
+      "resolution": {
+        "holds": null,
+        "resolution_evidence": [
+          {
+            "file": null,
+            "line": null,
+            "text": "the blocker is a phrase with no filename this tool can responsibly look for; not checked"
+          }
+        ],
+        "checked": [],
+        "found": [],
+        "issue_prose": []
+      }
+    },
+    {
+      "key": "node-q-shape-class-null",
+      "label": "Q: What does a shape-class-matched coherence null show?",
+      "kind": "prerequisite",
+      "issues": [],
+      "artefact_phrases": [],
+      "gates": [
+        {
+          "claim": "concept-coherence",
+          "label": "Coherence (top-k embedding clustering)",
+          "type": "concept",
+          "status": "supported",
+          "doc_ref": "docs/FINDINGS.md#f8-the-prolet-basin-is-a-coherent-cluster-of-related-tokens-not-a-single-token-permutation-tested",
+          "quotes": [
+            "graph edge `q-shape-class-null` blocks `concept-coherence`: F12 states the block as a standing rule rather than a wish: \"no cross-model coherence claim until a shape-class-matched null exists\". The measure cannot travel outside GPT-2 Small until that null is built."
+          ]
+        }
+      ],
+      "gate_count": 1,
+      "still_holds": null,
+      "resolution": {
+        "holds": null,
+        "resolution_evidence": [
+          {
+            "file": null,
+            "line": null,
+            "text": "the blocker is a phrase with no filename this tool can responsibly look for; not checked"
+          }
+        ],
+        "checked": [],
+        "found": [],
+        "issue_prose": []
+      }
+    },
+    {
+      "key": "node-q-tmix-llm",
+      "label": "Q: What is T_mix_LLM for each basin?",
+      "kind": "prerequisite",
+      "issues": [],
+      "artefact_phrases": [],
+      "gates": [
+        {
+          "claim": "q-fractal-dimension",
+          "label": "Q: Is the fractal dimension of convergence trajectories basin-specific?",
+          "type": "question",
+          "status": "open",
+          "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
+          "quotes": [
+            "graph edge `q-fractal-dimension` blocked-by `q-tmix-llm`: JOURNEY_MAP section 7 states the order in two words: the fractal-dimension question \"Requires T_mix first\"."
+          ]
+        }
+      ],
+      "gate_count": 1,
+      "still_holds": null,
+      "resolution": {
+        "holds": null,
+        "resolution_evidence": [
+          {
+            "file": null,
+            "line": null,
+            "text": "the blocker is a phrase with no filename this tool can responsibly look for; not checked"
+          }
+        ],
+        "checked": [],
+        "found": [],
+        "issue_prose": []
+      }
+    },
+    {
+      "key": "phrase-artefact",
+      "label": "an artefact",
+      "kind": "unresolvable-phrase",
+      "issues": [],
+      "artefact_phrases": [
+        "an artefact"
+      ],
+      "gates": [
+        {
+          "claim": "q-lag2-regate-33",
+          "label": "Q: Do the other 33 period-2 prompts re-gate as converged?",
+          "type": "question",
+          "status": "open",
+          "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
+          "quotes": [
+            "one, the Syntactic prompt, is now re-gated as converged.\" The procedure is on record too - the re-gate \"runs the full lag table on a short dense continuation and gates each state at its smallest passing lag\" - so this is blocked on an artefact, not on a method."
+          ]
+        }
+      ],
+      "gate_count": 1,
+      "still_holds": null,
+      "resolution": {
+        "holds": null,
+        "resolution_evidence": [
+          {
+            "file": null,
+            "line": null,
+            "text": "the blocker is a phrase with no filename this tool can responsibly look for; not checked"
+          }
+        ],
+        "checked": [
+          "artefact.py",
+          "artefact.json",
+          "artefact.pt",
+          "artefact.md"
+        ],
+        "found": [],
+        "issue_prose": []
+      }
+    },
+    {
+      "key": "phrase-re-gate",
+      "label": "re-gate",
+      "kind": "unresolvable-phrase",
+      "issues": [],
+      "artefact_phrases": [
+        "re-gate"
+      ],
+      "gates": [
+        {
+          "claim": "f2-divine-readout-stable",
+          "label": "F2: The Divine basin is readout-stable over a never-settling tensor",
+          "type": "finding",
+          "status": "corrected",
+          "doc_ref": "docs/FINDINGS.md#f2-the-divine-basin-is-readout-stable-over-a-never-settling-tensor",
+          "quotes": [
+            "Resolved 2026-07-19 as an exact period-2 limit cycle, so \"never converge\" over-claims and should read \"cycle, pending re-gate\"."
+          ]
+        }
+      ],
+      "gate_count": 1,
+      "still_holds": null,
+      "resolution": {
+        "holds": null,
+        "resolution_evidence": [
+          {
+            "file": null,
+            "line": null,
+            "text": "the blocker is a phrase with no filename this tool can responsibly look for; not checked"
+          }
+        ],
+        "checked": [
+          "re_gate.py",
+          "re_gate.json",
+          "re_gate.pt",
+          "re_gate.md"
+        ],
+        "found": [],
+        "issue_prose": []
+      }
+    }
+  ],
+  "open_threads": [
+    {
+      "claim": "h4-head-power-iteration",
+      "label": "H4: Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector)",
+      "type": "hypothesis",
+      "status": "untested",
+      "asserted": "2026-03-20",
+      "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions",
+      "description": "Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector). Disposition: Untested: protocol scaffolded (experiments/gpt2_small/spectral_resonance.ipynb), not run.",
+      "pending_language": [
+        "not run",
+        "scaffold",
+        "untested"
+      ],
+      "blockers": [],
+      "runs": [
+        "run-spectral-scaffold"
+      ],
+      "evidence": [
+        {
+          "run": "run-spectral-scaffold",
+          "run_label": "Spectral resonance scaffold (H4, not run)",
+          "graph_says": "not run",
+          "date": null,
+          "script": "experiments/gpt2_small/spectral_resonance.ipynb",
+          "script_exists": true,
+          "script_state": {
+            "kind": "notebook",
+            "readable": true,
+            "cells_total": 14,
+            "code_cells": 8,
+            "cells_with_outputs": 8,
+            "executed": true,
+            "verdict_quotes": [
+              {
+                "cell": 9,
+                "lines": [
+                  "==================================================",
+                  "VALIDATION SUMMARY",
+                  "==================================================",
+                  "Mean |cos sim|:   0.2387",
+                  "Median |cos sim|: 0.1614",
+                  "Heads > 0.9:      5 / 144",
+                  "Heads > 0.95:     2 / 144",
+                  "NOT SUPPORTED: loop dynamics are dominated by nonlinear effects for most heads.",
+                  "  Per-head resonant state cannot be reduced to the static OV eigensystem alone."
+                ]
+              }
+            ],
+            "banner": "# EXP_009c: The Lucier Resonance — \"The Spectrum\" ## Status **Not yet run.** This notebook is a scaffolded, pre-registered protocol — code only, no executed results. It has not been run; no plots, numbers, or claims should be inferred from its presence in this repo. See [README.md — Caveats and Pending Work](../README.md#caveats-and-pending-work). --- ## Theoretical Premise `layer_resonance.ipynb`",
+            "saves": [
+              "009c_spectral_data.pt",
+              "009c_validation_grid.pt"
+            ],
+            "loads": [
+              "009bFIX_head_loop_results.pt"
+            ]
+          },
+          "output_dir": null,
+          "output_dir_exists": null,
+          "output_dir_files": [],
+          "declared_inputs": [
+            {
+              "name": "009bFIX_head_loop_results.pt",
+              "found": [
+                "experiments/_DATA/EXP_009/009bFIX_head_loop_results.pt"
+              ]
+            }
+          ],
+          "missing_inputs": [],
+          "saved_artefacts": [
+            {
+              "name": "009c_spectral_data.pt",
+              "found": [
+                "experiments/_DATA/EXP_009/009c_spectral_data.pt"
+              ],
+              "size": 1124241
+            },
+            {
+              "name": "009c_validation_grid.pt",
+              "found": [
+                "experiments/_DATA/EXP_009/009c_validation_grid.pt"
+              ],
+              "size": 3067
+            }
+          ],
+          "missing_local_modules": [],
+          "graph_artefacts": []
+        }
+      ],
+      "verdict": "answered-on-disk",
+      "reason": "the run the graph designates as this claim's test has already executed and the graph still records no verdict: experiments/gpt2_small/spectral_resonance.ipynb carries executed outputs in 8 of its 14 cells; experiments/gpt2_small/spectral_resonance.ipynb has written experiments/_DATA/EXP_009/009c_spectral_data.pt, experiments/_DATA/EXP_009/009c_validation_grid.pt",
+      "rank_tier": 0
+    },
+    {
+      "claim": "q-tmix-llm",
+      "label": "Q: What is T_mix_LLM for each basin?",
+      "type": "question",
+      "status": "open",
+      "asserted": "2026-07-10",
+      "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
+      "description": "JOURNEY_MAP section 7: \"What is T_mix_LLM for each basin? | Measurable from existing data | Compute from .pt\". The glossary files the metric itself as a \"proposed metric\" that was never computed, so the question is open with its data already on disk - the cheapest item on the open list.",
+      "pending_language": [
+        "is open"
+      ],
+      "blockers": [],
+      "runs": [],
+      "evidence": [],
+      "verdict": "answerable-from-disk",
+      "reason": "the record itself says the inputs are already committed (\"JOURNEY_MAP section 7: \"What is T_mix_LLM for each basin? | Measurable from existing data | Compute from .pt\".\"), and 13 .pt artefact(s) exist under experiments/; no script is named for the computation, so this rests on the record's word plus the presence of the data",
+      "rank_tier": 2
+    },
+    {
+      "claim": "concept-fractal-dimension",
+      "label": "Fractal dimensional analysis",
+      "type": "concept",
+      "status": "untested",
+      "asserted": "2026-03-20",
+      "doc_ref": "docs/JOURNEY_MAP.md#4-adjacent-science--mathematics",
+      "description": "Fractal dimensional analysis (Fractal Geometry). Relevance to ATR: Potential metric for basin characterisation (untested).",
+      "pending_language": [
+        "untested"
+      ],
+      "blockers": [],
+      "runs": [],
+      "evidence": [],
+      "verdict": "needs-compute",
+      "reason": "the record states the work has not been done (\"Relevance to ATR: Potential metric for basin characterisation (untested).\") and names no script for it, so answering it requires a fresh run",
+      "rank_tier": 3
+    },
+    {
+      "claim": "f1-five-attractor-basins",
+      "label": "F1: GPT-2 Small resolves language-driven activity into five attractor basins, stable under convergence gating",
+      "type": "finding",
+      "status": "qualified",
+      "asserted": "2026-07-10",
+      "doc_ref": "docs/FINDINGS.md#run-5",
+      "description": "GPT-2 Small's 125-prompt sweep resolves into five attractor basins classified at lock-in (prolet 43.2%, Divine 27.2%, till 15.2%, Anarch 13.6%, solidarity 0.8%), with 91/125 prompts (73%) passing the lag-1 gate, all at iteration 120, which is the gate's earliest possible firing point rather than a measured settling time: the true iteration lies somewhere between 100 and 120 and finer cadence was never run (caveat 5). The earlier iteration-100 table over-counted Anarch by ~10 prompts still drifting to prolet, and a 2026-07-19 distribution-level note adds that prolet and Anarch are two argmax peaks over one shared structure. One seed (caveat 2).",
+      "pending_language": [
+        "finer cadence",
+        "never run"
+      ],
+      "blockers": [],
+      "runs": [
+        "run-1-attractor-dominance",
+        "run-5-gated-resweep"
+      ],
+      "evidence": [
+        {
+          "run": "run-1-attractor-dominance",
+          "run_label": "Run 1: Attractor dominance sweep",
+          "graph_says": "125 prompts, ≤100 iters",
+          "date": "2026-03-01",
+          "script": "experiments/gpt2_small/01_attractor_dominance.ipynb",
+          "script_exists": true,
+          "script_state": {
+            "kind": "notebook",
+            "readable": true,
+            "cells_total": 19,
+            "code_cells": 12,
+            "cells_with_outputs": 12,
+            "executed": true,
+            "verdict_quotes": [],
+            "banner": "# EXP_009d1: Attractor Dominance, Basin Mapping & Pathway Analysis ## Depends On **Stage 0 (Reproducibility Gate) must PASS before running this notebook.** ## Hypotheses Under Test ### H1: Attractor Dominance The `prolet` attractor is the dominant basin of GPT-2 Small's weight geometry. It should capture the majority of a diverse prompt set, regardless of input register, topic, or complexity. ### ",
+            "saves": [
+              "basin_distribution.png",
+              "convergence_matrix.png",
+              "stage1_config.pt",
+              "stage1_results.pt",
+              "topology_3d.png"
+            ],
+            "loads": [
+              "config.md",
+              "dissolution_pathways.md",
+              "dissolution_sentences.md",
+              "hypothesis_assessment.md"
+            ]
+          },
+          "output_dir": "experiments/gpt2_small/output/",
+          "output_dir_exists": true,
+          "output_dir_files": [
+            "experiments/gpt2_small/output/basin_distribution.png",
+            "experiments/gpt2_small/output/config.md",
+            "experiments/gpt2_small/output/convergence_matrix.png",
+            "experiments/gpt2_small/output/dissolution_pathways.md",
+            "experiments/gpt2_small/output/dissolution_sentences.md",
+            "experiments/gpt2_small/output/hypothesis_assessment.md",
+            "experiments/gpt2_small/output/topology_3d.png"
+          ],
+          "declared_inputs": [
+            {
+              "name": "config.md",
+              "found": [
+                "experiments/gpt2_medium/output/config.md",
+                "experiments/gpt2_small/output/config.md",
+                "experiments/pythia_160m/output/config.md"
+              ]
+            },
+            {
+              "name": "dissolution_pathways.md",
+              "found": [
+                "experiments/gpt2_medium/output/dissolution_pathways.md",
+                "experiments/gpt2_small/output/dissolution_pathways.md",
+                "experiments/pythia_160m/output/dissolution_pathways.md"
+              ]
+            },
+            {
+              "name": "dissolution_sentences.md",
+              "found": [
+                "experiments/gpt2_medium/output/dissolution_sentences.md",
+                "experiments/gpt2_small/output/dissolution_sentences.md",
+                "experiments/pythia_160m/output/dissolution_sentences.md"
+              ]
+            },
+            {
+              "name": "hypothesis_assessment.md",
+              "found": [
+                "experiments/gpt2_medium/output/hypothesis_assessment.md",
+                "experiments/gpt2_small/output/hypothesis_assessment.md",
+                "experiments/pythia_160m/output/hypothesis_assessment.md"
+              ]
+            }
+          ],
+          "missing_inputs": [],
+          "saved_artefacts": [
+            {
+              "name": "basin_distribution.png",
+              "found": [
+                "experiments/gpt2_medium/output/basin_distribution.png",
+                "experiments/gpt2_small/output/basin_distribution.png",
+                "experiments/pythia_160m/output/basin_distribution.png"
+              ],
+              "size": 90691
+            },
+            {
+              "name": "convergence_matrix.png",
+              "found": [
+                "experiments/gpt2_medium/output/convergence_matrix.png",
+                "experiments/gpt2_small/output/convergence_matrix.png",
+                "experiments/pythia_160m/output/convergence_matrix.png"
+              ],
+              "size": 514127
+            },
+            {
+              "name": "stage1_config.pt",
+              "found": [],
+              "size": null
+            },
+            {
+              "name": "stage1_results.pt",
+              "found": [],
+              "size": null
+            },
+            {
+              "name": "topology_3d.png",
+              "found": [
+                "experiments/gpt2_medium/output/topology_3d.png",
+                "experiments/gpt2_small/output/topology_3d.png",
+                "experiments/pythia_160m/output/topology_3d.png"
+              ],
+              "size": 1022346
+            }
+          ],
+          "missing_local_modules": [
+            "prompt_library.py"
+          ],
+          "graph_artefacts": [
+            {
+              "id": "art-basin-distribution-small",
+              "path": "experiments/gpt2_small/output/basin_distribution.png",
+              "exists": true
+            },
+            {
+              "id": "art-convergence-matrix-small",
+              "path": "experiments/gpt2_small/output/convergence_matrix.png",
+              "exists": true
+            },
+            {
+              "id": "art-dissolution-pathways-small",
+              "path": "experiments/gpt2_small/output/dissolution_pathways.md",
+              "exists": true
+            },
+            {
+              "id": "art-stage1-hypothesis-assessment",
+              "path": "experiments/gpt2_small/output/hypothesis_assessment.md",
+              "exists": true
+            },
+            {
+              "id": "art-topology-3d-small",
+              "path": "experiments/gpt2_small/output/topology_3d.png",
+              "exists": true
+            }
+          ]
+        },
+        {
+          "run": "run-5-gated-resweep",
+          "run_label": "Run 5: Convergence-gated re-sweep",
+          "graph_says": "125 prompts, gate cos>0.999×3, ≤1000 iters",
+          "date": "2026-07-10",
+          "script": "experiments/gpt2_small/gated_resweep.py",
+          "script_exists": true,
+          "script_state": {
+            "kind": "script",
+            "readable": true,
+            "cells_total": null,
+            "code_cells": null,
+            "cells_with_outputs": null,
+            "executed": null,
+            "verdict_quotes": [],
+            "banner": null,
+            "saves": [],
+            "loads": []
+          },
+          "output_dir": "experiments/gpt2_small/output_gated/",
+          "output_dir_exists": true,
+          "output_dir_files": [
+            "experiments/gpt2_small/output_gated/gated_report.md"
+          ],
+          "declared_inputs": [],
+          "missing_inputs": [],
+          "saved_artefacts": [],
+          "missing_local_modules": [
+            "prompt_library.py"
+          ],
+          "graph_artefacts": [
+            {
+              "id": "art-gated-report",
+              "path": "experiments/gpt2_small/output_gated/gated_report.md",
+              "exists": true
+            }
+          ]
+        }
+      ],
+      "verdict": "needs-compute",
+      "reason": "the record states the work has not been done (\"…gate, all at iteration 120, which is the gate's earliest possible firing point rather than a measured settling time: the true iteration lies somewhere between 100 and 120 and finer cadence was never run (caveat 5).\") and names no script for it, so answering it requires a fresh run",
+      "rank_tier": 3
+    },
+    {
+      "claim": "h0-determinism",
+      "label": "H0: Results are deterministic",
+      "type": "hypothesis",
+      "status": "supported",
+      "asserted": "2026-03-01",
+      "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions",
+      "description": "Results are deterministic. Disposition: Repeatability supported; first cross-hardware replication passed (2026-07-19): N=2 same-machine runs, plus three identical repeats on a fresh container (same code, different machine class, legacy-mirror weights, identical terminal attractors and dissolution waypoints; F6). Intermediate paths float-sensitive. Independent re-implementation still not attempted.",
+      "pending_language": [
+        "still not"
+      ],
+      "blockers": [
+        {
+          "key": "node-q-independent-reimplementation",
+          "label": "Q: Does an independent re-implementation reproduce the result?",
+          "still_holds": null
+        }
+      ],
+      "runs": [
+        "run-0-repeatability-gate",
+        "run-6-full-distribution-confidence"
+      ],
+      "evidence": [
+        {
+          "run": "run-0-repeatability-gate",
+          "run_label": "Run 0: Repeatability gate",
+          "graph_says": "5 prompts × 2 runs",
+          "date": "2026-03-01",
+          "script": "experiments/gpt2_small/00_reproducibility_gate.ipynb",
+          "script_exists": true,
+          "script_state": {
+            "kind": "notebook",
+            "readable": true,
+            "cells_total": 12,
+            "code_cells": 9,
+            "cells_with_outputs": 9,
+            "executed": true,
+            "verdict_quotes": [],
+            "banner": null,
+            "saves": [
+              "009d0_reproducibility_results.pt"
+            ],
+            "loads": []
+          },
+          "output_dir": null,
+          "output_dir_exists": null,
+          "output_dir_files": [],
+          "declared_inputs": [],
+          "missing_inputs": [],
+          "saved_artefacts": [
+            {
+              "name": "009d0_reproducibility_results.pt",
+              "found": [],
+              "size": null
+            }
+          ],
+          "missing_local_modules": [],
+          "graph_artefacts": []
+        },
+        {
+          "run": "run-6-full-distribution-confidence",
+          "run_label": "Run 6: Full-distribution confidence audit",
+          "graph_says": "5 prompts × 500 iters + 15 noise trials",
+          "date": "2026-07-19",
+          "script": "experiments/gpt2_small/04_readout_confidence.py",
+          "script_exists": true,
+          "script_state": {
+            "kind": "script",
+            "readable": true,
+            "cells_total": null,
+            "code_cells": null,
+            "cells_with_outputs": null,
+            "executed": null,
+            "verdict_quotes": [],
+            "banner": null,
+            "saves": [
+              "converged_tensors.pt"
+            ],
+            "loads": [
+              "confidence_results.json",
+              "converged_tensors.pt"
+            ]
+          },
+          "output_dir": "experiments/gpt2_small/output_confidence/",
+          "output_dir_exists": true,
+          "output_dir_files": [
+            "experiments/gpt2_small/output_confidence/chordness.json",
+            "experiments/gpt2_small/output_confidence/chordness_formal.json",
+            "experiments/gpt2_small/output_confidence/chordness_formal.md",
+            "experiments/gpt2_small/output_confidence/confidence_report.md",
+            "experiments/gpt2_small/output_confidence/confidence_results.json",
+            "experiments/gpt2_small/output_confidence/converged_tensors.pt"
+          ],
+          "declared_inputs": [
+            {
+              "name": "confidence_results.json",
+              "found": [
+                "experiments/gpt2_small/output_confidence/confidence_results.json"
+              ]
+            },
+            {
+              "name": "converged_tensors.pt",
+              "found": [
+                "experiments/gpt2_small/output_confidence/converged_tensors.pt"
+              ]
+            }
+          ],
+          "missing_inputs": [],
+          "saved_artefacts": [
+            {
+              "name": "converged_tensors.pt",
+              "found": [
+                "experiments/gpt2_small/output_confidence/converged_tensors.pt"
+              ],
+              "size": 184007
+            }
+          ],
+          "missing_local_modules": [],
+          "graph_artefacts": [
+            {
+              "id": "art-confidence-report",
+              "path": "experiments/gpt2_small/output_confidence/confidence_report.md",
+              "exists": true
+            }
+          ]
+        }
+      ],
+      "verdict": "needs-compute",
+      "reason": "the record states the work has not been done (\"Independent re-implementation still not attempted.\") and names no script for it, so answering it requires a fresh run (prerequisite in the graph: Q: Does an independent re-implementation reproduce the result?)",
+      "rank_tier": 3
+    },
+    {
+      "claim": "q-fractal-dimension",
+      "label": "Q: Is the fractal dimension of convergence trajectories basin-specific?",
+      "type": "question",
+      "status": "open",
+      "asserted": "2026-07-10",
+      "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
+      "description": "JOURNEY_MAP section 7: \"Is the fractal dimension of convergence trajectories basin-specific? | Speculative | Requires T_mix first\". The weakest item on the open list, recorded at that strength: speculative, and gated on a metric nobody has computed yet.",
+      "pending_language": [],
+      "blockers": [
+        {
+          "key": "node-q-tmix-llm",
+          "label": "Q: What is T_mix_LLM for each basin?",
+          "still_holds": null
+        }
+      ],
+      "runs": [],
+      "evidence": [],
+      "verdict": "needs-compute",
+      "reason": "the record states the work has not been done (\"The weakest item on the open list, recorded at that strength: speculative, and gated on a metric nobody has computed yet.\") and names no script for it, so answering it requires a fresh run (prerequisite in the graph: Q: What is T_mix_LLM for each basin?)",
+      "rank_tier": 3
+    },
+    {
+      "claim": "q-gate-cadence",
+      "label": "Q: What are the true settling iterations between 100 and 120?",
+      "type": "question",
+      "status": "open",
+      "asserted": "2026-07-10",
+      "doc_ref": "docs/FINDINGS.md#caveats",
+      "description": "Caveat 5: \"Lock-in iterations cluster at 120 because that is the gate's earliest possible firing; true settling times between 100 and 120 are unresolved.\" FINDINGS section 6 files it as the series' one remaining declared debt - \"One item remains open: finer convergence-gate cadence (caveat 5)\" - and bounds it in the same breath: \"It cannot overturn a principal finding: basin identities stand on the gate regardless of cadence.\" So it carries no blocks edge: open work that gates nothing.",
+      "pending_language": [
+        "remains open"
+      ],
+      "blockers": [],
+      "runs": [],
+      "evidence": [],
+      "verdict": "needs-compute",
+      "reason": "the record states the work has not been done (\"true settling times between 100 and 120 are unresolved.\" FINDINGS section 6 files it as the series' one remaining declared debt - \"One item remains open: finer convergence-gate cadence (caveat 5)\" - and bounds it in the…\") and names no script for it, so answering it requires a fresh run",
+      "rank_tier": 3
+    },
+    {
+      "claim": "q-hook-window-depth",
+      "label": "Q: Does the landscape depend on where the loop is cut (window / depth)?",
+      "type": "question",
+      "status": "open",
+      "asserted": "2026-07-10",
+      "doc_ref": "docs/FINDINGS.md#caveats",
+      "description": "Caveat 6: \"Hook-position dependence unexplored. All runs cut the loop at (final-layer resid_post to layer-0 resid_pre). Alternative windows (including a Pythia-410m depth control, layers 0-11 vs 0-23) are designed but not run.\" JOURNEY_MAP section 7 carries the row at status \"Designed, not run\", and FINDINGS section 5 lists \"hook-window/depth dependence (caveat 6)\" among the open directions.",
+      "pending_language": [
+        "not run"
+      ],
+      "blockers": [],
+      "runs": [],
+      "evidence": [],
+      "verdict": "needs-compute",
+      "reason": "the record states the work has not been done (\"Alternative windows (including a Pythia-410m depth control, layers 0-11 vs 0-23) are designed but not run.\" JOURNEY_MAP section 7 carries the row at status \"Designed, not run\", and FINDINGS section 5 lists…\") and names no script for it, so answering it requires a fresh run",
+      "rank_tier": 3
+    },
+    {
+      "claim": "q-independent-reimplementation",
+      "label": "Q: Does an independent re-implementation reproduce the result?",
+      "type": "question",
+      "status": "open",
+      "asserted": "2026-07-19",
+      "doc_ref": "docs/FINDINGS.md#caveats",
+      "description": "H0's disposition ends on the gap: \"Independent re-implementation still not attempted.\" Caveat 1 makes the same point its heading - \"Repeatability plus one cross-hardware replication, not independent reproducibility\" - and closes \"No independent re-implementation by another investigator.\" What exists is same-code replication on new hardware (F6), which is a different claim.",
+      "pending_language": [
+        "still not"
+      ],
+      "blockers": [],
+      "runs": [],
+      "evidence": [],
+      "verdict": "needs-compute",
+      "reason": "the record states the work has not been done (\"H0's disposition ends on the gap: \"Independent re-implementation still not attempted.\" Caveat 1 makes the same point its heading - \"Repeatability plus one cross-hardware replication, not independent reproducibility\" -…\") and names no script for it, so answering it requires a fresh run",
+      "rank_tier": 3
+    },
+    {
+      "claim": "q-slonski-macro-group",
+      "label": "Q: Are all basins in one Slonski macro-group?",
+      "type": "question",
+      "status": "open",
+      "asserted": "2026-07-10",
+      "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
+      "description": "JOURNEY_MAP section 7: \"Are all basins in one Slonski macro-group? | Untested; the all-warm premise of the prediction was retired 2026-07-11 (anisotropy artifact) | One Q-vector experiment, on its own terms\". Kept at exactly the strength the record gives it: the question outlived its own premise and stands only as a question, with a named one-experiment next step.",
+      "pending_language": [
+        "untested"
+      ],
+      "blockers": [],
+      "runs": [],
+      "evidence": [],
+      "verdict": "needs-compute",
+      "reason": "the record states the work has not been done (\"JOURNEY_MAP section 7: \"Are all basins in one Slonski macro-group? | Untested;\") and names no script for it, so answering it requires a fresh run",
+      "rank_tier": 3
+    },
+    {
+      "claim": "q-why-gpt2-small",
+      "label": "Q: Why does GPT-2 Small alone resolve language into few semantic basins?",
+      "type": "question",
+      "status": "open",
+      "asserted": "2026-07-10",
+      "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
+      "description": "JOURNEY_MAP section 7 files this one at a status of its own: \"The open question of the series\", next step \"New experimental stage\". FINDINGS section 5 puts it first in the open directions, ordered by leverage: \"why GPT-2 Small (the anomaly, now with low-probability coherent clusters as the thing to explain)\", and adds that the anomaly was sharpened rather than removed by Act II.5.",
+      "pending_language": [],
+      "blockers": [
+        {
+          "key": "node-q-hook-window-depth",
+          "label": "Q: Does the landscape depend on where the loop is cut (window / depth)?",
+          "still_holds": null
+        }
+      ],
+      "runs": [],
+      "evidence": [],
+      "verdict": "needs-compute",
+      "reason": "the record states the work has not been done (\"JOURNEY_MAP section 7 files this one at a status of its own: \"The open question of the series\", next step \"New experimental stage\".\") and names no script for it, so answering it requires a fresh run (prerequisite in the graph: Q: Does the landscape depend on where the loop is cut (window / depth)?)",
+      "rank_tier": 3
+    },
+    {
+      "claim": "f10-cycle-anatomy-flip-axis",
+      "label": "F10: Anatomy of the period-2 cycle: one nearly readout-invisible flip axis between a game-vocabulary pole and the glitch-token pole",
+      "type": "finding",
+      "status": "corrected",
+      "asserted": "2026-07-19",
+      "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole",
+      "description": "Writing the phases as A = M + d and B = M - d, the flip axis d is a single global rank-1 direction (per-position axes agree at mean pairwise cosine 1.0000) that is about 95% invisible to the readout (logit response ratio 0.054, 73% of its energy in W_U's bottom-100 directions). Its poles run between a game/elemental vocabulary and the published GPT-2 anomalous-token cluster, identified by inspection against published lists, not by a systematic test. One trajectory: whether all 34 Divine prompts share this flip axis is open, blocked on the prompt library (issue #9, caveat 11).",
+      "pending_language": [
+        "blocked on",
+        "is open",
+        "issue #9"
+      ],
+      "blockers": [
+        {
+          "key": "issue-9",
+          "label": "prompt library (issue #9)",
+          "still_holds": true
+        }
+      ],
+      "runs": [
+        "run-9-cycle-anatomy"
+      ],
+      "evidence": [
+        {
+          "run": "run-9-cycle-anatomy",
+          "run_label": "Run 9: Cycle anatomy",
+          "graph_says": "1 Divine trajectory, iteration-1000 states",
+          "date": "2026-07-19",
+          "script": "experiments/gpt2_small/06_bell_anatomy.py",
+          "script_exists": true,
+          "script_state": {
+            "kind": "script",
+            "readable": true,
+            "cells_total": null,
+            "code_cells": null,
+            "cells_with_outputs": null,
+            "executed": null,
+            "verdict_quotes": [],
+            "banner": null,
+            "saves": [
+              "bell_anatomy.json"
+            ],
+            "loads": [
+              "\\nsaved bell_anatomy.json",
+              "bell_anatomy.json",
+              "state_divine.pt"
+            ]
+          },
+          "output_dir": "experiments/gpt2_small/output_divine_motion/",
+          "output_dir_exists": true,
+          "output_dir_files": [
+            "experiments/gpt2_small/output_divine_motion/bell_anatomy.json",
+            "experiments/gpt2_small/output_divine_motion/bell_anatomy.md",
+            "experiments/gpt2_small/output_divine_motion/divine_motion_report.md",
+            "experiments/gpt2_small/output_divine_motion/divine_motion_results.json",
+            "experiments/gpt2_small/output_divine_motion/divine_motion_tables.md",
+            "experiments/gpt2_small/output_divine_motion/probe_lag1_results.json",
+            "experiments/gpt2_small/output_divine_motion/snapshots_divine.pt",
+            "experiments/gpt2_small/output_divine_motion/snapshots_noise.pt",
+            "experiments/gpt2_small/output_divine_motion/snapshots_prolet.pt",
+            "experiments/gpt2_small/output_divine_motion/state_divine.pt",
+            "experiments/gpt2_small/output_divine_motion/state_noise.pt",
+            "experiments/gpt2_small/output_divine_motion/state_prolet.pt"
+          ],
+          "declared_inputs": [
+            {
+              "name": "\\nsaved bell_anatomy.json",
+              "found": []
+            },
+            {
+              "name": "bell_anatomy.json",
+              "found": [
+                "experiments/gpt2_small/output_divine_motion/bell_anatomy.json"
+              ]
+            },
+            {
+              "name": "state_divine.pt",
+              "found": [
+                "experiments/gpt2_small/output_divine_motion/state_divine.pt"
+              ]
+            }
+          ],
+          "missing_inputs": [
+            "\\nsaved bell_anatomy.json"
+          ],
+          "saved_artefacts": [
+            {
+              "name": "bell_anatomy.json",
+              "found": [
+                "experiments/gpt2_small/output_divine_motion/bell_anatomy.json"
+              ],
+              "size": 1868
+            }
+          ],
+          "missing_local_modules": [],
+          "graph_artefacts": [
+            {
+              "id": "art-bell-anatomy",
+              "path": "experiments/gpt2_small/output_divine_motion/bell_anatomy.md",
+              "exists": true
+            }
+          ]
+        }
+      ],
+      "verdict": "still-blocked",
+      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
+      "rank_tier": 4
+    },
+    {
+      "claim": "f15-lag2-gate",
+      "label": "F15: A lag-2 convergence gate recognises the period-2 cycle; the engine now supports it",
+      "type": "finding",
+      "status": "supported",
+      "asserted": "2026-07-19",
+      "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
+      "description": "atr_engine.run_atr_gated gained a gate_lag parameter and a lag_scan helper, and a dense 24-iteration continuation separates three signatures cleanly: the prolet fixed point passes at every lag, the Divine state fails every odd lag (0.6849) and passes every even one, and the noise control decays monotonically. The audited Divine trajectory is converged under gate_lag = 2 and unconvergeable under gate_lag = 1. Two honest limits: a fixed lag-2 gate inherits the same aliasing one octave up (a period-4 cycle would be invisible again), so the recommended re-gate runs the full lag table and gates at the smallest passing lag; and the lag-k gate does not fix threshold-blindness to slow drift. The other 33 period-2 prompts remain blocked on the prompt library (issue #9).",
+      "pending_language": [
+        "blocked on",
+        "issue #9"
+      ],
+      "blockers": [
+        {
+          "key": "issue-9",
+          "label": "prompt library (issue #9)",
+          "still_holds": true
+        }
+      ],
+      "runs": [
+        "run-13-lagk-regate"
+      ],
+      "evidence": [
+        {
+          "run": "run-13-lagk-regate",
+          "run_label": "Run 13: Lag-k re-gate + engine gate_lag",
+          "graph_says": "3 states × 25 dense iters",
+          "date": "2026-07-19",
+          "script": "experiments/gpt2_small/09_lagk_gate.py",
+          "script_exists": true,
+          "script_state": {
+            "kind": "script",
+            "readable": true,
+            "cells_total": null,
+            "code_cells": null,
+            "cells_with_outputs": null,
+            "executed": null,
+            "verdict_quotes": [],
+            "banner": null,
+            "saves": [],
+            "loads": [
+              "bell_anatomy.json",
+              "lagk_results.json",
+              "state_{key}.pt"
+            ]
+          },
+          "output_dir": "experiments/gpt2_small/output_lagk/",
+          "output_dir_exists": true,
+          "output_dir_files": [
+            "experiments/gpt2_small/output_lagk/lagk_report.md",
+            "experiments/gpt2_small/output_lagk/lagk_results.json"
+          ],
+          "declared_inputs": [
+            {
+              "name": "bell_anatomy.json",
+              "found": [
+                "experiments/gpt2_small/output_divine_motion/bell_anatomy.json"
+              ]
+            },
+            {
+              "name": "lagk_results.json",
+              "found": [
+                "experiments/gpt2_small/output_lagk/lagk_results.json"
+              ]
+            },
+            {
+              "name": "state_{key}.pt",
+              "found": []
+            }
+          ],
+          "missing_inputs": [
+            "state_{key}.pt"
+          ],
+          "saved_artefacts": [],
+          "missing_local_modules": [],
+          "graph_artefacts": [
+            {
+              "id": "art-atr-engine",
+              "path": "atr_engine.py",
+              "exists": true
+            },
+            {
+              "id": "art-lagk-report",
+              "path": "experiments/gpt2_small/output_lagk/lagk_report.md",
+              "exists": true
+            }
+          ]
+        }
+      ],
+      "verdict": "still-blocked",
+      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
+      "rank_tier": 4
+    },
+    {
+      "claim": "h-j1",
+      "label": "H-J1: prolet sits inside the verbalizable (J-lens) subspace, Divine outside",
+      "type": "hypothesis",
+      "status": "not-supported",
+      "asserted": "2026-07-19",
+      "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions",
+      "description": "prolet sits inside the verbalizable (J-lens) subspace, Divine outside. Disposition: Not supported at pilot confidence (2026-07-19); now phase-qualified (F16): the point estimate runs slightly the other way at pilot confidence (Divine at least as lens-expressible as prolet), and the boundary that appears is language-vs-noise (F11). The phase-aware re-probe (F16) splits it: the reversal holds for phase A, strengthens at the pivot M (most lens-expressible), and reverses for phase B (below prolet at every layer); the physical flip axis is almost entirely outside the lens (span 0.013 vs 0.252 chance at L11). Full build still pending (issue #8).",
+      "pending_language": [
+        "issue #8",
+        "pending"
+      ],
+      "blockers": [
+        {
+          "key": "issue-8",
+          "label": "issue #8",
+          "still_holds": null
+        }
+      ],
+      "runs": [
+        "run-10-jlens-pilot",
+        "run-14-jlens-phase-probe"
+      ],
+      "evidence": [
+        {
+          "run": "run-10-jlens-pilot",
+          "run_label": "Run 10: J-lens pilot (restricted)",
+          "graph_says": "193-token lens × 30 prompts; 8 states probed",
+          "date": "2026-07-19",
+          "script": "experiments/gpt2_small/05_jlens_pilot.py",
+          "script_exists": true,
+          "script_state": {
+            "kind": "script",
+            "readable": true,
+            "cells_total": null,
+            "code_cells": null,
+            "cells_with_outputs": null,
+            "executed": null,
+            "verdict_quotes": [],
+            "banner": null,
+            "saves": [
+              "jlens_vectors.pt"
+            ],
+            "loads": [
+              "converged_tensors.pt",
+              "jlens_pilot_results.json"
+            ]
+          },
+          "output_dir": "experiments/gpt2_small/output_jlens_pilot/",
+          "output_dir_exists": true,
+          "output_dir_files": [
+            "experiments/gpt2_small/output_jlens_pilot/jlens_pilot_report.md",
+            "experiments/gpt2_small/output_jlens_pilot/jlens_pilot_results.json",
+            "experiments/gpt2_small/output_jlens_pilot/jlens_vectors.pt"
+          ],
+          "declared_inputs": [
+            {
+              "name": "converged_tensors.pt",
+              "found": [
+                "experiments/gpt2_small/output_confidence/converged_tensors.pt"
+              ]
+            },
+            {
+              "name": "jlens_pilot_results.json",
+              "found": [
+                "experiments/gpt2_small/output_jlens_pilot/jlens_pilot_results.json"
+              ]
+            }
+          ],
+          "missing_inputs": [],
+          "saved_artefacts": [
+            {
+              "name": "jlens_vectors.pt",
+              "found": [
+                "experiments/gpt2_small/output_jlens_pilot/jlens_vectors.pt"
+              ],
+              "size": 7122387
+            }
+          ],
+          "missing_local_modules": [],
+          "graph_artefacts": [
+            {
+              "id": "art-jlens-pilot-report",
+              "path": "experiments/gpt2_small/output_jlens_pilot/jlens_pilot_report.md",
+              "exists": true
+            }
+          ]
+        },
+        {
+          "run": "run-14-jlens-phase-probe",
+          "run_label": "Run 14: J-lens phase probe (both phases, pivot, flip axis)",
+          "graph_says": "pilot lens × cycle states",
+          "date": "2026-07-19",
+          "script": "experiments/gpt2_small/10_jlens_phase.py",
+          "script_exists": true,
+          "script_state": {
+            "kind": "script",
+            "readable": true,
+            "cells_total": null,
+            "code_cells": null,
+            "cells_with_outputs": null,
+            "executed": null,
+            "verdict_quotes": [],
+            "banner": null,
+            "saves": [
+              "phase_states.pt"
+            ],
+            "loads": [
+              "bell_anatomy.json",
+              "converged_tensors.pt",
+              "hinge_eigenvalue.json",
+              "jlens_phase.json",
+              "jlens_pilot_results.json",
+              "jlens_vectors.pt",
+              "state_divine.pt",
+              "state_noise.pt"
+            ]
+          },
+          "output_dir": "experiments/gpt2_small/output_jlens_phase/",
+          "output_dir_exists": true,
+          "output_dir_files": [
+            "experiments/gpt2_small/output_jlens_phase/jlens_phase.json",
+            "experiments/gpt2_small/output_jlens_phase/jlens_phase.md",
+            "experiments/gpt2_small/output_jlens_phase/phase_states.pt"
+          ],
+          "declared_inputs": [
+            {
+              "name": "bell_anatomy.json",
+              "found": [
+                "experiments/gpt2_small/output_divine_motion/bell_anatomy.json"
+              ]
+            },
+            {
+              "name": "converged_tensors.pt",
+              "found": [
+                "experiments/gpt2_small/output_confidence/converged_tensors.pt"
+              ]
+            },
+            {
+              "name": "hinge_eigenvalue.json",
+              "found": [
+                "experiments/gpt2_small/output_hinge_eigen/hinge_eigenvalue.json"
+              ]
+            },
+            {
+              "name": "jlens_phase.json",
+              "found": [
+                "experiments/gpt2_small/output_jlens_phase/jlens_phase.json"
+              ]
+            },
+            {
+              "name": "jlens_pilot_results.json",
+              "found": [
+                "experiments/gpt2_small/output_jlens_pilot/jlens_pilot_results.json"
+              ]
+            },
+            {
+              "name": "jlens_vectors.pt",
+              "found": [
+                "experiments/gpt2_small/output_jlens_pilot/jlens_vectors.pt"
+              ]
+            },
+            {
+              "name": "state_divine.pt",
+              "found": [
+                "experiments/gpt2_small/output_divine_motion/state_divine.pt"
+              ]
+            },
+            {
+              "name": "state_noise.pt",
+              "found": [
+                "experiments/gpt2_small/output_divine_motion/state_noise.pt"
+              ]
+            }
+          ],
+          "missing_inputs": [],
+          "saved_artefacts": [
+            {
+              "name": "phase_states.pt",
+              "found": [
+                "experiments/gpt2_small/output_jlens_phase/phase_states.pt"
+              ],
+              "size": 45339
+            }
+          ],
+          "missing_local_modules": [],
+          "graph_artefacts": [
+            {
+              "id": "art-jlens-phase",
+              "path": "experiments/gpt2_small/output_jlens_phase/jlens_phase.md",
+              "exists": true
+            }
+          ]
+        }
+      ],
+      "verdict": "still-blocked",
+      "reason": "the record calls this blocked on issue #8; an issue number names no file, so the working tree cannot say whether it has been resolved and this report does not guess",
+      "rank_tier": 4
+    },
+    {
+      "claim": "q-flip-axis-generality",
+      "label": "Q: Do all 34 Divine prompts share the F10 flip axis, head and eigenvalue?",
+      "type": "question",
+      "status": "open",
+      "asserted": "2026-07-19",
+      "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole",
+      "description": "F10 states it in as many words: \"Open: whether all 34 Divine prompts share this flip axis (blocked on the prompt-library restoration, issue #9).\" Caveat 14 widens it to the whole mechanism series: \"Whether the other 33 period-2 prompts share the flip axis, the flip head (L11.H8), the eigenvalue, and the anomalous-token alignment is untested (prompt library pending, issue #9).\" FINDINGS section 5 calls this \"what is now most open on the Divine object\".",
+      "pending_language": [
+        "blocked on",
+        "issue #9",
+        "pending",
+        "untested"
+      ],
+      "blockers": [
+        {
+          "key": "issue-9",
+          "label": "prompt library (issue #9)",
+          "still_holds": true
+        }
+      ],
+      "runs": [],
+      "evidence": [],
+      "verdict": "still-blocked",
+      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
+      "rank_tier": 4
+    },
+    {
+      "claim": "q-jlens-full-build",
+      "label": "Q: What does the phase-aware full J-lens build show (issue #8)?",
+      "type": "question",
+      "status": "open",
+      "asserted": "2026-07-19",
+      "doc_ref": "docs/FINDINGS.md#f11-j-lens-pilot-the-prolet-insidedivine-outside-prediction-did-not-hold-the-boundary-that-appeared-is-language-vs-noise",
+      "description": "F11 specifies the outstanding work: \"The full build (issue #8) should be phase-aware: probe both phases and the pivot M.\" H-J1's disposition closes on the same debt - \"Full build still pending (issue #8)\" - and FINDINGS section 5 lists \"the phase-aware J-lens full build (F11, issue #8)\" among the open directions. The pilot's own limits (caveat 13) are what the full build exists to lift.",
+      "pending_language": [
+        "issue #8",
+        "pending"
+      ],
+      "blockers": [
+        {
+          "key": "issue-8",
+          "label": "issue #8",
+          "still_holds": null
+        }
+      ],
+      "runs": [],
+      "evidence": [],
+      "verdict": "still-blocked",
+      "reason": "the record calls this blocked on issue #8; an issue number names no file, so the working tree cannot say whether it has been resolved and this report does not guess",
+      "rank_tier": 4
+    },
+    {
+      "claim": "q-lag2-regate-33",
+      "label": "Q: Do the other 33 period-2 prompts re-gate as converged?",
+      "type": "question",
+      "status": "open",
+      "asserted": "2026-07-19",
+      "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
+      "description": "F15 demonstrates the lag-k gate for one trajectory and records the rest as outstanding: \"The other 33 period-2 prompts remain blocked on the prompt library (issue #9); one, the Syntactic prompt, is now re-gated as converged.\" The procedure is on record too - the re-gate \"runs the full lag table on a short dense continuation and gates each state at its smallest passing lag\" - so this is blocked on an artefact, not on a method. JOURNEY_MAP section 7 gives the same next step: \"Re-gate the other 33 prompts (blocked on issue #9)\".",
+      "pending_language": [
+        "blocked on",
+        "issue #9"
+      ],
+      "blockers": [
+        {
+          "key": "issue-9",
+          "label": "prompt library (issue #9)",
+          "still_holds": true
+        },
+        {
+          "key": "phrase-artefact",
+          "label": "an artefact",
+          "still_holds": null
+        }
+      ],
+      "runs": [],
+      "evidence": [],
+      "verdict": "still-blocked",
+      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
+      "rank_tier": 4
+    },
+    {
+      "claim": "q-prompt-library",
+      "label": "Q: Is the 125-prompt library restored (issue #9)?",
+      "type": "question",
+      "status": "open",
+      "asserted": "2026-07-19",
+      "doc_ref": "docs/FINDINGS.md#caveats",
+      "description": "Caveats 11 and 14 both file the same gate in the same three words, \"prompt library pending, issue #9\", and FINDINGS section 5 names it as the blocker on two separate directions at once: the re-gate of the 34 cycling prompts and the flip-axis generality question are \"blocked in part on the prompt-library restoration, issue #9\". This node is a restoration task rather than a question about the model; it is in the graph so that the two threads it gates point at one blocker instead of repeating one sentence in two descriptions, where nothing can pair them.",
+      "pending_language": [
+        "issue #9",
+        "pending"
+      ],
+      "blockers": [
+        {
+          "key": "issue-9",
+          "label": "prompt library (issue #9)",
+          "still_holds": true
+        }
+      ],
+      "runs": [],
+      "evidence": [],
+      "verdict": "still-blocked",
+      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
+      "rank_tier": 4
+    },
+    {
+      "claim": "concept-coherence",
+      "label": "Coherence (top-k embedding clustering)",
+      "type": "concept",
+      "status": "supported",
+      "asserted": "2026-07-19",
+      "doc_ref": "docs/FINDINGS.md#f8-the-prolet-basin-is-a-coherent-cluster-of-related-tokens-not-a-single-token-permutation-tested",
+      "description": "First use in F8: the mean pairwise cosine similarity in W_E among the top-k tokens of a converged state's readout distribution, with a probability-weighted variant. High coherence means the head of the distribution is one cluster.",
+      "pending_language": [],
+      "blockers": [
+        {
+          "key": "node-q-shape-class-null",
+          "label": "Q: What does a shape-class-matched coherence null show?",
+          "still_holds": null
+        }
+      ],
+      "runs": [],
+      "evidence": [],
+      "verdict": "cannot-determine",
+      "reason": "nothing in the graph or the tree ties this thread to a script, run or artefact",
+      "rank_tier": 5
+    },
+    {
+      "claim": "concept-jspace-workspace",
+      "label": "J-space / the Jacobian lens",
+      "type": "concept",
+      "status": "open",
+      "asserted": "2026-07-19",
+      "doc_ref": "docs/FINDINGS.md#f11-j-lens-pilot-the-prolet-insidedivine-outside-prediction-did-not-hold-the-boundary-that-appeared-is-language-vs-noise",
+      "description": "Anthropic's J-space proposal: a model's verbalizable states occupy a distinguished subspace, probed by a lens built from averaged Jacobians of the forward map. This repo's reading companion is docs/JSPACE_PRIMER.md.",
+      "pending_language": [],
+      "blockers": [],
+      "runs": [],
+      "evidence": [],
+      "verdict": "cannot-determine",
+      "reason": "nothing in the graph or the tree ties this thread to a script, run or artefact",
+      "rank_tier": 5
+    },
+    {
+      "claim": "f2-divine-readout-stable",
+      "label": "F2: The Divine basin is readout-stable over a never-settling tensor",
+      "type": "finding",
+      "status": "corrected",
+      "asserted": "2026-07-10",
+      "doc_ref": "docs/FINDINGS.md#f2-the-divine-basin-is-readout-stable-over-a-never-settling-tensor",
+      "description": "The 34 prompts that never pass the lag-1 convergence gate are exactly the 34 Divine prompts: a stable top-1 readout over a tensor that keeps moving, the series' clearest dissociation of dynamics from decoding. Resolved 2026-07-19 as an exact period-2 limit cycle, so \"never converge\" over-claims and should read \"cycle, pending re-gate\".",
+      "pending_language": [
+        "pending"
+      ],
+      "blockers": [
+        {
+          "key": "phrase-re-gate",
+          "label": "re-gate",
+          "still_holds": null
+        }
+      ],
+      "runs": [
+        "run-1-attractor-dominance",
+        "run-5-gated-resweep"
+      ],
+      "evidence": [
+        {
+          "run": "run-1-attractor-dominance",
+          "run_label": "Run 1: Attractor dominance sweep",
+          "graph_says": "125 prompts, ≤100 iters",
+          "date": "2026-03-01",
+          "script": "experiments/gpt2_small/01_attractor_dominance.ipynb",
+          "script_exists": true,
+          "script_state": {
+            "kind": "notebook",
+            "readable": true,
+            "cells_total": 19,
+            "code_cells": 12,
+            "cells_with_outputs": 12,
+            "executed": true,
+            "verdict_quotes": [],
+            "banner": "# EXP_009d1: Attractor Dominance, Basin Mapping & Pathway Analysis ## Depends On **Stage 0 (Reproducibility Gate) must PASS before running this notebook.** ## Hypotheses Under Test ### H1: Attractor Dominance The `prolet` attractor is the dominant basin of GPT-2 Small's weight geometry. It should capture the majority of a diverse prompt set, regardless of input register, topic, or complexity. ### ",
+            "saves": [
+              "basin_distribution.png",
+              "convergence_matrix.png",
+              "stage1_config.pt",
+              "stage1_results.pt",
+              "topology_3d.png"
+            ],
+            "loads": [
+              "config.md",
+              "dissolution_pathways.md",
+              "dissolution_sentences.md",
+              "hypothesis_assessment.md"
+            ]
+          },
+          "output_dir": "experiments/gpt2_small/output/",
+          "output_dir_exists": true,
+          "output_dir_files": [
+            "experiments/gpt2_small/output/basin_distribution.png",
+            "experiments/gpt2_small/output/config.md",
+            "experiments/gpt2_small/output/convergence_matrix.png",
+            "experiments/gpt2_small/output/dissolution_pathways.md",
+            "experiments/gpt2_small/output/dissolution_sentences.md",
+            "experiments/gpt2_small/output/hypothesis_assessment.md",
+            "experiments/gpt2_small/output/topology_3d.png"
+          ],
+          "declared_inputs": [
+            {
+              "name": "config.md",
+              "found": [
+                "experiments/gpt2_medium/output/config.md",
+                "experiments/gpt2_small/output/config.md",
+                "experiments/pythia_160m/output/config.md"
+              ]
+            },
+            {
+              "name": "dissolution_pathways.md",
+              "found": [
+                "experiments/gpt2_medium/output/dissolution_pathways.md",
+                "experiments/gpt2_small/output/dissolution_pathways.md",
+                "experiments/pythia_160m/output/dissolution_pathways.md"
+              ]
+            },
+            {
+              "name": "dissolution_sentences.md",
+              "found": [
+                "experiments/gpt2_medium/output/dissolution_sentences.md",
+                "experiments/gpt2_small/output/dissolution_sentences.md",
+                "experiments/pythia_160m/output/dissolution_sentences.md"
+              ]
+            },
+            {
+              "name": "hypothesis_assessment.md",
+              "found": [
+                "experiments/gpt2_medium/output/hypothesis_assessment.md",
+                "experiments/gpt2_small/output/hypothesis_assessment.md",
+                "experiments/pythia_160m/output/hypothesis_assessment.md"
+              ]
+            }
+          ],
+          "missing_inputs": [],
+          "saved_artefacts": [
+            {
+              "name": "basin_distribution.png",
+              "found": [
+                "experiments/gpt2_medium/output/basin_distribution.png",
+                "experiments/gpt2_small/output/basin_distribution.png",
+                "experiments/pythia_160m/output/basin_distribution.png"
+              ],
+              "size": 90691
+            },
+            {
+              "name": "convergence_matrix.png",
+              "found": [
+                "experiments/gpt2_medium/output/convergence_matrix.png",
+                "experiments/gpt2_small/output/convergence_matrix.png",
+                "experiments/pythia_160m/output/convergence_matrix.png"
+              ],
+              "size": 514127
+            },
+            {
+              "name": "stage1_config.pt",
+              "found": [],
+              "size": null
+            },
+            {
+              "name": "stage1_results.pt",
+              "found": [],
+              "size": null
+            },
+            {
+              "name": "topology_3d.png",
+              "found": [
+                "experiments/gpt2_medium/output/topology_3d.png",
+                "experiments/gpt2_small/output/topology_3d.png",
+                "experiments/pythia_160m/output/topology_3d.png"
+              ],
+              "size": 1022346
+            }
+          ],
+          "missing_local_modules": [
+            "prompt_library.py"
+          ],
+          "graph_artefacts": [
+            {
+              "id": "art-basin-distribution-small",
+              "path": "experiments/gpt2_small/output/basin_distribution.png",
+              "exists": true
+            },
+            {
+              "id": "art-convergence-matrix-small",
+              "path": "experiments/gpt2_small/output/convergence_matrix.png",
+              "exists": true
+            },
+            {
+              "id": "art-dissolution-pathways-small",
+              "path": "experiments/gpt2_small/output/dissolution_pathways.md",
+              "exists": true
+            },
+            {
+              "id": "art-stage1-hypothesis-assessment",
+              "path": "experiments/gpt2_small/output/hypothesis_assessment.md",
+              "exists": true
+            },
+            {
+              "id": "art-topology-3d-small",
+              "path": "experiments/gpt2_small/output/topology_3d.png",
+              "exists": true
+            }
+          ]
+        },
+        {
+          "run": "run-5-gated-resweep",
+          "run_label": "Run 5: Convergence-gated re-sweep",
+          "graph_says": "125 prompts, gate cos>0.999×3, ≤1000 iters",
+          "date": "2026-07-10",
+          "script": "experiments/gpt2_small/gated_resweep.py",
+          "script_exists": true,
+          "script_state": {
+            "kind": "script",
+            "readable": true,
+            "cells_total": null,
+            "code_cells": null,
+            "cells_with_outputs": null,
+            "executed": null,
+            "verdict_quotes": [],
+            "banner": null,
+            "saves": [],
+            "loads": []
+          },
+          "output_dir": "experiments/gpt2_small/output_gated/",
+          "output_dir_exists": true,
+          "output_dir_files": [
+            "experiments/gpt2_small/output_gated/gated_report.md"
+          ],
+          "declared_inputs": [],
+          "missing_inputs": [],
+          "saved_artefacts": [],
+          "missing_local_modules": [
+            "prompt_library.py"
+          ],
+          "graph_artefacts": [
+            {
+              "id": "art-gated-report",
+              "path": "experiments/gpt2_small/output_gated/gated_report.md",
+              "exists": true
+            }
+          ]
+        }
+      ],
+      "verdict": "cannot-determine",
+      "reason": "the pending language here (pending) is tied to no script, run or artefact this tool can find, so no disk verdict is available",
+      "rank_tier": 5
+    }
+  ],
+  "low_hanging_fruit": [
+    {
+      "rank_tier": 0,
+      "tier_name": "answered-on-disk",
+      "claim": "h4-head-power-iteration",
+      "label": "H4: Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector)",
+      "status": "untested",
+      "reason": "the run the graph designates as this claim's test has already executed and the graph still records no verdict: experiments/gpt2_small/spectral_resonance.ipynb carries executed outputs in 8 of its 14 cells; experiments/gpt2_small/spectral_resonance.ipynb has written experiments/_DATA/EXP_009/009c_spectral_data.pt, experiments/_DATA/EXP_009/009c_validation_grid.pt",
+      "quoted_result": {
+        "script": "experiments/gpt2_small/spectral_resonance.ipynb",
+        "cell": 9,
+        "lines": [
+          "==================================================",
+          "VALIDATION SUMMARY",
+          "==================================================",
+          "Mean |cos sim|:   0.2387",
+          "Median |cos sim|: 0.1614",
+          "Heads > 0.9:      5 / 144",
+          "Heads > 0.95:     2 / 144",
+          "NOT SUPPORTED: loop dynamics are dominated by nonlinear effects for most heads.",
+          "  Per-head resonant state cannot be reduced to the static OV eigensystem alone."
+        ]
+      },
+      "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions",
+      "cheap": true,
+      "scripts": [
+        "experiments/gpt2_small/spectral_resonance.ipynb"
+      ],
+      "rank": 1
+    },
+    {
+      "rank_tier": 2,
+      "tier_name": "answerable-from-disk",
+      "claim": "q-tmix-llm",
+      "label": "Q: What is T_mix_LLM for each basin?",
+      "status": "open",
+      "reason": "the record itself says the inputs are already committed (\"JOURNEY_MAP section 7: \"What is T_mix_LLM for each basin? | Measurable from existing data | Compute from .pt\".\"), and 13 .pt artefact(s) exist under experiments/; no script is named for the computation, so this rests on the record's word plus the presence of the data",
+      "quoted_result": null,
+      "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
+      "cheap": true,
+      "scripts": [],
+      "rank": 2
+    },
+    {
+      "rank_tier": 3,
+      "tier_name": "needs-compute",
+      "claim": "concept-fractal-dimension",
+      "label": "Fractal dimensional analysis",
+      "status": "untested",
+      "reason": "the record states the work has not been done (\"Relevance to ATR: Potential metric for basin characterisation (untested).\") and names no script for it, so answering it requires a fresh run",
+      "quoted_result": null,
+      "doc_ref": "docs/JOURNEY_MAP.md#4-adjacent-science--mathematics",
+      "cheap": false,
+      "scripts": [],
+      "rank": 3
+    },
+    {
+      "rank_tier": 3,
+      "tier_name": "needs-compute",
+      "claim": "f1-five-attractor-basins",
+      "label": "F1: GPT-2 Small resolves language-driven activity into five attractor basins, stable under convergence gating",
+      "status": "qualified",
+      "reason": "the record states the work has not been done (\"…gate, all at iteration 120, which is the gate's earliest possible firing point rather than a measured settling time: the true iteration lies somewhere between 100 and 120 and finer cadence was never run (caveat 5).\") and names no script for it, so answering it requires a fresh run",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#run-5",
+      "cheap": false,
+      "scripts": [
+        "experiments/gpt2_small/01_attractor_dominance.ipynb",
+        "experiments/gpt2_small/gated_resweep.py"
+      ],
+      "rank": 4
+    },
+    {
+      "rank_tier": 3,
+      "tier_name": "needs-compute",
+      "claim": "h0-determinism",
+      "label": "H0: Results are deterministic",
+      "status": "supported",
+      "reason": "the record states the work has not been done (\"Independent re-implementation still not attempted.\") and names no script for it, so answering it requires a fresh run (prerequisite in the graph: Q: Does an independent re-implementation reproduce the result?)",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions",
+      "cheap": false,
+      "scripts": [
+        "experiments/gpt2_small/00_reproducibility_gate.ipynb",
+        "experiments/gpt2_small/04_readout_confidence.py"
+      ],
+      "rank": 5
+    },
+    {
+      "rank_tier": 3,
+      "tier_name": "needs-compute",
+      "claim": "q-fractal-dimension",
+      "label": "Q: Is the fractal dimension of convergence trajectories basin-specific?",
+      "status": "open",
+      "reason": "the record states the work has not been done (\"The weakest item on the open list, recorded at that strength: speculative, and gated on a metric nobody has computed yet.\") and names no script for it, so answering it requires a fresh run (prerequisite in the graph: Q: What is T_mix_LLM for each basin?)",
+      "quoted_result": null,
+      "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
+      "cheap": false,
+      "scripts": [],
+      "rank": 6
+    },
+    {
+      "rank_tier": 3,
+      "tier_name": "needs-compute",
+      "claim": "q-gate-cadence",
+      "label": "Q: What are the true settling iterations between 100 and 120?",
+      "status": "open",
+      "reason": "the record states the work has not been done (\"true settling times between 100 and 120 are unresolved.\" FINDINGS section 6 files it as the series' one remaining declared debt - \"One item remains open: finer convergence-gate cadence (caveat 5)\" - and bounds it in the…\") and names no script for it, so answering it requires a fresh run",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#caveats",
+      "cheap": false,
+      "scripts": [],
+      "rank": 7
+    },
+    {
+      "rank_tier": 3,
+      "tier_name": "needs-compute",
+      "claim": "q-hook-window-depth",
+      "label": "Q: Does the landscape depend on where the loop is cut (window / depth)?",
+      "status": "open",
+      "reason": "the record states the work has not been done (\"Alternative windows (including a Pythia-410m depth control, layers 0-11 vs 0-23) are designed but not run.\" JOURNEY_MAP section 7 carries the row at status \"Designed, not run\", and FINDINGS section 5 lists…\") and names no script for it, so answering it requires a fresh run",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#caveats",
+      "cheap": false,
+      "scripts": [],
+      "rank": 8
+    },
+    {
+      "rank_tier": 3,
+      "tier_name": "needs-compute",
+      "claim": "q-independent-reimplementation",
+      "label": "Q: Does an independent re-implementation reproduce the result?",
+      "status": "open",
+      "reason": "the record states the work has not been done (\"H0's disposition ends on the gap: \"Independent re-implementation still not attempted.\" Caveat 1 makes the same point its heading - \"Repeatability plus one cross-hardware replication, not independent reproducibility\" -…\") and names no script for it, so answering it requires a fresh run",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#caveats",
+      "cheap": false,
+      "scripts": [],
+      "rank": 9
+    },
+    {
+      "rank_tier": 3,
+      "tier_name": "needs-compute",
+      "claim": "q-slonski-macro-group",
+      "label": "Q: Are all basins in one Slonski macro-group?",
+      "status": "open",
+      "reason": "the record states the work has not been done (\"JOURNEY_MAP section 7: \"Are all basins in one Slonski macro-group? | Untested;\") and names no script for it, so answering it requires a fresh run",
+      "quoted_result": null,
+      "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
+      "cheap": false,
+      "scripts": [],
+      "rank": 10
+    },
+    {
+      "rank_tier": 3,
+      "tier_name": "needs-compute",
+      "claim": "q-why-gpt2-small",
+      "label": "Q: Why does GPT-2 Small alone resolve language into few semantic basins?",
+      "status": "open",
+      "reason": "the record states the work has not been done (\"JOURNEY_MAP section 7 files this one at a status of its own: \"The open question of the series\", next step \"New experimental stage\".\") and names no script for it, so answering it requires a fresh run (prerequisite in the graph: Q: Does the landscape depend on where the loop is cut (window / depth)?)",
+      "quoted_result": null,
+      "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
+      "cheap": false,
+      "scripts": [],
+      "rank": 11
+    },
+    {
+      "rank_tier": 4,
+      "tier_name": "still-blocked",
+      "claim": "f10-cycle-anatomy-flip-axis",
+      "label": "F10: Anatomy of the period-2 cycle: one nearly readout-invisible flip axis between a game-vocabulary pole and the glitch-token pole",
+      "status": "corrected",
+      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole",
+      "cheap": false,
+      "scripts": [
+        "experiments/gpt2_small/06_bell_anatomy.py"
+      ],
+      "rank": 12
+    },
+    {
+      "rank_tier": 4,
+      "tier_name": "still-blocked",
+      "claim": "f15-lag2-gate",
+      "label": "F15: A lag-2 convergence gate recognises the period-2 cycle; the engine now supports it",
+      "status": "supported",
+      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
+      "cheap": false,
+      "scripts": [
+        "experiments/gpt2_small/09_lagk_gate.py"
+      ],
+      "rank": 13
+    },
+    {
+      "rank_tier": 4,
+      "tier_name": "still-blocked",
+      "claim": "h-j1",
+      "label": "H-J1: prolet sits inside the verbalizable (J-lens) subspace, Divine outside",
+      "status": "not-supported",
+      "reason": "the record calls this blocked on issue #8; an issue number names no file, so the working tree cannot say whether it has been resolved and this report does not guess",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions",
+      "cheap": false,
+      "scripts": [
+        "experiments/gpt2_small/05_jlens_pilot.py",
+        "experiments/gpt2_small/10_jlens_phase.py"
+      ],
+      "rank": 14
+    },
+    {
+      "rank_tier": 4,
+      "tier_name": "still-blocked",
+      "claim": "q-flip-axis-generality",
+      "label": "Q: Do all 34 Divine prompts share the F10 flip axis, head and eigenvalue?",
+      "status": "open",
+      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole",
+      "cheap": false,
+      "scripts": [],
+      "rank": 15
+    },
+    {
+      "rank_tier": 4,
+      "tier_name": "still-blocked",
+      "claim": "q-jlens-full-build",
+      "label": "Q: What does the phase-aware full J-lens build show (issue #8)?",
+      "status": "open",
+      "reason": "the record calls this blocked on issue #8; an issue number names no file, so the working tree cannot say whether it has been resolved and this report does not guess",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#f11-j-lens-pilot-the-prolet-insidedivine-outside-prediction-did-not-hold-the-boundary-that-appeared-is-language-vs-noise",
+      "cheap": false,
+      "scripts": [],
+      "rank": 16
+    },
+    {
+      "rank_tier": 4,
+      "tier_name": "still-blocked",
+      "claim": "q-lag2-regate-33",
+      "label": "Q: Do the other 33 period-2 prompts re-gate as converged?",
+      "status": "open",
+      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
+      "cheap": false,
+      "scripts": [],
+      "rank": 17
+    },
+    {
+      "rank_tier": 4,
+      "tier_name": "still-blocked",
+      "claim": "q-prompt-library",
+      "label": "Q: Is the 125-prompt library restored (issue #9)?",
+      "status": "open",
+      "reason": "blocked on prompt library (issue #9), and `prompt_library.py` is named by the repository (README.md:153) but no such file exists anywhere in the working tree",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#caveats",
+      "cheap": false,
+      "scripts": [],
+      "rank": 18
+    },
+    {
+      "rank_tier": 5,
+      "tier_name": "cannot-determine",
+      "claim": "concept-coherence",
+      "label": "Coherence (top-k embedding clustering)",
+      "status": "supported",
+      "reason": "nothing in the graph or the tree ties this thread to a script, run or artefact",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#f8-the-prolet-basin-is-a-coherent-cluster-of-related-tokens-not-a-single-token-permutation-tested",
+      "cheap": false,
+      "scripts": [],
+      "rank": 19
+    },
+    {
+      "rank_tier": 5,
+      "tier_name": "cannot-determine",
+      "claim": "concept-jspace-workspace",
+      "label": "J-space / the Jacobian lens",
+      "status": "open",
+      "reason": "nothing in the graph or the tree ties this thread to a script, run or artefact",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#f11-j-lens-pilot-the-prolet-insidedivine-outside-prediction-did-not-hold-the-boundary-that-appeared-is-language-vs-noise",
+      "cheap": false,
+      "scripts": [],
+      "rank": 20
+    },
+    {
+      "rank_tier": 5,
+      "tier_name": "cannot-determine",
+      "claim": "f2-divine-readout-stable",
+      "label": "F2: The Divine basin is readout-stable over a never-settling tensor",
+      "status": "corrected",
+      "reason": "the pending language here (pending) is tied to no script, run or artefact this tool can find, so no disk verdict is available",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#f2-the-divine-basin-is-readout-stable-over-a-never-settling-tensor",
+      "cheap": false,
+      "scripts": [
+        "experiments/gpt2_small/01_attractor_dominance.ipynb",
+        "experiments/gpt2_small/gated_resweep.py"
+      ],
+      "rank": 21
+    }
+  ],
+  "frontier": [
+    {
+      "claim": "f6-cross-hardware-replication",
+      "label": "F6: First cross-hardware replication passed (same code, new machine, three repeats)",
+      "status": "supported",
+      "asserted": "2026-07-19",
+      "source_doc": "docs/FINDINGS.md",
+      "doc_ref": "docs/FINDINGS.md#f6-first-cross-hardware-replication-passed-same-code-new-machine-three-repeats",
+      "outgoing_edges": [
+        "documented-in",
+        "evidenced-by",
+        "produced-by",
+        "supports"
+      ],
+      "incoming_edges": [
+        "relates-to"
+      ]
+    },
+    {
+      "claim": "f17-l11h8-copy-promoter",
+      "label": "F17: L11.H8 is load-bearing for the cycle but is a copy promoter, not a copy-suppression head",
+      "status": "supported",
+      "asserted": "2026-07-19",
+      "source_doc": "docs/FINDINGS.md",
+      "doc_ref": "docs/FINDINGS.md#f17-l11h8-is-load-bearing-for-the-cycle-but-is-a-copy-promoter-not-a-copy-suppression-head",
+      "outgoing_edges": [
+        "builds-on",
+        "cites",
+        "documented-in",
+        "evidenced-by",
+        "produced-by",
+        "refutes",
+        "relates-to",
+        "supports"
+      ],
+      "incoming_edges": [
+        "relates-to"
+      ]
+    },
+    {
+      "claim": "f16-jlens-phase-probe",
+      "label": "F16: Phase-aware J-lens: the phases straddle the prolet level, the pivot is the most lens-expressible state probed, and the physical flip axis is almost entirely outside the lens",
+      "status": "supported",
+      "asserted": "2026-07-19",
+      "source_doc": "docs/FINDINGS.md",
+      "doc_ref": "docs/FINDINGS.md#f16-phase-aware-j-lens-the-phases-straddle-the-prolet-level-the-pivot-is-the-most-lens-expressible-state-probed-and-the-physical-flip-axis-is-almost-entirely-outside-the-lens",
+      "outgoing_edges": [
+        "builds-on",
+        "corrects",
+        "documented-in",
+        "evidenced-by",
+        "produced-by",
+        "qualifies",
+        "supports",
+        "tests"
+      ],
+      "incoming_edges": [
+        "relates-to"
+      ]
+    },
+    {
+      "claim": "f15-lag2-gate",
+      "label": "F15: A lag-2 convergence gate recognises the period-2 cycle; the engine now supports it",
+      "status": "supported",
+      "asserted": "2026-07-19",
+      "source_doc": "docs/FINDINGS.md",
+      "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
+      "outgoing_edges": [
+        "builds-on",
+        "documented-in",
+        "evidenced-by",
+        "produced-by",
+        "supersedes",
+        "supports"
+      ],
+      "incoming_edges": [
+        "relates-to"
+      ]
+    },
+    {
+      "claim": "f13-flip-axis-glitch-alignment",
+      "label": "F13: The flip axis connects the model's most-trained and least-trained token directions",
+      "status": "supported",
+      "asserted": "2026-07-19",
+      "source_doc": "docs/FINDINGS.md",
+      "doc_ref": "docs/FINDINGS.md#f13-the-flip-axis-connects-the-models-most-trained-and-least-trained-token-directions",
+      "outgoing_edges": [
+        "builds-on",
+        "cites",
+        "corrects",
+        "documented-in",
+        "evidenced-by",
+        "produced-by",
+        "supports"
+      ],
+      "incoming_edges": [
+        "relates-to"
+      ]
+    },
+    {
+      "claim": "f12-medium-typographic-cluster",
+      "label": "F12: Cross-model: GPT-2 Medium's universal attractor is a typographic cluster over a near-flat readout",
+      "status": "supported",
+      "asserted": "2026-07-19",
+      "source_doc": "docs/FINDINGS.md",
+      "doc_ref": "docs/FINDINGS.md#f12-cross-model-gpt-2-mediums-universal-attractor-is-a-typographic-cluster-over-a-near-flat-readout",
+      "outgoing_edges": [
+        "documented-in",
+        "evidenced-by",
+        "produced-by",
+        "qualifies",
+        "supports"
+      ],
+      "incoming_edges": [
+        "relates-to"
+      ]
+    },
+    {
+      "claim": "f4-null-model-regime",
+      "label": "F4: The five basins belong to the language-driven regime, not the weights in general (null model)",
+      "status": "supported",
+      "asserted": "2026-07-10",
+      "source_doc": "docs/FINDINGS.md",
+      "doc_ref": "docs/FINDINGS.md#f4-the-five-basins-belong-to-the-language-driven-regime-not-the-weights-in-general-null-model",
+      "outgoing_edges": [
+        "corrects",
+        "documented-in",
+        "evidenced-by",
+        "produced-by",
+        "qualifies",
+        "refutes",
+        "supports"
+      ],
+      "incoming_edges": [
+        "supports"
+      ]
+    },
+    {
+      "claim": "f3-fingerprint-refuted",
+      "label": "F3: The basin landscape does not generalise across models (fingerprint hypothesis refuted)",
+      "status": "supported",
+      "asserted": "2026-07-10",
+      "source_doc": "docs/FINDINGS.md",
+      "doc_ref": "docs/FINDINGS.md#f3-the-basin-landscape-does-not-generalise-across-models-fingerprint-hypothesis-refuted",
+      "outgoing_edges": [
+        "cites",
+        "documented-in",
+        "evidenced-by",
+        "produced-by",
+        "qualifies",
+        "refutes",
+        "retires",
+        "supersedes",
+        "supports"
+      ],
+      "incoming_edges": [
+        "relates-to",
+        "supports"
+      ]
+    },
+    {
+      "claim": "disc-16-differences-intrinsic",
+      "label": "Discovery 16: Cross-model differences are intrinsic dynamics, not apparatus",
+      "status": "supported",
+      "asserted": "2026-07-10",
+      "source_doc": "docs/JOURNEY_MAP.md",
+      "doc_ref": "docs/JOURNEY_MAP.md#2-key-discoveries-chronological",
+      "outgoing_edges": [
+        "documented-in",
+        "produced-by"
+      ],
+      "incoming_edges": [
+        "supports"
+      ]
+    },
+    {
+      "claim": "disc-14-labels-survive-gating",
+      "label": "Discovery 14: Basin labels survive convergence gating, with two corrections",
+      "status": "supported",
+      "asserted": "2026-07-10",
+      "source_doc": "docs/JOURNEY_MAP.md",
+      "doc_ref": "docs/JOURNEY_MAP.md#2-key-discoveries-chronological",
+      "outgoing_edges": [
+        "documented-in",
+        "produced-by"
+      ],
+      "incoming_edges": [
+        "supports"
+      ]
+    },
+    {
+      "claim": "disc-13-basins-regime-specific",
+      "label": "Discovery 13: The five basins are regime-specific, not weight-universal",
+      "status": "supported",
+      "asserted": "2026-07-10",
+      "source_doc": "docs/JOURNEY_MAP.md",
+      "doc_ref": "docs/JOURNEY_MAP.md#2-key-discoveries-chronological",
+      "outgoing_edges": [
+        "documented-in",
+        "produced-by"
+      ],
+      "incoming_edges": [
+        "supports"
+      ]
+    },
+    {
+      "claim": "disc-12-landscapes-model-specific",
+      "label": "Discovery 12: Basin landscapes are model-specific, not corpus-tracking",
+      "status": "supported",
+      "asserted": "2026-07-10",
+      "source_doc": "docs/JOURNEY_MAP.md",
+      "doc_ref": "docs/JOURNEY_MAP.md#2-key-discoveries-chronological",
+      "outgoing_edges": [
+        "documented-in",
+        "produced-by",
+        "qualifies"
+      ],
+      "incoming_edges": [
+        "supports"
+      ]
+    },
+    {
+      "claim": "disc-8-structural-semantic-transition",
+      "label": "Discovery 8: Dissolution has a structural→semantic phase transition",
+      "status": "supported",
+      "asserted": "2026-03-20",
+      "source_doc": "docs/JOURNEY_MAP.md",
+      "doc_ref": "docs/JOURNEY_MAP.md#2-key-discoveries-chronological",
+      "outgoing_edges": [
+        "builds-on",
+        "documented-in",
+        "produced-by"
+      ],
+      "incoming_edges": []
+    },
+    {
+      "claim": "disc-7-capit-is-capitulation",
+      "label": "Discovery 7: capit = capitulation, not capitalism",
+      "status": "supported",
+      "asserted": "2026-03-20",
+      "source_doc": "docs/JOURNEY_MAP.md",
+      "doc_ref": "docs/JOURNEY_MAP.md#2-key-discoveries-chronological",
+      "outgoing_edges": [
+        "documented-in",
+        "produced-by",
+        "qualifies"
+      ],
+      "incoming_edges": []
+    },
+    {
+      "claim": "disc-10-thematic-centre-of-mass",
+      "label": "Discovery 10: The all-warm property is consistent with a compact \"thematic-centre-of-mass\" interpretation",
+      "status": "retired",
+      "asserted": "2026-03-20",
+      "source_doc": "docs/JOURNEY_MAP.md",
+      "doc_ref": "docs/JOURNEY_MAP.md#2-key-discoveries-chronological",
+      "outgoing_edges": [
+        "builds-on",
+        "documented-in",
+        "produced-by"
+      ],
+      "incoming_edges": [
+        "retires"
+      ]
+    },
+    {
+      "claim": "disc-4-reproducible-terminals",
+      "label": "Discovery 4: Results are reproducible (terminal states deterministic)",
+      "status": "supported",
+      "asserted": "2026-03-01",
+      "source_doc": "docs/JOURNEY_MAP.md",
+      "doc_ref": "docs/JOURNEY_MAP.md#2-key-discoveries-chronological",
+      "outgoing_edges": [
+        "documented-in",
+        "produced-by"
+      ],
+      "incoming_edges": [
+        "supports"
+      ]
+    }
+  ],
+  "undeveloped": {
+    "thin_concepts": [
+      {
+        "claim": "concept-aliasing",
+        "label": "Aliasing (even-iteration sampling)",
+        "type": "concept",
+        "status": "supported",
+        "asserted": "2026-07-19",
+        "degree": 1,
+        "edge_types": [
+          "supports"
+        ],
+        "doc_ref": "docs/FINDINGS.md#f9-the-divine-anomaly-resolved-an-exact-period-2-limit-cycle-hidden-by-aliasing"
+      },
+      {
+        "claim": "concept-invisibility-ratio",
+        "label": "Invisibility ratio",
+        "type": "concept",
+        "status": "supported",
+        "asserted": "2026-07-19",
+        "degree": 1,
+        "edge_types": [
+          "supports"
+        ],
+        "doc_ref": "docs/FINDINGS.md#f9-the-divine-anomaly-resolved-an-exact-period-2-limit-cycle-hidden-by-aliasing"
+      },
+      {
+        "claim": "concept-phase-a-b",
+        "label": "Phase A / phase B",
+        "type": "concept",
+        "status": "supported",
+        "asserted": "2026-07-19",
+        "degree": 1,
+        "edge_types": [
+          "supports"
+        ],
+        "doc_ref": "docs/FINDINGS.md#f9-the-divine-anomaly-resolved-an-exact-period-2-limit-cycle-hidden-by-aliasing"
+      }
+    ],
+    "silent_claims": [
+      {
+        "claim": "concept-activation-patching",
+        "label": "Activation patching, probing, SAEs",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-20",
+        "degree": 2,
+        "edge_types": [
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#4-adjacent-science--mathematics"
+      },
+      {
+        "claim": "concept-atr",
+        "label": "ATR (Activation Tensor Resonance)",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-20",
+        "degree": 8,
+        "edge_types": [
+          "analogous-to",
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#5-glossary"
+      },
+      {
+        "claim": "concept-basin-token",
+        "label": "Basin token",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-01",
+        "degree": 2,
+        "edge_types": [
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#5-glossary"
+      },
+      {
+        "claim": "concept-body-without-organs",
+        "label": "Deleuze, Body without Organs",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-20",
+        "degree": 2,
+        "edge_types": [
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#4-adjacent-science--mathematics"
+      },
+      {
+        "claim": "concept-byte-pair-encoding",
+        "label": "Byte Pair Encoding",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-20",
+        "degree": 2,
+        "edge_types": [
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#4-adjacent-science--mathematics"
+      },
+      {
+        "claim": "concept-cross-prompt-invariance",
+        "label": "Cross-prompt invariance",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-20",
+        "degree": 2,
+        "edge_types": [
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#5-glossary"
+      },
+      {
+        "claim": "concept-fixed-point-theory",
+        "label": "Fixed-point theory, basin of attraction",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-20",
+        "degree": 2,
+        "edge_types": [
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#4-adjacent-science--mathematics"
+      },
+      {
+        "claim": "concept-fractal-dimension",
+        "label": "Fractal dimensional analysis",
+        "type": "concept",
+        "status": "untested",
+        "asserted": "2026-03-20",
+        "degree": 3,
+        "edge_types": [
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#4-adjacent-science--mathematics"
+      },
+      {
+        "claim": "concept-impulse-response",
+        "label": "Impulse response / room modes",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-20",
+        "degree": 2,
+        "edge_types": [
+          "analogous-to",
+          "documented-in"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#4-adjacent-science--mathematics"
+      },
+      {
+        "claim": "concept-l2-normalisation",
+        "label": "L2 normalisation",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-20",
+        "degree": 2,
+        "edge_types": [
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#5-glossary"
+      },
+      {
+        "claim": "concept-logit-lens",
+        "label": "Logit Lens / Tuned Lens",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-20",
+        "degree": 4,
+        "edge_types": [
+          "breaks-down-at",
+          "cites",
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#4-adjacent-science--mathematics"
+      },
+      {
+        "claim": "concept-mixing-time",
+        "label": "Mixing time (T_mix)",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-20",
+        "degree": 2,
+        "edge_types": [
+          "analogous-to",
+          "documented-in"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#4-adjacent-science--mathematics"
+      },
+      {
+        "claim": "concept-position-collapse",
+        "label": "Position collapse",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-20",
+        "degree": 2,
+        "edge_types": [
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#5-glossary"
+      },
+      {
+        "claim": "concept-power-iteration",
+        "label": "Power iteration",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-20",
+        "degree": 3,
+        "edge_types": [
+          "analogous-to",
+          "documented-in"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#4-adjacent-science--mathematics"
+      },
+      {
+        "claim": "concept-residual-stream",
+        "label": "Residual stream",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-20",
+        "degree": 2,
+        "edge_types": [
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#5-glossary"
+      },
+      {
+        "claim": "concept-structural-semantic-transition",
+        "label": "Phase transition (structural→semantic)",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-20",
+        "degree": 3,
+        "edge_types": [
+          "analogous-to",
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#5-glossary"
+      },
+      {
+        "claim": "concept-t-mix-llm",
+        "label": "T_mix_LLM",
+        "type": "concept",
+        "status": "untested",
+        "asserted": "2026-03-20",
+        "degree": 3,
+        "edge_types": [
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#5-glossary"
+      },
+      {
+        "claim": "concept-tame-morphogenesis",
+        "label": "Levin, TAME (morphogenesis)",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-20",
+        "degree": 2,
+        "edge_types": [
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#4-adjacent-science--mathematics"
+      },
+      {
+        "claim": "concept-w-e",
+        "label": "W_E",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-20",
+        "degree": 2,
+        "edge_types": [
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#5-glossary"
+      },
+      {
+        "claim": "concept-waypoint-token",
+        "label": "Waypoint token",
+        "type": "concept",
+        "status": "open",
+        "asserted": "2026-03-20",
+        "degree": 2,
+        "edge_types": [
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#5-glossary"
+      },
+      {
+        "claim": "q-flip-axis-generality",
+        "label": "Q: Do all 34 Divine prompts share the F10 flip axis, head and eigenvalue?",
+        "type": "question",
+        "status": "open",
+        "asserted": "2026-07-19",
+        "degree": 6,
+        "edge_types": [
+          "blocked-by",
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole"
+      },
+      {
+        "claim": "q-fractal-dimension",
+        "label": "Q: Is the fractal dimension of convergence trajectories basin-specific?",
+        "type": "question",
+        "status": "open",
+        "asserted": "2026-07-10",
+        "degree": 3,
+        "edge_types": [
+          "blocked-by",
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions"
+      },
+      {
+        "claim": "q-gate-cadence",
+        "label": "Q: What are the true settling iterations between 100 and 120?",
+        "type": "question",
+        "status": "open",
+        "asserted": "2026-07-10",
+        "degree": 2,
+        "edge_types": [
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/FINDINGS.md#caveats"
+      },
+      {
+        "claim": "q-hook-window-depth",
+        "label": "Q: Does the landscape depend on where the loop is cut (window / depth)?",
+        "type": "question",
+        "status": "open",
+        "asserted": "2026-07-10",
+        "degree": 3,
+        "edge_types": [
+          "blocks",
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/FINDINGS.md#caveats"
+      },
+      {
+        "claim": "q-independent-reimplementation",
+        "label": "Q: Does an independent re-implementation reproduce the result?",
+        "type": "question",
+        "status": "open",
+        "asserted": "2026-07-19",
+        "degree": 3,
+        "edge_types": [
+          "blocks",
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/FINDINGS.md#caveats"
+      },
+      {
+        "claim": "q-jlens-full-build",
+        "label": "Q: What does the phase-aware full J-lens build show (issue #8)?",
+        "type": "question",
+        "status": "open",
+        "asserted": "2026-07-19",
+        "degree": 4,
+        "edge_types": [
+          "blocks",
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/FINDINGS.md#f11-j-lens-pilot-the-prolet-insidedivine-outside-prediction-did-not-hold-the-boundary-that-appeared-is-language-vs-noise"
+      },
+      {
+        "claim": "q-lag2-regate-33",
+        "label": "Q: Do the other 33 period-2 prompts re-gate as converged?",
+        "type": "question",
+        "status": "open",
+        "asserted": "2026-07-19",
+        "degree": 4,
+        "edge_types": [
+          "blocked-by",
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it"
+      },
+      {
+        "claim": "q-prompt-library",
+        "label": "Q: Is the 125-prompt library restored (issue #9)?",
+        "type": "question",
+        "status": "open",
+        "asserted": "2026-07-19",
+        "degree": 3,
+        "edge_types": [
+          "blocked-by",
+          "documented-in"
+        ],
+        "doc_ref": "docs/FINDINGS.md#caveats"
+      },
+      {
+        "claim": "q-shape-class-null",
+        "label": "Q: What does a shape-class-matched coherence null show?",
+        "type": "question",
+        "status": "open",
+        "asserted": "2026-07-19",
+        "degree": 4,
+        "edge_types": [
+          "blocks",
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/FINDINGS.md#f12-cross-model-gpt-2-mediums-universal-attractor-is-a-typographic-cluster-over-a-near-flat-readout"
+      },
+      {
+        "claim": "q-slonski-macro-group",
+        "label": "Q: Are all basins in one Slonski macro-group?",
+        "type": "question",
+        "status": "open",
+        "asserted": "2026-07-10",
+        "degree": 3,
+        "edge_types": [
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions"
+      },
+      {
+        "claim": "q-tmix-llm",
+        "label": "Q: What is T_mix_LLM for each basin?",
+        "type": "question",
+        "status": "open",
+        "asserted": "2026-07-10",
+        "degree": 3,
+        "edge_types": [
+          "blocked-by",
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions"
+      },
+      {
+        "claim": "q-why-gpt2-small",
+        "label": "Q: Why does GPT-2 Small alone resolve language into few semantic basins?",
+        "type": "question",
+        "status": "open",
+        "asserted": "2026-07-10",
+        "degree": 4,
+        "edge_types": [
+          "blocks",
+          "documented-in",
+          "relates-to"
+        ],
+        "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions"
+      }
+    ]
+  },
+  "unreferenced": {
+    "artefacts": [
+      {
+        "path": "experiments/_DATA/EXP_009/009bFIX_convergence_grid.pt",
+        "size": 3155,
+        "kind": "data",
+        "classification": "orphan-directory",
+        "directory": "experiments/_DATA/EXP_009",
+        "produced_by_script": [
+          "experiments/gpt2_small/head_resonance.ipynb"
+        ],
+        "producer_run_nodes": []
+      },
+      {
+        "path": "experiments/_DATA/EXP_009/009bFIX_head_loop_results.pt",
+        "size": 4734891,
+        "kind": "data",
+        "classification": "orphan-directory",
+        "directory": "experiments/_DATA/EXP_009",
+        "produced_by_script": [
+          "experiments/gpt2_small/head_resonance.ipynb",
+          "experiments/gpt2_small/spectral_resonance.ipynb"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-spectral-scaffold",
+            "graph_says": "not run",
+            "date": null,
+            "label": "Spectral resonance scaffold (H4, not run)"
+          }
+        ]
+      },
+      {
+        "path": "experiments/_DATA/EXP_009/009c_spectral_data.pt",
+        "size": 1124241,
+        "kind": "data",
+        "classification": "orphan-directory",
+        "directory": "experiments/_DATA/EXP_009",
+        "produced_by_script": [
+          "experiments/gpt2_small/spectral_resonance.ipynb"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-spectral-scaffold",
+            "graph_says": "not run",
+            "date": null,
+            "label": "Spectral resonance scaffold (H4, not run)"
+          }
+        ]
+      },
+      {
+        "path": "experiments/_DATA/EXP_009/009c_validation_grid.pt",
+        "size": 3067,
+        "kind": "data",
+        "classification": "orphan-directory",
+        "directory": "experiments/_DATA/EXP_009",
+        "produced_by_script": [
+          "experiments/gpt2_small/spectral_resonance.ipynb"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-spectral-scaffold",
+            "graph_says": "not run",
+            "date": null,
+            "label": "Spectral resonance scaffold (H4, not run)"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_head_loop_regen/REGENERATION_REPORT.md",
+        "size": 7231,
+        "kind": "report",
+        "classification": "orphan-directory",
+        "directory": "experiments/gpt2_small/output_head_loop_regen",
+        "produced_by_script": [],
+        "producer_run_nodes": []
+      },
+      {
+        "path": "experiments/gpt2_small/output_confidence/chordness.json",
+        "size": 665,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_confidence",
+        "produced_by_script": [],
+        "producer_run_nodes": []
+      },
+      {
+        "path": "experiments/gpt2_small/output_confidence/chordness_formal.json",
+        "size": 28747,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_confidence",
+        "produced_by_script": [],
+        "producer_run_nodes": []
+      },
+      {
+        "path": "experiments/gpt2_small/output_confidence/confidence_results.json",
+        "size": 110455,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_confidence",
+        "produced_by_script": [
+          "experiments/gpt2_small/04_readout_confidence.py"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-6-full-distribution-confidence",
+            "graph_says": "5 prompts × 500 iters + 15 noise trials",
+            "date": "2026-07-19",
+            "label": "Run 6: Full-distribution confidence audit"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_confidence/converged_tensors.pt",
+        "size": 184007,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_confidence",
+        "produced_by_script": [
+          "experiments/gpt2_small/04_readout_confidence.py",
+          "experiments/gpt2_small/05_jlens_pilot.py",
+          "experiments/gpt2_small/10_jlens_phase.py"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-6-full-distribution-confidence",
+            "graph_says": "5 prompts × 500 iters + 15 noise trials",
+            "date": "2026-07-19",
+            "label": "Run 6: Full-distribution confidence audit"
+          },
+          {
+            "run": "run-10-jlens-pilot",
+            "graph_says": "193-token lens × 30 prompts; 8 states probed",
+            "date": "2026-07-19",
+            "label": "Run 10: J-lens pilot (restricted)"
+          },
+          {
+            "run": "run-14-jlens-phase-probe",
+            "graph_says": "pilot lens × cycle states",
+            "date": "2026-07-19",
+            "label": "Run 14: J-lens phase probe (both phases, pivot, flip axis)"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_divine_motion/bell_anatomy.json",
+        "size": 1868,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_divine_motion",
+        "produced_by_script": [
+          "experiments/gpt2_small/06_bell_anatomy.py",
+          "experiments/gpt2_small/07_glitch_alignment.py",
+          "experiments/gpt2_small/09_lagk_gate.py",
+          "experiments/gpt2_small/10_jlens_phase.py"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-9-cycle-anatomy",
+            "graph_says": "1 Divine trajectory, iteration-1000 states",
+            "date": "2026-07-19",
+            "label": "Run 9: Cycle anatomy"
+          },
+          {
+            "run": "run-11-glitch-alignment",
+            "graph_says": "1 Divine trajectory",
+            "date": "2026-07-19",
+            "label": "Run 11: Glitch alignment (flip axis vs anomalous-token cluster)"
+          },
+          {
+            "run": "run-13-lagk-regate",
+            "graph_says": "3 states × 25 dense iters",
+            "date": "2026-07-19",
+            "label": "Run 13: Lag-k re-gate + engine gate_lag"
+          },
+          {
+            "run": "run-14-jlens-phase-probe",
+            "graph_says": "pilot lens × cycle states",
+            "date": "2026-07-19",
+            "label": "Run 14: J-lens phase probe (both phases, pivot, flip axis)"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_divine_motion/divine_motion_results.json",
+        "size": 67671,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_divine_motion",
+        "produced_by_script": [
+          "experiments/gpt2_small/05_divine_motion.py"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-8-divine-motion-audit",
+            "graph_says": "3 trajectories × 1000 iters, +20 lag-1 iters",
+            "date": "2026-07-19",
+            "label": "Run 8: Divine motion audit (lag-10 + lag-1 probe)"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_divine_motion/probe_lag1_results.json",
+        "size": 64442,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_divine_motion",
+        "produced_by_script": [
+          "experiments/gpt2_small/05_divine_motion.py"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-8-divine-motion-audit",
+            "graph_says": "3 trajectories × 1000 iters, +20 lag-1 iters",
+            "date": "2026-07-19",
+            "label": "Run 8: Divine motion audit (lag-10 + lag-1 probe)"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_divine_motion/snapshots_divine.pt",
+        "size": 170565,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_divine_motion",
+        "produced_by_script": [],
+        "producer_run_nodes": []
+      },
+      {
+        "path": "experiments/gpt2_small/output_divine_motion/snapshots_noise.pt",
+        "size": 170381,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_divine_motion",
+        "produced_by_script": [],
+        "producer_run_nodes": []
+      },
+      {
+        "path": "experiments/gpt2_small/output_divine_motion/snapshots_prolet.pt",
+        "size": 170629,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_divine_motion",
+        "produced_by_script": [],
+        "producer_run_nodes": []
+      },
+      {
+        "path": "experiments/gpt2_small/output_divine_motion/state_divine.pt",
+        "size": 204777,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_divine_motion",
+        "produced_by_script": [
+          "experiments/gpt2_small/06_bell_anatomy.py",
+          "experiments/gpt2_small/07_glitch_alignment.py",
+          "experiments/gpt2_small/08_hinge_eigenvalue.py",
+          "experiments/gpt2_small/10_jlens_phase.py",
+          "experiments/gpt2_small/11_suppression_test.py"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-9-cycle-anatomy",
+            "graph_says": "1 Divine trajectory, iteration-1000 states",
+            "date": "2026-07-19",
+            "label": "Run 9: Cycle anatomy"
+          },
+          {
+            "run": "run-11-glitch-alignment",
+            "graph_says": "1 Divine trajectory",
+            "date": "2026-07-19",
+            "label": "Run 11: Glitch alignment (flip axis vs anomalous-token cluster)"
+          },
+          {
+            "run": "run-12-flip-axis-eigenvalue",
+            "graph_says": "1 Divine trajectory (jvp + finite diff)",
+            "date": "2026-07-19",
+            "label": "Run 12: Flip-axis eigenvalue + per-block/head localisation"
+          },
+          {
+            "run": "run-14-jlens-phase-probe",
+            "graph_says": "pilot lens × cycle states",
+            "date": "2026-07-19",
+            "label": "Run 14: J-lens phase probe (both phases, pivot, flip axis)"
+          },
+          {
+            "run": "run-15-suppression-test",
+            "graph_says": "144 heads; loop ablation; 12 sentences",
+            "date": "2026-07-19",
+            "label": "Run 15: Suppression-head test for L11.H8"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_divine_motion/state_noise.pt",
+        "size": 204591,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_divine_motion",
+        "produced_by_script": [
+          "experiments/gpt2_small/10_jlens_phase.py"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-14-jlens-phase-probe",
+            "graph_says": "pilot lens × cycle states",
+            "date": "2026-07-19",
+            "label": "Run 14: J-lens phase probe (both phases, pivot, flip axis)"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_divine_motion/state_prolet.pt",
+        "size": 210921,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_divine_motion",
+        "produced_by_script": [],
+        "producer_run_nodes": []
+      },
+      {
+        "path": "experiments/gpt2_small/output_glitch/glitch_alignment.json",
+        "size": 32693,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_glitch",
+        "produced_by_script": [
+          "experiments/gpt2_small/07_glitch_alignment.py"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-11-glitch-alignment",
+            "graph_says": "1 Divine trajectory",
+            "date": "2026-07-19",
+            "label": "Run 11: Glitch alignment (flip axis vs anomalous-token cluster)"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_hinge_eigen/hinge_eigenvalue.json",
+        "size": 89123,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_hinge_eigen",
+        "produced_by_script": [
+          "experiments/gpt2_small/08_hinge_eigenvalue.py",
+          "experiments/gpt2_small/10_jlens_phase.py",
+          "experiments/gpt2_small/11_suppression_test.py"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-12-flip-axis-eigenvalue",
+            "graph_says": "1 Divine trajectory (jvp + finite diff)",
+            "date": "2026-07-19",
+            "label": "Run 12: Flip-axis eigenvalue + per-block/head localisation"
+          },
+          {
+            "run": "run-14-jlens-phase-probe",
+            "graph_says": "pilot lens × cycle states",
+            "date": "2026-07-19",
+            "label": "Run 14: J-lens phase probe (both phases, pivot, flip axis)"
+          },
+          {
+            "run": "run-15-suppression-test",
+            "graph_says": "144 heads; loop ablation; 12 sentences",
+            "date": "2026-07-19",
+            "label": "Run 15: Suppression-head test for L11.H8"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_jlens_phase/jlens_phase.json",
+        "size": 55896,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_jlens_phase",
+        "produced_by_script": [
+          "experiments/gpt2_small/10_jlens_phase.py"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-14-jlens-phase-probe",
+            "graph_says": "pilot lens × cycle states",
+            "date": "2026-07-19",
+            "label": "Run 14: J-lens phase probe (both phases, pivot, flip axis)"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_jlens_phase/phase_states.pt",
+        "size": 45339,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_jlens_phase",
+        "produced_by_script": [
+          "experiments/gpt2_small/10_jlens_phase.py"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-14-jlens-phase-probe",
+            "graph_says": "pilot lens × cycle states",
+            "date": "2026-07-19",
+            "label": "Run 14: J-lens phase probe (both phases, pivot, flip axis)"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_jlens_pilot/jlens_pilot_results.json",
+        "size": 44795,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_jlens_pilot",
+        "produced_by_script": [
+          "experiments/gpt2_small/05_jlens_pilot.py",
+          "experiments/gpt2_small/10_jlens_phase.py"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-10-jlens-pilot",
+            "graph_says": "193-token lens × 30 prompts; 8 states probed",
+            "date": "2026-07-19",
+            "label": "Run 10: J-lens pilot (restricted)"
+          },
+          {
+            "run": "run-14-jlens-phase-probe",
+            "graph_says": "pilot lens × cycle states",
+            "date": "2026-07-19",
+            "label": "Run 14: J-lens phase probe (both phases, pivot, flip axis)"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_jlens_pilot/jlens_vectors.pt",
+        "size": 7122387,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_jlens_pilot",
+        "produced_by_script": [
+          "experiments/gpt2_small/05_jlens_pilot.py",
+          "experiments/gpt2_small/10_jlens_phase.py"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-10-jlens-pilot",
+            "graph_says": "193-token lens × 30 prompts; 8 states probed",
+            "date": "2026-07-19",
+            "label": "Run 10: J-lens pilot (restricted)"
+          },
+          {
+            "run": "run-14-jlens-phase-probe",
+            "graph_says": "pilot lens × cycle states",
+            "date": "2026-07-19",
+            "label": "Run 14: J-lens phase probe (both phases, pivot, flip axis)"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_lagk/lagk_results.json",
+        "size": 6541,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_lagk",
+        "produced_by_script": [
+          "experiments/gpt2_small/09_lagk_gate.py"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-13-lagk-regate",
+            "graph_says": "3 states × 25 dense iters",
+            "date": "2026-07-19",
+            "label": "Run 13: Lag-k re-gate + engine gate_lag"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_permutation/permutation_results.json",
+        "size": 709,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_permutation",
+        "produced_by_script": [
+          "experiments/gpt2_small/02b_permutation_test.py"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-all-warm-permutation",
+            "graph_says": "10,000 random 14-token sets",
+            "date": "2026-07-11",
+            "label": "All-warm permutation test"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_random_baseline/config.json",
+        "size": 384,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_random_baseline",
+        "produced_by_script": [
+          "experiments/gpt2_small/03_random_baseline.ipynb",
+          "experiments/gpt2_small/04_readout_confidence.py",
+          "experiments/gpt2_small/05_divine_motion.py",
+          "experiments/gpt2_small/07_glitch_alignment.py",
+          "experiments/gpt2_small/08_hinge_eigenvalue.py",
+          "experiments/gpt2_small/09_lagk_gate.py",
+          "experiments/gpt2_small/11_suppression_test.py",
+          "experiments/pythia_160m/01_attractor_dominance.ipynb"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-3-random-noise-null",
+            "graph_says": "125 Gaussian tensors (seed 42)",
+            "date": "2026-07-10",
+            "label": "Run 3: Random-noise null model"
+          },
+          {
+            "run": "run-6-full-distribution-confidence",
+            "graph_says": "5 prompts × 500 iters + 15 noise trials",
+            "date": "2026-07-19",
+            "label": "Run 6: Full-distribution confidence audit"
+          },
+          {
+            "run": "run-8-divine-motion-audit",
+            "graph_says": "3 trajectories × 1000 iters, +20 lag-1 iters",
+            "date": "2026-07-19",
+            "label": "Run 8: Divine motion audit (lag-10 + lag-1 probe)"
+          },
+          {
+            "run": "run-11-glitch-alignment",
+            "graph_says": "1 Divine trajectory",
+            "date": "2026-07-19",
+            "label": "Run 11: Glitch alignment (flip axis vs anomalous-token cluster)"
+          },
+          {
+            "run": "run-12-flip-axis-eigenvalue",
+            "graph_says": "1 Divine trajectory (jvp + finite diff)",
+            "date": "2026-07-19",
+            "label": "Run 12: Flip-axis eigenvalue + per-block/head localisation"
+          },
+          {
+            "run": "run-13-lagk-regate",
+            "graph_says": "3 states × 25 dense iters",
+            "date": "2026-07-19",
+            "label": "Run 13: Lag-k re-gate + engine gate_lag"
+          },
+          {
+            "run": "run-15-suppression-test",
+            "graph_says": "144 heads; loop ablation; 12 sentences",
+            "date": "2026-07-19",
+            "label": "Run 15: Suppression-head test for L11.H8"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_suppression/suppression_results.json",
+        "size": 509219,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_suppression",
+        "produced_by_script": [
+          "experiments/gpt2_small/11_suppression_test.py"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-15-suppression-test",
+            "graph_says": "144 heads; loop ablation; 12 sentences",
+            "date": "2026-07-19",
+            "label": "Run 15: Suppression-head test for L11.H8"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_medium/output/config.md",
+        "size": 131,
+        "kind": "report",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_medium/output",
+        "produced_by_script": [
+          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
+          "experiments/gpt2_small/01_attractor_dominance.ipynb",
+          "experiments/pythia_160m/01_attractor_dominance.ipynb",
+          "experiments/pythia_410m/01_attractor_dominance.ipynb",
+          "experiments/pythia_410m/01b_deep_convergence.ipynb"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-2-cross-model-sweeps",
+            "graph_says": "125 prompts each",
+            "date": "2026-07-10",
+            "label": "Run 2: Cross-model sweeps"
+          },
+          {
+            "run": "run-1-attractor-dominance",
+            "graph_says": "125 prompts, ≤100 iters",
+            "date": "2026-03-01",
+            "label": "Run 1: Attractor dominance sweep"
+          },
+          {
+            "run": "run-4-deep-convergence",
+            "graph_says": "8-prompt subset, 1000 iters",
+            "date": "2026-07-10",
+            "label": "Run 4: Deep convergence"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_medium/output/dissolution_sentences.md",
+        "size": 55941,
+        "kind": "report",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_medium/output",
+        "produced_by_script": [
+          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
+          "experiments/gpt2_small/01_attractor_dominance.ipynb",
+          "experiments/pythia_160m/01_attractor_dominance.ipynb",
+          "experiments/pythia_410m/01_attractor_dominance.ipynb"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-2-cross-model-sweeps",
+            "graph_says": "125 prompts each",
+            "date": "2026-07-10",
+            "label": "Run 2: Cross-model sweeps"
+          },
+          {
+            "run": "run-1-attractor-dominance",
+            "graph_says": "125 prompts, ≤100 iters",
+            "date": "2026-03-01",
+            "label": "Run 1: Attractor dominance sweep"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output/config.md",
+        "size": 131,
+        "kind": "report",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output",
+        "produced_by_script": [
+          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
+          "experiments/gpt2_small/01_attractor_dominance.ipynb",
+          "experiments/pythia_160m/01_attractor_dominance.ipynb",
+          "experiments/pythia_410m/01_attractor_dominance.ipynb",
+          "experiments/pythia_410m/01b_deep_convergence.ipynb"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-2-cross-model-sweeps",
+            "graph_says": "125 prompts each",
+            "date": "2026-07-10",
+            "label": "Run 2: Cross-model sweeps"
+          },
+          {
+            "run": "run-1-attractor-dominance",
+            "graph_says": "125 prompts, ≤100 iters",
+            "date": "2026-03-01",
+            "label": "Run 1: Attractor dominance sweep"
+          },
+          {
+            "run": "run-4-deep-convergence",
+            "graph_says": "8-prompt subset, 1000 iters",
+            "date": "2026-07-10",
+            "label": "Run 4: Deep convergence"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output/dissolution_sentences.md",
+        "size": 86782,
+        "kind": "report",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output",
+        "produced_by_script": [
+          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
+          "experiments/gpt2_small/01_attractor_dominance.ipynb",
+          "experiments/pythia_160m/01_attractor_dominance.ipynb",
+          "experiments/pythia_410m/01_attractor_dominance.ipynb"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-2-cross-model-sweeps",
+            "graph_says": "125 prompts each",
+            "date": "2026-07-10",
+            "label": "Run 2: Cross-model sweeps"
+          },
+          {
+            "run": "run-1-attractor-dominance",
+            "graph_says": "125 prompts, ≤100 iters",
+            "date": "2026-03-01",
+            "label": "Run 1: Attractor dominance sweep"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_divine_motion/divine_motion_tables.md",
+        "size": 5819,
+        "kind": "report",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_divine_motion",
+        "produced_by_script": [
+          "experiments/gpt2_small/05_divine_motion.py"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-8-divine-motion-audit",
+            "graph_says": "3 trajectories × 1000 iters, +20 lag-1 iters",
+            "date": "2026-07-19",
+            "label": "Run 8: Divine motion audit (lag-10 + lag-1 probe)"
+          }
+        ]
+      },
+      {
+        "path": "experiments/gpt2_small/output_random_baseline/dissolution_pathways_random.md",
+        "size": 1787,
+        "kind": "report",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/gpt2_small/output_random_baseline",
+        "produced_by_script": [
+          "experiments/gpt2_small/03_random_baseline.ipynb"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-3-random-noise-null",
+            "graph_says": "125 Gaussian tensors (seed 42)",
+            "date": "2026-07-10",
+            "label": "Run 3: Random-noise null model"
+          }
+        ]
+      },
+      {
+        "path": "experiments/pythia_160m/output/config.md",
+        "size": 131,
+        "kind": "report",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/pythia_160m/output",
+        "produced_by_script": [
+          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
+          "experiments/gpt2_small/01_attractor_dominance.ipynb",
+          "experiments/pythia_160m/01_attractor_dominance.ipynb",
+          "experiments/pythia_410m/01_attractor_dominance.ipynb",
+          "experiments/pythia_410m/01b_deep_convergence.ipynb"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-2-cross-model-sweeps",
+            "graph_says": "125 prompts each",
+            "date": "2026-07-10",
+            "label": "Run 2: Cross-model sweeps"
+          },
+          {
+            "run": "run-1-attractor-dominance",
+            "graph_says": "125 prompts, ≤100 iters",
+            "date": "2026-03-01",
+            "label": "Run 1: Attractor dominance sweep"
+          },
+          {
+            "run": "run-4-deep-convergence",
+            "graph_says": "8-prompt subset, 1000 iters",
+            "date": "2026-07-10",
+            "label": "Run 4: Deep convergence"
+          }
+        ]
+      },
+      {
+        "path": "experiments/pythia_160m/output/dissolution_sentences.md",
+        "size": 140671,
+        "kind": "report",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/pythia_160m/output",
+        "produced_by_script": [
+          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
+          "experiments/gpt2_small/01_attractor_dominance.ipynb",
+          "experiments/pythia_160m/01_attractor_dominance.ipynb",
+          "experiments/pythia_410m/01_attractor_dominance.ipynb"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-2-cross-model-sweeps",
+            "graph_says": "125 prompts each",
+            "date": "2026-07-10",
+            "label": "Run 2: Cross-model sweeps"
+          },
+          {
+            "run": "run-1-attractor-dominance",
+            "graph_says": "125 prompts, ≤100 iters",
+            "date": "2026-03-01",
+            "label": "Run 1: Attractor dominance sweep"
+          }
+        ]
+      },
+      {
+        "path": "experiments/pythia_410m/output/config.md",
+        "size": 146,
+        "kind": "report",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/pythia_410m/output",
+        "produced_by_script": [
+          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
+          "experiments/gpt2_small/01_attractor_dominance.ipynb",
+          "experiments/pythia_160m/01_attractor_dominance.ipynb",
+          "experiments/pythia_410m/01_attractor_dominance.ipynb",
+          "experiments/pythia_410m/01b_deep_convergence.ipynb"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-2-cross-model-sweeps",
+            "graph_says": "125 prompts each",
+            "date": "2026-07-10",
+            "label": "Run 2: Cross-model sweeps"
+          },
+          {
+            "run": "run-1-attractor-dominance",
+            "graph_says": "125 prompts, ≤100 iters",
+            "date": "2026-03-01",
+            "label": "Run 1: Attractor dominance sweep"
+          },
+          {
+            "run": "run-4-deep-convergence",
+            "graph_says": "8-prompt subset, 1000 iters",
+            "date": "2026-07-10",
+            "label": "Run 4: Deep convergence"
+          }
+        ]
+      },
+      {
+        "path": "experiments/pythia_410m/output/dissolution_sentences.md",
+        "size": 86241,
+        "kind": "report",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/pythia_410m/output",
+        "produced_by_script": [
+          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
+          "experiments/gpt2_small/01_attractor_dominance.ipynb",
+          "experiments/pythia_160m/01_attractor_dominance.ipynb",
+          "experiments/pythia_410m/01_attractor_dominance.ipynb"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-2-cross-model-sweeps",
+            "graph_says": "125 prompts each",
+            "date": "2026-07-10",
+            "label": "Run 2: Cross-model sweeps"
+          },
+          {
+            "run": "run-1-attractor-dominance",
+            "graph_says": "125 prompts, ≤100 iters",
+            "date": "2026-03-01",
+            "label": "Run 1: Attractor dominance sweep"
+          }
+        ]
+      },
+      {
+        "path": "experiments/pythia_410m/output_deep/config.md",
+        "size": 408,
+        "kind": "report",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/pythia_410m/output_deep",
+        "produced_by_script": [
+          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
+          "experiments/gpt2_small/01_attractor_dominance.ipynb",
+          "experiments/pythia_160m/01_attractor_dominance.ipynb",
+          "experiments/pythia_410m/01_attractor_dominance.ipynb",
+          "experiments/pythia_410m/01b_deep_convergence.ipynb"
+        ],
+        "producer_run_nodes": [
+          {
+            "run": "run-2-cross-model-sweeps",
+            "graph_says": "125 prompts each",
+            "date": "2026-07-10",
+            "label": "Run 2: Cross-model sweeps"
+          },
+          {
+            "run": "run-1-attractor-dominance",
+            "graph_says": "125 prompts, ≤100 iters",
+            "date": "2026-03-01",
+            "label": "Run 1: Attractor dominance sweep"
+          },
+          {
+            "run": "run-4-deep-convergence",
+            "graph_says": "8-prompt subset, 1000 iters",
+            "date": "2026-07-10",
+            "label": "Run 4: Deep convergence"
+          }
+        ]
+      }
+    ],
+    "orphan_scripts": [
+      {
+        "path": "experiments/gpt2_small/head_resonance.ipynb",
+        "kind": "notebook",
+        "cells_total": 14,
+        "code_cells": 10,
+        "cells_with_outputs": 10,
+        "executed": true
+      },
+      {
+        "path": "experiments/gpt2_small/layer_resonance.ipynb",
+        "kind": "notebook",
+        "cells_total": 15,
+        "code_cells": 10,
+        "cells_with_outputs": 0,
+        "executed": false
+      },
+      {
+        "path": "experiments/strip_hypotheses.py",
+        "kind": "script",
+        "cells_total": null,
+        "code_cells": null,
+        "cells_with_outputs": null,
+        "executed": null
+      }
+    ]
+  },
+  "execution_ledger": [
+    {
+      "run": "run-0-repeatability-gate",
+      "label": "Run 0: Repeatability gate",
+      "script": "experiments/gpt2_small/00_reproducibility_gate.ipynb",
+      "exists": true,
+      "cells_total": 12,
+      "code_cells": 9,
+      "cells_with_outputs": 9,
+      "note": null
+    },
+    {
+      "run": "run-1-attractor-dominance",
+      "label": "Run 1: Attractor dominance sweep",
+      "script": "experiments/gpt2_small/01_attractor_dominance.ipynb",
+      "exists": true,
+      "cells_total": 19,
+      "code_cells": 12,
+      "cells_with_outputs": 12,
+      "note": null
+    },
+    {
+      "run": "run-10-jlens-pilot",
+      "label": "Run 10: J-lens pilot (restricted)",
+      "script": "experiments/gpt2_small/05_jlens_pilot.py",
+      "exists": true,
+      "cells_total": null,
+      "code_cells": null,
+      "cells_with_outputs": null,
+      "note": "plain script: execution leaves no trace in the file"
+    },
+    {
+      "run": "run-11-glitch-alignment",
+      "label": "Run 11: Glitch alignment (flip axis vs anomalous-token cluster)",
+      "script": "experiments/gpt2_small/07_glitch_alignment.py",
+      "exists": true,
+      "cells_total": null,
+      "code_cells": null,
+      "cells_with_outputs": null,
+      "note": "plain script: execution leaves no trace in the file"
+    },
+    {
+      "run": "run-12-flip-axis-eigenvalue",
+      "label": "Run 12: Flip-axis eigenvalue + per-block/head localisation",
+      "script": "experiments/gpt2_small/08_hinge_eigenvalue.py",
+      "exists": true,
+      "cells_total": null,
+      "code_cells": null,
+      "cells_with_outputs": null,
+      "note": "plain script: execution leaves no trace in the file"
+    },
+    {
+      "run": "run-13-lagk-regate",
+      "label": "Run 13: Lag-k re-gate + engine gate_lag",
+      "script": "experiments/gpt2_small/09_lagk_gate.py",
+      "exists": true,
+      "cells_total": null,
+      "code_cells": null,
+      "cells_with_outputs": null,
+      "note": "plain script: execution leaves no trace in the file"
+    },
+    {
+      "run": "run-14-jlens-phase-probe",
+      "label": "Run 14: J-lens phase probe (both phases, pivot, flip axis)",
+      "script": "experiments/gpt2_small/10_jlens_phase.py",
+      "exists": true,
+      "cells_total": null,
+      "code_cells": null,
+      "cells_with_outputs": null,
+      "note": "plain script: execution leaves no trace in the file"
+    },
+    {
+      "run": "run-15-suppression-test",
+      "label": "Run 15: Suppression-head test for L11.H8",
+      "script": "experiments/gpt2_small/11_suppression_test.py",
+      "exists": true,
+      "cells_total": null,
+      "code_cells": null,
+      "cells_with_outputs": null,
+      "note": "plain script: execution leaves no trace in the file"
+    },
+    {
+      "run": "run-2-cross-model-sweeps",
+      "label": "Run 2: Cross-model sweeps",
+      "script": "experiments/gpt2_medium/01_attractor_dominance.ipynb",
+      "exists": true,
+      "cells_total": 19,
+      "code_cells": 12,
+      "cells_with_outputs": 12,
+      "note": null
+    },
+    {
+      "run": "run-3-random-noise-null",
+      "label": "Run 3: Random-noise null model",
+      "script": "experiments/gpt2_small/03_random_baseline.ipynb",
+      "exists": true,
+      "cells_total": 15,
+      "code_cells": 14,
+      "cells_with_outputs": 14,
+      "note": null
+    },
+    {
+      "run": "run-4-deep-convergence",
+      "label": "Run 4: Deep convergence",
+      "script": "experiments/pythia_410m/01b_deep_convergence.ipynb",
+      "exists": true,
+      "cells_total": 21,
+      "code_cells": 14,
+      "cells_with_outputs": 14,
+      "note": null
+    },
+    {
+      "run": "run-5-gated-resweep",
+      "label": "Run 5: Convergence-gated re-sweep",
+      "script": "experiments/gpt2_small/gated_resweep.py",
+      "exists": true,
+      "cells_total": null,
+      "code_cells": null,
+      "cells_with_outputs": null,
+      "note": "plain script: execution leaves no trace in the file"
+    },
+    {
+      "run": "run-6-full-distribution-confidence",
+      "label": "Run 6: Full-distribution confidence audit",
+      "script": "experiments/gpt2_small/04_readout_confidence.py",
+      "exists": true,
+      "cells_total": null,
+      "code_cells": null,
+      "cells_with_outputs": null,
+      "note": "plain script: execution leaves no trace in the file"
+    },
+    {
+      "run": "run-8-divine-motion-audit",
+      "label": "Run 8: Divine motion audit (lag-10 + lag-1 probe)",
+      "script": "experiments/gpt2_small/05_divine_motion.py",
+      "exists": true,
+      "cells_total": null,
+      "code_cells": null,
+      "cells_with_outputs": null,
+      "note": "plain script: execution leaves no trace in the file"
+    },
+    {
+      "run": "run-9-cycle-anatomy",
+      "label": "Run 9: Cycle anatomy",
+      "script": "experiments/gpt2_small/06_bell_anatomy.py",
+      "exists": true,
+      "cells_total": null,
+      "code_cells": null,
+      "cells_with_outputs": null,
+      "note": "plain script: execution leaves no trace in the file"
+    },
+    {
+      "run": "run-all-warm-permutation",
+      "label": "All-warm permutation test",
+      "script": "experiments/gpt2_small/02b_permutation_test.py",
+      "exists": true,
+      "cells_total": null,
+      "code_cells": null,
+      "cells_with_outputs": null,
+      "note": "plain script: execution leaves no trace in the file"
+    },
+    {
+      "run": "run-cos-sim-diagnostic",
+      "label": "Tensor convergence diagnostic",
+      "script": "experiments/cos_sim_diagnostic.ipynb",
+      "exists": true,
+      "cells_total": 7,
+      "code_cells": 5,
+      "cells_with_outputs": 5,
+      "note": null
+    },
+    {
+      "run": "run-original-piece",
+      "label": "EXP_009aFIX: the original five-prompt piece",
+      "script": "experiments/gpt2_small/lucier_total_resonance.ipynb",
+      "exists": true,
+      "cells_total": 21,
+      "code_cells": 13,
+      "cells_with_outputs": 12,
+      "note": null
+    },
+    {
+      "run": "run-readout-guardrails",
+      "label": "Readout confidence audit",
+      "script": "experiments/readout_guardrails.ipynb",
+      "exists": true,
+      "cells_total": 6,
+      "code_cells": 5,
+      "cells_with_outputs": 5,
+      "note": null
+    },
+    {
+      "run": "run-spectral-scaffold",
+      "label": "Spectral resonance scaffold (H4, not run)",
+      "script": "experiments/gpt2_small/spectral_resonance.ipynb",
+      "exists": true,
+      "cells_total": 14,
+      "code_cells": 8,
+      "cells_with_outputs": 8,
+      "note": "the graph calls this run unexecuted; the notebook carries outputs"
+    },
+    {
+      "run": "run-token-neighbourhood",
+      "label": "Priority Analysis 01: embedding neighbourhood test",
+      "script": "experiments/gpt2_small/02_token_neighbourhood.ipynb",
+      "exists": true,
+      "cells_total": 15,
+      "code_cells": 8,
+      "cells_with_outputs": 2,
+      "note": "only 2 of 8 code cells carry outputs; the rest have been cleared or never ran"
+    }
+  ]
+}

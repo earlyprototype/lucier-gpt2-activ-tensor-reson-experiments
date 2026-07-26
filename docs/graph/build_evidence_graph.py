@@ -74,8 +74,13 @@ ALLOWED_REL = {
     "produced-by", "run-on", "evidenced-by", "documented-in",
     # associative
     "analogous-to", "breaks-down-at", "builds-on", "cites", "relates-to",
+    # associative: dependency between open work and what it gates.  `blocks`
+    # runs blocker -> gated thing, `blocked-by` is the same relation written
+    # from the gated end; only one of the two is drawn per pair, in whichever
+    # direction the record states it.
+    "blocks", "blocked-by",
 }
-ALLOWED_CLAIM_TYPE = {"hypothesis", "finding", "concept"}
+ALLOWED_CLAIM_TYPE = {"hypothesis", "finding", "concept", "question"}
 ALLOWED_RUN_TYPE = {"run", "model", "null-model"}
 ALLOWED_SOURCE_TYPE = {"doc", "artefact", "prior-work"}
 
@@ -910,6 +915,213 @@ def series_concepts():
             ("phase", c["phase"]), ("asserted", c["asserted"]), ("retired", None),
             ("doc_ref", c["doc_ref"]),
         ]))
+    return out
+
+
+# --------------------------------------------------------------------------
+# 5b. Questions  (the things the record explicitly leaves open)
+# --------------------------------------------------------------------------
+#
+# A `question` is a claim type in its own right: not a hypothesis (which asserts
+# something testable) and not a concept (which is vocabulary).  It exists because
+# `open` was useless as a work signal - every `open` claim in this graph was a
+# concept, `open` being what a concept falls into when there is no epistemic
+# verdict to record.  `type == "question" and status == "open"` is the query that
+# returns work.
+#
+# HARVESTING RULE, and it is strict: a question node must correspond to something
+# the record actually leaves open, and the sentence that leaves it open is quoted
+# verbatim in the description.  Nothing here is inferred, extrapolated, or added
+# because it "would obviously be next".  Sources used, all read in full:
+#   * docs/FINDINGS.md section 6 (stage boundary: work closed unexecuted)
+#   * docs/FINDINGS.md section 5 (open directions, in rough order of leverage)
+#   * docs/FINDINGS.md section 4 (caveats 1, 5, 6, 10, 11, 14)
+#   * docs/FINDINGS.md section 3 (hypothesis dispositions: pending-work clauses)
+#   * docs/FINDINGS.md F10 / F11 / F12 / F15 bodies
+#   * docs/JOURNEY_MAP.md section 7 (Open Questions), non-struck rows only
+#
+# Every question here is `open`.  JOURNEY_MAP section 7 marks one row "Untested";
+# that word is quoted in the description rather than used as the status, because
+# `untested` in this graph means "asserted, never put to a run", and a question
+# asserts nothing.  Keeping one status across the set also keeps the work query a
+# single predicate.
+#
+# Struck-through rows of JOURNEY_MAP section 7 are deliberately NOT emitted: they
+# are answered, and their answers are already in the graph as findings with the
+# edges that settled them (F9 for the `Divine` object, F3 for basin profiles, the
+# permutation test for the W_E statistics).
+
+A_CAVEATS = "docs/FINDINGS.md#caveats"
+A_OPEN_QUESTIONS = "docs/JOURNEY_MAP.md#7-open-questions"
+A_F10 = ("docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-"
+         "invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole")
+A_F11 = ("docs/FINDINGS.md#f11-j-lens-pilot-the-prolet-insidedivine-outside-prediction-"
+         "did-not-hold-the-boundary-that-appeared-is-language-vs-noise")
+A_F12 = ("docs/FINDINGS.md#f12-cross-model-gpt-2-mediums-universal-attractor-is-a-"
+         "typographic-cluster-over-a-near-flat-readout")
+A_F15 = ("docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-"
+         "the-engine-now-supports-it")
+
+QUESTIONS = [
+    dict(
+        id="q-why-gpt2-small",
+        label="Q: Why does GPT-2 Small alone resolve language into few semantic basins?",
+        asserted=D_SERIES_CLOSE, doc_ref=A_OPEN_QUESTIONS,
+        description=(
+            "JOURNEY_MAP section 7 files this one at a status of its own: \"The open "
+            "question of the series\", next step \"New experimental stage\". FINDINGS "
+            "section 5 puts it first in the open directions, ordered by leverage: \"why "
+            "GPT-2 Small (the anomaly, now with low-probability coherent clusters as the "
+            "thing to explain)\", and adds that the anomaly was sharpened rather than "
+            "removed by Act II.5.")),
+    dict(
+        id="q-flip-axis-generality",
+        label="Q: Do all 34 Divine prompts share the F10 flip axis, head and eigenvalue?",
+        asserted=D_ACT_II_5, doc_ref=A_F10,
+        description=(
+            "F10 states it in as many words: \"Open: whether all 34 Divine prompts share "
+            "this flip axis (blocked on the prompt-library restoration, issue #9).\" "
+            "Caveat 14 widens it to the whole mechanism series: \"Whether the other 33 "
+            "period-2 prompts share the flip axis, the flip head (L11.H8), the "
+            "eigenvalue, and the anomalous-token alignment is untested (prompt library "
+            "pending, issue #9).\" FINDINGS section 5 calls this \"what is now most open "
+            "on the Divine object\".")),
+    dict(
+        id="q-lag2-regate-33",
+        label="Q: Do the other 33 period-2 prompts re-gate as converged?",
+        asserted=D_ACT_II_5, doc_ref=A_F15,
+        description=(
+            "F15 demonstrates the lag-k gate for one trajectory and records the rest as "
+            "outstanding: \"The other 33 period-2 prompts remain blocked on the prompt "
+            "library (issue #9); one, the Syntactic prompt, is now re-gated as "
+            "converged.\" The procedure is on record too - the re-gate \"runs the full "
+            "lag table on a short dense continuation and gates each state at its smallest "
+            "passing lag\" - so this is blocked on an artefact, not on a method. "
+            "JOURNEY_MAP section 7 gives the same next step: \"Re-gate the other 33 "
+            "prompts (blocked on issue #9)\".")),
+    dict(
+        id="q-prompt-library",
+        label="Q: Is the 125-prompt library restored (issue #9)?",
+        asserted=D_ACT_II_5, doc_ref=A_CAVEATS,
+        description=(
+            "Caveats 11 and 14 both file the same gate in the same three words, \"prompt "
+            "library pending, issue #9\", and FINDINGS section 5 names it as the blocker "
+            "on two separate directions at once: the re-gate of the 34 cycling prompts "
+            "and the flip-axis generality question are \"blocked in part on the "
+            "prompt-library restoration, issue #9\". This node is a restoration task "
+            "rather than a question about the model; it is in the graph so that the two "
+            "threads it gates point at one blocker instead of repeating one sentence in "
+            "two descriptions, where nothing can pair them.")),
+    dict(
+        id="q-jlens-full-build",
+        label="Q: What does the phase-aware full J-lens build show (issue #8)?",
+        asserted=D_ACT_II_5, doc_ref=A_F11,
+        description=(
+            "F11 specifies the outstanding work: \"The full build (issue #8) should be "
+            "phase-aware: probe both phases and the pivot M.\" H-J1's disposition closes "
+            "on the same debt - \"Full build still pending (issue #8)\" - and FINDINGS "
+            "section 5 lists \"the phase-aware J-lens full build (F11, issue #8)\" among "
+            "the open directions. The pilot's own limits (caveat 13) are what the full "
+            "build exists to lift.")),
+    dict(
+        id="q-independent-reimplementation",
+        label="Q: Does an independent re-implementation reproduce the result?",
+        asserted=D_ACT_II_5, doc_ref=A_CAVEATS,
+        description=(
+            "H0's disposition ends on the gap: \"Independent re-implementation still not "
+            "attempted.\" Caveat 1 makes the same point its heading - \"Repeatability "
+            "plus one cross-hardware replication, not independent reproducibility\" - and "
+            "closes \"No independent re-implementation by another investigator.\" What "
+            "exists is same-code replication on new hardware (F6), which is a different "
+            "claim.")),
+    dict(
+        id="q-gate-cadence",
+        label="Q: What are the true settling iterations between 100 and 120?",
+        asserted=D_SERIES_CLOSE, doc_ref=A_CAVEATS,
+        description=(
+            "Caveat 5: \"Lock-in iterations cluster at 120 because that is the gate's "
+            "earliest possible firing; true settling times between 100 and 120 are "
+            "unresolved.\" FINDINGS section 6 files it as the series' one remaining "
+            "declared debt - \"One item remains open: finer convergence-gate cadence "
+            "(caveat 5)\" - and bounds it in the same breath: \"It cannot overturn a "
+            "principal finding: basin identities stand on the gate regardless of "
+            "cadence.\" So it carries no blocks edge: open work that gates nothing.")),
+    dict(
+        id="q-hook-window-depth",
+        label="Q: Does the landscape depend on where the loop is cut (window / depth)?",
+        asserted=D_SERIES_CLOSE, doc_ref=A_CAVEATS,
+        description=(
+            "Caveat 6: \"Hook-position dependence unexplored. All runs cut the loop at "
+            "(final-layer resid_post to layer-0 resid_pre). Alternative windows "
+            "(including a Pythia-410m depth control, layers 0-11 vs 0-23) are designed "
+            "but not run.\" JOURNEY_MAP section 7 carries the row at status \"Designed, "
+            "not run\", and FINDINGS section 5 lists \"hook-window/depth dependence "
+            "(caveat 6)\" among the open directions.")),
+    dict(
+        id="q-shape-class-null",
+        label="Q: What does a shape-class-matched coherence null show?",
+        asserted=D_ACT_II_5, doc_ref=A_F12,
+        description=(
+            "F12 records the block as a standing methodological rule: \"no cross-model "
+            "coherence claim until a shape-class-matched null exists (matching token "
+            "length, case, and leading-space status)\". Caveat 10 repeats it, and "
+            "FINDINGS section 5 lists \"the shape-class-matched coherence null and its "
+            "application to the 125-sweep (F12, caveat 10)\" among the open directions. "
+            "Until it exists, the semantic-coherence phenomenon \"remains exclusive to "
+            "GPT-2 Small's language regime among the models tested\".")),
+    dict(
+        id="q-tmix-llm",
+        label="Q: What is T_mix_LLM for each basin?",
+        asserted=D_SERIES_CLOSE, doc_ref=A_OPEN_QUESTIONS,
+        description=(
+            "JOURNEY_MAP section 7: \"What is T_mix_LLM for each basin? | Measurable from "
+            "existing data | Compute from .pt\". The glossary files the metric itself as "
+            "a \"proposed metric\" that was never computed, so the question is open with "
+            "its data already on disk - the cheapest item on the open list.")),
+    dict(
+        id="q-slonski-macro-group",
+        label="Q: Are all basins in one Slonski macro-group?",
+        asserted=D_SERIES_CLOSE, doc_ref=A_OPEN_QUESTIONS,
+        description=(
+            "JOURNEY_MAP section 7: \"Are all basins in one Slonski macro-group? | "
+            "Untested; the all-warm premise of the prediction was retired 2026-07-11 "
+            "(anisotropy artifact) | One Q-vector experiment, on its own terms\". Kept at "
+            "exactly the strength the record gives it: the question outlived its own "
+            "premise and stands only as a question, with a named one-experiment next "
+            "step.")),
+    dict(
+        id="q-fractal-dimension",
+        label="Q: Is the fractal dimension of convergence trajectories basin-specific?",
+        asserted=D_SERIES_CLOSE, doc_ref=A_OPEN_QUESTIONS,
+        description=(
+            "JOURNEY_MAP section 7: \"Is the fractal dimension of convergence "
+            "trajectories basin-specific? | Speculative | Requires T_mix first\". The "
+            "weakest item on the open list, recorded at that strength: speculative, and "
+            "gated on a metric nobody has computed yet.")),
+]
+
+
+def questions():
+    out = []
+    for q in QUESTIONS:
+        out.append(OrderedDict([
+            ("id", q["id"]),
+            ("label", q["label"]),
+            ("type", "question"),
+            # Every question is `open`: the status finally means work rather than
+            # "a concept with no epistemic verdict".  An answered question would
+            # take `retired` plus a `retires` edge from whatever answered it, so
+            # the answer stays a followable node rather than a status word.
+            ("status", "open"),
+            ("description", q["description"]),
+            ("phase", "phase-5"),
+            ("asserted", q["asserted"]),
+            ("retired", None),
+            ("doc_ref", q["doc_ref"]),
+        ]))
+    ids = [q["id"] for q in out]
+    if len(ids) != len(set(ids)):
+        raise SystemExit("FATAL: duplicate question id")
     return out
 
 
@@ -1993,6 +2205,142 @@ def curated_relationships():
     return R
 
 
+def question_relationships():
+    """Wire every question to what raised it and to what it gates.
+
+    Direction rule: one edge per dependency, drawn the way the record phrases it.
+    Where the source says "X is blocked on Y" the edge is X -blocked-by-> Y;
+    where the source leads with the blocker ("no claim until Y exists") it is
+    Y -blocks-> X.  Drawing both would double the dependency count and make one
+    stated blocker look like two.
+    """
+    R = []
+
+    # ---- the shared blocker: issue #9, the prompt library -----------------
+    # This is the pairing that prose cannot show.  F10 and F15 sit in different
+    # sections and never mention each other, yet they are one artefact away from
+    # both moving.
+    R += [
+        rel("q-flip-axis-generality", "q-prompt-library", "blocked-by",
+            "F10's own words: the flip-axis generality question is \"blocked on the "
+            "prompt-library restoration, issue #9\", repeated in caveats 11 and 14 as "
+            "\"prompt library pending, issue #9\".", 8, D_ACT_II_5),
+        rel("q-lag2-regate-33", "q-prompt-library", "blocked-by",
+            "F15's own words: \"The other 33 period-2 prompts remain blocked on the "
+            "prompt library (issue #9)\", and JOURNEY_MAP section 7 gives the next step "
+            "as \"Re-gate the other 33 prompts (blocked on issue #9)\".", 8, D_ACT_II_5),
+    ]
+
+    # ---- the other stated dependencies ------------------------------------
+    R += [
+        rel("q-fractal-dimension", "q-tmix-llm", "blocked-by",
+            "JOURNEY_MAP section 7 states the order in two words: the fractal-dimension "
+            "question \"Requires T_mix first\".", 4, D_SERIES_CLOSE),
+        rel("q-jlens-full-build", "h-j1", "blocks",
+            "H-J1 cannot move past a pilot-confidence null while the instrument that "
+            "would settle it is unbuilt: its disposition ends \"Full build still pending "
+            "(issue #8)\", and F11 specifies that the build \"should be phase-aware: "
+            "probe both phases and the pivot M\".", 8, D_ACT_II_5),
+        rel("q-shape-class-null", "concept-coherence", "blocks",
+            "F12 states the block as a standing rule rather than a wish: \"no cross-model "
+            "coherence claim until a shape-class-matched null exists\". The measure "
+            "cannot travel outside GPT-2 Small until that null is built.", 7, D_ACT_II_5),
+        rel("q-independent-reimplementation", "h0-determinism", "blocks",
+            "H0 currently stands on repeatability plus one cross-hardware replication. "
+            "Caveat 1's heading is the block: \"Repeatability plus one cross-hardware "
+            "replication, not independent reproducibility\", and H0's disposition ends "
+            "\"Independent re-implementation still not attempted\".", 6, D_ACT_II_5),
+        rel("q-hook-window-depth", "q-why-gpt2-small", "blocks",
+            "FINDINGS section 6 assigns the depth control to the successor question "
+            "explicitly: the depth control, the per-layer / per-head decomposition, the "
+            "spectral test and readout upgrades \"do not test whether the result is real; "
+            "they test why the models differ. That is the successor project's "
+            "question.\"", 5, D_SERIES_CLOSE),
+    ]
+
+    # ---- questions -> the claims that raised them -------------------------
+    R += [
+        rel("q-why-gpt2-small", F3, "relates-to",
+            "F3 is what makes the question a question: same corpus, different landscape, "
+            "and GPT-2 Small alone resolves language into few semantic basins.",
+            7, D_SERIES_CLOSE),
+        rel("q-why-gpt2-small", F8, "relates-to",
+            "F8 sharpened what has to be explained: not a confident winner but a "
+            "low-probability argmax over a coherent lexical field.", 6, D_ACT_II_5),
+        rel("q-flip-axis-generality", F10, "relates-to",
+            "F10 measured the flip axis on one trajectory and left its generality open in "
+            "the same paragraph.", 8, D_ACT_II_5),
+        rel("q-flip-axis-generality", F13, "relates-to",
+            "Caveat 14 names the anomalous-token alignment as one of the four properties "
+            "whose generality across the other 33 prompts is untested.", 5, D_ACT_II_5),
+        rel("q-flip-axis-generality", F14, "relates-to",
+            "Caveat 14 names the eigenvalue and the flip head L11.H8 as two more of those "
+            "four properties.", 5, D_ACT_II_5),
+        rel("q-flip-axis-generality", F17, "relates-to",
+            "F17's ablation and copy test follow the same single audited trajectory, so "
+            "the head's role in the other 33 prompts is untested too (caveat 14).",
+            5, D_ACT_II_5),
+        rel("q-lag2-regate-33", F15, "relates-to",
+            "F15 implemented the lag-k gate and demonstrated it for one prompt; this is "
+            "the remainder of that work.", 8, D_ACT_II_5),
+        rel("q-lag2-regate-33", F9, "relates-to",
+            "F9 is the finding that made the re-gate necessary: the 34 non-convergers "
+            "cycle rather than drift, so they were failed by construction.", 6, D_ACT_II_5),
+        rel("q-jlens-full-build", F11, "relates-to",
+            "The pilot is what the full build replaces; every F11 limitation (caveat 13) "
+            "is a specification for it.", 7, D_ACT_II_5),
+        rel("q-jlens-full-build", F16, "relates-to",
+            "F16 re-probed with the same restricted pilot lens, so it inherits the "
+            "pilot's limits and does not discharge the full build.", 6, D_ACT_II_5),
+        rel("q-independent-reimplementation", F6, "relates-to",
+            "F6 is the strongest replication on record and is explicitly not this: "
+            "\"same-code replication on new hardware, not independent "
+            "re-implementation\".", 6, D_ACT_II_5),
+        rel("q-gate-cadence", F1, "relates-to",
+            "F1's lock-in iterations are all 120 because that is the gate's floor, which "
+            "is what leaves the true settling times unresolved (caveat 5).",
+            6, D_SERIES_CLOSE),
+        rel("q-hook-window-depth", F3, "relates-to",
+            "The cross-model differences are the thing a window or depth change would "
+            "have to be ruled out of; all four sweeps cut the loop at one place.",
+            5, D_SERIES_CLOSE),
+        rel("q-shape-class-null", F12, "relates-to",
+            "F12 is where the rule is stated: GPT-2 Medium's typographic cluster passes "
+            "the coherence test at p = 0.001, so shape has to be controlled for.",
+            7, D_ACT_II_5),
+        rel("q-shape-class-null", F8, "relates-to",
+            "F8's permutation nulls control for frequency via the norm proxy but not for "
+            "token shape (caveat 10), which is the gap this question names.",
+            5, D_ACT_II_5),
+        rel("q-tmix-llm", "concept-t-mix-llm", "relates-to",
+            "The question is the metric's own definition, still uncomputed: JOURNEY_MAP "
+            "section 7 marks it \"Measurable from existing data\".", 5, D_SERIES_CLOSE),
+        rel("q-slonski-macro-group", "prior-slonski-q-vector", "relates-to",
+            "The Q-vector dichotomy is the framework the question is posed in, and the "
+            "next step JOURNEY_MAP names is \"One Q-vector experiment, on its own "
+            "terms\".", 4, D_SERIES_CLOSE),
+        rel("q-slonski-macro-group", D["9"], "relates-to",
+            "The prediction's premise was the all-warm compact subspace, retired "
+            "2026-07-11 by the permutation test; the question survives it only as a "
+            "question.", 4, D_PERMUTATION),
+        rel("q-fractal-dimension", "concept-fractal-dimension", "relates-to",
+            "The concept is listed in the Adjacent Science table as a potential, untested "
+            "metric for basin geometry; this is the question that would use it.",
+            3, D_SERIES_CLOSE),
+    ]
+
+    # ---- documented-in ----------------------------------------------------
+    for q in QUESTIONS:
+        doc = ("doc-findings" if q["doc_ref"].startswith("docs/FINDINGS.md")
+               else "doc-journey-map")
+        where = ("the canonical record" if doc == "doc-findings"
+                 else "the journey map's Open Questions table")
+        R.append(rel(q["id"], doc, "documented-in",
+                     "The passage this question is quoted from is in %s." % where, 2))
+
+    return R
+
+
 def structural_relationships(claims, runs, run_models, sources):
     """produced-by, run-on, evidenced-by, documented-in - generated, but each
     with a description naming both endpoints and what the link is."""
@@ -2138,6 +2486,7 @@ def visual_config():
             ("hypothesis", "#6B4C8A"),
             ("finding", "#2E7D5B"),
             ("concept", "#B9812F"),
+            ("question", "#A8477A"),
             ("run", "#5B7DB1"),
             ("model", "#B3423F"),
             ("null-model", "#8A8F94"),
@@ -2164,6 +2513,9 @@ def visual_config():
             ("hypothesis", "diamond"),
             ("finding", "dot"),
             ("concept", "hexagon"),
+            # `circle` draws the label inside, so an open question cannot be
+            # mistaken for another finding's `dot` at a glance.
+            ("question", "circle"),
             ("run", "square"),
             ("model", "triangle"),
             ("null-model", "triangleDown"),
@@ -2205,11 +2557,19 @@ def visual_config():
                                    ("color", "#B0B7BC"), ("arrow", True), ("width", 1)])),
             ("relates-to", OrderedDict([("style", "solid"), ("dashes", False),
                                         ("color", "#B0B7BC"), ("arrow", True), ("width", 1)])),
+            # Dependency edges share the question colour so open work reads as
+            # one family, and are dashed with an arrow because which end is
+            # blocked is the entire content of the edge.
+            ("blocks", OrderedDict([("style", "dashed"), ("dashes", [6, 3]),
+                                    ("color", "#A8477A"), ("arrow", True), ("width", 2)])),
+            ("blocked-by", OrderedDict([("style", "dashed"), ("dashes", [6, 3]),
+                                        ("color", "#A8477A"), ("arrow", True), ("width", 2)])),
         ])),
         ("node_sizes", OrderedDict([
             ("hypothesis", 26),
             ("finding", 22),
             ("concept", 16),
+            ("question", 20),
             ("run", 18),
             ("model", 24),
             ("null-model", 18),
@@ -2344,6 +2704,7 @@ def main():
     claims += adj_concepts
     claims += parse_glossary(journey_md)
     claims += series_concepts()
+    claims += questions()
 
     runs, run_models = parse_runs(findings_md)
     runs += EXTRA_RUNS
@@ -2357,10 +2718,11 @@ def main():
     sources = build_sources(adj_priors)
 
     relationships = curated_relationships()
+    relationships += question_relationships()
     relationships += structural_relationships(claims, runs, run_models, sources)
 
     # stable ordering: idempotent output
-    type_order = {"finding": 0, "hypothesis": 1, "concept": 2}
+    type_order = {"finding": 0, "hypothesis": 1, "concept": 2, "question": 3}
     claims.sort(key=lambda c: (type_order[c["type"]], c["id"]))
     runs.sort(key=lambda r: ({"run": 0, "model": 1, "null-model": 2}[r["type"]], r["id"]))
     sources.sort(key=lambda s: ({"doc": 0, "artefact": 1, "prior-work": 2}[s["type"]], s["id"]))
@@ -2376,9 +2738,11 @@ def main():
             ("title", "ATR Evidence Graph: hypotheses, findings, runs and self-corrections"),
             ("description",
              "The Activation Tensor Resonance series as an evidence graph: 17 principal "
-             "findings, 16 key discoveries, 12 hypotheses and the concepts they run on, wired "
-             "to the runs, models and artefacts that produced them, with every recorded "
-             "correction, retirement and supersession carried as a signed edge."),
+             "findings, 16 key discoveries, 12 hypotheses, the concepts they run on and the "
+             "questions the record leaves open, wired to the runs, models and artefacts that "
+             "produced them, with every recorded correction, retirement and supersession "
+             "carried as a signed edge and every stated blocker as a blocks / blocked-by "
+             "edge."),
             ("generator", "docs/graph/build_evidence_graph.py"),
             ("sources_parsed", ["docs/FINDINGS.md", "docs/JOURNEY_MAP.md"]),
             ("sources_checked_not_parsed", ["README.md"]),
@@ -2388,7 +2752,12 @@ def main():
              "stamped 2026-07-19 because FINDINGS.md dates the mechanism series '2026-07-19 "
              "onward' and gives no per-run dates; the stamp is the series start, not each run's "
              "execution day. Hypothesis `asserted` dates are placements, not record: the sources "
-             "date dispositions, never the moment a hypothesis was raised. Every other date, "
+             "date dispositions, never the moment a hypothesis was raised. Question "
+             "`asserted` dates are placements on the same footing: the caveats and "
+             "JOURNEY_MAP's Open Questions table carry no dates of their own, so each "
+             "question is stamped with the document revision that states it (2026-07-10 at "
+             "series close, 2026-07-19 for the Act II.5 caveats and F-sections). Every other "
+             "date, "
              "including every date on a corrects / retires / supersedes edge, is day-precise as "
              "stated in the record."),
             ("phases", phases),
@@ -2444,6 +2813,32 @@ def main():
     for e in graph["relationships"]:
         if e["type"] in ("corrects", "retires", "supersedes"):
             print("  %-12s %s -> %s  [%s]" % (
+                e["type"], e["from"], e["to"], e.get("asserted", "undated")))
+    print("")
+    print("open questions (type=question, status=open) and their dependencies:")
+    q_ids = [c["id"] for c in graph["claims"] if c["type"] == "question"]
+    for qid in q_ids:
+        claim = next(c for c in graph["claims"] if c["id"] == qid)
+        print("  %s" % claim["label"])
+        print("      %-14s %s" % ("id", qid))
+        print("      %-14s %s" % ("doc_ref", claim["doc_ref"]))
+        gates, gated_by = [], []
+        for e in graph["relationships"]:
+            if e["type"] == "blocks" and e["from"] == qid:
+                gates.append(e["to"])
+            elif e["type"] == "blocked-by" and e["to"] == qid:
+                gates.append(e["from"])
+            elif e["type"] == "blocks" and e["to"] == qid:
+                gated_by.append(e["from"])
+            elif e["type"] == "blocked-by" and e["from"] == qid:
+                gated_by.append(e["to"])
+        print("      %-14s %s" % ("blocks", ", ".join(sorted(gates)) or "-"))
+        print("      %-14s %s" % ("blocked by", ", ".join(sorted(gated_by)) or "-"))
+    print("")
+    print("dependency edges (blocks / blocked-by):")
+    for e in graph["relationships"]:
+        if e["type"] in ("blocks", "blocked-by"):
+            print("  %-11s %s -> %s  [%s]" % (
                 e["type"], e["from"], e["to"], e.get("asserted", "undated")))
     print("")
     print("phases: %s" % ", ".join("%s (%s)" % (p["id"], p["start"])

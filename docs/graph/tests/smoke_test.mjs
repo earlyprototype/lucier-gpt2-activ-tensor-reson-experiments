@@ -3,7 +3,7 @@
  * Headless browser smoke + interaction test for docs/graph/viewer.html.
  *
  * Serves docs/graph on a free port, drives the viewer with Playwright's
- * bundled Chromium, and asserts thirteen things:
+ * bundled Chromium, and asserts fourteen things:
  *
  *   1. viewer.html loads with ZERO pageerror and ZERO console-error events
  *   2. a <canvas> exists and vis-network has actually rendered nodes
@@ -18,8 +18,14 @@
  *  11. no HTTP >= 400 responses for any requested asset
  *  12. on a phone-sized viewport the graph, not the chrome, owns the screen
  *  13. returning to evidence from another graph restores force-directed layout
+ *  14. Threads mode renders from threads.json — readiness colours reach the
+ *      DataSet, the ranked low-hanging-fruit list is populated and drives the
+ *      graph, blocks/blocked-by are drawn as gate edges — and none of it
+ *      leaks: after threads -> dissolution -> evidence the hub nodes are gone,
+ *      status colours are back, gate edges are undashed and evidence is still
+ *      clickable
  *
- * Assertions 1-11 and 13 run at 1600x1000. Assertion 12 opens a second,
+ * Assertions 1-11, 13 and 14 run at 1600x1000. Assertion 12 opens a second,
  * phone-sized context (393x830, isMobile + hasTouch) so the narrow-screen
  * layout is pinned without disturbing the desktop measurements the others
  * depend on.
@@ -151,7 +157,7 @@ function startServer(rootDir) {
 // --- reporting -------------------------------------------------------------
 // Every assertion must run: a suite that silently stops short is a failure, not
 // a pass. Bump this when adding one.
-const TOTAL_ASSERTIONS = 13;
+const TOTAL_ASSERTIONS = 14;
 
 // --- mobile budget (assertion 12) ------------------------------------------
 // A real device (Nothing Phone 2a) showed the header + chip rows eating 66% of
@@ -969,6 +975,305 @@ async function main() {
                 `distinctX=${r.back.distinctX}/${r.back.nodes}` +
                 `${r.ok ? '' : ' <-- STACKED'}`).join('\n') +
             '\n' + (describeSince(snap13).join('\n') || 'no errors'));
+
+        // ------------------------------------------------------------------
+        // 14. Threads mode renders, and leaves nothing behind.
+        //
+        // Threads is an overlay view: the same evidence nodes re-coloured by
+        // _data/threads.json, plus synthesised blocker hubs and loudly-styled
+        // blocks / blocked-by edges. Three things have to hold at once.
+        //
+        //   (a) it renders at all: readiness colours actually reach the vis
+        //       DataSet (not just the legend), the ranked low-hanging-fruit
+        //       list is populated from the report, and clicking a ranked row
+        //       focuses the graph the way a node click does;
+        //   (b) the gate edges are drawn as gate edges — dashed, width 4, in
+        //       the gate colour — since a blocker gating several claims
+        //       reading as a hub is the whole reason the view exists;
+        //   (c) and, critically, none of that survives the trip out. Threads
+        //       adds nodes (hubs), rewrites node colours, and mutates edge
+        //       objects in place. Every one of those is a leak waiting to
+        //       happen: come back to evidence via dissolution and the graph
+        //       could keep the hub nodes, keep readiness colours instead of
+        //       status colours, or keep drawing blocks edges dashed. Assertion
+        //       13 covers layout leaking; this covers *content* leaking, and
+        //       goes out through dissolution so a two-hop return is tested.
+        // ------------------------------------------------------------------
+        phase = 'threads';
+        const snap14 = snapshotErrors();
+
+        const report = JSON.parse(await fsp.readFile(path.join(ROOT, '_data', 'threads.json'), 'utf8'));
+        const reportFruit = (report.low_hanging_fruit || []).length;
+        const graphGateEdges = (entities.relationships || [])
+            .filter(r => r.type === 'blocks' || r.type === 'blocked-by').length;
+
+        // Everything threads-specific, read out of the live page.
+        //
+        // Note on where things are read from: `edgesDataSet` is a stripped copy
+        // (createEdges' `relType`/`data` are deleted before it is handed to
+        // vis), so edge *identity* comes from `allEdges` and edge *styling*
+        // from the DataSet row with the same id. Same split for nodes: `status`
+        // lives on `allNodes`, the painted colour on `nodesDataSet`.
+        const readThreads = () => page.evaluate(() => {
+            const dsNodes = (typeof nodesDataSet !== 'undefined' && nodesDataSet) ? nodesDataSet.get() : [];
+            const dsEdges = (typeof edgesDataSet !== 'undefined' && edgesDataSet) ? edgesDataSet.get() : [];
+            const drawnEdge = {};
+            dsEdges.forEach(e => { drawnEdge[e.id] = e; });
+            const gateTypes = ['blocks', 'blocked-by'];
+            const gate = (typeof allEdges !== 'undefined' ? allEdges : [])
+                .filter(e => gateTypes.indexOf(e.relType) !== -1);
+            const styled = gate.filter(e => {
+                const d = drawnEdge[e.id];
+                return d && Array.isArray(d.dashes) && d.dashes.length > 0 &&
+                    Number(d.width) === 4 &&
+                    d.color && String(d.color.color).toUpperCase() === '#6B4C8A';
+            });
+            const paint = {};
+            dsNodes.forEach(n => {
+                paint[n.id] = (n.color && n.color.background)
+                    ? String(n.color.background).toUpperCase() : null;
+            });
+            const byReadiness = {};
+            const colourByReadiness = {};
+            (typeof allNodes !== 'undefined' ? allNodes : []).forEach(n => {
+                const key = (typeof readinessOf === 'function') ? readinessOf(n) : 'neutral';
+                byReadiness[key] = (byReadiness[key] || 0) + 1;
+                if (!colourByReadiness[key]) colourByReadiness[key] = paint[n.id];
+            });
+            const nodes = dsNodes;
+            const edges = dsEdges;
+            const panel = document.getElementById('fruit-panel');
+            const rows = panel ? Array.from(panel.querySelectorAll('.fruit-row')) : [];
+            return {
+                renderMode: typeof renderMode !== 'undefined' ? renderMode : null,
+                nodeCount: nodes.length,
+                edgeCount: edges.length,
+                hubCount: (typeof threadsHubs !== 'undefined' && threadsHubs) ? threadsHubs.length : 0,
+                reportLoaded: typeof threadsReport !== 'undefined' && !!threadsReport,
+                fruitInState: (typeof threadsFruit !== 'undefined' && threadsFruit) ? threadsFruit.length : 0,
+                panelVisible: !!panel && !panel.classList.contains('mode-hidden'),
+                fruitRows: rows.length,
+                firstRowText: rows.length ? rows[0].textContent.replace(/\s+/g, ' ').trim() : null,
+                gateEdges: gate.length,
+                gateStyled: styled.length,
+                readinessChipsVisible: (() => {
+                    const el = document.getElementById('readiness-chips');
+                    return !!el && !el.classList.contains('mode-hidden');
+                })(),
+                byReadiness,
+                colourByReadiness,
+                answeredColour: colourByReadiness['answered-unrecorded'] || null,
+                canvases: document.querySelectorAll('#graph canvas').length
+            };
+        });
+
+        // Evidence-mode facts that threads must not have disturbed.
+        const readEvidenceContent = (probeId) => page.evaluate((probe) => {
+            const dsNodes = (typeof nodesDataSet !== 'undefined' && nodesDataSet) ? nodesDataSet.get() : [];
+            const dsEdges = (typeof edgesDataSet !== 'undefined' && edgesDataSet) ? edgesDataSet.get() : [];
+            const drawnEdge = {};
+            dsEdges.forEach(e => { drawnEdge[e.id] = e; });
+            // Evidence mode has its own blocks / blocked-by style, supplied by
+            // _data/visual_config.json -- these edges are legitimately dashed
+            // here. The leak to catch is the *threads* gate style (its own
+            // colour and dash pattern) surviving the trip back, so compare the
+            // drawn style against the config rather than against "undashed".
+            const gate = (typeof allEdges !== 'undefined' ? allEdges : [])
+                .filter(e => e.relType === 'blocks' || e.relType === 'blocked-by');
+            const gateStyle = gate.map(e => {
+                const d = drawnEdge[e.id];
+                return {
+                    id: e.id, type: e.relType, drawn: !!d,
+                    colour: d && d.color ? String(d.color.color).toUpperCase() : null,
+                    dashes: d ? JSON.stringify(d.dashes) : null,
+                    width: d ? Number(d.width) : null
+                };
+            });
+            const wearingThreadsStyle = gateStyle.filter(g =>
+                g.colour === String(GATE_EDGE_STYLE.color).toUpperCase() ||
+                g.dashes === JSON.stringify(GATE_EDGE_STYLE.dashes));
+            const paint = {};
+            dsNodes.forEach(n => {
+                paint[n.id] = (n.color && n.color.background)
+                    ? String(n.color.background).toUpperCase() : null;
+            });
+            // Every node carrying a status must be painted the colour that
+            // status implies -- or the retired grey, if the timeline cursor has
+            // already passed its retirement. Nothing else is acceptable.
+            const wrong = [];
+            let checked = 0;
+            (typeof allNodes !== 'undefined' ? allNodes : []).forEach(n => {
+                if (!n.status || typeof statusColour !== 'function') return;
+                checked++;
+                const want = String(statusColour(n.status)).toUpperCase();
+                const retired = (typeof RETIRED_COLOR !== 'undefined')
+                    ? String(RETIRED_COLOR).toUpperCase() : null;
+                const got = paint[n.id];
+                if (got !== want && got !== retired) {
+                    wrong.push({ id: n.id, status: n.status, want, got });
+                }
+            });
+            // The motivating node: red for "answered, unrecorded" in threads,
+            // and it must be back to its epistemic status colour here.
+            const probeNode = (typeof allNodes !== 'undefined' ? allNodes : [])
+                .find(n => n.id === probe) || null;
+            return {
+                renderMode: typeof renderMode !== 'undefined' ? renderMode : null,
+                nodeCount: dsNodes.length,
+                edgeCount: dsEdges.length,
+                hubNodes: dsNodes.filter(n => String(n.id).indexOf('threads-blocker-') === 0).length,
+                gateEdges: gate.length,
+                gateWearingThreadsStyle: wearingThreadsStyle.length,
+                gateStyleSample: gateStyle.slice(0, 2),
+                statusChecked: checked,
+                statusWrong: wrong.slice(0, 5),
+                statusWrongCount: wrong.length,
+                probeId: probe,
+                probeStatus: probeNode ? probeNode.status : null,
+                probePaint: paint[probe] || null,
+                probeWant: (probeNode && typeof statusColour === 'function')
+                    ? String(statusColour(probeNode.status)).toUpperCase() : null,
+                readinessChipsVisible: (() => {
+                    const el = document.getElementById('readiness-chips');
+                    return !!el && !el.classList.contains('mode-hidden');
+                })(),
+                fruitPanelVisible: (() => {
+                    const el = document.getElementById('fruit-panel');
+                    return !!el && !el.classList.contains('mode-hidden');
+                })(),
+                threadsStateCleared: (typeof threadsReport === 'undefined' || threadsReport === null) &&
+                    (typeof threadsFruit === 'undefined' || threadsFruit.length === 0)
+            };
+        }, probeId);
+
+        await page.selectOption('#graph-select', 'threads');
+        await waitLoaded(page);
+        await sleep(800);
+        const th = await readThreads();
+
+        // (a) the ranked list is real and clicking it drives the graph.
+        const beforeFocus = await readState(page);
+        const firstFruit = (report.low_hanging_fruit || [])[0] || {};
+        let focusVisible = null, focusSelected = null, focusPill = null;
+        if (th.fruitRows > 0) {
+            await page.click('#fruit-panel .fruit-row:first-of-type');
+            await page.waitForTimeout(600);
+            const after = await readState(page);
+            focusVisible = after.visibleNodes;
+            const d = await page.evaluate(() => {
+                const panel = document.getElementById('details-panel');
+                const pill = panel ? panel.querySelector('.readiness-pill') : null;
+                return {
+                    selected: typeof currentNodeId !== 'undefined' ? currentNodeId : null,
+                    pill: pill ? pill.textContent.trim() : null,
+                    open: !!panel && !panel.classList.contains('hidden')
+                };
+            });
+            focusSelected = d.selected;
+            focusPill = d.pill;
+        }
+        const fruitOk = th.panelVisible &&
+            th.fruitRows === reportFruit && reportFruit > 0 &&
+            th.fruitInState === reportFruit &&
+            focusSelected === firstFruit.claim &&
+            !!focusPill &&
+            focusVisible !== null && focusVisible < beforeFocus.visibleNodes;
+
+        // (b) gate edges drawn as gate edges, hubs synthesised.
+        const gateOk = th.gateEdges >= graphGateEdges &&
+            th.gateEdges > 0 &&
+            th.gateStyled === th.gateEdges &&
+            th.hubCount > 0 &&
+            th.nodeCount === evidenceCount + th.hubCount;
+
+        const rendersOk = th.renderMode === 'threads' && th.reportLoaded &&
+            th.canvases >= 1 && th.readinessChipsVisible &&
+            th.answeredColour === '#C1443C' &&
+            (th.byReadiness['answered-unrecorded'] || 0) > 0 &&
+            (th.byReadiness['neutral'] || 0) < th.nodeCount;
+
+        // (c) round trip out through dissolution and back to evidence.
+        await page.selectOption('#graph-select', 'dissolution');
+        await waitLoaded(page);
+        await sleep(900);
+        await page.selectOption('#graph-select', 'evidence');
+        await waitLoaded(page);
+        await sleep(1200);
+        const ev = await readEvidenceContent(firstFruit.claim);
+
+        // and evidence is still *interactive*, not merely painted correctly.
+        await typeSearch(page, target.id);
+        await clickNode(page, target.id);
+        const evDetail = await page.evaluate(() => {
+            const panel = document.getElementById('details-panel');
+            const pill = panel ? panel.querySelector('.status-pill') : null;
+            return {
+                open: !!panel && !panel.classList.contains('hidden'),
+                pill: pill ? pill.textContent.trim() : null,
+                selected: typeof currentNodeId !== 'undefined' ? currentNodeId : null
+            };
+        });
+        await typeSearch(page, '');
+
+        // The evidence style the gate edges must be wearing is the project's
+        // own, read from the same config the viewer reads -- not hardcoded here.
+        const visualConfig = JSON.parse(
+            await fsp.readFile(path.join(ROOT, '_data', 'visual_config.json'), 'utf8'));
+        const configGate = ((visualConfig.edge_styles || {})['blocks']) || {};
+        const configGateColour = String(configGate.color || '').toUpperCase();
+        const configGateDashes = configGate.dashes;
+        const evidenceGateStyleOk = ev.gateStyleSample.length > 0 &&
+            ev.gateStyleSample.every(g => g.drawn &&
+                g.colour === configGateColour &&
+                g.dashes === JSON.stringify(configGateDashes));
+
+        const roundTripOk = ev.renderMode === 'evidence' &&
+            ev.nodeCount === evidenceCount &&
+            ev.hubNodes === 0 &&
+            ev.gateEdges === graphGateEdges &&
+            ev.gateWearingThreadsStyle === 0 &&
+            evidenceGateStyleOk &&
+            ev.statusChecked > 0 && ev.statusWrongCount === 0 &&
+            !!ev.probeWant && ev.probePaint === ev.probeWant &&
+            !ev.readinessChipsVisible && !ev.fruitPanelVisible &&
+            ev.threadsStateCleared &&
+            evDetail.open && evDetail.selected === target.id && !!evDetail.pill;
+
+        const ok14 = rendersOk && fruitOk && gateOk && roundTripOk && cleanSince(snap14);
+        record(14,
+            'Threads mode renders from threads.json (readiness colours, ranked list, ' +
+            'gate edges) and leaves no trace after threads -> dissolution -> evidence',
+            ok14,
+            `threads: mode=${th.renderMode} overlay=${th.reportLoaded ? 'loaded' : 'MISSING'} ` +
+            `nodes=${th.nodeCount} (evidence ${evidenceCount} + ${th.hubCount} synthesised hubs) ` +
+            `edges=${th.edgeCount}${rendersOk ? '' : ' <-- RENDER'}\n` +
+            `readiness: ` +
+            Object.keys(th.byReadiness).sort().map(k => `${k}=${th.byReadiness[k]}`).join(' ') +
+            `; answered-unrecorded painted ${th.answeredColour} (expected #C1443C)\n` +
+            `fruit list: ${th.fruitRows} rows vs ${reportFruit} in threads.json; ` +
+            `click rank 1 -> currentNodeId=${focusSelected} (report says ${firstFruit.claim}), ` +
+            `pill=${focusPill === null ? 'MISSING' : '"' + focusPill + '"'}, ` +
+            `visible ${beforeFocus.visibleNodes} -> ${focusVisible}` +
+            `${fruitOk ? '' : ' <-- FRUIT'}\n` +
+            `gate edges: ${th.gateEdges} drawn (>= ${graphGateEdges} in entities.json), ` +
+            `${th.gateStyled} styled dashed/width-4/#6B4C8A${gateOk ? '' : ' <-- GATE'}\n` +
+            `back via dissolution: mode=${ev.renderMode} nodes=${ev.nodeCount}/${evidenceCount} ` +
+            `hubsLeft=${ev.hubNodes} gateEdges=${ev.gateEdges} ` +
+            `wearingThreadsStyle=${ev.gateWearingThreadsStyle} ` +
+            `(drawn ${ev.gateStyleSample.map(g => g.colour + '/' + g.dashes).join(', ')}; ` +
+            `visual_config says ${configGateColour}/${JSON.stringify(configGateDashes)}) ` +
+            `${ev.probeId} repainted ${ev.probePaint} (status ${ev.probeStatus} -> ${ev.probeWant}) ` +
+            `statusColours ${ev.statusChecked - ev.statusWrongCount}/${ev.statusChecked} correct ` +
+            `chips/panel hidden=${!ev.readinessChipsVisible && !ev.fruitPanelVisible} ` +
+            `stateCleared=${ev.threadsStateCleared}${roundTripOk ? '' : ' <-- LEAKED'}\n` +
+            (ev.statusWrongCount
+                ? 'mis-coloured: ' + ev.statusWrong.map(w =>
+                    `${w.id} status=${w.status} want=${w.want} got=${w.got}`).join('; ') + '\n'
+                : '') +
+            `evidence still interactive: details open=${evDetail.open} ` +
+            `node=${evDetail.selected} status pill=` +
+            `${evDetail.pill === null ? 'MISSING' : '"' + evDetail.pill + '"'}\n` +
+            (describeSince(snap14).join('\n') || 'no errors'));
 
     } catch (err) {
         console.error('\n\x1b[31mHARNESS ERROR\x1b[0m:', err && err.stack || err);

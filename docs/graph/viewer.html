@@ -237,6 +237,116 @@
             margin-top: 6px;
         }
 
+        /* ---- threads mode: ranked low-hanging-fruit panel ---- */
+        #fruit-panel {
+            position: absolute;
+            z-index: 5;
+            top: 12px;
+            right: 12px;
+            width: 300px;
+            max-width: 42%;
+            max-height: calc(100% - 24px);
+            overflow-y: auto;
+            background: rgba(255,255,255,0.96);
+            border: 1px solid #e1e5e8;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 12px;
+            color: #2c3e50;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        #fruit-panel h4,
+        #legend h4.fruit-heading {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #7f8c8d;
+            margin-bottom: 6px;
+        }
+
+        .fruit-note {
+            color: #7f8c8d;
+            font-size: 11px;
+            line-height: 1.4;
+            margin-bottom: 6px;
+        }
+
+        .fruit-row {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: 0;
+            border-top: 1px solid #f0f3f4;
+            border-radius: 4px;
+            padding: 6px 4px;
+            font: inherit;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        .fruit-row:hover {
+            background: #f4f7f9;
+        }
+
+        .fruit-rank {
+            flex: 0 0 auto;
+            width: 18px;
+            font-weight: 600;
+            color: #7f8c8d;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .fruit-swatch {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex: 0 0 auto;
+            margin-top: 4px;
+            border: 1px solid rgba(0,0,0,0.2);
+        }
+
+        .fruit-body {
+            flex: 1;
+            min-width: 0;
+            line-height: 1.35;
+        }
+
+        .fruit-tier {
+            display: block;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #7f8c8d;
+            margin-top: 2px;
+        }
+
+        .readiness-pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 11px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .quoted-result {
+            background: #f7f9fa;
+            border-left: 3px solid #C1443C;
+            padding: 8px 10px;
+            margin-top: 4px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 11px;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-x: auto;
+        }
+
         /* ---- details panel ---- */
         #details-panel {
             width: 380px;
@@ -1144,6 +1254,17 @@
                 display: block;
             }
 
+            /* The fruit list has no room of its own on a phone; renderLegend()
+               appends it to the legend instead, so the panel itself goes away
+               and the mobile chrome budget is untouched. */
+            #fruit-panel {
+                display: none;
+            }
+
+            .fruit-row {
+                min-height: 40px;
+            }
+
             /* ---- breadcrumb: gone until there is a real path ---- */
             #breadcrumb {
                 padding: 0 12px;
@@ -1333,6 +1454,7 @@
                 <option value="evidence">Evidence</option>
                 <option value="dissolution">Dissolution</option>
                 <option value="isomorphism">Isomorphism</option>
+                <option value="threads">Threads</option>
             </select>
             <input type="text" id="search" placeholder="Search claims, descriptions, ids...">
             <!-- display:contents above 768px, so these stay flex items of #controls
@@ -1377,6 +1499,9 @@
         <div class="chip-group" id="type-chips">
             <span class="chip-group-label">Type</span>
         </div>
+        <div class="chip-group mode-hidden" id="readiness-chips">
+            <span class="chip-group-label">Readiness</span>
+        </div>
         <div class="chip-group mode-hidden" id="register-chips">
             <span class="chip-group-label">Register</span>
         </div>
@@ -1392,6 +1517,12 @@
     <div id="container">
         <div id="graph">
             <div id="legend"></div>
+            <!-- Threads mode only: the report's ranked low-hanging fruit. An
+                 absolutely-positioned overlay inside #graph, so no other mode's
+                 geometry moves. Below 768px it is display:none and the same
+                 list is appended to #legend, behind the existing Legend
+                 disclosure — no fourth toolbar button, no extra chrome. -->
+            <div id="fruit-panel" class="mode-hidden" aria-label="Low-hanging fruit"></div>
         </div>
         <div id="details-panel" class="hidden">
             <button type="button" id="details-close" aria-label="Close details"
@@ -1568,6 +1699,19 @@
                 file: '_data/isomorphism.json',
                 mode: 'evidence',
                 fallbackTitle: "Lucier's Room and the Transformer"
+            },
+            // Threads reads the *evidence* nodes and re-colours them by
+            // readiness, using docs/graph/_data/threads.json (written by
+            // build_threads_report.py) as an overlay. Missing overlay =>
+            // the evidence graph in neutral grey plus a legend note; never a
+            // broken mode and never a broken sibling graph.
+            threads: {
+                key: 'threads',
+                label: 'Threads',
+                file: '_data/entities.json',
+                mode: 'threads',
+                overlay: '_data/threads.json',
+                fallbackTitle: 'ATR Threads — what is ready to move'
             }
         };
         const DEFAULT_GRAPH_KEY = 'evidence';
@@ -1610,6 +1754,86 @@
         const ASSOCIATIVE_TYPES = ['analogous-to', 'breaks-down-at', 'builds-on', 'cites', 'relates-to'];
         // Edge types the evidence-chain walker will follow.
         const CHAIN_TYPES = EPISTEMIC_TYPES.concat(STRUCTURAL_TYPES);
+
+        // =====================================================================
+        // Threads mode: readiness vocabulary.
+        //
+        // Colour here answers "can this move, and what would it cost?", not
+        // "is it true?". The categories are the ones the brief named; the
+        // extra `answerable-from-disk` exists because the report emits a tier
+        // (its tier 3) that none of the named categories covers honestly —
+        // inputs committed, answer not extracted, no model run required. It is
+        // ranked between the two cheapest tiers, which is where the report
+        // ranks it.
+        //
+        // `neutral` is everything the report says nothing about: settled
+        // claims, runs, documents. De-emphasised, never hidden.
+        // =====================================================================
+        const READINESS_ORDER = [
+            'answered-unrecorded', 'unblocked', 'answerable-from-disk',
+            'needs-compute', 'blocked', 'frontier', 'undeveloped', 'neutral'
+        ];
+
+        const READINESS = {
+            'answered-unrecorded': {
+                label: 'answered, unrecorded',
+                colour: '#C1443C',
+                note: 'the evidence is already on disk; the record has not caught up'
+            },
+            'unblocked': {
+                label: 'unblocked',
+                colour: '#2E7D5B',
+                note: 'was blocked; the blocker no longer holds on disk'
+            },
+            'answerable-from-disk': {
+                label: 'answerable from disk',
+                colour: '#1F7A8C',
+                note: 'inputs are committed; the answer has not been extracted — analysis, not a run'
+            },
+            'needs-compute': {
+                label: 'needs compute',
+                colour: '#B9812F',
+                note: 'open, and answering it takes a fresh run'
+            },
+            'blocked': {
+                label: 'blocked',
+                colour: '#6B4C8A',
+                note: 'a named blocker still holds, or cannot be settled from the tree'
+            },
+            'frontier': {
+                label: 'frontier',
+                colour: '#5B7DB1',
+                note: 'nothing downstream: no incoming corrects / supersedes / qualifies / builds-on'
+            },
+            'undeveloped': {
+                label: 'undeveloped',
+                colour: '#8A6B4C',
+                note: 'introduced and dropped: degree ≤ 1, or no epistemic edge at all'
+            },
+            'neutral': {
+                label: 'not an open thread',
+                colour: '#C7CCD1',
+                note: 'the report says nothing about this node; de-emphasised, still clickable'
+            }
+        };
+
+        // The report's own tier vocabulary (open_threads[].verdict) mapped onto
+        // the readiness vocabulary above. `cannot-determine` is deliberately
+        // absent: it resolves to `blocked` when the thread names a blocker and
+        // to neutral when it does not, because that is all the report knows.
+        const VERDICT_READINESS = {
+            'answered-on-disk': 'answered-unrecorded',
+            'newly-unblocked': 'unblocked',
+            'answerable-from-disk': 'answerable-from-disk',
+            'needs-compute': 'needs-compute',
+            'still-blocked': 'blocked'
+        };
+
+        // blocks / blocked-by get their own loud style in threads mode only:
+        // the point of the view is that one blocker gating five claims should
+        // read as a hub without being hunted for.
+        const GATE_EDGE_STYLE = { color: '#6B4C8A', dashes: [9, 5], arrows: 'to', width: 4 };
+        const GATE_EDGE_TYPES = ['blocks', 'blocked-by'];
 
         const RETIRED_COLOR = '#8A8F94';
         const RETIRED_OPACITY = 0.35;
@@ -1655,12 +1879,20 @@
 
         // ---- three-graph / dissolution state -------------------------------
         let currentGraphKey = DEFAULT_GRAPH_KEY;
-        let renderMode = 'evidence';       // 'evidence' | 'dissolution'
+        let renderMode = 'evidence';       // 'evidence' | 'dissolution' | 'threads'
         let dissolutionData = null;        // whole dissolution payload
         let currentModelKey = null;        // key into dissolutionData.models
         let activeRegisters = {};          // register -> bool
         let activeBasins = {};             // terminal basin -> bool
         let basinColours = {};             // basin -> hex, rebuilt per model
+
+        // ---- threads state -------------------------------------------------
+        let threadsReport = null;          // parsed threads.json, or null
+        let threadsInfo = {};              // node id -> everything the report says about it
+        let threadsBlockers = [];          // blocker records, report order
+        let threadsHubs = [];              // synthesised blocker nodes (blockers with no node of their own)
+        let threadsFruit = [];             // low_hanging_fruit, report order, resolved to node ids
+        let activeReadiness = {};          // readiness key -> bool
 
         // ---- small helpers -------------------------------------------------
         function esc(value) {
@@ -2297,9 +2529,677 @@
             applyVisualState();
         }
 
+        // =====================================================================
+        // Threads mode
+        //
+        // Same nodes as the evidence graph, re-coloured by READINESS: not "is
+        // this true?" but "can this move, and what would it cost?". Everything
+        // shown here is read out of _data/threads.json — the viewer classifies
+        // nothing on its own, it only renders what build_threads_report.py
+        // wrote, including the report's own words as the justification.
+        //
+        // Two things this view is for, which prose cannot show:
+        //   * a blocker that gates several claims becomes a hub. Blockers the
+        //     graph has no node for (an issue number, an artefact named only in
+        //     prose) are synthesised as star nodes so the fan-out is visible.
+        //   * the cheapest work is ranked, in the report's order, in a side
+        //     list that focuses the graph on the thread when clicked.
+        //
+        // No layoutOverride: threads renders with the same force-directed
+        // layout as evidence, so there is nothing to leak on the way out. See
+        // the comment above `layoutOverride = null` in loadAndInitialize().
+        // =====================================================================
+        function asArray(value) {
+            return Array.isArray(value) ? value : [];
+        }
+
+        function readinessColour(key) {
+            return (READINESS[key] || READINESS.neutral).colour;
+        }
+
+        function readinessLabel(key) {
+            return (READINESS[key] || READINESS.neutral).label;
+        }
+
+        function readinessOf(node) {
+            if (!node) return 'neutral';
+            const info = threadsInfo[node.id];
+            return (info && info.readiness) || 'neutral';
+        }
+
+        function readinessCounts() {
+            const counts = {};
+            READINESS_ORDER.forEach(function (key) { counts[key] = 0; });
+            allNodes.forEach(function (node) {
+                const key = readinessOf(node);
+                counts[key] = (counts[key] || 0) + 1;
+            });
+            return counts;
+        }
+
+        // A missing or unreadable overlay is a degraded threads mode, never a
+        // broken viewer: warn (not error), return null, colour everything
+        // neutral and say so in the legend.
+        async function loadThreadsReport() {
+            const graph = GRAPHS[currentGraphKey] || {};
+            const file = graph.overlay || '_data/threads.json';
+            try {
+                const response = await fetch(file);
+                if (!response.ok) throw new Error(response.status + ' ' + response.statusText);
+                const payload = await response.json();
+                if (!payload || typeof payload !== 'object') throw new Error('not a JSON object');
+                return payload;
+            } catch (error) {
+                console.warn('Threads overlay unavailable (' + file + '): ' + error.message +
+                    ' — rendering the evidence nodes with no readiness.');
+                return null;
+            }
+        }
+
+        // Where a blocker lives in the graph. Report blockers key off a claim
+        // id, a "node-"-prefixed claim id, or nothing at all (an issue number,
+        // a phrase lifted from prose) — the last kind gets a synthesised node.
+        function blockerNodeId(blocker, known) {
+            const key = String((blocker && blocker.key) || '');
+            if (known[key]) return key;
+            const stripped = key.replace(/^node-/, '');
+            if (known[stripped]) return stripped;
+            return 'threads-blocker-' + key;
+        }
+
+        // true = still holds, false = resolved on disk, null = the report
+        // explicitly declines to settle it. null is not false.
+        function blockerHolds(blocker) {
+            const resolved = (blocker || {}).resolution || {};
+            if (resolved.holds === true || resolved.holds === false) return resolved.holds;
+            if (blocker && (blocker.still_holds === true || blocker.still_holds === false)) {
+                return blocker.still_holds;
+            }
+            return null;
+        }
+
+        function blockerStateWord(blocker) {
+            const holds = blockerHolds(blocker);
+            if (holds === false) return 'resolved on disk';
+            if (holds === true) return 'still holds';
+            return 'cannot be settled from the tree';
+        }
+
+        // Leaving threads mode drops the overlay, so no stale readiness can
+        // colour, filter or annotate another graph.
+        function clearThreadsState() {
+            threadsReport = null;
+            threadsInfo = {};
+            threadsBlockers = [];
+            threadsHubs = [];
+            threadsFruit = [];
+        }
+
+        function buildThreadsModel(report, known) {
+            threadsInfo = {};
+            threadsBlockers = [];
+            threadsHubs = [];
+            threadsFruit = [];
+            if (!report) return;
+
+            function slot(id) {
+                if (!threadsInfo[id]) {
+                    threadsInfo[id] = { id: id, readiness: null, blockers: [], gates: null };
+                }
+                return threadsInfo[id];
+            }
+
+            // Blockers first: every later section can point at one.
+            asArray(report.blockers).forEach(function (raw) {
+                if (!raw || !raw.key) return;
+                const rec = Object.assign({}, raw);
+                rec.nodeId = blockerNodeId(raw, known);
+                rec.synthetic = !known[rec.nodeId];
+                rec.holds = blockerHolds(raw);
+                threadsBlockers.push(rec);
+                if (rec.synthetic) threadsHubs.push(rec);
+                slot(rec.nodeId).gates = rec;
+                asArray(raw.gates).forEach(function (gate) {
+                    if (!gate || !gate.claim) return;
+                    slot(gate.claim).blockers.push(rec);
+                });
+            });
+
+            // The report's own verdict per open thread is the primary signal.
+            asArray(report.open_threads).forEach(function (thread) {
+                if (!thread || !thread.claim) return;
+                const s = slot(thread.claim);
+                s.openThread = thread;
+                let key = VERDICT_READINESS[thread.verdict] || null;
+                const allClear = s.blockers.length > 0 && s.blockers.every(function (b) {
+                    return b.holds === false;
+                });
+                // "cannot-determine" carries no verdict of its own: if a
+                // blocker is named, that is the honest classification.
+                if (!key && s.blockers.length) key = allClear ? 'unblocked' : 'blocked';
+                // A thread the report parked as blocked whose every blocker has
+                // since been resolved on disk is the "resume this" case.
+                if (key === 'blocked' && allClear) key = 'unblocked';
+                if (key) s.readiness = key;
+            });
+
+            // Answered-but-unrecorded outranks everything else: the record is
+            // wrong *now*. Only when the report actually quotes a result —
+            // an entry it could not settle stays whatever it already was.
+            asArray(report.answered_but_unrecorded).forEach(function (entry) {
+                if (!entry || !entry.claim) return;
+                const s = slot(entry.claim);
+                s.answered = entry;
+                const proven = asArray(entry.quoted_result).length > 0 ||
+                    /^answered-on-disk/.test(String(entry.assessment || ''));
+                if (proven) s.readiness = 'answered-unrecorded';
+            });
+
+            // Frontier and undeveloped only fill gaps: "here is what to do
+            // next" beats "nothing cites this yet".
+            asArray(report.frontier).forEach(function (entry) {
+                if (!entry || !entry.claim) return;
+                const s = slot(entry.claim);
+                s.frontier = entry;
+                if (!s.readiness) s.readiness = 'frontier';
+            });
+
+            const undeveloped = report.undeveloped || {};
+            asArray(undeveloped.thin_concepts).forEach(function (entry) {
+                if (!entry || !entry.claim) return;
+                const s = slot(entry.claim);
+                s.thin = entry;
+                if (!s.readiness) s.readiness = 'undeveloped';
+            });
+            asArray(undeveloped.silent_claims).forEach(function (entry) {
+                if (!entry || !entry.claim) return;
+                const s = slot(entry.claim);
+                s.silent = entry;
+                if (!s.readiness) s.readiness = 'undeveloped';
+            });
+
+            // A blocker node is coloured by the gate itself, not by what it gates.
+            threadsBlockers.forEach(function (b) {
+                const s = slot(b.nodeId);
+                if (b.holds === false) {
+                    if (!s.readiness || s.readiness === 'blocked') s.readiness = 'unblocked';
+                } else if (!s.readiness) {
+                    s.readiness = 'blocked';
+                }
+            });
+
+            // The execution ledger is per-run, not per-claim: it hangs off the
+            // run nodes so a run's details can say what its script actually is.
+            asArray(report.execution_ledger).forEach(function (entry) {
+                if (!entry || !entry.run) return;
+                slot(entry.run).ledger = entry;
+            });
+
+            asArray(report.low_hanging_fruit).forEach(function (entry) {
+                if (!entry || !entry.claim) return;
+                slot(entry.claim).fruit = entry;
+                threadsFruit.push(entry);
+            });
+            threadsFruit.sort(function (a, b) {
+                return (Number(a.rank) || 0) - (Number(b.rank) || 0);
+            });
+        }
+
+        // Blockers with no node of their own become star hubs. Size grows with
+        // how many claims they gate, so issue #9 gating five reads as a hub
+        // before anything is clicked.
+        function createThreadsHubNodes() {
+            return threadsHubs.map(function (b) {
+                const gateCount = Number(b.gate_count) || asArray(b.gates).length;
+                const evidence = asArray((b.resolution || {}).resolution_evidence)
+                    .map(function (e) { return e && e.text; })
+                    .filter(Boolean)
+                    .join(' ');
+                return {
+                    id: b.nodeId,
+                    label: b.label || b.key,
+                    nodeType: 'blocker',
+                    entityType: 'blocker',
+                    status: null,
+                    asserted: null,
+                    retired: null,
+                    size: clamp(16 + 4 * gateCount, 18, 40),
+                    // `database` is the one vis shape no entity type already
+                    // uses (prior-work owns the star), so a synthesised blocker
+                    // can never be mistaken for a real node.
+                    shape: 'database',
+                    data: {
+                        label: b.label || b.key,
+                        description: 'Blocker (' + (b.kind || 'unknown kind') + ') gating ' +
+                            gateCount + ' claim' + (gateCount === 1 ? '' : 's') + ' — ' +
+                            blockerStateWord(b) + (evidence ? '. ' + evidence : '.'),
+                        blocker: b
+                    }
+                };
+            });
+        }
+
+        function gateEdgeColour() {
+            return {
+                color: GATE_EDGE_STYLE.color,
+                highlight: shade(GATE_EDGE_STYLE.color, -0.2),
+                hover: shade(GATE_EDGE_STYLE.color, -0.2),
+                opacity: 1
+            };
+        }
+
+        function truncate(text, max) {
+            const s = String(text || '');
+            return s.length > max ? s.slice(0, max - 1) + '…' : s;
+        }
+
+        // Edges from a synthesised blocker hub to each claim it gates.
+        function createThreadsHubEdges() {
+            const edges = [];
+            let counter = 0;
+            threadsHubs.forEach(function (b) {
+                if (!nodeIndex[b.nodeId]) return;
+                asArray(b.gates).forEach(function (gate) {
+                    if (!gate || !gate.claim || !nodeIndex[gate.claim]) return;
+                    const quote = asArray(gate.quotes)[0] || '';
+                    edges.push({
+                        id: 'tb' + (counter++),
+                        from: b.nodeId,
+                        to: gate.claim,
+                        relType: 'blocks',
+                        relKind: 'other',
+                        asserted: null,
+                        label: 'blocks',
+                        title: 'blocks — ' + (b.label || b.key) +
+                            (quote ? ' — ' + truncate(quote, 220) : ''),
+                        arrows: 'to',
+                        dashes: GATE_EDGE_STYLE.dashes,
+                        width: GATE_EDGE_STYLE.width,
+                        baseColour: GATE_EDGE_STYLE.color,
+                        color: gateEdgeColour(),
+                        font: {
+                            size: 10, face: 'italic arial',
+                            color: shade(GATE_EDGE_STYLE.color, -0.2),
+                            strokeWidth: 4, strokeColor: '#ffffff'
+                        },
+                        smooth: { type: 'curvedCW', roundness: 0.16 },
+                        data: {
+                            from: b.nodeId, to: gate.claim, type: 'blocks',
+                            description: quote || ('gates ' + (gate.label || gate.claim))
+                        }
+                    });
+                });
+            });
+            return edges;
+        }
+
+        // The blocks / blocked-by edges the builder already emits get the same
+        // loud treatment as the synthesised ones — in threads mode only, so the
+        // evidence graph is byte-for-byte the render it always was.
+        function styleThreadsGateEdges(edges) {
+            edges.forEach(function (edge) {
+                if (GATE_EDGE_TYPES.indexOf(edge.relType) === -1) return;
+                edge.dashes = GATE_EDGE_STYLE.dashes;
+                edge.width = GATE_EDGE_STYLE.width;
+                edge.baseColour = GATE_EDGE_STYLE.color;
+                edge.color = gateEdgeColour();
+                edge.label = edge.relType;
+                edge.font = {
+                    size: 10, face: 'italic arial',
+                    color: shade(GATE_EDGE_STYLE.color, -0.2),
+                    strokeWidth: 4, strokeColor: '#ffffff'
+                };
+            });
+        }
+
+        // ---- threads chips --------------------------------------------------
+        function buildReadinessChips() {
+            const bar = document.getElementById('readiness-chips');
+            if (!bar) return;
+            const counts = readinessCounts();
+            activeReadiness = {};
+            let html = '<span class="chip-group-label">Readiness</span>';
+            READINESS_ORDER.forEach(function (key) {
+                activeReadiness[key] = true;
+                html += '<button class="chip active" id="chip-readiness-' + esc(key) + '"' +
+                    ' data-readiness="' + esc(key) + '"' +
+                    ' onclick="toggleReadinessChip(\'' + jsAttr(key) + '\')">' +
+                    '<span class="swatch" style="background:' + esc(readinessColour(key)) + '"></span>' +
+                    esc(readinessLabel(key)) + ' (' + (counts[key] || 0) + ')</button>';
+            });
+            html += '<button class="chip active" id="chip-readiness-all" onclick="setAllReadinessChips(true)">all</button>';
+            html += '<button class="chip" id="chip-readiness-none" onclick="setAllReadinessChips(false)">none</button>';
+            bar.innerHTML = html;
+            updateFilterToggleLabel();
+        }
+
+        function syncReadinessChipClasses() {
+            Object.keys(activeReadiness).forEach(function (key) {
+                const el = document.getElementById('chip-readiness-' + key);
+                if (el) el.classList.toggle('active', activeReadiness[key] !== false);
+            });
+            updateFilterToggleLabel();
+        }
+
+        function toggleReadinessChip(key) {
+            activeReadiness[key] = activeReadiness[key] === false;
+            focusedNodeIds = null;
+            syncReadinessChipClasses();
+            applyVisualState();
+        }
+
+        function setAllReadinessChips(on) {
+            Object.keys(activeReadiness).forEach(function (k) { activeReadiness[k] = !!on; });
+            focusedNodeIds = null;
+            syncReadinessChipClasses();
+            applyVisualState();
+        }
+
+        // ---- threads legend + ranked list -----------------------------------
+        function renderThreadsLegend(legend) {
+            const counts = readinessCounts();
+            let html = '<h4>Colour = readiness</h4>';
+            if (!threadsReport) {
+                html += '<div class="legend-note">No <code>_data/threads.json</code>: every node is ' +
+                    'neutral. Regenerate it with <code>python docs/graph/build_threads_report.py</code>.</div>';
+            }
+            READINESS_ORDER.forEach(function (key) {
+                html += '<div class="legend-row"><span class="legend-swatch" style="background:' +
+                    esc(readinessColour(key)) + '"></span><span>' + esc(readinessLabel(key)) +
+                    ' (' + (counts[key] || 0) + ')</span></div>';
+                html += '<div class="legend-note" style="margin-top:0">' + esc(READINESS[key].note) + '</div>';
+            });
+
+            html += '<div class="legend-section"><h4>Blocking</h4>' +
+                '<div class="legend-row"><span class="legend-line" style="border-top-color:' +
+                esc(GATE_EDGE_STYLE.color) + '; border-top-style:dashed; border-top-width:4px"></span>' +
+                '<span>blocks / blocked-by</span></div>' +
+                '<div class="legend-row"><span>database</span><span style="color:#7f8c8d">' +
+                'blocker with no node of its own (an issue number, an artefact named only in ' +
+                'prose)</span></div>' +
+                '<div class="legend-note">A blocker node grows with the number of claims it gates, ' +
+                'so a shared blocker reads as a hub before anything is clicked.</div>';
+            const shared = threadsBlockers.filter(function (b) {
+                return (Number(b.gate_count) || asArray(b.gates).length) > 1;
+            });
+            shared.forEach(function (b) {
+                html += '<div class="legend-note">' + esc(b.label || b.key) + ' gates ' +
+                    esc(Number(b.gate_count) || asArray(b.gates).length) + ': ' +
+                    esc(asArray(b.gates).map(function (g) { return g.claim; }).join(', ')) + '</div>';
+            });
+            html += '</div>';
+
+            const meta = (threadsReport || {}).metadata || {};
+            const counted = (threadsReport || {}).counts || {};
+            html += '<div class="legend-section"><h4>Source</h4>' +
+                '<div class="legend-note">Nodes and edges: <code>_data/entities.json</code>. ' +
+                'Readiness: <code>_data/threads.json</code>' +
+                (meta.generator ? ' (' + esc(meta.generator) + ')' : '') + '.</div>';
+            if (counted.open_threads !== undefined) {
+                html += '<div class="legend-note">' + esc(counted.open_threads) + ' open threads, ' +
+                    esc(counted.blockers) + ' blockers (' + esc(counted.shared_blockers) +
+                    ' shared), ' + esc(counted.frontier) + ' on the frontier.</div>';
+            }
+            const audit = (threadsReport || {}).open_status_audit || {};
+            const auditKeys = Object.keys(audit);
+            if (auditKeys.length) {
+                html += '<div class="legend-note">Status <code>open</code> is not a work signal on ' +
+                    'its own: ' + esc(auditKeys.map(function (k) {
+                        return audit[k] + ' ' + k + (audit[k] === 1 ? '' : 's');
+                    }).join(', ')) + '.</div>';
+            }
+            html += '<div class="legend-note">No timeline here: readiness is a statement about now.</div></div>';
+
+            // Things the graph does not know about at all. They have no node to
+            // colour, so the legend is the only place they can appear.
+            const unreferenced = (threadsReport || {}).unreferenced || {};
+            const orphans = asArray(unreferenced.artefacts);
+            const orphanScripts = asArray(unreferenced.orphan_scripts);
+            if (orphans.length || orphanScripts.length) {
+                html += '<div class="legend-section"><h4>Not in the graph</h4>';
+                if (orphans.length) {
+                    html += '<div class="legend-note">' + orphans.length + ' artefact(s) on disk that ' +
+                        'no node references, e.g. ' +
+                        esc(orphans.slice(0, 3).map(function (a) { return a.path; }).join(', ')) +
+                        (orphans.length > 3 ? ', …' : '') + '</div>';
+                }
+                if (orphanScripts.length) {
+                    html += '<div class="legend-note">' + orphanScripts.length + ' script(s) no run node ' +
+                        'claims: ' + esc(orphanScripts.map(function (s) { return s.path; }).join(', ')) +
+                        '</div>';
+                }
+                html += '<div class="legend-note">See THREADS.md for the full inventory.</div></div>';
+            }
+
+            legend.innerHTML = html;
+
+            // On a phone the ranked list has nowhere of its own to live, so it
+            // rides along inside the existing Legend disclosure.
+            if (isMobileLayout()) {
+                legend.innerHTML += '<div class="legend-section">' +
+                    fruitListHtml('Low-hanging fruit') + '</div>';
+            }
+        }
+
+        function fruitListHtml(heading) {
+            if (!threadsReport) return '';
+            let html = '<h4 class="fruit-heading">' + esc(heading) + '</h4>';
+            if (!threadsFruit.length) {
+                return html + '<div class="fruit-note">The report lists no actionable threads.</div>';
+            }
+            html += '<div class="fruit-note">' + threadsFruit.length +
+                ' threads, cheapest first, in the report\'s own ranking. ' +
+                'Click one to focus the graph on it.</div>';
+            threadsFruit.forEach(function (entry) {
+                const known = !!nodeIndex[entry.claim];
+                const info = threadsInfo[entry.claim] || {};
+                const key = info.readiness || 'neutral';
+                const label = entry.label || entry.claim;
+                html += '<button type="button" class="fruit-row"' +
+                    (known ? '' : ' disabled') +
+                    ' title="' + esc(truncate(entry.reason || '', 300)) + '"' +
+                    ' onclick="focusThread(\'' + jsAttr(entry.claim) + '\')">' +
+                    '<span class="fruit-rank">' + esc(entry.rank) + '</span>' +
+                    '<span class="fruit-swatch" style="background:' + esc(readinessColour(key)) + '"></span>' +
+                    '<span class="fruit-body">' + esc(truncate(label, 110)) +
+                    '<span class="fruit-tier">' + esc(entry.tier_name || '') +
+                    (entry.cheap ? ' · cheap' : '') + '</span></span></button>';
+            });
+            return html;
+        }
+
+        function renderFruitPanel() {
+            const panel = document.getElementById('fruit-panel');
+            if (!panel) return;
+            const show = renderMode === 'threads' && !!threadsReport && !isMobileLayout();
+            panel.classList.toggle('mode-hidden', !show);
+            panel.innerHTML = show ? fruitListHtml('Low-hanging fruit') : '';
+        }
+
+        // Clicking a ranked entry: open its details and narrow the graph to it
+        // and its neighbours. "Reset View" undoes it, exactly as for a node.
+        function focusThread(nodeId) {
+            if (!nodeIndex[nodeId]) {
+                showToast('No node for ' + nodeId + ' in this graph');
+                return;
+            }
+            showNodeDetails(nodeId);
+            focusOnNode(nodeId);
+        }
+
+        // ---- threads details ------------------------------------------------
+        function renderBlockerBlock(b, selfId) {
+            const gateCount = Number(b.gate_count) || asArray(b.gates).length;
+            let html = '<div class="rel-item" style="border-left-color:' + esc(GATE_EDGE_STYLE.color) + '">' +
+                '<span class="rel-type" style="color:' + esc(shade(GATE_EDGE_STYLE.color, -0.15)) + '">' +
+                esc(b.label || b.key) + '</span> — ' + esc(blockerStateWord(b));
+            asArray((b.resolution || {}).resolution_evidence).forEach(function (e) {
+                if (!e || !e.text) return;
+                html += '<span class="rel-desc">' +
+                    (e.file ? esc(e.file) + (e.line ? ':' + esc(e.line) : '') + ' — ' : '') +
+                    esc(e.text) + '</span>';
+            });
+            if (gateCount > 1) {
+                html += '<span class="rel-desc">gates ' + gateCount + ' claims:</span>';
+                asArray(b.gates).forEach(function (g) {
+                    if (!g || !g.claim || g.claim === selfId) return;
+                    const other = nodeIndex[g.claim];
+                    html += '<div>' + (other
+                        ? '<span class="node-link" onclick="navigateToNode(\'' + jsAttr(g.claim) + '\')">' +
+                          esc(other.label) + '</span>'
+                        : esc(g.label || g.claim)) + '</div>';
+                });
+            }
+            if (nodeIndex[b.nodeId] && b.nodeId !== selfId) {
+                html += '<div><span class="node-link" onclick="navigateToNode(\'' + jsAttr(b.nodeId) +
+                    '\')">go to the blocker</span></div>';
+            }
+            html += '</div>';
+            return html;
+        }
+
+        function renderQuotedResult(quoted) {
+            const entries = Array.isArray(quoted) ? quoted : (quoted ? [quoted] : []);
+            let html = '';
+            entries.forEach(function (q) {
+                if (!q) return;
+                const lines = asArray(q.lines).join('\n');
+                if (!lines) return;
+                html += '<div class="fruit-note" style="margin-bottom:2px">' + esc(q.script || '') +
+                    (q.cell === undefined ? '' : ' — cell ' + esc(q.cell)) + '</div>' +
+                    '<div class="quoted-result">' + esc(lines) + '</div>';
+            });
+            return html;
+        }
+
+        function renderThreadsDetail(node) {
+            const key = readinessOf(node);
+            let html = renderField('Readiness',
+                '<span class="readiness-pill" style="background:' + esc(readinessColour(key)) + '">' +
+                esc(readinessLabel(key)) + '</span>' +
+                '<div class="fruit-note" style="margin-top:6px">' + esc(READINESS[key].note) + '</div>');
+
+            if (!threadsReport) {
+                return html + renderField('Report',
+                    'No <code>_data/threads.json</code> was loaded, so no readiness evidence is available.');
+            }
+
+            const info = threadsInfo[node.id];
+            if (!info) {
+                return html + renderField('Report',
+                    '<span style="color:#7f8c8d">The threads report does not mention this node.</span>');
+            }
+
+            const thread = info.openThread;
+            if (thread) {
+                html += renderField('Report verdict', esc(thread.verdict || 'unclassified') +
+                    (thread.rank_tier === undefined ? '' : ' (tier ' + esc(Number(thread.rank_tier) + 1) + ')'));
+                if (thread.reason) html += renderField('Why', esc(thread.reason));
+                if (asArray(thread.pending_language).length) {
+                    html += renderField('Pending-work language in the record',
+                        esc(thread.pending_language.join(' · ')));
+                }
+            }
+
+            if (info.fruit) {
+                html += renderField('Ranked', '#' + esc(info.fruit.rank) + ' of ' + threadsFruit.length +
+                    ' — ' + esc(info.fruit.tier_name || '') + (info.fruit.cheap ? ' (cheap)' : ''));
+                if (!thread && info.fruit.reason) html += renderField('Why', esc(info.fruit.reason));
+            }
+
+            const quoted = (info.answered && asArray(info.answered.quoted_result).length)
+                ? info.answered.quoted_result
+                : (info.fruit && info.fruit.quoted_result) || [];
+            const quotedHtml = renderQuotedResult(quoted);
+            if (quotedHtml) html += renderField('The result, already on disk', quotedHtml);
+
+            if (info.answered) {
+                if (asArray(info.answered.verdict_edges).length === 0 &&
+                    asArray(info.answered.tested_by).length) {
+                    html += renderField('Graph says',
+                        esc(asArray(info.answered.tested_by).map(function (t) { return t.label || t.id; }).join('; ')) +
+                        ' — and no supports / refutes / qualifies / corrects edge back.');
+                }
+                let prose = '';
+                asArray(info.answered.prose_says_not_run).forEach(function (p) {
+                    if (!p) return;
+                    prose += '<div class="rel-desc">' + esc(p.file || '') +
+                        (p.line ? ':' + esc(p.line) : '') + ' — ' + esc(truncate(p.text, 240)) + '</div>';
+                });
+                if (prose) html += renderField('The record still says "not run"', prose);
+            }
+
+            if (info.blockers.length) {
+                let blocked = '';
+                info.blockers.forEach(function (b) { blocked += renderBlockerBlock(b, node.id); });
+                html += renderField('Blocked by', blocked);
+            }
+
+            if (info.gates) {
+                let gates = '<div class="fruit-note">This node is the blocker — ' +
+                    esc(blockerStateWord(info.gates)) + '.</div>';
+                asArray(info.gates.gates).forEach(function (g) {
+                    if (!g || !g.claim) return;
+                    const other = nodeIndex[g.claim];
+                    gates += '<div class="rel-item" style="border-left-color:' + esc(GATE_EDGE_STYLE.color) + '">' +
+                        (other
+                            ? '<span class="node-link" onclick="navigateToNode(\'' + jsAttr(g.claim) + '\')">' +
+                              esc(other.label) + '</span>'
+                            : esc(g.label || g.claim));
+                    asArray(g.quotes).forEach(function (q) {
+                        gates += '<span class="rel-desc">' + esc(truncate(q, 320)) + '</span>';
+                    });
+                    gates += '</div>';
+                });
+                asArray((info.gates.resolution || {}).resolution_evidence).forEach(function (e) {
+                    if (!e || !e.text) return;
+                    gates += '<div class="rel-desc">' +
+                        (e.file ? esc(e.file) + (e.line ? ':' + esc(e.line) : '') + ' — ' : '') +
+                        esc(e.text) + '</div>';
+                });
+                html += renderField('Gates (' + esc(Number(info.gates.gate_count) ||
+                    asArray(info.gates.gates).length) + ')', gates);
+            }
+
+            if (info.ledger) {
+                html += renderField('Execution ledger',
+                    (info.ledger.script ? esc(info.ledger.script) : 'no script recorded') +
+                    (info.ledger.exists === false ? ' — not on disk' : '') +
+                    (info.ledger.cells_total
+                        ? ' — ' + esc(info.ledger.cells_with_outputs) + ' of ' +
+                          esc(info.ledger.cells_total) + ' cells carry output'
+                        : '') +
+                    (info.ledger.note ? '<div class="rel-desc">' + esc(info.ledger.note) + '</div>' : ''));
+            }
+
+            if (info.frontier) {
+                html += renderField('Frontier',
+                    'Nothing downstream: no incoming corrects / supersedes / qualifies / builds-on.' +
+                    (asArray(info.frontier.incoming_edges).length
+                        ? ' Incoming: ' + esc(info.frontier.incoming_edges.join(', ')) + '.'
+                        : ' No incoming edges at all.') +
+                    (info.frontier.source_doc ? ' From ' + esc(info.frontier.source_doc) + '.' : ''));
+            }
+
+            if (info.thin) {
+                html += renderField('Undeveloped',
+                    'Degree ' + esc(info.thin.degree) + ' — introduced and never connected onward' +
+                    (asArray(info.thin.edge_types).length
+                        ? ' (only ' + esc(info.thin.edge_types.join(', ')) + ').' : '.'));
+            } else if (info.silent) {
+                html += renderField('Undeveloped',
+                    'No epistemic edge: degree ' + esc(info.silent.degree) +
+                    (asArray(info.silent.edge_types).length
+                        ? ', all of it ' + esc(info.silent.edge_types.join(', ')) + '.' : '.'));
+            }
+
+            return html;
+        }
+
         // Show/hide the controls that only make sense in one mode.
         function applyModeVisibility() {
             const dissolution = renderMode === 'dissolution';
+            const threads = renderMode === 'threads';
             const toggle = function (id, hidden) {
                 const el = document.getElementById(id);
                 if (el) el.classList.toggle('mode-hidden', hidden);
@@ -2307,11 +3207,17 @@
             toggle('model-controls', !dissolution);
             toggle('register-chips', !dissolution);
             toggle('basin-chips', !dissolution);
-            toggle('status-chips', dissolution);
+            toggle('readiness-chips', !threads);
+            // Threads swaps the status row for the readiness row rather than
+            // adding one, so the chip bar keeps its two groups and the desktop
+            // header geometry does not move.
+            toggle('status-chips', dissolution || threads);
             toggle('type-chips', dissolution);
-            // The timeline scrubs asserted dates; dissolution nodes have none.
-            toggle('timeline-bar', dissolution);
-            toggle('colour-mode-controls', dissolution);
+            toggle('fruit-panel', !threads);
+            // The timeline scrubs asserted dates; dissolution nodes have none,
+            // and readiness is a statement about the tree as it is right now.
+            toggle('timeline-bar', dissolution || threads);
+            toggle('colour-mode-controls', dissolution || threads);
             // Switching graphs swaps which chip groups are live, so the
             // "Filters (n of m)" count has to be recomputed, and any open
             // disclosure closed before its contents change underneath it.
@@ -2406,6 +3312,16 @@
             } else if (d.side || d.role) {
                 parts.push(d.side, d.role);
             }
+            if (renderMode === 'threads') {
+                const info = threadsInfo[node.id];
+                parts.push(readinessLabel(readinessOf(node)));
+                if (info) {
+                    if (info.openThread) parts.push(info.openThread.verdict, info.openThread.reason);
+                    if (info.fruit) parts.push(info.fruit.tier_name);
+                    info.blockers.forEach(function (b) { parts.push(b.label, b.key); });
+                    if (info.gates) parts.push(info.gates.label, info.gates.key);
+                }
+            }
             return parts.join(' ').toLowerCase().indexOf(searchTerm) !== -1;
         }
 
@@ -2417,6 +3333,13 @@
                     const anyOn = registers.some(function (r) { return activeRegisters[r] !== false; });
                     if (!anyOn) return false;
                 }
+                return true;
+            }
+            // Threads swaps the status row for the readiness row; the type row
+            // is shared, so a blocker hub can be filtered out like any type.
+            if (renderMode === 'threads') {
+                if (activeReadiness[readinessOf(node)] === false) return false;
+                if (node.entityType && activeTypes[node.entityType] === false) return false;
                 return true;
             }
             if (node.status && activeStatuses[node.status] === false) return false;
@@ -2441,6 +3364,8 @@
             // Dissolution nodes carry no epistemic status; colour is the
             // terminal basin the token funnels into.
             if (renderMode === 'dissolution') return basinColour(node.basin);
+            // Threads recolours the same nodes by readiness, not epistemics.
+            if (renderMode === 'threads') return readinessColour(readinessOf(node));
             if (colourMode === 'status' && node.status) return statusColour(node.status);
             return typeColour(node.entityType);
         }
@@ -2473,6 +3398,20 @@
             const trunc = desc.length > 180 ? desc.substring(0, 177) + '...' : desc;
             let html = '<b>' + esc(node.label) + '</b>';
             html += '<br>Type: ' + esc(node.entityType || 'n/a');
+            if (renderMode === 'threads') {
+                const rkey = readinessOf(node);
+                html += '<br>Readiness: ' + esc(readinessLabel(rkey).toUpperCase());
+                const info = threadsInfo[node.id];
+                if (info && info.blockers.length) {
+                    html += '<br>Blocked by: ' + esc(info.blockers.map(function (b) {
+                        return b.label || b.key;
+                    }).join(', '));
+                }
+                if (info && info.gates) {
+                    html += '<br>Gates ' + esc(Number(info.gates.gate_count) ||
+                        asArray(info.gates.gates).length) + ' claim(s)';
+                }
+            }
             if (node.status) html += '<br>Status: ' + esc(node.status.toUpperCase());
             if (d.phase) html += '<br>Phase: ' + esc(phaseLabel(d.phase));
             if (node.asserted !== null && node.asserted !== undefined) html += '<br>Asserted: ' + formatDate(node.asserted);
@@ -2499,6 +3438,10 @@
                 const retiredNow = nodeRetiredAtCursor(node, cursor);
                 const colour = nodeDisplayColour(node, retiredNow);
                 const border = retiredNow ? nodeLiveColour(node) : shade(colour, -0.22);
+                // Threads: nodes the report says nothing about recede so the
+                // readiness classes carry the picture. Never hidden.
+                const dimmed = !retiredNow && renderMode === 'threads' &&
+                    readinessOf(node) === 'neutral';
 
                 nodeUpdates.push({
                     id: node.id,
@@ -2507,7 +3450,7 @@
                     shape: node.shape,
                     size: node.size,
                     hidden: hidden,
-                    opacity: retiredNow ? RETIRED_OPACITY : 1,
+                    opacity: retiredNow ? RETIRED_OPACITY : (dimmed ? 0.5 : 1),
                     borderWidth: retiredNow ? 3 : 2,
                     shapeProperties: { borderDashes: retiredNow ? [4, 4] : false },
                     color: {
@@ -2659,7 +3602,12 @@
                 return;
             }
             if (!type || type === 'all') {
-                setAllStatusChips(true);
+                if (renderMode === 'threads') {
+                    Object.keys(activeReadiness).forEach(function (k) { activeReadiness[k] = true; });
+                    syncReadinessChipClasses();
+                } else {
+                    setAllStatusChips(true);
+                }
                 Object.keys(activeTypes).forEach(function (t) { activeTypes[t] = true; });
             } else {
                 Object.keys(activeTypes).forEach(function (t) { activeTypes[t] = (t === type); });
@@ -2731,7 +3679,9 @@
         function activeFilterCounts() {
             const groups = renderMode === 'dissolution'
                 ? [activeRegisters, activeBasins]
-                : [activeStatuses, activeTypes];
+                : renderMode === 'threads'
+                    ? [activeReadiness, activeTypes]
+                    : [activeStatuses, activeTypes];
             let total = 0;
             let on = 0;
             groups.forEach(function (group) {
@@ -2765,6 +3715,9 @@
         }
 
         window.addEventListener('resize', function () {
+            // The ranked list lives in its own panel above 768px and inside the
+            // legend disclosure below it, so a width change has to re-render.
+            if (renderMode === 'threads') renderLegend();
             if (!isMobileLayout()) {
                 closeAllDisclosures();
                 return;
@@ -2840,10 +3793,17 @@
 
         function renderLegend() {
             const legend = document.getElementById('legend');
+            // The ranked list tracks the legend: same data, same refresh path.
+            renderFruitPanel();
             if (!legend) return;
 
             if (renderMode === 'dissolution') {
                 renderDissolutionLegend(legend);
+                return;
+            }
+
+            if (renderMode === 'threads') {
+                renderThreadsLegend(legend);
                 return;
             }
 
@@ -2940,9 +3900,10 @@
             const bar = document.getElementById('timeline-bar');
 
             // Dissolution has no wall-clock axis - its ordering is iteration
-            // count, which the layered layout already encodes. Neutralise the
-            // scrubber so cursorTime() never hides anything.
-            if (renderMode === 'dissolution') {
+            // count, which the layered layout already encodes. Threads has no
+            // axis either: readiness describes the tree as it stands today.
+            // Neutralise the scrubber so cursorTime() never hides anything.
+            if (renderMode === 'dissolution' || renderMode === 'threads') {
                 stopTimelinePlay();
                 timelineMin = null;
                 timelineMax = null;
@@ -3090,25 +4051,35 @@
         // vis-network empties its container element when it builds its canvas,
         // which takes the absolutely-positioned #legend overlay with it. Hold a
         // reference before construction and re-attach afterwards.
-        function detachLegend() {
-            let el = document.getElementById('legend');
-            if (!el) {
-                el = document.createElement('div');
-                el.id = 'legend';
-            }
-            if (el.parentNode) el.parentNode.removeChild(el);
-            return el;
+        // Overlays that live inside #graph and would otherwise be swallowed:
+        // constructing a vis.Network clears its container, and some builds
+        // clear it again on destroy(). Both are held aside and put back.
+        const GRAPH_OVERLAY_IDS = ['legend', 'fruit-panel'];
+
+        function detachGraphOverlays() {
+            return GRAPH_OVERLAY_IDS.map(function (id) {
+                let el = document.getElementById(id);
+                if (!el) {
+                    el = document.createElement('div');
+                    el.id = id;
+                    if (id === 'fruit-panel') el.className = 'mode-hidden';
+                }
+                if (el.parentNode) el.parentNode.removeChild(el);
+                return el;
+            });
         }
 
-        function attachLegend(container, legendEl) {
-            if (!container || !legendEl) return;
-            if (!document.getElementById('legend')) container.appendChild(legendEl);
+        function attachGraphOverlays(container, overlays) {
+            if (!container || !overlays) return;
+            overlays.forEach(function (el) {
+                if (el && !document.getElementById(el.id)) container.appendChild(el);
+            });
         }
 
         function initNetwork() {
             const container = document.getElementById('graph');
             const data = { nodes: nodesDataSet, edges: edgesDataSet };
-            const legendEl = detachLegend();
+            const overlays = detachGraphOverlays();
 
             const options = {
                 physics: buildPhysicsOptions(),
@@ -3139,7 +4110,7 @@
             }
 
             network = new vis.Network(container, data, options);
-            attachLegend(container, legendEl);
+            attachGraphOverlays(container, overlays);
 
             network.on('click', function (params) {
                 if (params.nodes.length > 0) {
@@ -3340,6 +4311,10 @@
                 return;
             }
 
+            // Threads: readiness, the report's own reasoning for it, and the
+            // blocker, above the epistemic record rather than instead of it.
+            if (renderMode === 'threads') html += renderThreadsDetail(node);
+
             if (d.description) html += renderField('Description', esc(d.description));
             if (d.side) html += renderField('Side', esc(d.side));
             if (d.role) html += renderField('Role', esc(d.role));
@@ -3422,6 +4397,9 @@
                 Object.keys(activeRegisters).forEach(function (r) { activeRegisters[r] = true; });
                 Object.keys(activeBasins).forEach(function (b) { activeBasins[b] = true; });
                 syncDissolutionChipClasses();
+            } else if (renderMode === 'threads') {
+                setAllReadinessChips(true);
+                setAllTypeChips(true);
             } else {
                 setAllStatusChips(true);
                 setAllTypeChips(true);
@@ -3733,6 +4711,7 @@
                 renderMode = 'dissolution';
                 dissolutionData = payload;
                 phases = [];
+                clearThreadsState();
 
                 const models = dissolutionModels();
                 const modelKeys = Object.keys(models);
@@ -3750,7 +4729,9 @@
 
                 layoutOverride = dissolutionLayoutOverride();
             } else {
-                renderMode = 'evidence';
+                // Threads shares the evidence schema and the evidence layout;
+                // only the colouring, the chips and the overlay differ.
+                renderMode = (graph.mode === 'threads') ? 'threads' : 'evidence';
                 dissolutionData = null;
                 currentModelKey = null;
 
@@ -3760,6 +4741,11 @@
                 // signature below is derived from this value, an unchanged
                 // signature would also skip the destroy/recreate and quietly
                 // reuse the hierarchical network via setData().
+                //
+                // Threads deliberately sets no layoutOverride of its own: it
+                // renders force-directed exactly like evidence, so there is
+                // nothing for it to leak. If it ever needs one, it must clear
+                // it here too — this line is the only return path.
                 layoutOverride = null;
 
                 phases = Array.isArray(metadata.phases) ? metadata.phases.slice() : [];
@@ -3770,8 +4756,27 @@
                 });
 
                 allNodes = createNodes(payload);
+
+                if (renderMode === 'threads') {
+                    threadsReport = await loadThreadsReport();
+                    const known = {};
+                    allNodes.forEach(function (n) { known[n.id] = true; });
+                    buildThreadsModel(threadsReport, known);
+                    // Blocker hubs must exist before buildIndexes(), or
+                    // createEdges() would drop their gate edges as dangling.
+                    allNodes = allNodes.concat(createThreadsHubNodes());
+                } else {
+                    clearThreadsState();
+                }
+
                 buildIndexes();
                 allEdges = createEdges(payload);
+
+                if (renderMode === 'threads') {
+                    allEdges = allEdges.concat(createThreadsHubEdges());
+                    styleThreadsGateEdges(allEdges);
+                }
+
                 buildAdjacency();
 
                 // Isomorphism claims carry a `side`; pin acoustic left and
@@ -3779,12 +4784,17 @@
                 applySideLayout(allNodes);
 
                 buildChips();
+                if (renderMode === 'threads') buildReadinessChips();
             }
 
             applyModeVisibility();
             setupTimeline(payload);
 
-            const heading = metadata.title || graph.fallbackTitle || graph.label;
+            // Threads reads entities.json, whose metadata.title describes the
+            // evidence graph — the overlay's own title is the honest heading.
+            const heading = (renderMode === 'threads')
+                ? (((threadsReport || {}).metadata || {}).title || graph.fallbackTitle || graph.label)
+                : (metadata.title || graph.fallbackTitle || graph.label);
             const titleEl = document.getElementById('graph-title');
             if (titleEl) titleEl.textContent = heading;
             document.title = heading;
@@ -3823,13 +4833,13 @@
             const layoutSignature = JSON.stringify(layoutOverride);
             if (network !== null && layoutSignature !== networkLayoutSignature) {
                 // Some vis builds clear the whole container on destroy(), which
-                // would take the legend overlay with it - hold a reference and
-                // put it back afterwards.
+                // would take the legend and the threads list with it - hold
+                // references and put them back afterwards.
                 const graphEl = document.getElementById('graph');
-                const legendEl = detachLegend();
+                const overlays = detachGraphOverlays();
                 try { network.destroy(); } catch (e) { console.warn('network.destroy() failed:', e.message); }
                 network = null;
-                attachLegend(graphEl, legendEl);
+                attachGraphOverlays(graphEl, overlays);
             }
             networkLayoutSignature = layoutSignature;
 
@@ -3861,6 +4871,14 @@
                     (payload.runs || []).length + ' runs, ' +
                     (payload.sources || []).length + ' sources, ' +
                     allEdges.length + ' relationships.');
+                if (renderMode === 'threads') {
+                    const counts = readinessCounts();
+                    console.log('Threads overlay: ' + (threadsReport
+                        ? threadsFruit.length + ' ranked threads, ' + threadsBlockers.length +
+                          ' blockers (' + threadsHubs.length + ' synthesised as hubs), readiness ' +
+                          READINESS_ORDER.map(function (k) { return k + '=' + counts[k]; }).join(' ')
+                        : 'unavailable — every node neutral'));
+                }
             }
         }
 

@@ -27,7 +27,12 @@ EVIDENCE_FILES = ["entities.json", "isomorphism.json"]
 
 # --- Vocabularies, transcribed from docs/graph/README.md "The vocabularies" --
 
-CLAIM_TYPES = {"hypothesis", "finding", "concept"}
+# Four types. `question` is what the record explicitly leaves open - distinct
+# from a hypothesis, which asserts something testable, and from a concept, which
+# is only vocabulary. It exists because `open` was useless as a work signal:
+# every `open` claim in this graph used to be a concept, `open` being what a
+# concept falls into when there is no epistemic verdict to record.
+CLAIM_TYPES = {"hypothesis", "finding", "concept", "question"}
 RUN_TYPES = {"run", "model", "null-model"}
 SOURCE_TYPES = {"doc", "artefact", "prior-work"}
 
@@ -82,8 +87,43 @@ EPISTEMIC_EDGES = {
     "tests",
 }
 STRUCTURAL_EDGES = {"produced-by", "run-on", "evidenced-by", "documented-in"}
-ASSOCIATIVE_EDGES = {"analogous-to", "breaks-down-at", "builds-on", "cites", "relates-to"}
+# `blocks` / `blocked-by` are the same relation read from opposite ends: a
+# dependency between open work and what it gates. Associative, not epistemic - a
+# blocker changes whether a claim can be settled yet, never whether it is true.
+DEPENDENCY_EDGES = {"blocks", "blocked-by"}
+ASSOCIATIVE_EDGES = {
+    "analogous-to",
+    "breaks-down-at",
+    "builds-on",
+    "cites",
+    "relates-to",
+} | DEPENDENCY_EDGES
 EDGE_TYPES = EPISTEMIC_EDGES | STRUCTURAL_EDGES | ASSOCIATIVE_EDGES
+
+# The statuses a `question` may carry. There is deliberately no "answered"
+# value: an answered question takes `retired` and the answer is the claim on the
+# other end of its incoming retires/supersedes edge.
+QUESTION_STATUSES = {"open", "untested", "retired"}
+
+# The questions extracted from the record, pinned. Every one of these
+# corresponds to a sentence in docs/FINDINGS.md or docs/JOURNEY_MAP.md that
+# leaves something open, quoted in the node's own description. Adding another is
+# a judgement call about the record and belongs in this pin, so that a builder
+# cannot quietly manufacture open work.
+EXPECTED_QUESTIONS = [
+    "q-flip-axis-generality",
+    "q-fractal-dimension",
+    "q-gate-cadence",
+    "q-hook-window-depth",
+    "q-independent-reimplementation",
+    "q-jlens-full-build",
+    "q-lag2-regate-33",
+    "q-prompt-library",
+    "q-shape-class-null",
+    "q-slonski-macro-group",
+    "q-tmix-llm",
+    "q-why-gpt2-small",
+]
 
 EVIDENCE_TOP_LEVEL_KEYS = {"metadata", "claims", "runs", "sources", "relationships"}
 DISSOLUTION_TOP_LEVEL_KEYS = {"metadata", "models"}
@@ -786,6 +826,203 @@ def test_content_isomorphism_records_where_the_analogy_breaks(isomorphism):
         assert str(rel.get("description", "")).strip(), (
             "a breaks-down-at edge must state the reason the analogy fails"
         )
+
+
+# ===========================================================================
+# Questions: the open work the record names, and what gates it
+# ===========================================================================
+
+
+def _questions(graph):
+    return [claim for claim in graph["claims"] if claim["type"] == "question"]
+
+
+def _dependency_edges(graph):
+    return [rel for rel in graph["relationships"] if rel["type"] in DEPENDENCY_EDGES]
+
+
+def test_questions_are_exactly_the_pinned_set(entities):
+    """A question node must be traceable to a sentence in the record that leaves
+    something open. If the builder invents one, this fails."""
+    found = sorted(claim["id"] for claim in _questions(entities))
+    assert found == EXPECTED_QUESTIONS, (
+        f"question set drifted from the audited list; added: "
+        f"{sorted(set(found) - set(EXPECTED_QUESTIONS))}, "
+        f"removed: {sorted(set(EXPECTED_QUESTIONS) - set(found))}"
+    )
+
+
+def test_every_question_id_is_prefixed(entities):
+    for claim in _questions(entities):
+        assert claim["id"].startswith("q-"), f"{claim['id']} is not a q- id"
+
+
+def test_every_question_uses_the_question_status_slice(entities):
+    bad = [
+        (claim["id"], claim["status"])
+        for claim in _questions(entities)
+        if claim["status"] not in QUESTION_STATUSES
+    ]
+    assert not bad, f"questions with a status outside {sorted(QUESTION_STATUSES)}: {bad}"
+
+
+def test_every_open_question_is_actually_open(entities):
+    """All 12 stand open at the close; none has been answered since."""
+    assert all(claim["status"] == "open" for claim in _questions(entities))
+    assert all(claim.get("retired") is None for claim in _questions(entities))
+
+
+def test_open_is_no_longer_a_dead_work_signal(entities):
+    """THE POINT OF THE `question` TYPE.
+
+    Before it existed, every claim with status `open` was a concept - `open` is
+    what a concept falls into when nobody has an epistemic verdict to record - so
+    filtering on `open` returned vocabulary and no work. Now `type == "question"
+    and status == "open"` is a real work queue, and `open` means something for a
+    claim that is not a concept.
+    """
+    open_claims = [c for c in entities["claims"] if c["status"] == "open"]
+    types = {c["type"] for c in open_claims}
+    assert "question" in types, "no open questions: `open` is a dead signal again"
+    assert types == {"concept", "question"}, (
+        f"unexpected types carrying status `open`: {sorted(types)}"
+    )
+    work = [c for c in open_claims if c["type"] == "question"]
+    assert len(work) == len(EXPECTED_QUESTIONS)
+
+
+def test_every_question_quotes_the_record(entities):
+    """The description must carry the sentence that leaves the matter open, so a
+    reader can check the node against the document without leaving the graph."""
+    for claim in _questions(entities):
+        description = claim["description"]
+        assert '"' in description, (
+            f"{claim['id']}: description quotes nothing from the record"
+        )
+        assert len(description) > 120, f"{claim['id']}: description is too thin to audit"
+
+
+def test_every_question_points_at_the_passage_it_came_from(entities):
+    for claim in _questions(entities):
+        doc_ref = claim.get("doc_ref", "")
+        assert doc_ref.startswith(("docs/FINDINGS.md#", "docs/JOURNEY_MAP.md#")), (
+            f"{claim['id']}: doc_ref {doc_ref!r} does not point into the record"
+        )
+
+
+def test_every_question_is_wired_to_something(entities):
+    """A question with no edges is a note, not a graph node: it must relate to
+    the claim that raised it, or gate something, or be gated."""
+    for claim in _questions(entities):
+        wired = [
+            rel
+            for rel in entities["relationships"]
+            if rel["type"] in DEPENDENCY_EDGES | {"relates-to"}
+            and claim["id"] in (rel["from"], rel["to"])
+        ]
+        assert wired, f"{claim['id']} has no relates-to or dependency edge"
+
+
+def test_the_prompt_library_is_a_shared_blocker(entities):
+    """FINDINGS F10 and F15 sit in different sections, never mention each other,
+    and are blocked on the same artefact:
+
+        F10  "Open: whether all 34 Divine prompts share this flip axis
+              (blocked on the prompt-library restoration, issue #9)."
+        F15  "The other 33 period-2 prompts remain blocked on the prompt
+              library (issue #9)."
+
+    Read linearly you would never pair them. In the graph they are two edges
+    into one node, so unblocking issue #9 visibly frees two threads.
+    """
+    blocked = {
+        rel["from"]
+        for rel in entities["relationships"]
+        if rel["type"] == "blocked-by" and rel["to"] == "q-prompt-library"
+    }
+    assert blocked == {"q-flip-axis-generality", "q-lag2-regate-33"}, (
+        f"issue #9 should gate exactly the two threads the record blocks on it, "
+        f"got {sorted(blocked)}"
+    )
+
+
+def test_the_jlens_full_build_blocks_h_j1(entities):
+    """H-J1's disposition ends "Full build still pending (issue #8)", so the
+    hypothesis cannot move past its pilot-confidence null until that is built."""
+    blocked = {
+        rel["to"]
+        for rel in entities["relationships"]
+        if rel["type"] == "blocks" and rel["from"] == "q-jlens-full-build"
+    }
+    assert "h-j1" in blocked
+    assert _claim(entities, "h-j1")["status"] == "not-supported"
+
+
+def test_the_fractal_question_is_gated_on_t_mix(entities):
+    """JOURNEY_MAP section 7 states the order outright: "Requires T_mix first"."""
+    gated = {
+        rel["to"]
+        for rel in entities["relationships"]
+        if rel["type"] == "blocked-by" and rel["from"] == "q-fractal-dimension"
+    }
+    assert gated == {"q-tmix-llm"}
+
+
+def test_gate_cadence_gates_nothing(entities):
+    """DELIBERATE: caveat 5's finer gate cadence has no blocks edge.
+
+    FINDINGS section 6 files it as the series' one declared debt and bounds it in
+    the same breath: "It cannot overturn a principal finding: basin identities
+    stand on the gate regardless of cadence." Open work that gates nothing is a
+    real category, and inventing a dependant for it would misreport the record.
+    """
+    gates = [
+        rel
+        for rel in _dependency_edges(entities)
+        if (rel["type"] == "blocks" and rel["from"] == "q-gate-cadence")
+        or (rel["type"] == "blocked-by" and rel["to"] == "q-gate-cadence")
+    ]
+    assert not gates, f"q-gate-cadence should block nothing, got {gates}"
+
+
+def test_no_dependency_is_drawn_from_both_ends(entities):
+    """`blocks` and `blocked-by` are one relation read two ways. Drawing both for
+    a pair would double the dependency count and make one stated blocker look
+    like two."""
+    pairs = set()
+    for rel in _dependency_edges(entities):
+        if rel["type"] == "blocks":
+            pairs.add((rel["from"], rel["to"]))
+        else:
+            pairs.add((rel["to"], rel["from"]))
+    assert len(pairs) == len(_dependency_edges(entities)), (
+        "a dependency is drawn from both ends"
+    )
+
+
+def test_dependency_edges_only_ever_involve_open_work(entities):
+    """Something has to be open at one end, or it is not a blocker."""
+    by_id = {claim["id"]: claim for claim in entities["claims"]}
+    for rel in _dependency_edges(entities):
+        blocker = rel["from"] if rel["type"] == "blocks" else rel["to"]
+        node = by_id.get(blocker)
+        assert node is not None, f"{blocker} is not a claim"
+        assert node["type"] == "question" and node["status"] == "open", (
+            f"{blocker} blocks something but is not open work"
+        )
+
+
+def test_visual_config_styles_the_question_type_and_its_edges():
+    config = _load("visual_config.json")
+    assert config["colors"]["question"] == "#A8477A"
+    assert config["shapes"]["question"] == "circle"
+    for edge in sorted(DEPENDENCY_EDGES):
+        style = config["edge_styles"][edge]
+        assert style["color"] == config["colors"]["question"], (
+            f"{edge} should read as part of the question family"
+        )
+        assert style["arrow"] is True, f"{edge} must be directed"
+    assert config["edge_styles"]["blocks"] == config["edge_styles"]["blocked-by"]
 
 
 # ===========================================================================

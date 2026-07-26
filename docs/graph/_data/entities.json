@@ -6,7 +6,7 @@
     "last_updated": "2026-07-25",
     "source_last_updated": "2026-07-23",
     "title": "ATR Evidence Graph: hypotheses, findings, runs and self-corrections",
-    "description": "The Activation Tensor Resonance series as an evidence graph: 17 principal findings, 16 key discoveries, 12 hypotheses and the concepts they run on, wired to the runs, models and artefacts that produced them, with every recorded correction, retirement and supersession carried as a signed edge.",
+    "description": "The Activation Tensor Resonance series as an evidence graph: 17 principal findings, 16 key discoveries, 12 hypotheses, the concepts they run on and the questions the record leaves open, wired to the runs, models and artefacts that produced them, with every recorded correction, retirement and supersession carried as a signed edge and every stated blocker as a blocks / blocked-by edge.",
     "generator": "docs/graph/build_evidence_graph.py",
     "sources_parsed": [
       "docs/FINDINGS.md",
@@ -15,7 +15,7 @@
     "sources_checked_not_parsed": [
       "README.md"
     ],
-    "date_precision": "Phases 0-3 and the runs inside them carry the month anchor 2026-03-01; FINDINGS.md records only 'Original exploratory work: 2026-03'. Runs 11-15 are stamped 2026-07-19 because FINDINGS.md dates the mechanism series '2026-07-19 onward' and gives no per-run dates; the stamp is the series start, not each run's execution day. Hypothesis `asserted` dates are placements, not record: the sources date dispositions, never the moment a hypothesis was raised. Every other date, including every date on a corrects / retires / supersedes edge, is day-precise as stated in the record.",
+    "date_precision": "Phases 0-3 and the runs inside them carry the month anchor 2026-03-01; FINDINGS.md records only 'Original exploratory work: 2026-03'. Runs 11-15 are stamped 2026-07-19 because FINDINGS.md dates the mechanism series '2026-07-19 onward' and gives no per-run dates; the stamp is the series start, not each run's execution day. Hypothesis `asserted` dates are placements, not record: the sources date dispositions, never the moment a hypothesis was raised. Question `asserted` dates are placements on the same footing: the caveats and JOURNEY_MAP's Open Questions table carry no dates of their own, so each question is stamped with the document revision that states it (2026-07-10 at series close, 2026-07-19 for the Act II.5 caveats and F-sections). Every other date, including every date on a corrects / retires / supersedes edge, is day-precise as stated in the record.",
     "phases": [
       {
         "id": "phase-0",
@@ -1093,6 +1093,138 @@
       "asserted": "2026-03-20",
       "retired": null,
       "doc_ref": "docs/JOURNEY_MAP.md#5-glossary"
+    },
+    {
+      "id": "q-flip-axis-generality",
+      "label": "Q: Do all 34 Divine prompts share the F10 flip axis, head and eigenvalue?",
+      "type": "question",
+      "status": "open",
+      "description": "F10 states it in as many words: \"Open: whether all 34 Divine prompts share this flip axis (blocked on the prompt-library restoration, issue #9).\" Caveat 14 widens it to the whole mechanism series: \"Whether the other 33 period-2 prompts share the flip axis, the flip head (L11.H8), the eigenvalue, and the anomalous-token alignment is untested (prompt library pending, issue #9).\" FINDINGS section 5 calls this \"what is now most open on the Divine object\".",
+      "phase": "phase-5",
+      "asserted": "2026-07-19",
+      "retired": null,
+      "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole"
+    },
+    {
+      "id": "q-fractal-dimension",
+      "label": "Q: Is the fractal dimension of convergence trajectories basin-specific?",
+      "type": "question",
+      "status": "open",
+      "description": "JOURNEY_MAP section 7: \"Is the fractal dimension of convergence trajectories basin-specific? | Speculative | Requires T_mix first\". The weakest item on the open list, recorded at that strength: speculative, and gated on a metric nobody has computed yet.",
+      "phase": "phase-5",
+      "asserted": "2026-07-10",
+      "retired": null,
+      "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions"
+    },
+    {
+      "id": "q-gate-cadence",
+      "label": "Q: What are the true settling iterations between 100 and 120?",
+      "type": "question",
+      "status": "open",
+      "description": "Caveat 5: \"Lock-in iterations cluster at 120 because that is the gate's earliest possible firing; true settling times between 100 and 120 are unresolved.\" FINDINGS section 6 files it as the series' one remaining declared debt - \"One item remains open: finer convergence-gate cadence (caveat 5)\" - and bounds it in the same breath: \"It cannot overturn a principal finding: basin identities stand on the gate regardless of cadence.\" So it carries no blocks edge: open work that gates nothing.",
+      "phase": "phase-5",
+      "asserted": "2026-07-10",
+      "retired": null,
+      "doc_ref": "docs/FINDINGS.md#caveats"
+    },
+    {
+      "id": "q-hook-window-depth",
+      "label": "Q: Does the landscape depend on where the loop is cut (window / depth)?",
+      "type": "question",
+      "status": "open",
+      "description": "Caveat 6: \"Hook-position dependence unexplored. All runs cut the loop at (final-layer resid_post to layer-0 resid_pre). Alternative windows (including a Pythia-410m depth control, layers 0-11 vs 0-23) are designed but not run.\" JOURNEY_MAP section 7 carries the row at status \"Designed, not run\", and FINDINGS section 5 lists \"hook-window/depth dependence (caveat 6)\" among the open directions.",
+      "phase": "phase-5",
+      "asserted": "2026-07-10",
+      "retired": null,
+      "doc_ref": "docs/FINDINGS.md#caveats"
+    },
+    {
+      "id": "q-independent-reimplementation",
+      "label": "Q: Does an independent re-implementation reproduce the result?",
+      "type": "question",
+      "status": "open",
+      "description": "H0's disposition ends on the gap: \"Independent re-implementation still not attempted.\" Caveat 1 makes the same point its heading - \"Repeatability plus one cross-hardware replication, not independent reproducibility\" - and closes \"No independent re-implementation by another investigator.\" What exists is same-code replication on new hardware (F6), which is a different claim.",
+      "phase": "phase-5",
+      "asserted": "2026-07-19",
+      "retired": null,
+      "doc_ref": "docs/FINDINGS.md#caveats"
+    },
+    {
+      "id": "q-jlens-full-build",
+      "label": "Q: What does the phase-aware full J-lens build show (issue #8)?",
+      "type": "question",
+      "status": "open",
+      "description": "F11 specifies the outstanding work: \"The full build (issue #8) should be phase-aware: probe both phases and the pivot M.\" H-J1's disposition closes on the same debt - \"Full build still pending (issue #8)\" - and FINDINGS section 5 lists \"the phase-aware J-lens full build (F11, issue #8)\" among the open directions. The pilot's own limits (caveat 13) are what the full build exists to lift.",
+      "phase": "phase-5",
+      "asserted": "2026-07-19",
+      "retired": null,
+      "doc_ref": "docs/FINDINGS.md#f11-j-lens-pilot-the-prolet-insidedivine-outside-prediction-did-not-hold-the-boundary-that-appeared-is-language-vs-noise"
+    },
+    {
+      "id": "q-lag2-regate-33",
+      "label": "Q: Do the other 33 period-2 prompts re-gate as converged?",
+      "type": "question",
+      "status": "open",
+      "description": "F15 demonstrates the lag-k gate for one trajectory and records the rest as outstanding: \"The other 33 period-2 prompts remain blocked on the prompt library (issue #9); one, the Syntactic prompt, is now re-gated as converged.\" The procedure is on record too - the re-gate \"runs the full lag table on a short dense continuation and gates each state at its smallest passing lag\" - so this is blocked on an artefact, not on a method. JOURNEY_MAP section 7 gives the same next step: \"Re-gate the other 33 prompts (blocked on issue #9)\".",
+      "phase": "phase-5",
+      "asserted": "2026-07-19",
+      "retired": null,
+      "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it"
+    },
+    {
+      "id": "q-prompt-library",
+      "label": "Q: Is the 125-prompt library restored (issue #9)?",
+      "type": "question",
+      "status": "open",
+      "description": "Caveats 11 and 14 both file the same gate in the same three words, \"prompt library pending, issue #9\", and FINDINGS section 5 names it as the blocker on two separate directions at once: the re-gate of the 34 cycling prompts and the flip-axis generality question are \"blocked in part on the prompt-library restoration, issue #9\". This node is a restoration task rather than a question about the model; it is in the graph so that the two threads it gates point at one blocker instead of repeating one sentence in two descriptions, where nothing can pair them.",
+      "phase": "phase-5",
+      "asserted": "2026-07-19",
+      "retired": null,
+      "doc_ref": "docs/FINDINGS.md#caveats"
+    },
+    {
+      "id": "q-shape-class-null",
+      "label": "Q: What does a shape-class-matched coherence null show?",
+      "type": "question",
+      "status": "open",
+      "description": "F12 records the block as a standing methodological rule: \"no cross-model coherence claim until a shape-class-matched null exists (matching token length, case, and leading-space status)\". Caveat 10 repeats it, and FINDINGS section 5 lists \"the shape-class-matched coherence null and its application to the 125-sweep (F12, caveat 10)\" among the open directions. Until it exists, the semantic-coherence phenomenon \"remains exclusive to GPT-2 Small's language regime among the models tested\".",
+      "phase": "phase-5",
+      "asserted": "2026-07-19",
+      "retired": null,
+      "doc_ref": "docs/FINDINGS.md#f12-cross-model-gpt-2-mediums-universal-attractor-is-a-typographic-cluster-over-a-near-flat-readout"
+    },
+    {
+      "id": "q-slonski-macro-group",
+      "label": "Q: Are all basins in one Slonski macro-group?",
+      "type": "question",
+      "status": "open",
+      "description": "JOURNEY_MAP section 7: \"Are all basins in one Slonski macro-group? | Untested; the all-warm premise of the prediction was retired 2026-07-11 (anisotropy artifact) | One Q-vector experiment, on its own terms\". Kept at exactly the strength the record gives it: the question outlived its own premise and stands only as a question, with a named one-experiment next step.",
+      "phase": "phase-5",
+      "asserted": "2026-07-10",
+      "retired": null,
+      "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions"
+    },
+    {
+      "id": "q-tmix-llm",
+      "label": "Q: What is T_mix_LLM for each basin?",
+      "type": "question",
+      "status": "open",
+      "description": "JOURNEY_MAP section 7: \"What is T_mix_LLM for each basin? | Measurable from existing data | Compute from .pt\". The glossary files the metric itself as a \"proposed metric\" that was never computed, so the question is open with its data already on disk - the cheapest item on the open list.",
+      "phase": "phase-5",
+      "asserted": "2026-07-10",
+      "retired": null,
+      "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions"
+    },
+    {
+      "id": "q-why-gpt2-small",
+      "label": "Q: Why does GPT-2 Small alone resolve language into few semantic basins?",
+      "type": "question",
+      "status": "open",
+      "description": "JOURNEY_MAP section 7 files this one at a status of its own: \"The open question of the series\", next step \"New experimental stage\". FINDINGS section 5 puts it first in the open directions, ordered by leverage: \"why GPT-2 Small (the anomaly, now with low-probability coherent clusters as the thing to explain)\", and adds that the anomaly was sharpened rather than removed by Act II.5.",
+      "phase": "phase-5",
+      "asserted": "2026-07-10",
+      "retired": null,
+      "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions"
     }
   ],
   "runs": [
@@ -1843,6 +1975,62 @@
       "type": "analogous-to",
       "description": "The nearest published neighbour: period-2 attractor cycles found by iterating a model through its text interface. Theirs are approximate, statistical, and text-level; this one is exact to machine precision and mechanistically located.",
       "weight": 7
+    },
+    {
+      "from": "q-flip-axis-generality",
+      "to": "q-prompt-library",
+      "type": "blocked-by",
+      "description": "F10's own words: the flip-axis generality question is \"blocked on the prompt-library restoration, issue #9\", repeated in caveats 11 and 14 as \"prompt library pending, issue #9\".",
+      "weight": 8,
+      "asserted": "2026-07-19"
+    },
+    {
+      "from": "q-fractal-dimension",
+      "to": "q-tmix-llm",
+      "type": "blocked-by",
+      "description": "JOURNEY_MAP section 7 states the order in two words: the fractal-dimension question \"Requires T_mix first\".",
+      "weight": 4,
+      "asserted": "2026-07-10"
+    },
+    {
+      "from": "q-lag2-regate-33",
+      "to": "q-prompt-library",
+      "type": "blocked-by",
+      "description": "F15's own words: \"The other 33 period-2 prompts remain blocked on the prompt library (issue #9)\", and JOURNEY_MAP section 7 gives the next step as \"Re-gate the other 33 prompts (blocked on issue #9)\".",
+      "weight": 8,
+      "asserted": "2026-07-19"
+    },
+    {
+      "from": "q-hook-window-depth",
+      "to": "q-why-gpt2-small",
+      "type": "blocks",
+      "description": "FINDINGS section 6 assigns the depth control to the successor question explicitly: the depth control, the per-layer / per-head decomposition, the spectral test and readout upgrades \"do not test whether the result is real; they test why the models differ. That is the successor project's question.\"",
+      "weight": 5,
+      "asserted": "2026-07-10"
+    },
+    {
+      "from": "q-independent-reimplementation",
+      "to": "h0-determinism",
+      "type": "blocks",
+      "description": "H0 currently stands on repeatability plus one cross-hardware replication. Caveat 1's heading is the block: \"Repeatability plus one cross-hardware replication, not independent reproducibility\", and H0's disposition ends \"Independent re-implementation still not attempted\".",
+      "weight": 6,
+      "asserted": "2026-07-19"
+    },
+    {
+      "from": "q-jlens-full-build",
+      "to": "h-j1",
+      "type": "blocks",
+      "description": "H-J1 cannot move past a pilot-confidence null while the instrument that would settle it is unbuilt: its disposition ends \"Full build still pending (issue #8)\", and F11 specifies that the build \"should be phase-aware: probe both phases and the pivot M\".",
+      "weight": 8,
+      "asserted": "2026-07-19"
+    },
+    {
+      "from": "q-shape-class-null",
+      "to": "concept-coherence",
+      "type": "blocks",
+      "description": "F12 states the block as a standing rule rather than a wish: \"no cross-model coherence claim until a shape-class-matched null exists\". The measure cannot travel outside GPT-2 Small until that null is built.",
+      "weight": 7,
+      "asserted": "2026-07-19"
     },
     {
       "from": "concept-lag1-convergence-gate",
@@ -2887,6 +3075,90 @@
       "to": "doc-findings",
       "type": "documented-in",
       "description": "H4's disposition is fixed in the canonical record's hypothesis table.",
+      "weight": 2
+    },
+    {
+      "from": "q-flip-axis-generality",
+      "to": "doc-findings",
+      "type": "documented-in",
+      "description": "The passage this question is quoted from is in the canonical record.",
+      "weight": 2
+    },
+    {
+      "from": "q-fractal-dimension",
+      "to": "doc-journey-map",
+      "type": "documented-in",
+      "description": "The passage this question is quoted from is in the journey map's Open Questions table.",
+      "weight": 2
+    },
+    {
+      "from": "q-gate-cadence",
+      "to": "doc-findings",
+      "type": "documented-in",
+      "description": "The passage this question is quoted from is in the canonical record.",
+      "weight": 2
+    },
+    {
+      "from": "q-hook-window-depth",
+      "to": "doc-findings",
+      "type": "documented-in",
+      "description": "The passage this question is quoted from is in the canonical record.",
+      "weight": 2
+    },
+    {
+      "from": "q-independent-reimplementation",
+      "to": "doc-findings",
+      "type": "documented-in",
+      "description": "The passage this question is quoted from is in the canonical record.",
+      "weight": 2
+    },
+    {
+      "from": "q-jlens-full-build",
+      "to": "doc-findings",
+      "type": "documented-in",
+      "description": "The passage this question is quoted from is in the canonical record.",
+      "weight": 2
+    },
+    {
+      "from": "q-lag2-regate-33",
+      "to": "doc-findings",
+      "type": "documented-in",
+      "description": "The passage this question is quoted from is in the canonical record.",
+      "weight": 2
+    },
+    {
+      "from": "q-prompt-library",
+      "to": "doc-findings",
+      "type": "documented-in",
+      "description": "The passage this question is quoted from is in the canonical record.",
+      "weight": 2
+    },
+    {
+      "from": "q-shape-class-null",
+      "to": "doc-findings",
+      "type": "documented-in",
+      "description": "The passage this question is quoted from is in the canonical record.",
+      "weight": 2
+    },
+    {
+      "from": "q-slonski-macro-group",
+      "to": "doc-journey-map",
+      "type": "documented-in",
+      "description": "The passage this question is quoted from is in the journey map's Open Questions table.",
+      "weight": 2
+    },
+    {
+      "from": "q-tmix-llm",
+      "to": "doc-journey-map",
+      "type": "documented-in",
+      "description": "The passage this question is quoted from is in the journey map's Open Questions table.",
+      "weight": 2
+    },
+    {
+      "from": "q-why-gpt2-small",
+      "to": "doc-journey-map",
+      "type": "documented-in",
+      "description": "The passage this question is quoted from is in the journey map's Open Questions table.",
       "weight": 2
     },
     {
@@ -4085,6 +4357,158 @@
       "description": "The readout is logit-lens-style, applying ln_final and W_U to intermediate states, and F2 is the case where the decode and the dynamics disagree (caveat 9).",
       "weight": 5,
       "asserted": "2026-07-10"
+    },
+    {
+      "from": "q-flip-axis-generality",
+      "to": "f10-cycle-anatomy-flip-axis",
+      "type": "relates-to",
+      "description": "F10 measured the flip axis on one trajectory and left its generality open in the same paragraph.",
+      "weight": 8,
+      "asserted": "2026-07-19"
+    },
+    {
+      "from": "q-flip-axis-generality",
+      "to": "f13-flip-axis-glitch-alignment",
+      "type": "relates-to",
+      "description": "Caveat 14 names the anomalous-token alignment as one of the four properties whose generality across the other 33 prompts is untested.",
+      "weight": 5,
+      "asserted": "2026-07-19"
+    },
+    {
+      "from": "q-flip-axis-generality",
+      "to": "f14-flip-eigenvalue-l11h8",
+      "type": "relates-to",
+      "description": "Caveat 14 names the eigenvalue and the flip head L11.H8 as two more of those four properties.",
+      "weight": 5,
+      "asserted": "2026-07-19"
+    },
+    {
+      "from": "q-flip-axis-generality",
+      "to": "f17-l11h8-copy-promoter",
+      "type": "relates-to",
+      "description": "F17's ablation and copy test follow the same single audited trajectory, so the head's role in the other 33 prompts is untested too (caveat 14).",
+      "weight": 5,
+      "asserted": "2026-07-19"
+    },
+    {
+      "from": "q-fractal-dimension",
+      "to": "concept-fractal-dimension",
+      "type": "relates-to",
+      "description": "The concept is listed in the Adjacent Science table as a potential, untested metric for basin geometry; this is the question that would use it.",
+      "weight": 3,
+      "asserted": "2026-07-10"
+    },
+    {
+      "from": "q-gate-cadence",
+      "to": "f1-five-attractor-basins",
+      "type": "relates-to",
+      "description": "F1's lock-in iterations are all 120 because that is the gate's floor, which is what leaves the true settling times unresolved (caveat 5).",
+      "weight": 6,
+      "asserted": "2026-07-10"
+    },
+    {
+      "from": "q-hook-window-depth",
+      "to": "f3-fingerprint-refuted",
+      "type": "relates-to",
+      "description": "The cross-model differences are the thing a window or depth change would have to be ruled out of; all four sweeps cut the loop at one place.",
+      "weight": 5,
+      "asserted": "2026-07-10"
+    },
+    {
+      "from": "q-independent-reimplementation",
+      "to": "f6-cross-hardware-replication",
+      "type": "relates-to",
+      "description": "F6 is the strongest replication on record and is explicitly not this: \"same-code replication on new hardware, not independent re-implementation\".",
+      "weight": 6,
+      "asserted": "2026-07-19"
+    },
+    {
+      "from": "q-jlens-full-build",
+      "to": "f11-jlens-pilot-null",
+      "type": "relates-to",
+      "description": "The pilot is what the full build replaces; every F11 limitation (caveat 13) is a specification for it.",
+      "weight": 7,
+      "asserted": "2026-07-19"
+    },
+    {
+      "from": "q-jlens-full-build",
+      "to": "f16-jlens-phase-probe",
+      "type": "relates-to",
+      "description": "F16 re-probed with the same restricted pilot lens, so it inherits the pilot's limits and does not discharge the full build.",
+      "weight": 6,
+      "asserted": "2026-07-19"
+    },
+    {
+      "from": "q-lag2-regate-33",
+      "to": "f15-lag2-gate",
+      "type": "relates-to",
+      "description": "F15 implemented the lag-k gate and demonstrated it for one prompt; this is the remainder of that work.",
+      "weight": 8,
+      "asserted": "2026-07-19"
+    },
+    {
+      "from": "q-lag2-regate-33",
+      "to": "f9-divine-period-2",
+      "type": "relates-to",
+      "description": "F9 is the finding that made the re-gate necessary: the 34 non-convergers cycle rather than drift, so they were failed by construction.",
+      "weight": 6,
+      "asserted": "2026-07-19"
+    },
+    {
+      "from": "q-shape-class-null",
+      "to": "f12-medium-typographic-cluster",
+      "type": "relates-to",
+      "description": "F12 is where the rule is stated: GPT-2 Medium's typographic cluster passes the coherence test at p = 0.001, so shape has to be controlled for.",
+      "weight": 7,
+      "asserted": "2026-07-19"
+    },
+    {
+      "from": "q-shape-class-null",
+      "to": "f8-prolet-coherent-cluster",
+      "type": "relates-to",
+      "description": "F8's permutation nulls control for frequency via the norm proxy but not for token shape (caveat 10), which is the gap this question names.",
+      "weight": 5,
+      "asserted": "2026-07-19"
+    },
+    {
+      "from": "q-slonski-macro-group",
+      "to": "disc-9-all-warm-compact-subspace",
+      "type": "relates-to",
+      "description": "The prediction's premise was the all-warm compact subspace, retired 2026-07-11 by the permutation test; the question survives it only as a question.",
+      "weight": 4,
+      "asserted": "2026-07-11"
+    },
+    {
+      "from": "q-slonski-macro-group",
+      "to": "prior-slonski-q-vector",
+      "type": "relates-to",
+      "description": "The Q-vector dichotomy is the framework the question is posed in, and the next step JOURNEY_MAP names is \"One Q-vector experiment, on its own terms\".",
+      "weight": 4,
+      "asserted": "2026-07-10"
+    },
+    {
+      "from": "q-tmix-llm",
+      "to": "concept-t-mix-llm",
+      "type": "relates-to",
+      "description": "The question is the metric's own definition, still uncomputed: JOURNEY_MAP section 7 marks it \"Measurable from existing data\".",
+      "weight": 5,
+      "asserted": "2026-07-10"
+    },
+    {
+      "from": "q-why-gpt2-small",
+      "to": "f3-fingerprint-refuted",
+      "type": "relates-to",
+      "description": "F3 is what makes the question a question: same corpus, different landscape, and GPT-2 Small alone resolves language into few semantic basins.",
+      "weight": 7,
+      "asserted": "2026-07-10"
+    },
+    {
+      "from": "q-why-gpt2-small",
+      "to": "f8-prolet-coherent-cluster",
+      "type": "relates-to",
+      "description": "F8 sharpened what has to be explained: not a confident winner but a low-probability argmax over a coherent lexical field.",
+      "weight": 6,
+      "asserted": "2026-07-19"
     },
     {
       "from": "f3-fingerprint-refuted",
