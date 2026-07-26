@@ -19,7 +19,7 @@
 
 **The graph says:** `h4-head-power-iteration`, status **untested**, tested by `run-spectral-scaffold`, and no `supports` / `refutes` / `qualifies` / `corrects` edge points at it. On the graph alone this is an open question.
 
-**The disk says otherwise.** `experiments/gpt2_small/spectral_resonance.ipynb` exists and 8 of its 14 cells carry a non-empty `outputs` array.
+**The disk says otherwise.** `experiments/gpt2_small/spectral_resonance.ipynb` exists and 8 of its 8 code cells (14 cells total) carry a non-empty `outputs` array.
 
 Artefacts the script writes, and where they now are:
 
@@ -40,7 +40,7 @@ From cell 9 of `experiments/gpt2_small/spectral_resonance.ipynb`:
 
 Meanwhile the committed prose still says it was never run:
 
-- [`README.md`:208](../../README.md) &mdash; \| [`spectral_resonance.ipynb`](experiments/gpt2_small/spectral_resonance.ipynb) \| SVD-predicted per-head resonance (H4) \| 🔬 scaffold, not run \|
+- [`README.md`:215](../../README.md) &mdash; \| [`spectral_resonance.ipynb`](experiments/gpt2_small/spectral_resonance.ipynb) \| SVD-predicted per-head resonance (H4) \| 🔬 scaffold, not run \|
 - [`docs/ATR_METHOD_COMPARISON.md`:173](../../docs/ATR_METHOD_COMPARISON.md) &mdash; - [ ] SVD/spectral-gap prediction of per-head resonant states vs. observed convergence (scaffolded in `spectral_resonance.ipynb`; not yet run)
 - [`docs/FINDINGS.md`:629](../../docs/FINDINGS.md) &mdash; \| H4 \| Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector) \| **Untested**: protocol scaffolded (`experiments/gpt2_small/spectral_resonance.ipynb`), not run. \|
 - [`docs/JOURNEY_MAP.md`:88](../../docs/JOURNEY_MAP.md) &mdash; \| H4 \| Per-head resonance ≈ SVD dominant singular vector \| Untested \| Scaffold only: `experiments/gpt2_small/spectral_resonance.ipynb` \|
@@ -83,11 +83,11 @@ Tiers 1 to 3 are the fruit proper &mdash; 7 of 21 open threads. The rest are ran
 | # | Cheap? | Tier | Claim | Evidence, in brief |
 |---:|:---:|:---|:---|:---|
 | 1 | yes | answered-on-disk | `h4-head-power-iteration` | the run the graph designates as this claim's test has already executed and the graph still records no verdict: experiments/gpt2_small/spectral_resonance.ipynb carries executed outputs in... |
-| 2 | yes | newly-unblocked | `f10-cycle-anatomy-flip-axis` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes) |
-| 3 | yes | newly-unblocked | `f15-lag2-gate` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes) |
-| 4 | yes | newly-unblocked | `q-flip-axis-generality` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes) |
-| 5 | yes | newly-unblocked | `q-lag2-regate-33` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes) |
-| 6 | yes | newly-unblocked | `q-prompt-library` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes) |
+| 2 | yes | newly-unblocked | `f10-cycle-anatomy-flip-axis` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the... |
+| 3 | yes | newly-unblocked | `f15-lag2-gate` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the... |
+| 4 | yes | newly-unblocked | `q-flip-axis-generality` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the... |
+| 5 | yes | newly-unblocked | `q-lag2-regate-33` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the... |
+| 6 | yes | newly-unblocked | `q-prompt-library` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the... |
 | 7 | yes | answerable-from-disk | `q-tmix-llm` | the record itself says the inputs are already committed ("JOURNEY_MAP section 7: "What is T_mix_LLM for each basin? \| Measurable from existing data \| Compute from .pt"."), and 13 .pt... |
 | 8 | no | needs-compute | `concept-fractal-dimension` | the record states the work has not been done ("Relevance to ATR: Potential metric for basin characterisation (untested).") and names no script for it, so answering it requires a fresh run |
 | 9 | no | needs-compute | `f1-five-attractor-basins` | the record states the work has not been done ("…gate, all at iteration 120, which is the gate's earliest possible firing point rather than a measured settling time: the true iteration... |
@@ -111,7 +111,7 @@ The cheap ones in full:
 - Tier: *answered-on-disk*
 - Record: `docs/FINDINGS.md#3-hypothesis-dispositions`
 - Script(s): `experiments/gpt2_small/spectral_resonance.ipynb`
-- Evidence: the run the graph designates as this claim's test has already executed and the graph still records no verdict: experiments/gpt2_small/spectral_resonance.ipynb carries executed outputs in 8 of its 14 cells; experiments/gpt2_small/spectral_resonance.ipynb has written experiments/_DATA/EXP_009/009c_spectral_data.pt, experiments/_DATA/EXP_009/009c_validation_grid.pt
+- Evidence: the run the graph designates as this claim's test has already executed and the graph still records no verdict: experiments/gpt2_small/spectral_resonance.ipynb carries executed outputs in 8 of its 8 code cells (14 cells total); experiments/gpt2_small/spectral_resonance.ipynb has written experiments/_DATA/EXP_009/009c_spectral_data.pt, experiments/_DATA/EXP_009/009c_validation_grid.pt
 - Already printed, in cell 9 of `experiments/gpt2_small/spectral_resonance.ipynb`:
 
   > `==================================================`
@@ -128,32 +128,32 @@ The cheap ones in full:
 - Tier: *newly-unblocked*
 - Record: `docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole`
 - Script(s): `experiments/gpt2_small/06_bell_anatomy.py`
-- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)
+- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's
 
 **3. F15: A lag-2 convergence gate recognises the period-2 cycle; the engine now supports it**
 
 - Tier: *newly-unblocked*
 - Record: `docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it`
 - Script(s): `experiments/gpt2_small/09_lagk_gate.py`
-- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)
+- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's
 
 **4. Q: Do all 34 Divine prompts share the F10 flip axis, head and eigenvalue?**
 
 - Tier: *newly-unblocked*
 - Record: `docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole`
-- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)
+- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's
 
 **5. Q: Do the other 33 period-2 prompts re-gate as converged?**
 
 - Tier: *newly-unblocked*
 - Record: `docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it`
-- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)
+- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's
 
 **6. Q: Is the 125-prompt library restored (issue #9)?**
 
 - Tier: *newly-unblocked*
 - Record: `docs/FINDINGS.md#caveats`
-- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)
+- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's
 
 **7. Q: What is T_mix_LLM for each basin?**
 
@@ -171,7 +171,7 @@ Grouped by the obstacle rather than by the claim, because that is the thing pros
 
 Something the record names is not in the working tree, or the record defers to an issue number. These are the blockers that gate work.
 
-#### prompt library (issue #9) &mdash; gates 5 claims; no longer holds on disk
+#### prompt library (issue #9) &mdash; gates 5 claims; no longer holds on disk (the filename was inferred from the phrase, then confirmed against the record's own wording of it)
 
 - **`f10-cycle-anatomy-flip-axis`** (finding, corrected) &mdash; docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole
   > One trajectory: whether all 34 Divine prompts share this flip axis is open, blocked on the prompt library (issue #9, caveat 11).
@@ -187,7 +187,12 @@ Something the record names is not in the working tree, or the record defers to a
 - **`q-prompt-library`** (question, open) &mdash; docs/FINDINGS.md#caveats
   > Caveats 11 and 14 both file the same gate in the same three words, "prompt library pending, issue #9", and FINDINGS section 5 names it as the blocker on two separate directions at once: the re-gate of the 34 cycling prompts and the flip-axis generality question are "blocked in part on the prompt-library restoration, issue #9".
 
-*Disk check:* `prompt_library.py` is present in the working tree (17193 bytes)
+*Disk check:* `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's
+
+*What the record still says, and this disagrees with:*
+- `experiments/gpt2_small/output_lagk/lagk_report.md`:56 &mdash; “The other 33 cycling prompts exist in the sweep records only as ids and terminal tokens; their texts live in `prompt_library.py`, which exists only on Thom's home machine (issue #9, his errand). Until it is restored they cannot be re-run, so "34 prompts ring, pending re-gate" resolves today to: 1 re” (stale: the file it calls absent is in the tree)
+- `docs/PODCAST_SOURCES.md`:302 &mdash; “> **Note:** the 125-prompt sweep notebooks (`01_*`), `gated_resweep.py` and the Pythia-410m deep run import `prompt_library.py`, which is temporarily absent from the repository and will be restored shortly. Steps 1, 2, 4 and 5 run without it.” (stale: the file it calls absent is in the tree)
+- `docs/PODCAST_SOURCES.md`:3984 &mdash; “- **#9 prompt_library.py restore**: only Thom can do this (file exists on his home machine). Blocks the 34-cycle question and #10's sweep half.” (stale: the file it calls absent is in the tree)
 
 *Filenames tried:* `prompt_library.py`, `prompt_library.json`, `prompt_library.pt`, `prompt_library.md`
 
@@ -275,12 +280,12 @@ A thread is open here if its description carries pending-work language, or it is
 
 | Claim | Status | Verdict | Evidence |
 |:---|:---|:---|:---|
-| `h4-head-power-iteration` | untested | **answered-on-disk** | the run the graph designates as this claim's test has already executed and the graph still records no verdict: experiments/gpt2_small/spectral_resonance.ipynb carries executed outputs in 8 of its 14 cells; experiments/gpt2_small/spectral_resonance.ipynb has written experiments/_DATA/EXP_009/009c_spectral_data.pt, experiments/_DATA/EXP_009/009c_validation_grid.pt |
-| `f10-cycle-anatomy-flip-axis` | corrected | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes) |
-| `f15-lag2-gate` | supported | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes) |
-| `q-flip-axis-generality` | open | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes) |
-| `q-lag2-regate-33` | open | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes) |
-| `q-prompt-library` | open | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes) |
+| `h4-head-power-iteration` | untested | **answered-on-disk** | the run the graph designates as this claim's test has already executed and the graph still records no verdict: experiments/gpt2_small/spectral_resonance.ipynb carries executed outputs in 8 of its 8 code cells (14 cells total); experiments/gpt2_small/spectral_resonance.ipynb has written experiments/_DATA/EXP_009/009c_spectral_data.pt, experiments/_DATA/EXP_009/009c_validation_grid.pt |
+| `f10-cycle-anatomy-flip-axis` | corrected | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's |
+| `f15-lag2-gate` | supported | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's |
+| `q-flip-axis-generality` | open | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's |
+| `q-lag2-regate-33` | open | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's |
+| `q-prompt-library` | open | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's |
 | `q-tmix-llm` | open | **answerable-from-disk** | the record itself says the inputs are already committed ("JOURNEY_MAP section 7: "What is T_mix_LLM for each basin? \| Measurable from existing data \| Compute from .pt"."), and 13 .pt artefact(s) exist under experiments/; no script is named for the computation, so this rests on the record's word plus the presence of the data |
 | `concept-fractal-dimension` | untested | **needs-compute** | the record states the work has not been done ("Relevance to ATR: Potential metric for basin characterisation (untested).") and names no script for it, so answering it requires a fresh run |
 | `f1-five-attractor-basins` | qualified | **needs-compute** | the record states the work has not been done ("…gate, all at iteration 120, which is the gate's earliest possible firing point rather than a measured settling time: the true iteration lies somewhere between 100 and 120 and finer cadence was never run (caveat 5).") and names no script for it, so answering it requires a fresh run |

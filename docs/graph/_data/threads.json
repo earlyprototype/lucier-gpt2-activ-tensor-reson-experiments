@@ -176,7 +176,7 @@
       "prose_says_not_run": [
         {
           "file": "README.md",
-          "line": 208,
+          "line": 215,
           "text": "| [`spectral_resonance.ipynb`](experiments/gpt2_small/spectral_resonance.ipynb) | SVD-predicted per-head resonance (H4) | 🔬 scaffold, not run |"
         },
         {
@@ -312,13 +312,33 @@
       ],
       "gate_count": 5,
       "still_holds": false,
+      "resolution_evidence_kind": "in-record",
       "resolution": {
         "holds": false,
         "resolution_evidence": [
           {
             "file": "prompt_library.py",
             "line": null,
-            "text": "`prompt_library.py` is present in the working tree (17193 bytes)"
+            "kind": "verdict",
+            "text": "`prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's"
+          },
+          {
+            "file": "experiments/gpt2_small/output_lagk/lagk_report.md",
+            "line": 56,
+            "kind": "contrary",
+            "text": "`experiments/gpt2_small/output_lagk/lagk_report.md`:56 &mdash; “The other 33 cycling prompts exist in the sweep records only as ids and terminal tokens; their texts live in `prompt_library.py`, which exists only on Thom's home machine (issue #9, his errand). Until it is restored they cannot be re-run, so \"34 prompts ring, pending re-gate\" resolves today to: 1 re” (stale: the file it calls absent is in the tree)"
+          },
+          {
+            "file": "docs/PODCAST_SOURCES.md",
+            "line": 302,
+            "kind": "contrary",
+            "text": "`docs/PODCAST_SOURCES.md`:302 &mdash; “> **Note:** the 125-prompt sweep notebooks (`01_*`), `gated_resweep.py` and the Pythia-410m deep run import `prompt_library.py`, which is temporarily absent from the repository and will be restored shortly. Steps 1, 2, 4 and 5 run without it.” (stale: the file it calls absent is in the tree)"
+          },
+          {
+            "file": "docs/PODCAST_SOURCES.md",
+            "line": 3984,
+            "kind": "contrary",
+            "text": "`docs/PODCAST_SOURCES.md`:3984 &mdash; “- **#9 prompt_library.py restore**: only Thom can do this (file exists on his home machine). Blocks the 34-cycle question and #10's sweep half.” (stale: the file it calls absent is in the tree)"
           }
         ],
         "checked": [
@@ -332,6 +352,24 @@
             "name": "prompt_library.py",
             "paths": [
               "prompt_library.py"
+            ],
+            "evidence": "in-record",
+            "mentions": [
+              {
+                "file": "README.md",
+                "line": 153,
+                "text": "├── prompt_library.py ← 125 prompts across 7 categories"
+              },
+              {
+                "file": "README.md",
+                "line": 236,
+                "text": "> **Note on `prompt_library.py`:** the 125-prompt sweep notebooks (`01_*`), `gated_resweep.py` and the Pythia-410m deep run import `prompt_library.py`. The file is a provenance-flagged reconstruction (issue #24): all 125 prompts were recovered verbatim from committed records — the original file's de"
+              },
+              {
+                "file": "experiments/gpt2_small/output_lagk/lagk_report.md",
+                "line": 56,
+                "text": "The other 33 cycling prompts exist in the sweep records only as ids and terminal tokens; their texts live in `prompt_library.py`, which exists only on Thom's home machine (issue #9, his errand). Until it is restored they cannot be re-run, so \"34 prompts ring, pending re-gate\" resolves today to: 1 re"
+              }
             ]
           }
         ],
@@ -361,7 +399,26 @@
               }
             ]
           }
-        ]
+        ],
+        "evidence": "in-record",
+        "contrary_prose": [
+          {
+            "file": "experiments/gpt2_small/output_lagk/lagk_report.md",
+            "line": 56,
+            "text": "The other 33 cycling prompts exist in the sweep records only as ids and terminal tokens; their texts live in `prompt_library.py`, which exists only on Thom's home machine (issue #9, his errand). Until it is restored they cannot be re-run, so \"34 prompts ring, pending re-gate\" resolves today to: 1 re"
+          },
+          {
+            "file": "docs/PODCAST_SOURCES.md",
+            "line": 302,
+            "text": "> **Note:** the 125-prompt sweep notebooks (`01_*`), `gated_resweep.py` and the Pythia-410m deep run import `prompt_library.py`, which is temporarily absent from the repository and will be restored shortly. Steps 1, 2, 4 and 5 run without it."
+          },
+          {
+            "file": "docs/PODCAST_SOURCES.md",
+            "line": 3984,
+            "text": "- **#9 prompt_library.py restore**: only Thom can do this (file exists on his home machine). Blocks the 34-cycle question and #10's sweep half."
+          }
+        ],
+        "guessed_only": []
       }
     },
     {
@@ -397,12 +454,14 @@
       ],
       "gate_count": 2,
       "still_holds": null,
+      "resolution_evidence_kind": null,
       "resolution": {
         "holds": null,
         "resolution_evidence": [
           {
             "file": null,
             "line": null,
+            "kind": "verdict",
             "text": "the blocker is recorded only as an issue number, which names no file; the working tree cannot settle it and this report does not guess"
           }
         ],
@@ -434,7 +493,10 @@
               }
             ]
           }
-        ]
+        ],
+        "evidence": null,
+        "contrary_prose": [],
+        "guessed_only": []
       }
     },
     {
@@ -457,18 +519,23 @@
       ],
       "gate_count": 1,
       "still_holds": null,
+      "resolution_evidence_kind": null,
       "resolution": {
         "holds": null,
         "resolution_evidence": [
           {
             "file": null,
             "line": null,
+            "kind": "verdict",
             "text": "the blocker is a phrase with no filename this tool can responsibly look for; not checked"
           }
         ],
         "checked": [],
         "found": [],
-        "issue_prose": []
+        "issue_prose": [],
+        "evidence": null,
+        "contrary_prose": [],
+        "guessed_only": []
       }
     },
     {
@@ -491,18 +558,23 @@
       ],
       "gate_count": 1,
       "still_holds": null,
+      "resolution_evidence_kind": null,
       "resolution": {
         "holds": null,
         "resolution_evidence": [
           {
             "file": null,
             "line": null,
+            "kind": "verdict",
             "text": "the blocker is a phrase with no filename this tool can responsibly look for; not checked"
           }
         ],
         "checked": [],
         "found": [],
-        "issue_prose": []
+        "issue_prose": [],
+        "evidence": null,
+        "contrary_prose": [],
+        "guessed_only": []
       }
     },
     {
@@ -525,18 +597,23 @@
       ],
       "gate_count": 1,
       "still_holds": null,
+      "resolution_evidence_kind": null,
       "resolution": {
         "holds": null,
         "resolution_evidence": [
           {
             "file": null,
             "line": null,
+            "kind": "verdict",
             "text": "the blocker is a phrase with no filename this tool can responsibly look for; not checked"
           }
         ],
         "checked": [],
         "found": [],
-        "issue_prose": []
+        "issue_prose": [],
+        "evidence": null,
+        "contrary_prose": [],
+        "guessed_only": []
       }
     },
     {
@@ -559,18 +636,23 @@
       ],
       "gate_count": 1,
       "still_holds": null,
+      "resolution_evidence_kind": null,
       "resolution": {
         "holds": null,
         "resolution_evidence": [
           {
             "file": null,
             "line": null,
+            "kind": "verdict",
             "text": "the blocker is a phrase with no filename this tool can responsibly look for; not checked"
           }
         ],
         "checked": [],
         "found": [],
-        "issue_prose": []
+        "issue_prose": [],
+        "evidence": null,
+        "contrary_prose": [],
+        "guessed_only": []
       }
     },
     {
@@ -595,12 +677,14 @@
       ],
       "gate_count": 1,
       "still_holds": null,
+      "resolution_evidence_kind": null,
       "resolution": {
         "holds": null,
         "resolution_evidence": [
           {
             "file": null,
             "line": null,
+            "kind": "verdict",
             "text": "the blocker is a phrase with no filename this tool can responsibly look for; not checked"
           }
         ],
@@ -611,7 +695,10 @@
           "artefact.md"
         ],
         "found": [],
-        "issue_prose": []
+        "issue_prose": [],
+        "evidence": null,
+        "contrary_prose": [],
+        "guessed_only": []
       }
     },
     {
@@ -636,12 +723,14 @@
       ],
       "gate_count": 1,
       "still_holds": null,
+      "resolution_evidence_kind": null,
       "resolution": {
         "holds": null,
         "resolution_evidence": [
           {
             "file": null,
             "line": null,
+            "kind": "verdict",
             "text": "the blocker is a phrase with no filename this tool can responsibly look for; not checked"
           }
         ],
@@ -652,7 +741,10 @@
           "re_gate.md"
         ],
         "found": [],
-        "issue_prose": []
+        "issue_prose": [],
+        "evidence": null,
+        "contrary_prose": [],
+        "guessed_only": []
       }
     }
   ],
@@ -747,7 +839,7 @@
         }
       ],
       "verdict": "answered-on-disk",
-      "reason": "the run the graph designates as this claim's test has already executed and the graph still records no verdict: experiments/gpt2_small/spectral_resonance.ipynb carries executed outputs in 8 of its 14 cells; experiments/gpt2_small/spectral_resonance.ipynb has written experiments/_DATA/EXP_009/009c_spectral_data.pt, experiments/_DATA/EXP_009/009c_validation_grid.pt",
+      "reason": "the run the graph designates as this claim's test has already executed and the graph still records no verdict: experiments/gpt2_small/spectral_resonance.ipynb carries executed outputs in 8 of its 8 code cells (14 cells total); experiments/gpt2_small/spectral_resonance.ipynb has written experiments/_DATA/EXP_009/009c_spectral_data.pt, experiments/_DATA/EXP_009/009c_validation_grid.pt",
       "rank_tier": 0
     },
     {
@@ -794,7 +886,6 @@
               "bell_anatomy.json"
             ],
             "loads": [
-              "\\nsaved bell_anatomy.json",
               "bell_anatomy.json",
               "state_divine.pt"
             ]
@@ -817,10 +908,6 @@
           ],
           "declared_inputs": [
             {
-              "name": "\\nsaved bell_anatomy.json",
-              "found": []
-            },
-            {
               "name": "bell_anatomy.json",
               "found": [
                 "experiments/gpt2_small/output_divine_motion/bell_anatomy.json"
@@ -833,9 +920,7 @@
               ]
             }
           ],
-          "missing_inputs": [
-            "\\nsaved bell_anatomy.json"
-          ],
+          "missing_inputs": [],
           "saved_artefacts": [
             {
               "name": "bell_anatomy.json",
@@ -856,7 +941,7 @@
         }
       ],
       "verdict": "newly-unblocked",
-      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's",
       "rank_tier": 1
     },
     {
@@ -901,8 +986,7 @@
             "saves": [],
             "loads": [
               "bell_anatomy.json",
-              "lagk_results.json",
-              "state_{key}.pt"
+              "lagk_results.json"
             ]
           },
           "output_dir": "experiments/gpt2_small/output_lagk/",
@@ -923,15 +1007,9 @@
               "found": [
                 "experiments/gpt2_small/output_lagk/lagk_results.json"
               ]
-            },
-            {
-              "name": "state_{key}.pt",
-              "found": []
             }
           ],
-          "missing_inputs": [
-            "state_{key}.pt"
-          ],
+          "missing_inputs": [],
           "saved_artefacts": [],
           "missing_local_modules": [],
           "graph_artefacts": [
@@ -949,7 +1027,7 @@
         }
       ],
       "verdict": "newly-unblocked",
-      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's",
       "rank_tier": 1
     },
     {
@@ -976,7 +1054,7 @@
       "runs": [],
       "evidence": [],
       "verdict": "newly-unblocked",
-      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's",
       "rank_tier": 1
     },
     {
@@ -1006,7 +1084,7 @@
       "runs": [],
       "evidence": [],
       "verdict": "newly-unblocked",
-      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's",
       "rank_tier": 1
     },
     {
@@ -1031,7 +1109,7 @@
       "runs": [],
       "evidence": [],
       "verdict": "newly-unblocked",
-      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's",
       "rank_tier": 1
     },
     {
@@ -1998,7 +2076,7 @@
       "claim": "h4-head-power-iteration",
       "label": "H4: Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector)",
       "status": "untested",
-      "reason": "the run the graph designates as this claim's test has already executed and the graph still records no verdict: experiments/gpt2_small/spectral_resonance.ipynb carries executed outputs in 8 of its 14 cells; experiments/gpt2_small/spectral_resonance.ipynb has written experiments/_DATA/EXP_009/009c_spectral_data.pt, experiments/_DATA/EXP_009/009c_validation_grid.pt",
+      "reason": "the run the graph designates as this claim's test has already executed and the graph still records no verdict: experiments/gpt2_small/spectral_resonance.ipynb carries executed outputs in 8 of its 8 code cells (14 cells total); experiments/gpt2_small/spectral_resonance.ipynb has written experiments/_DATA/EXP_009/009c_spectral_data.pt, experiments/_DATA/EXP_009/009c_validation_grid.pt",
       "quoted_result": {
         "script": "experiments/gpt2_small/spectral_resonance.ipynb",
         "cell": 9,
@@ -2027,7 +2105,7 @@
       "claim": "f10-cycle-anatomy-flip-axis",
       "label": "F10: Anatomy of the period-2 cycle: one nearly readout-invisible flip axis between a game-vocabulary pole and the glitch-token pole",
       "status": "corrected",
-      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's",
       "quoted_result": null,
       "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole",
       "cheap": true,
@@ -2042,7 +2120,7 @@
       "claim": "f15-lag2-gate",
       "label": "F15: A lag-2 convergence gate recognises the period-2 cycle; the engine now supports it",
       "status": "supported",
-      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's",
       "quoted_result": null,
       "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
       "cheap": true,
@@ -2057,7 +2135,7 @@
       "claim": "q-flip-axis-generality",
       "label": "Q: Do all 34 Divine prompts share the F10 flip axis, head and eigenvalue?",
       "status": "open",
-      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's",
       "quoted_result": null,
       "doc_ref": "docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole",
       "cheap": true,
@@ -2070,7 +2148,7 @@
       "claim": "q-lag2-regate-33",
       "label": "Q: Do the other 33 period-2 prompts re-gate as converged?",
       "status": "open",
-      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's",
       "quoted_result": null,
       "doc_ref": "docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it",
       "cheap": true,
@@ -2083,7 +2161,7 @@
       "claim": "q-prompt-library",
       "label": "Q: Is the 125-prompt library restored (issue #9)?",
       "status": "open",
-      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes)",
+      "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's",
       "quoted_result": null,
       "doc_ref": "docs/FINDINGS.md#caveats",
       "cheap": true,

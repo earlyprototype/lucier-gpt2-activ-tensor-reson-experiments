@@ -38,7 +38,6 @@ import json
 import re
 import sys
 from collections import Counter, defaultdict
-from datetime import date
 from pathlib import Path
 
 # --------------------------------------------------------------------------
@@ -49,6 +48,14 @@ HERE = Path(__file__).resolve().parent           # docs/graph
 REPO = HERE.parent.parent                        # repo root
 OUT_DIR = HERE / "_data"
 OUT_PATH = OUT_DIR / "dissolution.json"
+
+# The build date, pinned rather than read from the clock.  This builder is
+# idempotent by contract -- re-running it on an unchanged tree must produce a
+# byte-identical dissolution.json -- and `date.today()` broke that: every CI
+# regeneration rewrote metadata.generated and showed up as a diff.  The sibling
+# build_isomorphism_graph.py pins the same way (GENERATED).  Bump this by hand
+# when the graph's content actually changes.
+GENERATED = "2026-07-25"
 
 # Token used to display a decoded token that is the empty string (the tables
 # contain literal empty backtick cells for tokens that decode to "").
@@ -469,7 +476,7 @@ def main() -> int:
             "domain": "dissolution",
             "version": "1.0",
             "title": "Dissolution pathways: prompts funnelling into terminal attractor basins",
-            "generated": date.today().isoformat(),
+            "generated": GENERATED,
             "generated_from": generated_from,
             "iterations": canonical,
             "iterations_observed": all_iters,

@@ -28,11 +28,14 @@ Validates itself before writing:
   * every relationship endpoint resolves to a real node id
   * every claim.status is in the allowed vocabulary
   * every relationship.type is in the allowed vocabulary
-  * every doc_ref / path / script / output_dir resolves on disk
+  * every doc_ref / path / script / output_dir resolves on disk, *including*
+    its '#anchor': a doc_ref that names a heading the document no longer has is
+    a dead link in the viewer and on the published site, and used to pass
 """
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import os
 import re
@@ -46,6 +49,30 @@ from collections import Counter, OrderedDict
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
 DATA_DIR = os.path.join(HERE, "_data")
+
+
+def load_sibling(name: str):
+    """Import a module sitting next to this one, by path.
+
+    By path rather than by name so it works however the builder is invoked --
+    `python3 docs/graph/build_evidence_graph.py`, from another directory, or
+    imported by a test -- without depending on sys.path.
+    """
+    spec = importlib.util.spec_from_file_location(
+        "docs_graph_" + name, os.path.join(HERE, name + ".py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+# The one definition of "which anchors does this document offer", borrowed from
+# the drift checker rather than reimplemented here. Two anchor resolvers that
+# disagree is precisely the class of drift docs/graph/ exists to catch, and a
+# private second copy in the generator would be the one place the checker could
+# not see it. See check_record_drift.heading_anchors for the rule itself (both
+# GitHub's literal slug and its space-collapsed form are accepted, so
+# "Science & Mathematics" validates as `science--mathematics`).
+heading_anchors = load_sibling("check_record_drift").heading_anchors
 
 FINDINGS_MD = os.path.join(REPO, "docs", "FINDINGS.md")
 JOURNEY_MD = os.path.join(REPO, "docs", "JOURNEY_MAP.md")
@@ -133,7 +160,11 @@ def parse_table(block: str):
             continue           # the ---|--- separator row
         while len(cells) < len(header):
             cells.append("")
-        rows.append(OrderedDict(zip(header, cells[:len(header)])))
+        # strict=True is safe -- and worth having -- because the two sequences
+        # are made the same length on the two lines above: short rows are padded
+        # with empty cells, long rows are truncated to the header. If that ever
+        # stops being true, a silently dropped column becomes a loud error.
+        rows.append(OrderedDict(zip(header, cells[:len(header)], strict=True)))
     if not rows:
         raise SystemExit("FATAL: no table rows parsed from block")
     return rows
@@ -2652,18 +2683,39 @@ def validate(graph):
         errors.append("DANGLING RELATIONSHIP ENDPOINTS (%d):\n    %s"
                       % (len(dangling), "\n    ".join(dangling)))
 
-    # every path on disk
+    # every path on disk -- and every anchor inside the document it names
+    anchor_cache = {}
+
+    def anchors_of(rel_path):
+        if rel_path not in anchor_cache:
+            try:
+                with open(os.path.join(REPO, rel_path), encoding="utf-8") as fh:
+                    anchor_cache[rel_path] = heading_anchors(fh.read())
+            except OSError:
+                anchor_cache[rel_path] = set()
+        return anchor_cache[rel_path]
+
     def check_path(owner, field, value):
         if not value:
             return
         if value.startswith("http://") or value.startswith("https://"):
             return
-        rel_path = value.split("#", 1)[0].rstrip("/")
+        rel_path, _, fragment = value.partition("#")
+        rel_path = rel_path.rstrip("/")
         if not rel_path:
             return
         if not os.path.exists(os.path.join(REPO, rel_path)):
             errors.append("%s.%s points at %r which does not exist on disk"
                           % (owner, field, rel_path))
+            return
+        # A file that exists but whose named heading does not is a dead link
+        # everywhere the graph is rendered, and silently so.
+        if fragment and rel_path.endswith(".md") and fragment not in anchors_of(rel_path):
+            errors.append(
+                "%s.%s points at %r: %s exists, but no heading in it anchors as "
+                "#%s (the section was renamed or removed -- re-point the reference "
+                "in the source document, do not hand-edit the graph)"
+                % (owner, field, value, rel_path, fragment))
 
     for c in graph["claims"]:
         check_path(c["id"], "doc_ref", c.get("doc_ref"))

@@ -15,6 +15,7 @@ Run from the repo root:
 
 import json
 import re
+from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -228,7 +229,7 @@ def test_metadata_has_domain_and_version(evidence_graphs, name):
 @pytest.mark.parametrize("name", EVIDENCE_FILES)
 def test_no_duplicate_node_ids(evidence_graphs, name):
     ids = _node_ids(_graph(evidence_graphs, name))
-    duplicates = sorted({i for i in ids if ids.count(i) > 1})
+    duplicates = sorted(i for i, n in Counter(ids).items() if n > 1)
     assert not duplicates, f"{name}: duplicate node ids {duplicates}"
 
 
@@ -307,7 +308,7 @@ def test_every_relationship_has_a_description(evidence_graphs, name):
 def test_no_duplicate_or_self_referential_relationships(evidence_graphs, name):
     graph = _graph(evidence_graphs, name)
     keys = [(rel["from"], rel["to"], rel["type"]) for rel in graph["relationships"]]
-    duplicates = sorted({k for k in keys if keys.count(k) > 1})
+    duplicates = sorted(k for k, n in Counter(keys).items() if n > 1)
     assert not duplicates, f"{name}: duplicate edges {duplicates}"
     loops = [k for k in keys if k[0] == k[1]]
     assert not loops, f"{name}: self-referential edges {loops}"
@@ -469,7 +470,7 @@ def test_model_has_required_keys(model):
 def test_model_has_no_duplicate_node_ids(model):
     name, data = model
     ids = [node["id"] for node in data["nodes"]]
-    duplicates = sorted({i for i in ids if ids.count(i) > 1})
+    duplicates = sorted(i for i, n in Counter(ids).items() if n > 1)
     assert not duplicates, f"{name}: duplicate node ids {duplicates}"
 
 
@@ -511,12 +512,18 @@ def test_model_edge_iteration_bands_are_monotonic(model):
 def test_model_edge_bands_agree_with_their_endpoints(model):
     name, data = model
     nodes = {node["id"]: node for node in data["nodes"]}
-    bad = [
-        edge["from"] + " -> " + edge["to"]
-        for edge in data["edges"]
-        if nodes[edge["from"]]["iter"] != edge["from_iter"]
-        or nodes[edge["to"]]["iter"] != edge["to_iter"]
-    ]
+    # Endpoints that do not resolve are test_model_edges_reference_emitted_nodes'
+    # business; skip them here so a broken generator fails with that test's
+    # message rather than a KeyError out of this one. pytest gives no ordering
+    # guarantee, so this test cannot assume that one has already run.
+    bad = []
+    for edge in data["edges"]:
+        source = nodes.get(edge["from"])
+        target = nodes.get(edge["to"])
+        if source is None or target is None:
+            continue
+        if source["iter"] != edge["from_iter"] or target["iter"] != edge["to_iter"]:
+            bad.append(edge["from"] + " -> " + edge["to"])
     assert not bad, f"{name}: edge bands disagree with node iters: {bad[:10]}"
 
 
@@ -551,8 +558,12 @@ def test_model_terminal_nodes_sit_at_the_terminal_iteration(model):
 def test_model_terminal_nodes_are_sinks(model):
     name, data = model
     nodes = {node["id"]: node for node in data["nodes"]}
+    # Same as above: an edge from an id that was never emitted is the dangling-
+    # endpoint test's finding, not this one's, so skip it instead of raising.
     leaking = [
-        edge["from"] for edge in data["edges"] if nodes[edge["from"]].get("terminal")
+        edge["from"]
+        for edge in data["edges"]
+        if nodes.get(edge["from"], {}).get("terminal")
     ]
     assert not leaking, f"{name}: edges leaving a terminal node: {leaking[:5]}"
 

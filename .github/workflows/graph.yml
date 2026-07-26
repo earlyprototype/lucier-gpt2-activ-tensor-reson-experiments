@@ -43,7 +43,12 @@ jobs:
     name: graph builds, record matches the repository, data tests
     runs-on: ubuntu-latest
     steps:
+      # persist-credentials: false -- this job never pushes, so there is no
+      # reason to leave GITHUB_TOKEN sitting in .git/config for the rest of the
+      # run. Nothing here needs write access to the repository.
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@v5
         with:
@@ -151,7 +156,13 @@ jobs:
     name: viewer smoke test (headless chromium)
     runs-on: ubuntu-latest
     steps:
+      # persist-credentials: false -- this job never pushes, and it is the job
+      # that runs an npm install and a headless browser. Leaving GITHUB_TOKEN in
+      # .git/config would put a write-capable credential inside the blast radius
+      # of a dependency it downloads and a page it renders, for no benefit.
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@v5
         with:
@@ -166,6 +177,26 @@ jobs:
           python3 build_dissolution_graph.py
           python3 build_isomorphism_graph.py
 
+      # Assertion 14 drives Threads mode, which reads _data/threads.json. Without
+      # this step the smoke test would validate the *committed* threads.json
+      # against the current viewer -- testing yesterday's data, which is the one
+      # thing the step above exists to avoid. Runs after the three builders and
+      # not beside them: build_threads_report.py reads _data/entities.json, so
+      # ordering it first would rank threads off the previous evidence graph.
+      #
+      # Guarded like the record job because the report is written by a separate
+      # piece of work and may not be in the tree yet. When it is absent the
+      # smoke test falls back to the committed threads.json -- assertion 14 still
+      # runs, just against data this workflow did not produce.
+      - name: Regenerate the threads report
+        run: |
+          set -euo pipefail
+          if [ -f docs/graph/build_threads_report.py ]; then
+            python3 docs/graph/build_threads_report.py
+          else
+            echo "::notice title=Threads report skipped::docs/graph/build_threads_report.py is not in this tree, so assertion 14 will run against the committed docs/graph/_data/threads.json rather than a freshly built one."
+          fi
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -176,16 +207,33 @@ jobs:
       # repository that otherwise has no node dependencies. The second command
       # fetches the browser binary and its system libraries, which is why it
       # needs --with-deps on a bare runner.
+      #
+      # Pinned, because an unpinned `playwright` resolves to whatever shipped
+      # that morning: a Playwright release could turn this job red with no change
+      # in the repository, and the failure would look like the viewer's fault.
+      # 1.56.1 is the version the smoke suite is developed against. Bump it here,
+      # deliberately, when the suite has been re-run against a newer one.
+      #
+      # `npx --no` refuses to fetch anything not already installed, so the second
+      # line can only run the binary the first line just pinned -- without it, a
+      # failed install would be papered over by npx silently fetching latest.
       - name: Install Playwright and Chromium
         run: |
-          npm install --no-save playwright
-          npx playwright install --with-deps chromium
+          npm install --no-save playwright@1.56.1
+          npx --no playwright install --with-deps chromium
 
       # Serves docs/graph on a free port, drives viewer.html in headless Chromium
-      # and asserts thirteen things: that all three graphs draw, that the model
-      # switch re-renders, that search, the details panel, the status chips and
-      # the timeline scrubber work, that the phone layout gives the graph the
-      # screen, and that nothing lands in the console. The two CDN scripts are
-      # served from a local mirror, so a bad day at unpkg is not a red build.
+      # and asserts fourteen things: that all three graphs draw, that the model
+      # switch re-renders, that search, the details panel, the evidence-chain
+      # copy, the status chips (including an unrecognised status) and the
+      # timeline scrubber work, that the legend orders severity correctly, that
+      # the phone layout gives the graph the screen, that returning to evidence
+      # restores the force-directed layout, that no asset answers >= 400 and that
+      # nothing lands in the console -- and, fourteenth, that Threads mode renders
+      # from threads.json (readiness colours, the ranked low-hanging-fruit list,
+      # gate edges) and leaves no trace behind on the way back out. Assertion 14
+      # is why the threads report is rebuilt above.
+      # The two CDN scripts are served from a local mirror, so a bad day at
+      # unpkg is not a red build.
       - name: Viewer smoke test
         run: node docs/graph/tests/smoke_test.mjs

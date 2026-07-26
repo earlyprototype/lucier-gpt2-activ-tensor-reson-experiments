@@ -299,6 +299,34 @@ SAVE_CALL_RE = re.compile(
     r"to_csv)\s*\(", re.IGNORECASE)
 STRING_RE = re.compile(r"""['"]([^'"\n]+)['"]""")
 
+# Three things a string ending in ".json" can be without being a filename.
+NOT_A_FILENAME_RE = re.compile(r"[\s{}\\]")
+
+
+def is_filename_literal(literal: str) -> bool:
+    """Is this string literal a path, or merely a string that ends like one?
+
+    The 400-character window after a ``torch.load(`` / ``json.dump(`` catches
+    every string literal in the neighbourhood, not just the call's argument, so
+    it also catches log lines and unformatted templates. Two got all the way
+    into the published report as *declared inputs* whose absence then drove
+    needs-compute verdicts: ``"\\nsaved bell_anatomy.json"`` (a print, not a
+    path) and ``"state_{key}.pt"`` (an f-string template whose real filename is
+    not knowable without running the code).
+
+    Three disqualifiers, each of which means "not a path as written":
+
+      whitespace   prose around the name, or a whole sentence containing one
+      a backslash  an escape sequence, so the literal is display text
+      braces       an unexpanded ``{}`` placeholder
+
+    Rejecting is the conservative direction. A file we decline to call a
+    declared input is at worst a thread this report says less about; a
+    non-existent one we do call a declared input is this report telling the
+    operator that committed work cannot proceed, wrongly.
+    """
+    return bool(literal) and not NOT_A_FILENAME_RE.search(literal)
+
 
 def extract_paths(source: str, save: bool):
     """String literals that look like data files, inside load or save calls.
@@ -312,7 +340,7 @@ def extract_paths(source: str, save: bool):
     for match in call_re.finditer(source):
         window = source[match.end(): match.end() + 400]
         for lit in STRING_RE.findall(window):
-            if lit.endswith(DATA_EXT):
+            if lit.endswith(DATA_EXT) and is_filename_literal(lit):
                 found.append(os.path.basename(lit))
     # os.path.join(dir, "name.pt") splits the basename off; the loop above
     # already catches the literal, since it scans the whole window.
@@ -641,26 +669,64 @@ def normalise_phrase(captured: str):
 
 
 def blocker_candidates(label: str):
-    """File basenames a blocker phrase might name."""
+    """File basenames a blocker phrase might name, each with where it came from.
+
+    Returns ``[(basename, origin)]`` with ``origin`` one of:
+
+      "written"  the phrase contains this filename verbatim -- "blocked on
+                 `prompt_library.py`" -- so the record itself named the file.
+      "guessed"  this tool synthesised the name out of prose words: "the prompt
+                 library" -> ``prompt_library.py``. A useful lead and nothing
+                 more; the record never wrote it.
+
+    The two are kept apart because they are not the same quality of evidence,
+    and ``resolve_blocker`` refuses to overturn the record on the second alone.
+    """
     cands = []
     for match in re.finditer(r"[\w./-]+\.(?:py|ipynb|pt|json|md|csv)", label):
-        cands.append(os.path.basename(match.group(0)))
+        cands.append((os.path.basename(match.group(0)), "written"))
     words = [w for w in re.split(r"[^A-Za-z0-9]+", label.lower())
              if w and w not in STOPWORDS]
     if words:
         stem = "_".join(words[:3])
         for ext in (".py", ".json", ".pt", ".md"):
-            cands.append(stem + ext)
+            cands.append((stem + ext, "guessed"))
         if len(words) > 1:
             stem2 = "_".join(words[:2])
             for ext in (".py", ".json", ".pt", ".md"):
-                cands.append(stem2 + ext)
+                cands.append((stem2 + ext, "guessed"))
     seen, out = set(), []
-    for c in cands:
-        if c not in seen:
-            seen.add(c)
-            out.append(c)
+    for name, origin in cands:
+        if name in seen:
+            continue
+        seen.add(name)
+        out.append((name, origin))
     return out
+
+
+# Prose asserting that a named thing is not available here: the sentences a
+# guessed filename must not be allowed to overrule on its own.
+ABSENCE_PROSE_RE = re.compile(
+    r"exists only on|only on [A-Z]\w+'s|home machine|local machine|"
+    r"not committed|never committed|uncommitted|"
+    r"temporarily absent|is absent|absent from|missing from|is missing|"
+    r"not present|not in the repo|awaiting restoration|to be restored|"
+    r"will be restored|yet to be restored|blocked on|blocked by",
+    re.IGNORECASE,
+)
+
+
+def literal_mentions(name: str, limit: int = 3):
+    """Committed markdown lines that write ``name`` out as a filename."""
+    return [{"file": p, "line": n, "text": " ".join(t.split())[:300]}
+            for p, n, t in markdown_index() if name in t][:limit]
+
+
+def contrary_prose(name: str, limit: int = 3):
+    """Committed lines that name ``name`` *and* assert it is not available."""
+    return [{"file": p, "line": n, "text": " ".join(t.split())[:300]}
+            for p, n, t in markdown_index()
+            if name in t and ABSENCE_PROSE_RE.search(t)][:limit]
 
 
 _TEXT_CORPUS = None
@@ -692,46 +758,129 @@ def resolve_blocker(group) -> dict:
     """Does this blocker still appear to hold?  Evidence first, verdict after.
 
     Three outcomes, and the third is not a failure:
-      False  the artefact the blocker names is present in the working tree
+      False  a file the *record* names as the blocker is present in the tree
       True   the artefact is named by the repository but absent from it
-      None   nothing checkable: the blocker is an issue number, or a phrase
-             this tool cannot responsibly turn into a filename
+      None   nothing checkable: the blocker is an issue number, a phrase this
+             tool cannot responsibly turn into a filename, or a filename it
+             only guessed at
+
+    HOW STRONG THE EVIDENCE HAS TO BE
+    ---------------------------------
+
+    Turning ``holds`` to False contradicts the record in the operator's own
+    document, so the bar is set where the evidence is actually load-bearing.
+    Every resolution therefore carries an ``evidence`` grade, and only the first
+    two can carry a verdict:
+
+      "written"   the blocker phrase names the file verbatim
+                  ("blocked on `prompt_library.py`")
+      "in-record" the tool synthesised the name from prose, but the repository
+                  writes that exact filename somewhere -- README.md's file tree
+                  and its note on `prompt_library.py`, say -- so the name is the
+                  record's, not this tool's
+      "guessed"   the name exists only because this tool built it out of the
+                  words in a phrase, and nothing committed ever writes it
+
+    A "guessed" hit alone is reported as a lead and leaves ``holds`` at None.
+    Previously it was enough on its own: a phrase like "blocked on the prompt
+    library" became ``prompt_library.py``, any file of that basename anywhere in
+    the tree matched, and the blocker was declared lifted. That reasoning would
+    have out-argued the record on a coincidence of naming, which is not a thing
+    a report about the record should be able to do.
+
+    Prose asserting the opposite ("exists only on Thom's home machine") is
+    collected either way and printed next to the verdict, so a resolution that
+    overrides the record does so visibly rather than silently.
     """
     res = {"holds": None, "resolution_evidence": [], "checked": [],
-           "found": [], "issue_prose": []}
+           "found": [], "issue_prose": [], "evidence": None,
+           "contrary_prose": [], "guessed_only": []}
     index = basename_index()
+    corpus = None
 
     for label in group["artefact_phrases"]:
-        for cand in blocker_candidates(label):
+        for cand, origin in blocker_candidates(label):
             if cand in res["checked"]:
                 continue
             res["checked"].append(cand)
             hits = index.get(cand, [])
             if hits:
-                res["found"].append({"name": cand, "paths": hits[:3]})
+                mentions = literal_mentions(cand)
+                if origin == "written":
+                    grade = "written"
+                else:
+                    if corpus is None:
+                        corpus = text_corpus()
+                    grade = "in-record" if (mentions or cand in corpus) else "guessed"
+                res["found"].append({"name": cand, "paths": hits[:3],
+                                     "evidence": grade, "mentions": mentions})
+                res["contrary_prose"].extend(contrary_prose(cand))
                 continue
             # Absent.  Does the repository nonetheless talk about it as a file?
-            mentions = [
-                {"file": p, "line": n, "text": " ".join(t.split())[:300]}
-                for p, n, t in markdown_index() if cand in t][:3]
-            if mentions or cand in text_corpus():
+            mentions = literal_mentions(cand)
+            if corpus is None:
+                corpus = text_corpus()
+            if mentions or cand in corpus:
                 res.setdefault("named_but_absent", []).append(
                     {"name": cand, "mentions": mentions})
 
-    if res["found"]:
+    named = [f for f in res["found"] if f["evidence"] in ("written", "in-record")]
+    res["guessed_only"] = [f for f in res["found"] if f["evidence"] == "guessed"]
+
+    if named:
         res["holds"] = False
-        res["resolution_evidence"] = [
-            {"file": p, "line": None,
-             "text": "`%s` is present in the working tree (%s bytes)"
-                     % (p, file_size(p) or 0)}
-            for f in res["found"] for p in f["paths"][:1]]
+        res["evidence"] = ("written" if any(f["evidence"] == "written" for f in named)
+                           else "in-record")
+        for found in named:
+            path = found["paths"][0]
+            first = found["mentions"][0] if found["mentions"] else None
+            if found["evidence"] == "written":
+                because = "the record names this file directly"
+            else:
+                because = ("the record writes this filename%s, so the name is the "
+                           "record's and not this tool's"
+                           % (" (%s:%d)" % (first["file"], first["line"])
+                              if first else ""))
+            res["resolution_evidence"].append({
+                "file": path, "line": None, "kind": "verdict",
+                "text": "`%s` is present in the working tree (%s bytes); %s"
+                        % (path, file_size(path) or 0, because),
+            })
+        for hit in res["contrary_prose"]:
+            res["resolution_evidence"].append({
+                "file": hit["file"], "line": hit["line"], "kind": "contrary",
+                "text": "`%s`:%d &mdash; “%s” (stale: the file it calls "
+                        "absent is in the tree)"
+                        % (hit["file"], hit["line"], hit["text"]),
+            })
+    elif res["guessed_only"]:
+        # A name this tool invented matched a file. Worth reading, never a
+        # verdict: the record is not overturned by a coincidence of naming.
+        res["evidence"] = "guessed"
+        for found in res["guessed_only"]:
+            res["resolution_evidence"].append({
+                "file": found["paths"][0], "line": None, "kind": "verdict",
+                "text": "`%s` was guessed from the phrase, not written in the "
+                        "record, and a file of that name exists (`%s`). Nothing "
+                        "committed writes that filename, so this is a lead to "
+                        "check by hand, not grounds to call the blocker lifted"
+                        % (found["name"], found["paths"][0]),
+            })
+        for hit in res["contrary_prose"]:
+            res["resolution_evidence"].append({
+                "file": hit["file"], "line": hit["line"], "kind": "contrary",
+                "text": "`%s`:%d &mdash; “%s” (which a guessed filename "
+                        "is not evidence enough to overturn)"
+                        % (hit["file"], hit["line"], hit["text"]),
+            })
     elif res.get("named_but_absent"):
         res["holds"] = True
+        res["evidence"] = "in-record"
         for item in res["named_but_absent"]:
             first = item["mentions"][0] if item["mentions"] else None
             res["resolution_evidence"].append({
                 "file": first["file"] if first else None,
-                "line": first["line"] if first else None,
+                "line": first["line"] if first else None, "kind": "verdict",
                 "text": "`%s` is named by the repository%s but no such file "
                         "exists anywhere in the working tree"
                         % (item["name"],
@@ -740,14 +889,14 @@ def resolve_blocker(group) -> dict:
             })
     elif group["issues"]:
         res["resolution_evidence"] = [{
-            "file": None, "line": None,
+            "file": None, "line": None, "kind": "verdict",
             "text": "the blocker is recorded only as an issue number, which "
                     "names no file; the working tree cannot settle it and this "
                     "report does not guess",
         }]
     else:
         res["resolution_evidence"] = [{
-            "file": None, "line": None,
+            "file": None, "line": None, "kind": "verdict",
             "text": "the blocker is a phrase with no filename this tool can "
                     "responsibly look for; not checked",
         }]
@@ -786,6 +935,29 @@ def cell_count(row) -> str:
     if not code:
         return "&mdash;"
     text = "%s of %s" % (got, code)
+    if total and total != code:
+        text += " (%s cells total)" % total
+    return text
+
+
+def executed_share(state) -> str:
+    """"8 of its 8 code cells (14 cells total)" -- the ledger's denominator.
+
+    The narrative sections used to quote the executed count against
+    ``cells_total`` ("8 of its 14 cells") while the notebook ledger quoted it
+    against code cells ("8 of 8, 14 cells total") for the same file, so the
+    document contradicted itself about whether six cells had failed to run.
+    They had not: markdown cells cannot carry an `outputs` array at all, and six
+    of those fourteen were prose. Code cells are the only denominator that means
+    anything, and both places now use it -- with the total kept in parentheses,
+    because it is what a reader sees when they open the file.
+    """
+    got = state.get("cells_with_outputs")
+    code = state.get("code_cells")
+    total = state.get("cells_total")
+    if not code:
+        return "%s of its cells" % got
+    text = "%s of its %s code cells" % (got, code)
     if total and total != code:
         text += " (%s cells total)" % total
     return text
@@ -940,6 +1112,7 @@ def detect_blockers(graph: Graph):
             "gates": claims,
             "gate_count": len(claims),
             "still_holds": resolution["holds"],
+            "resolution_evidence_kind": resolution["evidence"],
             "resolution": resolution,
         })
     out.sort(key=lambda g: (-g["gate_count"], g["key"]))
@@ -1054,9 +1227,8 @@ def _judge_scripts(evidence, scripts):
             continue
         state = ev.get("script_state") or {}
         if state.get("executed"):
-            executed.append("%s carries executed outputs in %s of its %s cells"
-                            % (ev["script"], state.get("cells_with_outputs"),
-                               state.get("cells_total")))
+            executed.append("%s carries executed outputs in %s"
+                            % (ev["script"], executed_share(state)))
         got = [a["found"][0] for a in ev.get("saved_artefacts", []) if a["found"]]
         if got:
             artefacts.append("%s has written %s"
@@ -1116,15 +1288,21 @@ def classify_thread(evidence, blocker_groups, named_scripts, answered_record,
                 % (", ".join(g["label"] for g in holding),
                    "; ".join(dict.fromkeys(
                        e["text"] for g in holding
-                       for e in g["resolution"]["resolution_evidence"])),
+                       for e in g["resolution"]["resolution_evidence"]
+                       if e.get("kind") != "contrary")),
                    suffix))
     if unblocked and not unknown_issue:
+        # Only the verdict-bearing evidence goes in the one-line reason. The
+        # stale prose the resolution overrides is quoted in full in the blockers
+        # section, where there is room for it; repeating it in a table cell for
+        # every gated claim buries the verdict under its own footnotes.
         return ("newly-unblocked",
                 "the record calls this blocked on %s, and %s%s"
                 % (", ".join(g["label"] for g in unblocked),
                    "; ".join(dict.fromkeys(
                        e["text"] for g in unblocked
-                       for e in g["resolution"]["resolution_evidence"])),
+                       for e in g["resolution"]["resolution_evidence"]
+                       if e.get("kind") != "contrary")),
                    suffix))
     if unknown_issue:
         return ("still-blocked",
@@ -1457,10 +1635,9 @@ def render_markdown(graph, answered, blockers, threads, frontier, undeveloped,
         add("")
         for ev in record["disk_evidence"]:
             state = ev.get("script_state") or {}
-            add("**The disk says otherwise.** `%s` exists and %s of its %s "
-                "cells carry a non-empty `outputs` array."
-                % (ev["script"], state.get("cells_with_outputs"),
-                   state.get("cells_total")))
+            add("**The disk says otherwise.** `%s` exists and %s carry a "
+                "non-empty `outputs` array."
+                % (ev["script"], executed_share(state)))
             add("")
             saved = [a for a in ev.get("saved_artefacts", []) if a["found"]]
             if saved:
@@ -1612,9 +1789,20 @@ def render_markdown(graph, answered, blockers, threads, frontier, undeveloped,
             state = {True: "still holds on disk",
                      False: "no longer holds on disk",
                      None: "the working tree cannot settle it"}[holds]
-            add("#### %s &mdash; gates %d claim%s; %s" % (
+            # What kind of evidence the verdict rests on, said out loud: a
+            # filename the record wrote is not the same thing as a filename this
+            # tool built out of a phrase, and only the first can move a verdict.
+            grade = {
+                "written": "the blocker phrase names the file itself",
+                "in-record": "the filename was inferred from the phrase, then "
+                             "confirmed against the record's own wording of it",
+                "guessed": "on a filename this tool guessed from the phrase and "
+                           "the record never writes &mdash; a lead, not a verdict",
+            }.get(group.get("resolution_evidence_kind"))
+            add("#### %s &mdash; gates %d claim%s; %s%s" % (
                 md_escape(group["label"]), group["gate_count"],
-                "" if group["gate_count"] == 1 else "s", state))
+                "" if group["gate_count"] == 1 else "s", state,
+                " (%s)" % grade if grade else ""))
             add("")
             for gate in group["gates"]:
                 add("- **`%s`** (%s, %s) &mdash; %s" % (
@@ -1623,10 +1811,20 @@ def render_markdown(graph, answered, blockers, threads, frontier, undeveloped,
                 for quote in gate["quotes"]:
                     add("  > %s" % md_escape(quote))
             add("")
+            evidence = group["resolution"]["resolution_evidence"]
             add("*Disk check:* %s" % (
-                "; ".join(e["text"]
-                          for e in group["resolution"]["resolution_evidence"])
+                "; ".join(e["text"] for e in evidence
+                          if e.get("kind") != "contrary")
                 or "nothing committed speaks to this either way"))
+            # The prose the verdict argues against, quoted rather than
+            # summarised: a resolution that contradicts the record should show
+            # the reader exactly what it is contradicting.
+            contrary = [e for e in evidence if e.get("kind") == "contrary"]
+            if contrary:
+                add("")
+                add("*What the record still says, and this disagrees with:*")
+                for item in contrary:
+                    add("- %s" % item["text"])
             if group["resolution"]["checked"]:
                 add("")
                 add("*Filenames tried:* %s" % ", ".join(

@@ -58,9 +58,18 @@ converts a real signal into background noise.  Two rules follow.
    code.  "I could not tell" is printed as "I could not tell".
 
 2. Known-accepted divergences live in an allowlist, ``docs/graph/.drift-allow``
-   (optional; absent means empty).  One key per line, a reason after ``#``:
+   (optional; absent means empty).  One key per line, then whitespace, then
+   ``#``, then the reason:
 
        A/experiments/gpt2_small/spectral_resonance.ipynb  # tracked in #54
+       C/f4-null-model-regime/doc_ref#fragment  # heading renamed, see #61
+
+   The comment delimiter is *whitespace followed by* ``#``, not the first ``#``
+   on the line.  That matters: check C mints keys that contain a literal ``#``
+   ("...#fragment"), and splitting on the first one would parse such an entry as
+   a different key with a mangled reason -- so the divergence it was written to
+   silence would keep failing while the entry itself was reported stale.  Keys
+   themselves never contain whitespace, so the rule is unambiguous.
 
    The reason is required -- an allowlist entry without one is a configuration
    error and fails the run, because an unexplained silence is how a guard rots.
@@ -84,6 +93,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import posixpath
 import re
 import sys
 
@@ -226,6 +236,40 @@ def gh_anchor(heading: str) -> str:
     return re.sub(r"\s", "-", h.strip())
 
 
+def heading_anchors(markdown: str) -> set:
+    """Every anchor the headings of a markdown document can be linked by.
+
+    Both GitHub's literal slug and its space-collapsed form are returned, plus
+    any explicit ``{#custom-id}``, so that neither a stricter nor a looser
+    generator downstream is mistaken for drift.
+
+    "## 4. Adjacent Science & Mathematics" therefore yields *both*
+    `4-adjacent-science--mathematics` -- GitHub's own answer, because '&' is
+    deleted rather than expanded to "and" and the two spaces it leaves behind
+    become two hyphens -- and the collapsed `4-adjacent-science-mathematics`.
+
+    This is the single definition of the rule for the whole of docs/graph/:
+    build_evidence_graph.py and build_isomorphism_graph.py import it for their
+    own doc_ref validation rather than each carrying a private copy, because two
+    anchor resolvers that disagree is exactly the failure this file exists to
+    catch, and the one place it could not catch it is inside itself.
+    """
+    found = set()
+    for line in (markdown or "").split("\n"):
+        match = re.match(r"^#{1,6}\s+(.*)$", line)
+        if not match:
+            continue
+        heading = match.group(1).strip()
+        explicit = re.search(r"\{#([^}]+)\}", heading)
+        if explicit:
+            found.add(explicit.group(1))
+        slug = gh_anchor(heading)
+        if slug:
+            found.add(slug)
+            found.add(re.sub(r"-+", "-", slug))
+    return found
+
+
 def normalise_name(text: str) -> str:
     """Lowercase, with separators flattened, for name-to-name comparison.
 
@@ -233,6 +277,37 @@ def normalise_name(text: str) -> str:
     "blocked on the prompt library" meet `prompt_library.py`.
     """
     return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", (text or "").lower())).strip()
+
+
+def inside_root(raw: str):
+    """A path as written in a document -> a repo-relative path, or None.
+
+    None means "this does not name a place inside the tree": a URL, an absolute
+    path, or a path that climbs out of the root with ``..``.
+
+    The care here is not pedantry.  The obvious version, ``raw.lstrip("./")``,
+    strips a character *set* rather than a prefix, so "../experiments/foo.py"
+    comes back as "experiments/foo.py" -- a citation pointing at a sibling
+    checkout silently resolves to a different, root-relative file that does
+    exist.  For a check whose only value is never crying wolf, that is the worst
+    possible failure: it invents a divergence out of a misresolution and fails
+    CI on it.  A path that leaves the root is not resolvable here, and saying so
+    is the honest answer.
+    """
+    text = (raw or "").split("#", 1)[0].strip().replace(os.sep, "/")
+    if not text or text.startswith(("http://", "https://", "mailto:")):
+        return None
+    if text.startswith("/") or posixpath.isabs(text):
+        return None
+    while text.startswith("./"):
+        text = text[2:]
+    if not text:
+        return None
+    trailing = text.endswith("/")
+    normalised = posixpath.normpath(text)
+    if normalised == "." or normalised == ".." or normalised.startswith("../"):
+        return None
+    return normalised + "/" if trailing else normalised
 
 
 def paths_in(text: str) -> list:
@@ -304,12 +379,11 @@ class Repo:
         Tried in order: as written; relative to a document's own directory is
         NOT guessed (that produces false pairs); finally a unique basename match
         anywhere in the repository.  Ambiguous basenames resolve to nothing --
-        a guess here would become a false positive later.
+        a guess here would become a false positive later.  A path that escapes
+        the root resolves to nothing at all: see ``inside_root``.
         """
-        if not raw:
-            return None
-        rel = raw.split("#", 1)[0].strip().lstrip("./")
-        if not rel or rel.startswith(("http://", "https://", "mailto:")):
+        rel = inside_root(raw)
+        if rel is None:
             return None
         if self.exists(rel):
             return rel
@@ -319,14 +393,33 @@ class Repo:
         return None
 
 
+def _joined(value) -> str:
+    """A notebook `source`/`text` field as a string, whatever shape it is in."""
+    if isinstance(value, str):
+        return value
+    if isinstance(value, list):
+        return "".join(part for part in value if isinstance(part, str))
+    return ""
+
+
 def notebook_state(repo: Repo, rel: str):
-    """What a .ipynb says about its own execution.  None if unreadable."""
+    """What a .ipynb says about its own execution.  None if unreadable.
+
+    "Unreadable" includes structurally wrong, not merely unparseable as JSON.
+    check_d walks every .ipynb in the tree, so a single malformed notebook --
+    a `cells` array holding a string, an `outputs` entry that is not an object
+    -- used to abort the whole check with an AttributeError instead of emitting
+    the unreadable-notebook advisory this function exists to feed.  A drift
+    check that dies on one bad file reports nothing about the other eighty.
+    """
     try:
         notebook = json.loads(repo.read(rel))
     except (OSError, ValueError):
         return None
+    if not isinstance(notebook, dict):
+        return None
     cells = notebook.get("cells")
-    if not isinstance(cells, list):
+    if not isinstance(cells, list) or not all(isinstance(c, dict) for c in cells):
         return None
 
     code = [c for c in cells if c.get("cell_type") == "code"]
@@ -334,27 +427,33 @@ def notebook_state(repo: Repo, rel: str):
     for index, cell in enumerate(cells):
         if cell.get("cell_type") != "code":
             continue
-        outputs = cell.get("outputs") or []
+        outputs = cell.get("outputs")
+        outputs = outputs if isinstance(outputs, list) else []
         count = cell.get("execution_count")
+        if not isinstance(count, int):
+            count = None
         if count or outputs:
             executed.append(index)
             if count:
                 counts.append(count)
         for out in outputs:
+            if not isinstance(out, dict):
+                continue
             chunk = out.get("text")
             if chunk is None:
-                chunk = (out.get("data") or {}).get("text/plain")
+                data = out.get("data")
+                chunk = data.get("text/plain") if isinstance(data, dict) else None
             if chunk is None:
                 chunk = out.get("traceback")
             if chunk:
-                texts.append((index, "".join(chunk) if isinstance(chunk, list) else str(chunk)))
+                texts.append((index, _joined(chunk) or str(chunk)))
 
     banner = []
     for cell in cells:
         if cell.get("cell_type") == "code":
             break
         if cell.get("cell_type") == "markdown":
-            banner.append("".join(cell.get("source") or []))
+            banner.append(_joined(cell.get("source")))
 
     # Files the executed outputs say were written, resolved against the
     # notebook's own directory (a notebook saving to "../_DATA/x.pt" is talking
@@ -861,19 +960,7 @@ def check_c(repo: Repo, record: Record):
 
     def anchors_of(doc):
         if doc not in anchor_cache:
-            found = set()
-            for line in repo.lines(doc):
-                match = re.match(r"^#{1,6}\s+(.*)$", line)
-                if not match:
-                    continue
-                heading = match.group(1).strip()
-                explicit = re.search(r"\{#([^}]+)\}", heading)
-                if explicit:
-                    found.add(explicit.group(1))
-                slug = gh_anchor(heading)
-                found.add(slug)
-                found.add(re.sub(r"-+", "-", slug))
-            anchor_cache[doc] = found
+            anchor_cache[doc] = heading_anchors(repo.read(doc))
         return anchor_cache[doc]
 
     fields = [("sources", ("path",)), ("claims", ("doc_ref",)),
@@ -1195,8 +1282,17 @@ def check_e(repo: Repo, record: Record):
 # ---------------------------------------------------------------------------
 
 
+# The comment delimiter in .drift-allow: whitespace, then '#'.  NOT the first
+# '#' on the line -- check C's keys end in a literal "#fragment", and splitting
+# there would make the very keys this report tells the operator to copy in
+# unsilenceable (parsed as the wrong key, with the rest of the real key eaten as
+# the reason, so the divergence keeps failing and the entry is simultaneously
+# reported stale).  Allowlist keys never contain whitespace.
+ALLOW_COMMENT = re.compile(r"\s#")
+
+
 def load_allowlist(path: str):
-    """key -> reason.  Raises ValueError on an entry with no reason."""
+    """key -> reason.  Returns (allow, problems); a reason is mandatory."""
     allow, problems = {}, []
     if not os.path.isfile(path):
         return allow, problems
@@ -1205,15 +1301,19 @@ def load_allowlist(path: str):
             line = raw.strip()
             if not line or line.startswith("#"):
                 continue
-            key, hash_mark, reason = line.partition("#")
-            key, reason = key.strip(), reason.strip()
+            delimiter = ALLOW_COMMENT.search(line)
+            if delimiter:
+                key = line[: delimiter.start()].strip()
+                reason = line[delimiter.end():].strip()
+            else:
+                key, reason = line, ""
             if not key:
                 problems.append("%s:%d has no key" % (path, number))
                 continue
-            if not hash_mark or not reason:
+            if not reason:
                 problems.append(
                     "%s:%d entry %r has no reason. Every allowlisted divergence needs "
-                    "one, after a '#'." % (path, number, key)
+                    "one, written after whitespace and a '#'." % (path, number, key)
                 )
                 continue
             allow[key] = reason
@@ -1317,7 +1417,9 @@ def report(divergences, allowed, advisories, unused_allow, root):
         for item in divergences:
             write("    %s  # why this is accepted" % item.key)
         write("")
-        write("An entry without a reason after '#' is a configuration error and fails.")
+        write("The reason is whatever follows the whitespace-and-'#' after the key, so a")
+        write("key containing a '#' can be pasted in verbatim. An entry with no reason at")
+        write("all is a configuration error and fails.")
     elif allowed:
         write(
             "PASS: no un-allowlisted divergence. %d accepted in docs/graph/.drift-allow, "
@@ -1381,8 +1483,11 @@ def main(argv=None):
         for problem in problems:
             print("  " + problem, file=sys.stderr)
         print(
-            "\nFormat: one key per line, then '#', then why it is accepted:\n"
-            "    A/experiments/gpt2_small/spectral_resonance.ipynb  # tracked in issue #54",
+            "\nFormat: one key per line, then whitespace, then '#', then why it is\n"
+            "accepted. The reason begins at the first '#' that follows whitespace, so a\n"
+            "key may itself contain a '#':\n"
+            "    A/experiments/gpt2_small/spectral_resonance.ipynb  # tracked in issue #54\n"
+            "    C/f4-null-model-regime/doc_ref#fragment  # heading renamed, tracked in #61",
             file=sys.stderr,
         )
         return 2

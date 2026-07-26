@@ -269,8 +269,13 @@ a regeneration cannot silently rewrite the epistemic record. It skips rather tha
 all three graphs actually draw, that the model switch re-renders, that search and the details panel
 and the timeline scrubber work, that returning to Evidence from another graph restores the
 force-directed layout, that the phone budget holds — and that nothing lands in the console. Its
-thirteen assertions cover the three graphs; Threads mode is not among them yet, so a change there
-is on the person making it to drive. It needs Playwright
+fourteen assertions cover all four views. The fourteenth is Threads: that the overlay renders from
+`_data/threads.json` — readiness colours reaching the vis DataSet, the ranked low-hanging-fruit
+list populated from the report and driving the graph when a row is clicked, `blocks` / `blocked-by`
+drawn as gate edges — and that none of it leaks, so after Threads → Dissolution → Evidence the
+synthesised blocker hubs are gone, status colours are back, the gate edges have their evidence
+style again and the graph is still clickable. If `_data/threads.json` has not been generated that
+assertion fails with an actionable message and the other thirteen still run. It needs Playwright
 (`npm i -D playwright`, or set `PLAYWRIGHT_PATH`); the two CDN scripts are served from a local
 mirror so a bad day at unpkg cannot turn into a red test.
 

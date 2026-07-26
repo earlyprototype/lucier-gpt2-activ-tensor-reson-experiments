@@ -36,17 +36,33 @@ the places the analogy fails.
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import sys
 from collections import Counter
-from datetime import date
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent            # docs/graph
+REPO = HERE.parent.parent                         # repo root
 OUT_DIR = HERE / "_data"
 OUT_PATH = OUT_DIR / "isomorphism.json"
 
 GENERATED = "2026-07-25"
+
+
+def load_sibling(name: str):
+    """Import a module sitting next to this one, by path (not via sys.path)."""
+    spec = importlib.util.spec_from_file_location(
+        "docs_graph_" + name, str(HERE / (name + ".py")))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+# Shared with check_record_drift.py and build_evidence_graph.py: one anchor
+# rule for the whole of docs/graph/, so a document renamed under one generator
+# cannot stay green under the other.
+heading_anchors = load_sibling("check_record_drift").heading_anchors
 
 # --------------------------------------------------------------------------
 # Phases.  Ids, labels and starts are kept identical to entities.json so the
@@ -715,7 +731,15 @@ def validate(graph):
         "runs": {"run", "model", "null-model"},
         "sources": {"doc", "artefact", "prior-work"},
     }
-    statuses = {"supported", "refuted", "qualified", "retired", "corrected", "open", "untested"}
+    # Kept identical to build_evidence_graph.ALLOWED_STATUS. The two graphs are
+    # rendered by the same viewer.html, coloured from the same
+    # visual_config.json and documented by the same README table, so a value
+    # legal in one and illegal in the other is a bug waiting to happen -- which
+    # is what "not-supported" was, having been added on the evidence side only.
+    # "not-supported" = the evidence failed to back the claim without
+    # contradicting it, which is a different verdict from "refuted".
+    statuses = {"supported", "refuted", "not-supported", "qualified", "retired",
+                "corrected", "open", "untested"}
     edge_types = {
         "supports", "refutes", "qualifies", "corrects", "retires", "supersedes", "tests",
         "produced-by", "run-on", "evidenced-by", "documented-in",
@@ -748,6 +772,47 @@ def validate(graph):
             problems.append(f"edge {r['from']} -> {r['to']}: bad type {r['type']!r}")
         if not r.get("description", "").strip():
             problems.append(f"edge {r['from']} -> {r['to']}: empty description")
+
+    # Every path this graph cites must exist, and every '#anchor' must name a
+    # heading that is still there. Both graphs feed the same viewer; a renamed
+    # document leaving a dead link behind a green build is the failure mode.
+    anchor_cache: dict[str, set] = {}
+
+    def anchors_of(rel_path: str) -> set:
+        if rel_path not in anchor_cache:
+            try:
+                anchor_cache[rel_path] = heading_anchors(
+                    (REPO / rel_path).read_text(encoding="utf-8"))
+            except OSError:
+                anchor_cache[rel_path] = set()
+        return anchor_cache[rel_path]
+
+    def check_path(owner: str, field: str, value):
+        if not value or value.startswith(("http://", "https://")):
+            return
+        rel_path, _, fragment = value.partition("#")
+        rel_path = rel_path.rstrip("/")
+        if not rel_path:
+            return
+        if not (REPO / rel_path).exists():
+            problems.append(
+                f"{owner}.{field} points at {rel_path!r} which does not exist on disk")
+            return
+        if fragment and rel_path.endswith(".md") and fragment not in anchors_of(rel_path):
+            problems.append(
+                f"{owner}.{field} points at {value!r}: {rel_path} exists, but no "
+                f"heading in it anchors as #{fragment}")
+
+    for c in graph["claims"]:
+        check_path(c["id"], "doc_ref", c.get("doc_ref"))
+    for r in graph["runs"]:
+        for field in ("script", "output_dir", "output_path", "doc_ref"):
+            check_path(r["id"], field, r.get(field))
+    for s in graph["sources"]:
+        check_path(s["id"], "path", s.get("path"))
+        check_path(s["id"], "doc_ref", s.get("doc_ref"))
+    for p in graph["metadata"]["phases"]:
+        check_path(p["id"], "doc_ref", p.get("doc_ref"))
 
     return ids, problems, unresolved
 

@@ -1957,22 +1957,30 @@
         // the smoke test keys its legend assertions on. The kit template's viewer
         // title-cases instead, because its legend is styled for prose labels.
 
+        // Every one of the three lookups below is keyed by a string that came out
+        // of a JSON payload, so a node type or relationship type called
+        // "constructor" or "toString" would otherwise resolve to an inherited
+        // Object.prototype member — a *function* where a colour string or a style
+        // object is expected. Own-property only, then fall through to `.default`.
+        function ownProp(map, key) {
+            return (typeof key === 'string' &&
+                Object.prototype.hasOwnProperty.call(map, key)) ? map[key] : undefined;
+        }
+
         // Unknown / unmapped statuses fall back to the default colour rather than
         // returning undefined (which would render as a black swatch) or picking up
         // an inherited Object.prototype member for names like "constructor".
         function statusColour(status) {
-            if (status && Object.prototype.hasOwnProperty.call(STATUS_COLORS, status)) {
-                return STATUS_COLORS[status];
-            }
-            return STATUS_COLORS.default;
+            const own = ownProp(STATUS_COLORS, status);
+            return own === undefined ? STATUS_COLORS.default : own;
         }
 
         function typeColour(type) {
-            return TYPE_COLORS[type] || TYPE_COLORS.default;
+            return ownProp(TYPE_COLORS, type) || TYPE_COLORS.default;
         }
 
         function edgeStyleFor(type) {
-            return EDGE_STYLES[type] || EDGE_STYLES.default;
+            return ownProp(EDGE_STYLES, type) || EDGE_STYLES.default;
         }
 
         // vis-network wants `arrows` as a string ('to' / 'from' / 'to;from') or
@@ -2107,7 +2115,7 @@
                 Object.keys(styles).forEach(function (key) {
                     const incoming = styles[key];
                     if (!incoming || typeof incoming !== 'object') return;
-                    const base = EDGE_STYLES[key] || Object.assign({}, EDGE_STYLES.default);
+                    const base = ownProp(EDGE_STYLES, key) || Object.assign({}, EDGE_STYLES.default);
                     EDGE_STYLES[key] = Object.assign({}, base, incoming);
                 });
             } catch (error) {
@@ -2143,8 +2151,8 @@
                     status: status,
                     asserted: asserted,
                     retired: retired,
-                    size: NODE_SIZES[type] || NODE_SIZES.claim || 20,
-                    shape: NODE_SHAPES[type] || NODE_SHAPES.default,
+                    size: ownProp(NODE_SIZES, type) || NODE_SIZES.claim || 20,
+                    shape: ownProp(NODE_SHAPES, type) || NODE_SHAPES.default,
                     data: claim
                 });
             });
@@ -2160,8 +2168,8 @@
                     status: run.status || null,
                     asserted: parseDate(run.date),
                     retired: null,
-                    size: NODE_SIZES[type] || NODE_SIZES.run || 16,
-                    shape: NODE_SHAPES[type] || NODE_SHAPES.default,
+                    size: ownProp(NODE_SIZES, type) || NODE_SIZES.run || 16,
+                    shape: ownProp(NODE_SHAPES, type) || NODE_SHAPES.default,
                     data: run
                 });
             });
@@ -2177,8 +2185,8 @@
                     status: source.status || null,
                     asserted: parseDate(source.date),
                     retired: null,
-                    size: NODE_SIZES[type] || NODE_SIZES.source || 14,
-                    shape: NODE_SHAPES[type] || NODE_SHAPES.default,
+                    size: ownProp(NODE_SIZES, type) || NODE_SIZES.source || 14,
+                    shape: ownProp(NODE_SHAPES, type) || NODE_SHAPES.default,
                     data: source
                 });
             });
@@ -2459,7 +2467,11 @@
                 registers.forEach(function (register) {
                     activeRegisters[register] = true;
                     const count = (model.register_counts || {})[register];
-                    html += '<button class="chip active" id="chip-register-' + esc(register) + '"' +
+                    // The id is slugified on both sides (here and in
+                    // syncDissolutionChipClasses) so a register token carrying
+                    // &, <, > or a quote cannot escape its id and break the
+                    // lookup. activeRegisters still keys off the raw value.
+                    html += '<button class="chip active" id="chip-register-' + esc(slugify(register)) + '"' +
                         ' data-register="' + esc(register) + '"' +
                         ' onclick="toggleRegisterChip(\'' + jsAttr(register) + '\')">' +
                         esc(register) + (count === undefined ? '' : ' (' + count + ')') + '</button>';
@@ -2491,7 +2503,7 @@
 
         function syncDissolutionChipClasses() {
             Object.keys(activeRegisters).forEach(function (register) {
-                const el = document.getElementById('chip-register-' + register);
+                const el = document.getElementById('chip-register-' + slugify(register));
                 if (el) el.classList.toggle('active', activeRegisters[register] !== false);
             });
             Object.keys(activeBasins).forEach(function (basin) {
@@ -3829,7 +3841,7 @@
 
             html += '<div class="legend-section"><h4>Shape = type</h4>';
             (present.types.length ? present.types : TYPE_ORDER).forEach(function (type) {
-                html += '<div class="legend-row"><span>' + esc(NODE_SHAPES[type] || NODE_SHAPES.default) +
+                html += '<div class="legend-row"><span>' + esc(ownProp(NODE_SHAPES, type) || NODE_SHAPES.default) +
                     '</span><span style="color:#7f8c8d">' + esc(type) + '</span></div>';
             });
             html += '</div>';
@@ -4618,6 +4630,30 @@
             loadMarkdownDoc(path, anchor, tab);
         }
 
+        // The trust assumption, stated: everything this panel renders is a
+        // markdown file from this repository, cited by a doc_ref in the graph and
+        // reviewed like any other file in it. There is no user-supplied content
+        // path, and no sanitiser is loaded from a CDN — the Pages deployment and
+        // the artifact both run under a CSP that blocks external hosts, so
+        // DOMPurify simply would not load.
+        //
+        // That assumption is not a guarantee, so before the parsed HTML is
+        // injected we remove the two constructs that would turn a cited .md file
+        // into script execution: <script> elements and on* handler attributes.
+        // This is deliberately not a general sanitiser — inline HTML is otherwise
+        // left alone, because the documents use it.
+        function stripActiveMarkup(html) {
+            const holder = document.createElement('div');
+            holder.innerHTML = html;   // detached: innerHTML never runs <script>
+            holder.querySelectorAll('script').forEach(function (el) { el.remove(); });
+            holder.querySelectorAll('*').forEach(function (el) {
+                Array.prototype.slice.call(el.attributes).forEach(function (attr) {
+                    if (/^on/i.test(attr.name)) el.removeAttribute(attr.name);
+                });
+            });
+            return holder.innerHTML;
+        }
+
         async function loadMarkdownDoc(path, anchor, activeTab) {
             const content = document.getElementById('markdown-content');
             const tabs = document.getElementById('markdown-tabs');
@@ -4639,7 +4675,7 @@
                 }
                 const markdown = await response.text();
                 content.innerHTML = (typeof marked !== 'undefined' && marked.parse)
-                    ? marked.parse(markdown)
+                    ? stripActiveMarkup(marked.parse(markdown))
                     : '<pre>' + esc(markdown) + '</pre>';
 
                 // marked does not always emit heading ids - add them, then jump.
