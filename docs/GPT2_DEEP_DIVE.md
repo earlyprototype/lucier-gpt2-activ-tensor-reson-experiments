@@ -21,8 +21,13 @@ model, with a drafted summary for each paper.*
 > `openai-community` and `distilbert` repositories — that is, `[primary data, read directly]`. Where they disagree
 > with the GPT-2 paper's own table, both are given and the disagreement is flagged rather than explained away.
 >
-> Where this document connects the literature to ATR, that is **this project's reading**, marked as such. None of
-> the cited work discusses ATR.
+> Where this document connects the literature to **ATR** (Activation Tensor Resonance, this repository's method),
+> that is **this project's reading**, marked as such. None of the cited work discusses ATR.
+>
+> **On abbreviations.** Every initialism is written out in full at its first use, and all of them are collected in
+> [Appendix C](#appendix-c--glossary-of-abbreviations) at the end. This field abbreviates heavily and the habit
+> makes its literature harder to enter than it needs to be; nothing here should require you to already know the
+> vocabulary.
 
 **Contents**
 
@@ -35,6 +40,7 @@ model, with a drafted summary for each paper.*
 - [Part 7 — Bearings on this repository](#part-7--bearings-on-this-repository)
 - [Appendix A — Instruments, one line each](#appendix-a--instruments-one-line-each)
 - [Appendix B — Suggested reading order](#appendix-b--suggested-reading-order)
+- [Appendix C — Glossary of abbreviations](#appendix-c--glossary-of-abbreviations)
 - [Sources](#sources)
 
 ---
@@ -46,13 +52,15 @@ model, with a drafted summary for each paper.*
 GPT-2 is not an architectural invention. It is a scaling and a dataset decision applied to an architecture that
 already existed, and its historical importance lies almost entirely in what that decision demonstrated.
 
-The architecture arrived in **Vaswani et al., *Attention Is All You Need* (NeurIPS 2017)** `[peer-reviewed]`
+The architecture arrived in **Vaswani et al., *Attention Is All You Need*** (NeurIPS 2017 — the Conference on
+Neural Information Processing Systems, machine learning's largest venue) `[peer-reviewed]`
 (https://arxiv.org/abs/1706.03762): multi-head scaled dot-product attention, residual connections, layer
 normalisation, position encodings, as an encoder–decoder for translation.
 
 **Radford, Narasimhan, Salimans, Sutskever, *Improving Language Understanding by Generative Pre-Training* (OpenAI,
-2018)** `[published research report, not journal-reviewed]` — GPT-1 — kept only the decoder, trained it
-autoregressively on BooksCorpus, then fine-tuned per task. The recipe was pre-train once, fine-tune many times.
+2018)** `[published research report, not journal-reviewed]` — GPT-1, and the paper the abbreviation comes from:
+**G**enerative **P**re-**T**raining — kept only the decoder, trained it autoregressively on BooksCorpus, then
+fine-tuned per task. The recipe was pre-train once, fine-tune many times.
 
 GPT-2's contribution was to delete the second half of that recipe. Its claim was that a large enough language
 model trained on a diverse enough corpus performs downstream tasks **zero-shot**, with no gradient updates and no
@@ -72,13 +80,15 @@ OpenAI scraped **all outbound links from Reddit posts with at least 3 karma** �
 other users found the link interesting, educational, or just funny" — yielding the text of **45 million links**.
 Text was extracted with Dragnet and Newspaper. The version used for all results in the paper excludes links
 created after **December 2017** and, after de-duplication and heuristic cleaning, contains **slightly over 8
-million documents, 40 GB of text**. Wikipedia was removed deliberately. WebText itself was never released, which
+million documents, 40 GB (gigabytes) of text**. Wikipedia was removed deliberately. WebText itself was never released, which
 is a permanent handicap for interpretability: on GPT-2 you can study weights and activations but you cannot ask
 what in the training data produced them. (OpenWebText, a community reconstruction of the recipe, is the usual
 substitute\*.)
 
-**The tokeniser.** Byte-level BPE. The paper's reasoning is worth keeping in mind because its consequences show up
-throughout the MI literature: character-level BPE over Unicode would need a base vocabulary above 130,000, while
+**The tokeniser.** Byte-level **BPE** — byte-pair encoding, the scheme that starts from individual characters (here
+individual bytes) and repeatedly merges the most frequent adjacent pair into a new symbol, so common words end up
+as one token and rare ones as several. The paper's reasoning is worth keeping in mind because its consequences show
+up throughout the interpretability literature: character-level byte-pair encoding over Unicode would need a base vocabulary above 130,000, while
 a byte-level base vocabulary needs only 256 and can assign a probability to *any* Unicode string. Greedy
 frequency-based merging over raw bytes produces waste — the paper observed BPE learning `dog.`, `dog!`, `dog?` as
 separate tokens — so merges are **prevented from crossing character categories, with an exception for spaces**.
@@ -90,7 +100,9 @@ that begin with a space.
 later:
 
 1. Layer normalisation **moved to the input of each sub-block**, "similar to a pre-activation residual network" —
-   i.e. pre-LN rather than post-LN.
+   i.e. *pre-normalisation* (normalise on the way in) rather than post-normalisation (normalise on the way out).
+   Written **pre-LN** and **post-LN** below, LN being the standard abbreviation for layer normalisation: the
+   operation that rescales a vector to zero mean and unit variance, then applies a learned scale and offset.
 2. **An additional layer normalisation after the final self-attention block** (`ln_f`).
 3. A modified initialisation accounting for accumulation on the residual path with depth: **residual-layer weights
    scaled by 1/√N at initialisation**, N = number of residual layers.
@@ -104,11 +116,16 @@ which is exactly the object Anthropic's circuits framework later formalised, and
 reinjects.
 
 **The results.** Four models were trained, "approximately log-uniformly spaced" in size (§3). The 1.5B model set
-state of the art on **7 of 8** language-modelling datasets zero-shot; smaller models already beat prior SOTA on
-several. Even the smallest model (the row the paper labels 117M) reports LAMBADA perplexity 35.13 against a prior
-SOTA of 99.8, and CBT-CN accuracy 87.65 against 85.7. Elsewhere zero-shot transfer was much weaker: 55 F1 on
-CoQA against a supervised BERT SOTA of 89 F1, 70.70% on the Winograd Schema Challenge, and a summarisation score
-(`TL;DR:` prompting, ROUGE-avg 21.40) that the paper's own Table 4 shows losing to a `Random-3` sentence
+state of the art on **7 of 8** language-modelling datasets zero-shot; smaller models already beat the previous best
+published result on several. Even the smallest model (the row the paper labels 117M) reports perplexity 35.13 on
+LAMBADA (a long-range word-prediction benchmark) against a previous best of 99.8, and 87.65% accuracy on the
+common-noun split of the Children's Book Test (CBT-CN) against 85.7%. Elsewhere zero-shot transfer was much
+weaker: **55 F1** on CoQA — the Conversational Question Answering dataset; F1 being the harmonic mean of precision
+and recall, so a single number balancing the two — against **89 F1** for a supervised system built on BERT
+(Bidirectional Encoder Representations from Transformers, Google's 2018 encoder model); 70.70% on the Winograd
+Schema Challenge; and a summarisation score (prompting with the literal string `TL;DR:`, internet shorthand for
+"too long; didn't read", to elicit a summary; scored by ROUGE, the standard word-overlap metric for
+summarisation, averaged at 21.40) that the paper's own Table 4 shows losing to a `Random-3` sentence
 baseline at 20.98 by a hair and to `Lede-3` at 31.55 outright. The paper reports the failures alongside the
 successes; the field's memory has been kinder to it than the paper was to itself.
 
@@ -121,7 +138,7 @@ reason GPT-2 can support circuit analysis but not developmental analysis.
 
 ### 1.3 The staged release, and what it was for
 
-GPT-2's release is a piece of AI-governance history independent of the model.
+GPT-2's release is a piece of artificial-intelligence governance history independent of the model.
 
 | Date | Release | Accompanying material |
 |:---|:---|:---|
@@ -133,8 +150,8 @@ GPT-2's release is a piece of AI-governance history independent of the model.
 The stated purpose of staging was to "give people time to assess the properties of these models, discuss their
 societal implications, and evaluate the impacts of release after each stage"\*, with the withheld-model concern
 being synthetic disinformation, impersonation, and automated abuse. Supporting measures included partnered
-research (Cornell, the Middlebury Institute's CTEC, the University of Oregon, and the University of Texas at
-Austin\*), released datasets of model outputs so that others could build detectors, and bias analysis. The
+research (Cornell, the Middlebury Institute's Center on Terrorism, Extremism, and Counterterrorism, the University
+of Oregon, and the University of Texas at Austin\*), released datasets of model outputs so that others could build detectors, and bias analysis. The
 argument and its aftermath are documented in **Solaiman et al., *Release Strategies and the Social Impacts of
 Language Models* (arXiv:1908.09203, Aug/Nov 2019)** `[preprint, unreviewed]`.
 
@@ -167,20 +184,27 @@ x₀      = wte[t] + wpe[0..n-1]                                  # residual str
 
 for each block ℓ = 0 … L-1:
     x    = x + Attn( LN₁(x) )                                   # pre-LN attention sub-block
-    x    = x + MLP(  LN₂(x) )                                   # pre-LN MLP sub-block
+    x    = x + MLP(  LN₂(x) )                                   # pre-LN feed-forward sub-block
 
 logits  = LN_f(x) · wteᵀ                                        # tied unembedding
 ```
 
+Two names in that block: **LN** is layer normalisation (above), and **MLP** stands for *multi-layer perceptron* —
+the field's inherited name for the two-layer feed-forward network sitting in each block. It is also called the
+**FFN** (feed-forward network); the two terms mean the same thing and both appear in the literature below.
+
 with, per block:
 
-- **Attention.** `c_attn` projects LN₁(x) to Q, K, V at once (one weight of shape d × 3d); heads are
+- **Attention.** `c_attn` projects LN₁(x) to Q, K, V — query, key and value, the three vectors attention is
+  computed from — at once (one weight of shape d × 3d); heads are
   d/64 in number, each of head dimension **64 in every GPT-2 size**; causal-masked scaled dot-product attention;
   `c_proj` maps back to d. The checkpoints ship the causal mask as a **non-trainable `attn.bias` buffer of shape
   (1, 1, 1024, 1024) per layer** — 1,048,576 values a layer that are not parameters, a detail that trips up naive
   parameter counting (see §2.2).
-- **MLP.** `c_fc` to width **4d**, activation **GELU** (`gelu_new`, the tanh approximation, per `config.json`),
-  `c_proj` back to d. No gating, no SwiGLU.
+- **MLP.** `c_fc` to width **4d**, activation **GELU** — the Gaussian Error Linear Unit, a smooth curve that
+  behaves roughly like the older ReLU (rectified linear unit: pass positives, zero negatives) without the sharp
+  kink (`gelu_new`, the tanh approximation, per `config.json`) — then `c_proj` back to d. No gating, no
+  SwiGLU (a gated activation variant common in later models).
 - **LayerNorm** with learned γ and β, ε = 1e-5 (per `config.json`).
 - **Weight tying.** The released checkpoints contain **no `lm_head` tensor** (verified in the `safetensors`
   header): the unembedding is `wte` transposed.
@@ -226,7 +250,9 @@ are studying the same weights. A reader collating results across the MI literatu
   the `#version: 0.2` header — so **50,000 merges**. 256 byte-level base tokens + 50,000 merges + 1 special token
   = 50,257. The arithmetic closes exactly.
 - Ids 0–255 are the byte alphabet (id 0 = `!`, in the printable-remap encoding).
-- **Id 50256 = `<|endoftext|>`**, the only special token. There is no separate BOS, PAD, or UNK. GPT-2 does not
+- **Id 50256 = `<|endoftext|>`**, the only special token. There is no separate beginning-of-sequence (BOS),
+  padding (PAD), or unknown-token (UNK) entry — abbreviations you will meet in the attention-sink literature
+  below, where whether a model has a dedicated first token turns out to matter. GPT-2 does not
   prepend anything by default, so **position 0 of a GPT-2 forward pass is an ordinary content token**, which is
   the reason the attention-sink literature (§5.4) behaves differently on GPT-2 than on models trained with a
   dedicated BOS.
@@ -236,12 +262,27 @@ are studying the same weights. A reader collating results across the MI literatu
 
 ### 2.4 What GPT-2 does *not* have
 
-Reading GPT-2 results forward into modern models requires knowing what has since changed. GPT-2 has **learned
-absolute position embeddings** (not RoPE, not ALiBi, not NoPE); **LayerNorm** with bias (not RMSNorm);
-**plain GELU MLPs** (not SwiGLU/GeGLU); **full multi-head attention** (not MQA/GQA); **no QK-norm**; **tied
-embeddings**; **1024-token context**; **no instruction tuning, no RLHF, no chat template** — GPT-2 is a pure base
-model, which is why every alignment-relevant MI result (refusal, sycophancy, deception features) had to be found
-elsewhere. Its dense 4d MLP and clean pre-LN residual stream are, however, still the modal transformer block, so
+Reading GPT-2 results forward into modern models requires knowing what has since changed. Each item below names
+the modern replacement GPT-2 does *not* use, with a gloss, since these are the abbreviations that make recent
+architecture papers unreadable to newcomers. GPT-2 has:
+
+- **Learned absolute position embeddings** — one trained vector per slot, added to the token embedding. Not
+  **RoPE** (rotary position embedding: positions applied by rotating query and key vectors), not **ALiBi**
+  (Attention with Linear Biases: a distance penalty added to attention scores), not **NoPE** (no positional
+  encoding at all, relying on the causal mask to imply order).
+- **LayerNorm** with a learned bias — not **RMSNorm** (root-mean-square normalisation, which drops the
+  mean-centring step and the bias).
+- **Plain GELU feed-forward blocks** — not **SwiGLU** or **GeGLU** (gated variants that multiply two projections
+  together, one of them passed through an activation).
+- **Full multi-head attention** — every head with its own keys and values. Not **MQA** (multi-query attention: all
+  heads share one key/value pair) or **GQA** (grouped-query attention: heads share in groups), both of which trade
+  a little quality for much smaller memory during generation.
+- **No QK-norm** — no normalisation applied to the query and key vectors before their dot product.
+- **Tied embeddings**, a **1024-token context**, and **no instruction tuning, no RLHF** (reinforcement learning
+  from human feedback: the post-training step that turns a text predictor into an assistant) and **no chat
+  template**. GPT-2 is a pure base model, which is why every alignment-relevant interpretability result (refusal,
+  sycophancy, deception features) had to be found elsewhere.
+ Its dense 4d MLP and clean pre-LN residual stream are, however, still the modal transformer block, so
 circuit-level results about *how information moves through a residual stream* travel better than results about
 positions or normalisation.
 
@@ -276,7 +317,8 @@ kind — no size of GPT-2 follows instructions, and none is chat-shaped.
 - **GPT-2 Medium (355M)** is where "does the circuit reproduce at scale?" is usually asked first, and the answer
   is often *yes, with rearrangement* (Merullo et al., §5.3).
 - **GPT-2 Large (774M)** is the least-studied size, with no canonical MI result attached to it that I could find.
-- **GPT-2 XL (1558M)** is the factual-recall and automated-interpretability model: 48 layers × 6400 MLP neurons =
+- **GPT-2 XL (1558M)** — "XL" for extra large, OpenAI's label for the biggest of the four — is the factual-recall
+  and automated-interpretability model: 48 layers × 6400 feed-forward neurons =
   **307,200 neurons**, the exact figure OpenAI's neuron-explainer covered (§5.6), and the model ROME edits
   (§5.3).
 
@@ -294,7 +336,8 @@ results.
   framing (**Hinton et al., arXiv:1503.02531** `[preprint, unreviewed]`) by the Hugging Face DistilBERT
   authors\*. Same tokeniser, half the depth, verified above at 81,912,576 parameters. Not a GPT-2 checkpoint: a
   student of one.
-- **The Stanford CRFM "Mistral" GPT-2 replications** (Karamcheti et al., 2021) — **five GPT-2 Small and five
+- **The Stanford CRFM "Mistral" GPT-2 replications** — CRFM being Stanford's Center for Research on Foundation
+  Models (Karamcheti et al., 2021) — **five GPT-2 Small and five
   GPT-2 Medium models trained from different random seeds**, released with intermediate checkpoints. Confirmed by
   reading Gurnee et al.'s methods section (§5.5), which studies `GPT2-{small,medium}-[a-e]` and names
   `stanford-crfm/arwen-gpt2-medium-x21` and `stanford-crfm/alias-gpt2-small-x21`. These are the *only* way to ask
@@ -302,9 +345,9 @@ results.
   particular initialisation?" — and their existence is why §5.5's result is possible at all. (Note the name
   collision: nothing to do with Mistral AI.)
 - **OpenWebText-trained reproductions** — community re-creations of the WebText recipe, including Karpathy's
-  nanoGPT/minGPT lineage\*. Architecturally GPT-2, different weights, different data sample. Most published SAEs
-  for GPT-2 Small are trained on OpenWebText activations (§5.7), which means the *dictionaries* and the *model*
-  saw different corpora.
+  nanoGPT/minGPT lineage\*. Architecturally GPT-2, different weights, different data sample. Most published
+  **sparse autoencoders** (SAEs — the feature-extraction tool explained in §5.5) for GPT-2 Small are trained on
+  OpenWebText activations (§5.7), which means the *dictionaries* and the *model* saw different corpora.
 - **The GPT-2 output datasets and detector** — released alongside the staged rollout for detection research; the
   detector was a RoBERTa fine-tune\*. Not a language model, but part of the artifact family.
 - **Task fine-tunes** — DialoGPT, countless domain models. Different weights; MI results on base GPT-2 do not
@@ -321,12 +364,14 @@ Five properties, in rough order of importance:
 
 1. **Fully open weights of a genuinely pretrained model.** After November 2019 all four sizes are downloadable.
    The alternative in 2020–2022 was a toy model you trained yourself (which might not exhibit the phenomenon) or
-   an API model whose activations you could not see.
+   a model reachable only through an API (application programming interface — a remote service you send text to
+   and get text back from), whose activations you could not see.
 2. **Small enough for exhaustive methods.** 144 heads and 12 MLPs in Small means you can patch *everything* and
    report a heatmap rather than a sample.
-3. **Big enough to have real behaviours.** Unlike a 2-layer attention-only toy, GPT-2 Small does indirect object
-   identification, numeric comparison, ordinal succession, and sentiment — natural behaviours "in the wild", to
-   borrow the IOI paper's phrase.
+3. **Big enough to have real behaviours.** Unlike a 2-layer attention-only toy, GPT-2 Small does **indirect object
+   identification** (IOI, the abbreviation used throughout below: working out that "John gave the bottle to ___"
+   should complete with the *other* name mentioned), numeric comparison, ordinal succession, and sentiment —
+   natural behaviours "in the wild", to borrow the IOI paper's phrase.
 4. **Tooling gravity.** TransformerLens ships GPT-2 as its canonical model with weights pre-processed for
    analysis (LayerNorm folding, centring); Neuronpedia hosts GPT-2 Small features; SAELens ships GPT-2 Small SAE
    suites. Each new tool defaulting to GPT-2 makes the next paper's cheapest choice GPT-2 again.
@@ -370,9 +415,11 @@ it establishes four ideas that everything downstream assumes:
   "communicate by reading and writing to different subspaces of the residual stream." This is what makes
   linear-algebraic decomposition of a forward pass legitimate, and it is a direct consequence of GPT-2-style
   pre-LN placement (§2.1).
-- **QK and OV circuits.** An attention head factors into two independent computations — where to attend
-  (QK) and what to write given attention (OV). The OV circuit is a fixed d→d linear map, independent of the
-  attention pattern.
+- **QK and OV circuits.** An attention head factors into two independent computations — where to attend (the
+  **QK circuit**, from *query* and *key*) and what to write once attention is decided (the **OV circuit**, from
+  *output* and *value*). The OV circuit is a fixed d→d linear map, independent of the attention pattern. These two
+  abbreviations are used constantly in the papers below and are worth committing to memory: QK decides *where a
+  head looks*, OV decides *what it says*.
 - **Path expansion.** An attention-only model can be rewritten as a sum of interpretable end-to-end
   token→logit functions, one per path through the model.
 - **Virtual attention heads.** Composition of heads across layers behaves like additional heads that exist in no
@@ -427,7 +474,8 @@ is the form of finding 4.
 Kaplan, Amodei, Wattenberg, Olah — *Toy Models of Superposition* (Transformer Circuits Thread, September 2022).**
 `[published research report, not journal-reviewed]` https://transformer-circuits.pub/2022/toy_model/index.html
 
-The theoretical justification for everything in §5.7. In small ReLU models with a controllable number of
+The theoretical justification for everything in §5.7. In small models built from ReLU units (rectified linear
+units — pass positive values, zero out negative ones) with a controllable number of
 synthetic features of controllable **sparsity** (how often a feature is non-zero) and **importance** (its weight
 in the loss), the paper shows networks representing **more features than they have dimensions** by placing them
 in non-orthogonal directions — **superposition** — and tolerating the resulting interference because sparse
@@ -543,7 +591,8 @@ and is the reason later circuit diagrams can claim edges rather than just nodes.
 ---
 
 **Zhang, Nanda — *Towards Best Practices of Activation Patching in Language Models: Metrics and Methods*
-(arXiv:2309.16042, September 2023).** `[peer-reviewed]` (ICLR 2024)\*
+(arXiv:2309.16042, September 2023).** `[peer-reviewed]` (ICLR 2024 — the International Conference on Learning
+Representations, with NeurIPS one of the two main machine learning venues)\*
 
 The field auditing its main instrument. Systematically varies the methodological choices in activation
 patching — evaluation metric, corruption method, patching direction — and shows that **varying these
@@ -606,7 +655,8 @@ year to them.
 **Generality:** the same circuit activates on other greater-than-requiring tasks, which the authors read as a
 "complex but general mechanism" rather than a template-matched shortcut.
 
-Why it matters beyond the result: it is the task ACDC (§5.6) is scored on, and the circuit transcoders (§5.7)
+Why it matters beyond the result: it is the task ACDC — Automatic Circuit DisCovery, the automated method in
+§5.6 — is scored on, and the circuit transcoders (§5.7)
 later revisited and revised — making it the most re-examined GPT-2 circuit after IOI.
 
 ---
@@ -633,7 +683,8 @@ larger GPT-2 size.
 The paper that made **GPT-2 XL** the factual-recall model. Causal tracing — corrupting the subject tokens and
 restoring individual hidden states — localises factual recall to **mid-layer feed-forward modules processing the
 subject token**. The authors then test the localisation by exploiting it: **ROME** (Rank-One Model Editing)
-modifies a single MLP's weights to change one fact, evaluated both on zsRE and on a new counterfactual dataset
+modifies a single feed-forward block's weights to change one fact, evaluated both on zsRE (zero-shot relation
+extraction, a standard fact-editing benchmark) and on a new counterfactual dataset
 where it uniquely maintains specificity *and* generalisation where prior methods trade one for the other.
 
 Method-wise this is the origin of "causal tracing" as a GPT-2 idiom. Epistemically it is also the origin of a
@@ -646,7 +697,8 @@ behaviour lives here."
 ### 5.4 Components: what individual heads and neurons do
 
 **Geva, Schuster, Berant, Levy — *Transformer Feed-Forward Layers Are Key-Value Memories* (arXiv:2012.14913,
-December 2020).** `[peer-reviewed]` (EMNLP 2021)\*
+December 2020).** `[peer-reviewed]` (EMNLP 2021 — the Conference on Empirical Methods in Natural Language
+Processing)\*
 
 The first widely adopted account of the two-thirds of a transformer's parameters that the circuits framework had
 least traction on. Each FFN is read as a key-value memory: the first-layer rows are **keys** correlating with
@@ -747,7 +799,7 @@ confidence metrics.
 ---
 
 **Gurnee, Nanda, Pauly, Harvey, Troitskii, Bertsimas — *Finding Neurons in a Haystack: Case Studies with Sparse
-Probing* (arXiv:2305.01610, May 2023).** `[peer-reviewed]` (TMLR)\*
+Probing* (arXiv:2305.01610, May 2023).** `[peer-reviewed]` (TMLR — Transactions on Machine Learning Research)\*
 
 Trains **k-sparse linear probes** on internal activations to predict input features, sweeping k to measure how
 distributed a feature's representation is. Over **100 features in 10 categories across 7 models from 70M to 6.9B
@@ -778,12 +830,15 @@ token positions converge to a single shared vector (finding 2).
 
 **Xiao, Tian, Chen, Han, Lewis — *Efficient Streaming Language Models with Attention Sinks* (arXiv:2309.17453,
 September 2023)** `[peer-reviewed]` (ICLR 2024)\* **and Sun, Chen, Kolter, Liu — *Massive Activations in Large
-Language Models* (arXiv:2402.17762, February 2024)** `[peer-reviewed]` (COLM 2024)\*
+Language Models* (arXiv:2402.17762, February 2024)** `[peer-reviewed]` (COLM 2024 — the Conference on Language
+Modeling)\*
 
 Two papers about a phenomenon that any residual-stream study must control for. The first identifies the
 **attention sink**: models direct large attention mass to the first few tokens regardless of semantic relevance,
-and preserving those tokens' KV entries rescues window attention (the basis of StreamingLLM, which extends
-finite-window models to millions of tokens without fine-tuning). The second characterises **massive
+and preserving those tokens' key/value (KV) cache entries — the stored keys and values a model reuses instead of
+recomputing them for every new token — rescues window attention. That is the basis of StreamingLLM (LLM = **large
+language model**, the general term for this class of system), which extends
+finite-window models to millions of tokens without fine-tuning. The second characterises **massive
 activations** — a handful of activations up to ~100,000× larger than the rest, largely **input-independent**,
 functioning as indispensable **bias terms**, and causing exactly the attention concentration the first paper
 observes.
@@ -807,7 +862,8 @@ https://transformer-circuits.pub/2023/monosemantic-features/index.html
 The paper that turned superposition from theory into method. A **sparse autoencoder** (SAE) is trained on the MLP
 activations of a **one-layer transformer with a 512-neuron MLP**, decomposing those 512 neurons into **over 4,000
 features** that are individually far more interpretable than the neurons — the released examples include DNA
-sequences, legal language, HTTP requests, Hebrew text, and nutrition statements\*. **Ninety learned dictionaries**
+(genetic) sequences, legal language, HTTP requests (Hypertext Transfer Protocol — the text format web browsers use to
+request pages), Hebrew text, and nutrition statements\*. **Ninety learned dictionaries**
 were released with activating examples and downstream logit effects for every feature; the recommended entry
 point is the run labelled **A/1**.
 
@@ -827,7 +883,9 @@ Models* (arXiv:2309.08600, September 2023).** `[peer-reviewed]` (ICLR 2024)\*
 
 Concurrent, independent, and the version that landed on GPT-2-scale models. Trains SAEs to reconstruct internal
 activations of language models and shows the learned features are **more interpretable and more monosemantic**
-than directions found by alternatives (PCA, ICA, neuron basis), under automated interpretability scoring. The
+than directions found by alternatives — PCA (principal component analysis, which finds the directions of greatest
+variance), ICA (independent component analysis, which finds statistically independent directions), and the raw
+neuron basis — under automated interpretability scoring. The
 result that connects it to §5.3: SAE features pinpoint the units **causally responsible for counterfactual
 behaviour on the IOI task** at a **finer granularity than previous decompositions**. Superposition, the paper
 argues, is resolvable by a scalable unsupervised method.
@@ -942,9 +1000,12 @@ into a benchmark suite.
 **Syed, Rager, Conmy — *Attribution Patching Outperforms Automated Circuit Discovery* (arXiv:2310.10348, October
 2023).** `[peer-reviewed]` (BlackboxNLP 2024)\*
 
-Replaces ACDC's iterative patching with a **linear approximation** (attribution patching / EAP) requiring **two
+Replaces ACDC's iterative patching with a **linear approximation** (attribution patching, also called **EAP** for
+edge attribution patching) requiring **two
 forward passes and one backward pass** total, then prunes the least important edges. Averaged over tasks it
-achieves **greater circuit-recovery AUC than all existing methods**, including ACDC. The practical significance
+achieves **greater circuit-recovery AUC than all existing methods**, including ACDC — AUC being area under the
+curve, a single number summarising how well a method separates the right components from the wrong ones across all
+possible cut-off thresholds. The practical significance
 is that circuit discovery stops being a compute-bound activity — a prerequisite for everything in §5.7 that
 builds circuits out of tens of thousands of features rather than 144 heads.
 
@@ -973,7 +1034,8 @@ finer instrument.
 Causal Graphs in Language Models* (arXiv:2403.19647, March 2024).** `[peer-reviewed]` (ICLR 2025)\*
 
 Circuits whose nodes are **interpretable features** rather than polysemantic heads and neurons. The payoff is
-downstream utility: **SHIFT** improves a classifier's generalisation by ablating features a *human* judges
+downstream utility: **SHIFT** (the authors' name for the technique) improves a classifier's generalisation by
+ablating features a *human* judges
 task-irrelevant — spurious-cue removal via interpretability — and the paper demonstrates a fully unsupervised
 pipeline discovering **thousands** of feature circuits for automatically discovered behaviours. The bridge from
 "we can name features" to "naming features lets us fix something."
@@ -1025,7 +1087,9 @@ The methods half of Anthropic's 2025 circuits work, and the current best answer 
 of a frontier model?"
 
 **Cross-layer transcoders (CLTs)** extend §5.6's transcoders across depth: a layer-ℓ feature reads from the
-residual stream at layer ℓ via a linear encoder and JumpReLU, and contributes to reconstructing MLP outputs at
+residual stream at layer ℓ via a linear encoder and a JumpReLU (a rectified linear unit with a learned activation
+threshold, so a feature stays at exactly zero until its input clears the bar), and contributes to reconstructing
+feed-forward outputs at
 layers ℓ, ℓ+1, …, L — trained jointly for reconstruction plus sparsity across all layers. Substituting CLT
 features for MLPs gives a **replacement model**; making it accurate for one prompt gives a **local replacement
 model**, which freezes attention patterns and normalisation denominators from the real forward pass and adds
@@ -1151,7 +1215,8 @@ Garriga-Alonso, Conmy, Nanda, Rumbelow, Wattenberg, Schoots, Miller, Michaud, Ca
 Todd, Geiger, Geva, Hoogland, Murfet, McGrath — *Open Problems in Mechanistic Interpretability*
 (arXiv:2501.16496, January 2025).** `[preprint, unreviewed]`
 
-The field's own agenda, co-authored across Anthropic, DeepMind, EleutherAI, Apollo, MIT, Harvard, Northeastern
+The field's own agenda, co-authored across Anthropic, DeepMind, EleutherAI, Apollo, the Massachusetts Institute of
+Technology, Harvard, Northeastern
 and others — which makes it the best single citation for "what the field agrees it has not solved." Three
 categories: **methods need conceptual and practical improvement** to reveal deeper insight; **applying methods to
 specific goals** (auditing, debugging, control) is largely unsolved; and there are **socio-technical challenges**
@@ -1216,7 +1281,8 @@ parameters.
   space. That finding is only meaningful because this literature established that the never-trained region exists
   and is geometrically distinctive.
 - **Hendel, Geva, Globerson, *In-Context Learning Creates Task Vectors* (arXiv:2310.15916, October 2023)**
-  `[peer-reviewed]` (EMNLP 2023 Findings)\*. ICL compresses a demonstration set into a **single task vector** that
+  `[peer-reviewed]` (EMNLP 2023 Findings)\*. In-context learning — ICL, the ability to pick up a task from examples
+  in the prompt without any weight changes — compresses a demonstration set into a **single task vector** that
   modulates the model. Evidence that a *single* residual-stream direction can carry an entire task
   specification — the kind of claim that makes ATR's question ("what is a converged tensor?") well-posed.
 - **Li, Patel, Viégas, Pfister, Wattenberg, *Inference-Time Intervention* (arXiv:2306.03341, June 2023)**
@@ -1231,9 +1297,11 @@ parameters.
   **diverse and additive** rather than singular. The developmental study GPT-2 cannot support, because GPT-2 has
   no released intermediate checkpoints (§1.2).
 - **Paulo, Marshall, Belrose, *Does Transformer Interpretability Transfer to RNNs?* (arXiv:2404.05971, April
-  2024)** `[preprint, unreviewed]`. Contrastive activation addition, the tuned lens, and latent-knowledge
-  elicitation mostly transfer to Mamba and RWKV. Relevant as the outer bound on how architecture-specific the
-  GPT-2 toolkit is.
+  2024)** `[preprint, unreviewed]`. RNN = recurrent neural network, the pre-transformer architecture family that
+  processes a sequence one step at a time while carrying a running state. Contrastive activation addition, the
+  tuned lens, and latent-knowledge elicitation mostly transfer to Mamba and RWKV (two modern recurrent
+  architectures; RWKV is a coined name rather than an abbreviation of words). Relevant as the outer bound on how
+  architecture-specific the GPT-2 toolkit is.
 
 ---
 
@@ -1370,6 +1438,85 @@ For someone who wants working knowledge of GPT-2 mechanistic interpretability, i
    (§5.8) as the dissenting bet.
 8. **For this repository specifically.** [JSPACE_PRIMER.md](JSPACE_PRIMER.md), then §5.2 and §5.4 of this
    document re-read against [FINDINGS.md](FINDINGS.md).
+
+## Appendix C — Glossary of abbreviations
+
+Every abbreviation used anywhere above, in one place. Each is also written out at its first use in the text; this
+table is for when you meet one again fifty pages later.
+
+**Model and architecture**
+
+| Short | In full | What it is |
+|:---|:---|:---|
+| GPT | Generative Pre-Training | The 2018 paper's name for the recipe; became the model family's name |
+| d_model | — | Width of the residual stream (768 in GPT-2 Small) |
+| d_head | — | Dimension of a single attention head (64 in every GPT-2 size) |
+| XL | Extra large | OpenAI's label for the 1558M checkpoint |
+| MLP | Multi-layer perceptron | The two-layer feed-forward block in each transformer block |
+| FFN | Feed-forward network | The same thing as an MLP; both terms appear in the literature |
+| LN | Layer normalisation | Rescale to zero mean and unit variance, then learned scale and offset |
+| pre-LN / post-LN | Pre-/post-normalisation | Whether normalisation happens on the way into a sub-block or out of it |
+| GELU | Gaussian Error Linear Unit | GPT-2's activation function; a smoothed ReLU |
+| ReLU | Rectified linear unit | Pass positive values, zero out negative ones |
+| JumpReLU | — | A ReLU with a learned threshold; stays at exactly zero until its input clears the bar |
+| QK circuit | Query–Key | The half of an attention head that decides **where it looks** |
+| OV circuit | Output–Value | The half of an attention head that decides **what it writes** |
+| Q, K, V | Query, key, value | The three vectors attention is computed from |
+| KV cache | Key–value cache | Stored keys and values reused instead of recomputed for each new token |
+| BPE | Byte-pair encoding | Tokenisation by repeatedly merging the most frequent adjacent symbol pair |
+| BOS / PAD / UNK | Beginning-of-sequence / padding / unknown | Special tokens GPT-2 does **not** have |
+| RoPE | Rotary position embedding | Positions applied by rotating query and key vectors (GPT-2 does not use it) |
+| ALiBi | Attention with Linear Biases | A distance penalty added to attention scores (not in GPT-2) |
+| NoPE | No positional encoding | Relying on the causal mask alone to imply order (not in GPT-2) |
+| RMSNorm | Root-mean-square normalisation | LayerNorm without mean-centring or bias (not in GPT-2) |
+| SwiGLU / GeGLU | Gated linear unit variants | Feed-forward blocks that multiply two projections together (not in GPT-2) |
+| MQA / GQA | Multi-query / grouped-query attention | Heads sharing keys and values, wholly or in groups (not in GPT-2) |
+| RLHF | Reinforcement learning from human feedback | The post-training step that turns a text predictor into an assistant |
+| LLM | Large language model | The general term for this class of system |
+| RNN | Recurrent neural network | Pre-transformer family; processes a sequence one step at a time |
+| Mamba / RWKV | — | Two modern recurrent architectures; RWKV is a coined name, not an expansion |
+| BERT | Bidirectional Encoder Representations from Transformers | Google's 2018 encoder model |
+
+**Interpretability**
+
+| Short | In full | What it is |
+|:---|:---|:---|
+| MI | Mechanistic interpretability | Reverse-engineering the internal computations of a network |
+| ATR | Activation Tensor Resonance | This repository's method: iterated reinjection of the final-layer tensor |
+| IOI | Indirect object identification | The canonical GPT-2 Small circuit task |
+| ICL | In-context learning | Picking up a task from prompt examples, with no weight changes |
+| SAE | Sparse autoencoder | Learns an overcomplete sparse dictionary over activations |
+| CLT | Cross-layer transcoder | A transcoder whose features write to every later layer |
+| ACDC | Automatic Circuit DisCovery | Iterative edge pruning to find a circuit |
+| EAP | Edge attribution patching | Linear approximation to patching; two forward passes and one backward |
+| APD | Attribution-based Parameter Decomposition | Decomposes weights, not activations, into mechanisms |
+| SPD | Stochastic Parameter Decomposition | The scalable successor to APD |
+| SHIFT | — | Marks et al.'s name for their feature-ablation technique, not an expansion |
+| ROME | Rank-One Model Editing | Edits one fact by a rank-one change to a feed-forward weight |
+| J-lens / J-space | Jacobian lens / Jacobian space | Anthropic's 2026 readout, and the verbalizable subspace it finds |
+| PCA / ICA | Principal / independent component analysis | Baseline ways of finding directions in activation space |
+
+**Metrics, data and venues**
+
+| Short | In full | What it is |
+|:---|:---|:---|
+| F1 | — | Harmonic mean of precision and recall; one number balancing the two |
+| AUC | Area under the curve | How well a method separates right from wrong across all thresholds |
+| ROUGE | — | Standard word-overlap metric for summarisation |
+| CBT-CN | Children's Book Test, common-noun split | A cloze benchmark GPT-2 was scored on |
+| CoQA | Conversational Question Answering | Reading-comprehension dialogue benchmark |
+| LAMBADA | — | Long-range word-prediction benchmark |
+| zsRE | Zero-shot relation extraction | Standard fact-editing benchmark |
+| DNA | Deoxyribonucleic acid | Appears only as the subject of a discovered feature |
+| HTTP | Hypertext Transfer Protocol | Likewise — the format web browsers use to request pages |
+| API | Application programming interface | A remote service you send text to and get text back from |
+| GB | Gigabytes | WebText is 40 of them |
+| CRFM | Center for Research on Foundation Models | Stanford; published the five-seed GPT-2 replications |
+| NeurIPS | Conference on Neural Information Processing Systems | Machine learning's largest venue |
+| ICLR | International Conference on Learning Representations | With NeurIPS, one of the two main venues |
+| EMNLP | Conference on Empirical Methods in Natural Language Processing | The main natural-language-processing venue |
+| COLM | Conference on Language Modeling | Newer venue specific to language models |
+| TMLR | Transactions on Machine Learning Research | Peer-reviewed journal |
 
 ## Sources
 
