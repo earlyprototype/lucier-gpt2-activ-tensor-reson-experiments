@@ -169,6 +169,9 @@ ATR never set out to be a technique at all. It began as a thought experiment, an
     ├── TECHNICAL.md                 ← formal method specification
     ├── UNDERSTANDING.md             ← accessible mechanism explanation
     ├── MATH_PRIMER.md               ← the maths from scratch, tied to this repo
+    ├── GPT2_DEEP_DIVE.md            ← the model itself: history, exact structure, versions,
+    │                                   and the mechanistic-interpretability literature summarised
+    ├── PRIOR_WORK.md                ← ATR against the published record, finding by finding
     ├── JSPACE_PRIMER.md             ← reading companion for Anthropic's J-space paper
     ├── JSPACE_READING_GUIDE.md      ← page-keyed map of the 133-page paper PDF
     ├── ISOMORPHISM.md               ← Lucier ↔ transformer correspondence
