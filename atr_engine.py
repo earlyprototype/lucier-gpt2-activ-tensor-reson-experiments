@@ -275,7 +275,7 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
     layer-window experiments (EXP_010c); the defaults reproduce the registered
     single-window path exactly, so existing callers are unaffected.
 
-    Lean by design (one readout decode, at the end) so a 125-prompt × 1000-iter
+    Lean by design (one readout decode, at the end) so a 125-prompt x 1000-iter
     sweep stays forward-pass-bound.
 
     Returns a dict:
@@ -297,10 +297,13 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
         raise ValueError(f"renorm must be 'seed_j' or 'natural_i', got {renorm!r}")
     hook_point_read = f"blocks.{layer_end}.hook_resid_post"
     hook_point_write = inject_hook_name or f"blocks.{layer_start}.hook_resid_pre"
-    # Control B (renorm="natural_i") needs the natural resid_pre norm at the
-    # injection layer; the initial pass is un-hooked, so its resid_pre at
-    # layer_start IS the natural value for this prompt.
-    natural_pre_name = f"blocks.{layer_start}.hook_resid_pre"
+    # Control B (renorm="natural_i") needs the natural norm at the actual
+    # injection site; the initial pass is un-hooked, so its activation at the
+    # write hook IS the natural value for this prompt. Use hook_point_write, not
+    # the default layer_start hook, so an inject_hook_name override captures the
+    # norm at the site it actually injects into (assumes that override is a
+    # resid_pre-like site, which every Control A arm to date is).
+    natural_pre_name = hook_point_write
     cache_names = {hook_point_read} | ({natural_pre_name} if renorm == "natural_i" else set())
 
     with torch.no_grad():

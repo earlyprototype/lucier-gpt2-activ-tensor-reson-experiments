@@ -53,10 +53,14 @@ Sessions run network-restricted, so a git submodule is avoided. Downstream repos
 `atr_research/_STAGE2_JSPACE/experiments/atr_engine2.py` was a recorded-diff
 superset: the canonical engine plus the `capture_terminal` / `inject_hook_name`
 / `renorm` extensions. Those extensions are now upstreamed here (this commit),
-so the recorded diff collapses to the vendor header alone. The follow-up in
-`atr_research` is mechanical: re-vendor `atr_engine2.py` from this file at the
-merge commit, keep only the vendor header, and add the equivalence check. That
-work is tracked as its own issue and PR in that repo, not here.
+so the canonical engine already carries them. `atr_research` is intentionally
+untouched by this PR, so its `atr_engine2.py` still holds the extensions inline;
+its recorded diff will collapse to the vendor header alone only *after* the
+follow-up re-vendors it. That follow-up is mechanical: re-vendor `atr_engine2.py`
+from this file at the merge commit, keep only the vendor header, and add the
+equivalence check. It is tracked as its own issue and PR in that repo, not here.
+Note that the canonical engine may briefly lead the fork (for example the
+`natural_i` injection-site fix in this PR); the re-vendor is what re-syncs them.
 
 `atr_plasticity` imports the engine rather than reimplementing it (see its
 README), which is the same contract by a different mechanism.
