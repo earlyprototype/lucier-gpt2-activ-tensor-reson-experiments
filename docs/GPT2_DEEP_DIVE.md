@@ -24,6 +24,14 @@ model, with a drafted summary for each paper.*
 > Where this document connects the literature to **ATR** (Activation Tensor Resonance, this repository's method),
 > that is **this project's reading**, marked as such. None of the cited work discusses ATR.
 >
+> **Companion document.** [PYTHIA_INTERPRETABILITY_REVIEW.md](PYTHIA_INTERPRETABILITY_REVIEW.md) does the same job
+> for the Pythia suite, the other model family this repository runs. The two were written in parallel without
+> contact and are complementary rather than overlapping: this document is the single-model archaeology side
+> (circuits, heads, neurons, in one frozen checkpoint), that one is the developmental and cross-scale side
+> (checkpoints, seeds, scaling ladders). Six papers are summarised in both; where the two disagree on a citation,
+> the discussion is recorded on the peer board rather than silently resolved in either file. Read together they
+> cover the whole 2×2 this project's cross-model controls are built on.
+>
 > **On abbreviations.** Every initialism is written out in full at its first use, and all of them are collected in
 > [Appendix C](#appendix-c--glossary-of-abbreviations) at the end. This field abbreviates heavily and the habit
 > makes its literature harder to enter than it needs to be; nothing here should require you to already know the
@@ -133,7 +141,9 @@ Two admissions in §3 deserve to be read together: the learning rate for each mo
 held-out sample of WebText, and **"all models still underfit WebText"** with held-out perplexity still improving
 given more training time. Every GPT-2 checkpoint studied by every paper in Part 5 is therefore an undertrained
 model, stopped for reasons never stated. No token count, no compute budget, no learning-rate schedule, no seed,
-and no intermediate checkpoints were published. This is the structural reason the Pythia suite exists, and the
+and no intermediate checkpoints were published. This is the structural reason the Pythia suite exists — a claim
+the companion review makes from the other side, listing the suites of the day and why each was unusable for
+developmental work ([PYTHIA_INTERPRETABILITY_REVIEW.md](PYTHIA_INTERPRETABILITY_REVIEW.md) §I.1) — and the
 reason **OpenAI's** GPT-2 can support circuit analysis but not developmental analysis.
 
 That last limitation is a fact about OpenAI's release, not about the architecture, and §3.2 gives the way round
@@ -1423,8 +1433,8 @@ the neighbours already catalogued in [PRIOR_WORK.md](PRIOR_WORK.md):
    for `pythia-160m` and `pythia-410m` from EleutherAI. Run across all four, the question stops being "does this
    checkpoint have basins" and becomes "is the basin count a property of the architecture-and-corpus cell" — which
    is the question the refuted founding hypothesis was actually asking. The Pythia half of that resource is
-   catalogued in the companion Pythia review (opened as PR #56); the GPT-2 half is §3.2 here. Neither document
-   found the other's.
+   catalogued in [PYTHIA_INTERPRETABILITY_REVIEW.md](PYTHIA_INTERPRETABILITY_REVIEW.md) §II.3; the GPT-2 half is
+   §3.2 here. The two documents were written in parallel and neither found the other's half at the time.
 7. **The developmental version of the question is answerable on GPT-2 Small, and only there.** §3.2: ~609
    checkpoints per Stanford Small seed, 10-step resolution through the first 100 steps. "At which step does the
    basin structure appear, and does it appear at the same point across seeds?" is a runnable experiment on the
