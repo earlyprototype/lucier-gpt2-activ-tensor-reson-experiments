@@ -1,0 +1,236 @@
+{
+  "version": "1.0",
+  "domain": "evidence",
+  "colors": {
+    "hypothesis": "#6B4C8A",
+    "finding": "#2E7D5B",
+    "concept": "#B9812F",
+    "question": "#A8477A",
+    "run": "#5B7DB1",
+    "model": "#B3423F",
+    "null-model": "#8A8F94",
+    "doc": "#7f8c8d",
+    "artefact": "#C7CDD1",
+    "prior-work": "#B0B7BC",
+    "default": "#7f8c8d"
+  },
+  "status_colors": {
+    "supported": "#2E7D5B",
+    "refuted": "#B3423F",
+    "not-supported": "#8F5A57",
+    "qualified": "#B9812F",
+    "retired": "#8A8F94",
+    "corrected": "#5B7DB1",
+    "open": "#6B4C8A",
+    "untested": "#9AA3A8",
+    "default": "#7f8c8d"
+  },
+  "shapes": {
+    "hypothesis": "diamond",
+    "finding": "dot",
+    "concept": "hexagon",
+    "question": "circle",
+    "run": "square",
+    "model": "triangle",
+    "null-model": "triangleDown",
+    "doc": "box",
+    "artefact": "ellipse",
+    "prior-work": "star",
+    "default": "dot"
+  },
+  "edge_styles": {
+    "supports": {
+      "style": "solid",
+      "dashes": false,
+      "color": "#2E7D5B",
+      "arrow": true,
+      "width": 2
+    },
+    "refutes": {
+      "style": "dashed",
+      "dashes": [
+        8,
+        4
+      ],
+      "color": "#B3423F",
+      "arrow": true,
+      "width": 2
+    },
+    "qualifies": {
+      "style": "dashed",
+      "dashes": [
+        8,
+        4
+      ],
+      "color": "#B9812F",
+      "arrow": true,
+      "width": 2
+    },
+    "corrects": {
+      "style": "dotted",
+      "dashes": [
+        2,
+        4
+      ],
+      "color": "#5B7DB1",
+      "arrow": true,
+      "width": 2
+    },
+    "retires": {
+      "style": "dotted",
+      "dashes": [
+        2,
+        4
+      ],
+      "color": "#8A8F94",
+      "arrow": true,
+      "width": 2
+    },
+    "supersedes": {
+      "style": "dotted",
+      "dashes": [
+        2,
+        4
+      ],
+      "color": "#5B7DB1",
+      "arrow": true,
+      "width": 2
+    },
+    "tests": {
+      "style": "solid",
+      "dashes": false,
+      "color": "#6B4C8A",
+      "arrow": true,
+      "width": 2
+    },
+    "produced-by": {
+      "style": "solid",
+      "dashes": false,
+      "color": "#C7CDD1",
+      "arrow": true,
+      "width": 1
+    },
+    "run-on": {
+      "style": "solid",
+      "dashes": false,
+      "color": "#C7CDD1",
+      "arrow": true,
+      "width": 1
+    },
+    "evidenced-by": {
+      "style": "solid",
+      "dashes": false,
+      "color": "#C7CDD1",
+      "arrow": true,
+      "width": 1
+    },
+    "documented-in": {
+      "style": "solid",
+      "dashes": false,
+      "color": "#C7CDD1",
+      "arrow": true,
+      "width": 1
+    },
+    "analogous-to": {
+      "style": "dashed",
+      "dashes": [
+        8,
+        4
+      ],
+      "color": "#5B7DB1",
+      "arrow": false,
+      "width": 1
+    },
+    "breaks-down-at": {
+      "style": "dashed",
+      "dashes": [
+        8,
+        4
+      ],
+      "color": "#5B7DB1",
+      "arrow": false,
+      "width": 1
+    },
+    "builds-on": {
+      "style": "solid",
+      "dashes": false,
+      "color": "#B0B7BC",
+      "arrow": true,
+      "width": 1
+    },
+    "cites": {
+      "style": "solid",
+      "dashes": false,
+      "color": "#B0B7BC",
+      "arrow": true,
+      "width": 1
+    },
+    "relates-to": {
+      "style": "solid",
+      "dashes": false,
+      "color": "#B0B7BC",
+      "arrow": true,
+      "width": 1
+    },
+    "blocks": {
+      "style": "dashed",
+      "dashes": [
+        6,
+        3
+      ],
+      "color": "#A8477A",
+      "arrow": true,
+      "width": 2
+    },
+    "blocked-by": {
+      "style": "dashed",
+      "dashes": [
+        6,
+        3
+      ],
+      "color": "#A8477A",
+      "arrow": true,
+      "width": 2
+    }
+  },
+  "node_sizes": {
+    "hypothesis": 26,
+    "finding": 22,
+    "concept": 16,
+    "question": 20,
+    "run": 18,
+    "model": 24,
+    "null-model": 18,
+    "doc": 14,
+    "artefact": 11,
+    "prior-work": 12,
+    "default": 14
+  },
+  "physics": {
+    "enabled": true,
+    "solver": "forceAtlas2Based",
+    "forceAtlas2Based": {
+      "gravitationalConstant": -72,
+      "centralGravity": 0.008,
+      "springLength": 165,
+      "springConstant": 0.06,
+      "damping": 0.5,
+      "avoidOverlap": 0.35
+    },
+    "stabilization": {
+      "enabled": true,
+      "iterations": 420,
+      "updateInterval": 25,
+      "fit": true
+    },
+    "minVelocity": 0.75,
+    "maxVelocity": 40,
+    "timestep": 0.4
+  },
+  "edge_weight_range": {
+    "min": 1,
+    "max": 10,
+    "min_width": 0.5,
+    "max_width": 5
+  }
+}

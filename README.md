@@ -176,8 +176,28 @@ ATR never set out to be a technique at all. It began as a thought experiment, an
     ├── VALIDATION_PLAN.md           ← the pre-registered validation design (historical)
     ├── ATR_METHOD_COMPARISON.md     ← ATR in the interpretability landscape
     ├── JOURNEY_MAP.md               ← project timeline, discoveries, glossary
+    ├── graph/                       ← the interactive graphs and the Threads view (see below)
     └── sessions/                    ← AI-assisted review session records
 ```
+
+## The Knowledge Graph
+
+Everything above is linear, and the study is not. `docs/graph/` holds three interactive
+graphs that draw what the prose can only list: an *evidence* graph, in which every hypothesis,
+finding and run is a node and the arrows between them are the actual epistemic relations — so
+that the founding hypothesis appears as what it is, a red node with two independent refutations
+converging on it and nothing leading out; a *dissolution* graph, which draws the descent itself,
+prompts on the left and terminal basins on the right; and an *isomorphism* graph, which sets
+Lucier's apparatus against the transformer's and marks the five places the analogy stops holding.
+The selector carries a fourth entry, *Threads*, which is not a fourth graph but the evidence
+graph re-coloured — readiness in place of epistemic status, arrived at by reading the graph
+against the working tree. It answers a different question: not whether a claim is true but
+whether it can move, and what moving it would cost. Two things surface there that prose keeps
+hidden: a claim the record has fallen behind on — H4, whose notebook has been run and whose
+result was never written down — and a blocker gating several separate threads at once, drawn as
+one hub with an arm to each rather than as sentences eight findings apart.
+Serve the repository root and open `docs/graph/viewer.html`, or read
+[docs/graph/README.md](docs/graph/README.md) first.
 
 ## Notebooks — Quick Reference
 

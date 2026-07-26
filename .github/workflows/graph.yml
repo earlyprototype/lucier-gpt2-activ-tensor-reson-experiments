@@ -1,0 +1,239 @@
+name: graph
+
+# Continuous integration for the knowledge graph and the record it describes.
+#
+# pages.yml deploys; this workflow decides whether there is anything worth
+# deploying. Three things are checked, in this order, because each one is only
+# meaningful if the one before it held:
+#
+#   1. the graph still builds from the record        (build_*.py)
+#   2. the record still matches the repository       (check_record_drift.py)
+#   3. the data and the page still behave            (pytest, smoke_test.mjs)
+#
+# Step 2 is the one that is easy to skip and expensive to skip. The graph is
+# built by parsing docs/FINDINGS.md and docs/JOURNEY_MAP.md, so it inherits
+# their staleness perfectly and cannot see it: H4 sat in the record as "never
+# run" for months while its notebook on disk carried executed outputs and a
+# printed verdict. Nothing that reads the documents could catch that. Something
+# that reads the disk catches it in about a second, which is what runs here.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Deliberately no `paths:` filter. The drift check compares the record against
+# the whole repository, so a change anywhere can create or clear a divergence --
+# restoring `prompt_library.py` at the repository root would unblock two parked
+# threads and match no docs/** or experiments/** filter. The python job is a few
+# seconds; a filter would buy nothing and cost exactly the case this exists for.
+
+permissions:
+  contents: read
+
+# A superseded run of the same branch or PR tells you nothing. Unlike the pages
+# deploy, cancelling one mid-flight is free.
+concurrency:
+  group: graph-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  record:
+    name: graph builds, record matches the repository, data tests
+    runs-on: ubuntu-latest
+    steps:
+      # persist-credentials: false -- this job never pushes, so there is no
+      # reason to leave GITHUB_TOKEN sitting in .git/config for the rest of the
+      # run. Nothing here needs write access to the repository.
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Only pytest. The builders, the threads report and the drift check are
+      # all pure standard library, and the graph tests read JSON and walk the
+      # tree — none of it needs the repo's requirements.txt, which pulls torch
+      # and the model stack for the experiments themselves.
+      - name: Install pytest
+        run: python3 -m pip install --disable-pip-version-check --quiet pytest
+
+      # The builders parse docs/FINDINGS.md, docs/JOURNEY_MAP.md,
+      # docs/ISOMORPHISM.md and the experiments' dissolution tables. Each one
+      # validates that every edge endpoint resolves to a real node and exits
+      # non-zero without writing if it does not, so a document reshuffled such
+      # that parsing breaks fails here rather than shipping a dangling graph.
+      # Pure standard library: nothing to install.
+      - name: Regenerate the three graphs from the source documents
+        working-directory: docs/graph
+        run: |
+          python3 build_evidence_graph.py
+          python3 build_dissolution_graph.py
+          python3 build_isomorphism_graph.py
+
+      # Informational only, and deliberately so. The published site regenerates
+      # the data at deploy time (pages.yml), so committed data being behind the
+      # documents cannot ship a wrong site -- but it does mean anyone opening
+      # viewer.html from a checkout sees yesterday's graph. Worth saying out
+      # loud; not worth failing a pull request that did not cause it.
+      - name: Note whether the committed graph data is up to date
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- docs/graph/_data; then
+            echo "committed graph data matches a fresh build"
+          else
+            echo "::notice title=Graph data is stale::docs/graph/_data differs from a fresh build. Regenerate and commit: python3 docs/graph/build_evidence_graph.py (and the other two builders)."
+            git diff --stat -- docs/graph/_data
+          fi
+
+      # Written by a separate piece of work and may not be in the tree yet. A
+      # missing report is a skip with a reason, not a red build: this workflow
+      # must not fail for the absence of something optional.
+      - name: Threads and opportunities report
+        run: |
+          set -euo pipefail
+          if [ -f docs/graph/build_threads_report.py ]; then
+            python3 docs/graph/build_threads_report.py
+          else
+            echo "::notice title=Threads report skipped::docs/graph/build_threads_report.py is not in this tree, so the threads report was skipped. Nothing else in this workflow depends on it."
+          fi
+
+      # The guard. Exits 1 on any divergence between what the record claims and
+      # what the repository contains, and prints, per divergence, the record's
+      # own words with their location, the contradicting fact with its path, and
+      # what would resolve it. The full report is copied into the job summary so
+      # a failure is readable without opening the log, and uploaded as an
+      # artifact so it can be diffed between runs.
+      #
+      # To accept a divergence deliberately, add its key -- printed at the foot
+      # of the report -- to docs/graph/.drift-allow with a reason after '#'.
+      # An entry without a reason is a configuration error and fails the run.
+      - name: Check the record against the repository
+        id: drift
+        run: |
+          # `|| status=$?` rather than a pipe into tee: the default shell runs
+          # with -e, so a failing pipeline would abort the step here and the
+          # summary below -- the part that makes the failure readable -- would
+          # never be written.
+          status=0
+          python3 docs/graph/check_record_drift.py > drift-report.txt 2>&1 || status=$?
+          cat drift-report.txt
+          {
+            echo '## Record drift check'
+            echo
+            echo '```'
+            cat drift-report.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$status" -ne 0 ]; then
+            echo "::error title=The record and the repository disagree::See the job summary. Fix the side that is wrong, or record the divergence in docs/graph/.drift-allow with a reason. docs/FINDINGS.md and docs/JOURNEY_MAP.md are the canonical scientific record: correcting them is the operator's call, never an automated edit."
+          fi
+          exit "$status"
+
+      - name: Upload the drift report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-report
+          path: drift-report.txt
+          if-no-files-found: warn
+
+      # Reads the three JSON files and checks what a generator gets wrong
+      # quietly: duplicate ids, unresolved endpoints, out-of-vocabulary statuses,
+      # empty edge descriptions, doc_refs that do not exist on disk, plus a
+      # handful of facts pinned against FINDINGS.md so a regeneration cannot
+      # silently rewrite the epistemic record.
+      # `!cancelled()` so a drift failure does not hide a test failure: one run
+      # should tell you everything that is wrong, not the first thing.
+      - name: Data tests
+        if: ${{ !cancelled() }}
+        run: python3 -m pytest docs/graph/tests/ -q
+
+  viewer:
+    name: viewer smoke test (headless chromium)
+    runs-on: ubuntu-latest
+    steps:
+      # persist-credentials: false -- this job never pushes, and it is the job
+      # that runs an npm install and a headless browser. Leaving GITHUB_TOKEN in
+      # .git/config would put a write-capable credential inside the blast radius
+      # of a dependency it downloads and a page it renders, for no benefit.
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # The viewer is tested against the data the current documents produce, not
+      # against whatever happens to be committed -- same reasoning as pages.yml.
+      - name: Regenerate the three graphs
+        working-directory: docs/graph
+        run: |
+          python3 build_evidence_graph.py
+          python3 build_dissolution_graph.py
+          python3 build_isomorphism_graph.py
+
+      # Assertion 14 drives Threads mode, which reads _data/threads.json. Without
+      # this step the smoke test would validate the *committed* threads.json
+      # against the current viewer -- testing yesterday's data, which is the one
+      # thing the step above exists to avoid. Runs after the three builders and
+      # not beside them: build_threads_report.py reads _data/entities.json, so
+      # ordering it first would rank threads off the previous evidence graph.
+      #
+      # Guarded like the record job because the report is written by a separate
+      # piece of work and may not be in the tree yet. When it is absent the
+      # smoke test falls back to the committed threads.json -- assertion 14 still
+      # runs, just against data this workflow did not produce.
+      - name: Regenerate the threads report
+        run: |
+          set -euo pipefail
+          if [ -f docs/graph/build_threads_report.py ]; then
+            python3 docs/graph/build_threads_report.py
+          else
+            echo "::notice title=Threads report skipped::docs/graph/build_threads_report.py is not in this tree, so assertion 14 will run against the committed docs/graph/_data/threads.json rather than a freshly built one."
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # smoke_test.mjs resolves Playwright by `require('playwright')`, walking up
+      # from docs/graph/tests, so the package has to exist in a node_modules
+      # above it: --no-save installs it without inventing a package.json for a
+      # repository that otherwise has no node dependencies. The second command
+      # fetches the browser binary and its system libraries, which is why it
+      # needs --with-deps on a bare runner.
+      #
+      # Pinned, because an unpinned `playwright` resolves to whatever shipped
+      # that morning: a Playwright release could turn this job red with no change
+      # in the repository, and the failure would look like the viewer's fault.
+      # 1.56.1 is the version the smoke suite is developed against. Bump it here,
+      # deliberately, when the suite has been re-run against a newer one.
+      #
+      # `npx --no` refuses to fetch anything not already installed, so the second
+      # line can only run the binary the first line just pinned -- without it, a
+      # failed install would be papered over by npx silently fetching latest.
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx --no playwright install --with-deps chromium
+
+      # Serves docs/graph on a free port, drives viewer.html in headless Chromium
+      # and asserts fourteen things: that all three graphs draw, that the model
+      # switch re-renders, that search, the details panel, the evidence-chain
+      # copy, the status chips (including an unrecognised status) and the
+      # timeline scrubber work, that the legend orders severity correctly, that
+      # the phone layout gives the graph the screen, that returning to evidence
+      # restores the force-directed layout, that no asset answers >= 400 and that
+      # nothing lands in the console -- and, fourteenth, that Threads mode renders
+      # from threads.json (readiness colours, the ranked low-hanging-fruit list,
+      # gate edges) and leaves no trace behind on the way back out. Assertion 14
+      # is why the threads report is rebuilt above.
+      # The two CDN scripts are served from a local mirror, so a bad day at
+      # unpkg is not a red build.
+      - name: Viewer smoke test
+        run: node docs/graph/tests/smoke_test.mjs

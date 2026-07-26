@@ -1,0 +1,243 @@
+name: pages
+
+# Publishes the knowledge graph at
+#   https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/
+#
+# The site is assembled rather than served straight from a directory, because the
+# viewer and the documents it cites live in different places in the repository.
+# The layout below puts the viewer at the site root and the repo's markdown one
+# level under it, which is exactly what the viewer's own path resolution expects:
+# a provenance link recorded as `docs/FINDINGS.md` resolves with no prefix at all.
+#
+# Requires one manual step, once: Settings -> Pages -> Source -> "GitHub Actions".
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      # The builders' real inputs are not only images. build_dissolution_graph.py
+      # parses experiments/**/output*/dissolution_pathways*.md, and the assemble
+      # step publishes every markdown file under experiments/. With only *.png
+      # here, editing a dissolution table changed the graph and the site but
+      # published neither -- the deploy waited for an unrelated docs/** commit to
+      # carry it. Matching *.md alongside *.png is what the build actually reads.
+      - 'experiments/**/*.md'
+      - 'experiments/**/*.png'
+      - 'README.md'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+# Least privilege at the workflow level: everything here can be done with a
+# read-only token. `pages: write` and `id-token: write` are granted to the deploy
+# job alone, which is the only job that calls actions/deploy-pages -- scoping
+# them here would hand write-capable Pages credentials and an OIDC identity to
+# the build job, which runs the builders, a curl and a heredoc over repo content.
+permissions:
+  contents: read
+
+# Let a running deploy finish rather than cancelling it half-published.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Assembles a directory and uploads it as an artifact. It publishes nothing,
+    # so it needs to read the repository and nothing else.
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # The three builders parse docs/FINDINGS.md, docs/JOURNEY_MAP.md,
+      # docs/ISOMORPHISM.md and the experiments' dissolution tables. Regenerating
+      # here means the published graph can never drift from the record it
+      # describes: if a document is reshuffled such that parsing breaks, or a
+      # relationship endpoint stops resolving, the builders exit non-zero and this
+      # deploy fails loudly instead of shipping a stale or dangling graph.
+      # They are pure standard library, so there is nothing to install.
+      - name: Regenerate graph data from the source documents
+        working-directory: docs/graph
+        run: |
+          python3 build_evidence_graph.py
+          python3 build_dissolution_graph.py
+          python3 build_isomorphism_graph.py
+
+      - name: Assemble site
+        run: |
+          set -euo pipefail
+          SITE="$RUNNER_TEMP/site"
+          mkdir -p "$SITE/_data"
+
+          # The viewer, at the site root. Also kept as viewer.html so the local
+          # development URL (python3 -m http.server, then /viewer.html) and the
+          # published URL are the same page.
+          cp docs/graph/viewer.html "$SITE/index.html"
+          cp docs/graph/viewer.html "$SITE/viewer.html"
+          cp docs/graph/_data/*.json "$SITE/_data/"
+
+          # Every markdown document, plus the images those documents embed, and the
+          # run reports and figures under experiments/. Text and images only — the
+          # tensor checkpoints are large and nothing links to them.
+          # `cp --parents` reproduces each file's repo-relative path under the site,
+          # which is what makes a link recorded as `docs/FINDINGS.md` resolve.
+          find docs -name '*.md' -exec cp --parents {} "$SITE/" \;
+          find docs/assets -type f -exec cp --parents {} "$SITE/" \;
+          find experiments \( -name '*.md' -o -name '*.png' \) \
+            -exec cp --parents {} "$SITE/" \;
+          cp README.md "$SITE/README.md"
+
+          # Catch-all: copy anything the graph cites that the rules above missed.
+          # Driven from entities.json rather than a hand-maintained list, so a
+          # builder that starts citing a new kind of file does not silently ship a
+          # dead link — the site follows the graph instead of tracking it by hand.
+          python3 - "$SITE" <<'PY'
+          import json, pathlib, shutil, sys
+          site = pathlib.Path(sys.argv[1])
+          data = json.loads(pathlib.Path("docs/graph/_data/entities.json").read_text())
+          cited = {s.get("path") for s in data.get("sources", [])}
+          cited |= {c.get("doc_ref") for c in data.get("claims", [])}
+          copied = 0
+          for raw in sorted(p for p in cited if p):
+              if raw.startswith(("http://", "https://")):
+                  continue
+              rel = raw.split("#", 1)[0]
+              source, target = pathlib.Path(rel), site / rel
+              if source.is_file() and not target.exists():
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  shutil.copy2(source, target)
+                  copied += 1
+          print(f"copied {copied} additional cited file(s)")
+          PY
+
+          # Pages runs Jekyll by default, which silently drops directories whose
+          # names begin with an underscore. That would delete _data/ — the graph
+          # itself. This file is what stops that.
+          touch "$SITE/.nojekyll"
+
+          echo "site assembled:"
+          du -sh "$SITE"
+          find "$SITE" -name '*.json' -o -name '*.md' | wc -l
+
+      # The viewer loads vis-network and marked from a CDN, which is fine when a
+      # person opens the file locally. For the published site we vendor both at
+      # build time and rewrite the two script tags in the built copy only — the
+      # repository's viewer.html is untouched. The deployed page is then
+      # self-contained: no third-party request at view time.
+      #
+      # Vendoring alone only moves the question from view time to build time. An
+      # unpinned "latest" URL fetched during the build still means two deploys of
+      # the same commit can ship two different bundles, and a compromised or
+      # yanked-and-republished package ships straight to the site. So both are
+      # pinned to an exact version AND checked against a sha256 recorded here:
+      #
+      #   - the version pin makes a deploy reproducible
+      #   - the checksum makes a substituted bundle a red build, not a live site
+      #
+      # Both digests were taken from the pinned URLs and cross-checked against the
+      # same versions served by the other CDN (unpkg vs jsdelivr byte-identical).
+      # To upgrade: change the version, re-run the two curls, paste the new
+      # digests, and re-run the viewer smoke suite against the new bundle.
+      #
+      # If a CDN is unreachable, or answers with something other than the exact
+      # bytes recorded below, the build fails here, loudly, rather than the site
+      # silently rendering a blank canvas for visitors.
+      - name: Vendor front-end libraries (pinned + checksummed)
+        env:
+          VIS_URL: https://unpkg.com/vis-network@10.1.0/standalone/umd/vis-network.min.js
+          VIS_SHA256: fd730e304a5b877a937a896be9536e7974dc473d8ac87fa66644bce52cb5f8e4
+          MARKED_URL: https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js
+          MARKED_SHA256: 3e7e7d7feb3e5d58cb6c804f68ab5c24cc7e5eb6270fd6e5cbb9124739217d0c
+        run: |
+          set -euo pipefail
+          SITE="$RUNNER_TEMP/site"
+
+          fetch_pinned() {
+            url="$1"; want="$2"; dest="$3"
+            curl -sSfL --retry 3 --retry-delay 2 "$url" -o "$dest"
+            printf '%s  %s\n' "$want" "$dest" | sha256sum --check --status || {
+              echo "checksum mismatch for $url"
+              echo "  expected $want"
+              echo "  actual   $(sha256sum "$dest" | cut -d' ' -f1)"
+              echo "The pinned bundle is not the bundle this workflow recorded."
+              echo "Do not update the digest to match: find out why it changed."
+              exit 1
+            }
+            echo "verified $(basename "$dest") ($want)"
+          }
+
+          fetch_pinned "$VIS_URL"    "$VIS_SHA256"    "$SITE/vis-network.min.js"
+          fetch_pinned "$MARKED_URL" "$MARKED_SHA256" "$SITE/marked.min.js"
+
+          # The repository's viewer.html still carries the unpinned CDN URLs, so
+          # those are what sed matches; the bytes they are replaced by are the
+          # pinned ones fetched above. Both copies of the page are rewritten, and
+          # both are verified -- index.html and viewer.html are the same source
+          # file today, but nothing enforces that, and an unrewritten viewer.html
+          # would quietly reintroduce the third-party request this step removes.
+          for page in index.html viewer.html; do
+            sed -i \
+              -e 's#https://unpkg.com/vis-network/standalone/umd/vis-network.min.js#vis-network.min.js#' \
+              -e 's#https://cdn.jsdelivr.net/npm/marked/marked.min.js#marked.min.js#' \
+              "$SITE/$page"
+            grep -q 'src="vis-network.min.js"' "$SITE/$page" \
+              || { echo "vis-network script tag was not rewritten in $page"; exit 1; }
+            grep -q 'src="marked.min.js"' "$SITE/$page" \
+              || { echo "marked script tag was not rewritten in $page"; exit 1; }
+          done
+
+      - name: Check every cited path is actually present in the site
+        run: |
+          set -euo pipefail
+          python3 - "$RUNNER_TEMP/site" <<'PY'
+          import json, sys, pathlib
+          site = pathlib.Path(sys.argv[1])
+          data = json.loads((site / "_data" / "entities.json").read_text())
+          missing = []
+          for source in data.get("sources", []):
+              path = source.get("path") or ""
+              if not path or path.startswith(("http://", "https://")):
+                  continue
+              if not (site / path.split("#", 1)[0]).exists():
+                  missing.append(path)
+          for claim in data.get("claims", []):
+              ref = (claim.get("doc_ref") or "").split("#", 1)[0]
+              if ref and not (site / ref).exists():
+                  missing.append(ref)
+          if missing:
+              print("cited paths absent from the assembled site:")
+              for path in sorted(set(missing)):
+                  print("  ", path)
+              sys.exit(1)
+          print("every cited path resolves in the site")
+          PY
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ runner.temp }}/site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    # The only job that publishes: actions/deploy-pages needs `pages: write` to
+    # push the artifact and `id-token: write` to mint the OIDC token it
+    # authenticates with. Granted here rather than workflow-wide so the build
+    # job never holds them.
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
