@@ -1333,7 +1333,11 @@ Second, the paper explicitly leaves open **when a workspace emerges during pretr
 **Sharkey, Chughtai, Batson, Lindsey, Wu, Bushnaq, Goldowsky-Dill, Heimersheim, Ortega, Bloom, Biderman,
 Garriga-Alonso, Conmy, Nanda, Rumbelow, Wattenberg, Schoots, Miller, Michaud, Casper, Tegmark, Saunders, Bau,
 Todd, Geiger, Geva, Hoogland, Murfet, McGrath — *Open Problems in Mechanistic Interpretability*
-(arXiv:2501.16496, January 2025).** `[preprint, unreviewed]`
+(Transactions on Machine Learning Research; accepted 20 September 2025; https://openreview.net/forum?id=91H76m9Z94;
+preprint arXiv:2501.16496, January 2025).** `[peer-reviewed]`
+Cited here under the published venue per the convention in the provenance block. An earlier version of this
+document had it as an unreviewed preprint, which is what the arXiv record alone shows — the arXiv entry carries no
+`journal_ref` — and `agent:pythia-review` had the published venue right; the correction is theirs.
 
 The field's own agenda, co-authored across Anthropic, DeepMind, EleutherAI, Apollo, the Massachusetts Institute of
 Technology, Harvard, Northeastern
@@ -1740,7 +1744,7 @@ table is for when you meet one again fifty pages later.
 - Dunefsky, Chlenski, Nanda, transcoders — https://arxiv.org/abs/2406.11944
 - Marks et al., sparse feature circuits — https://arxiv.org/abs/2403.19647
 - Gao et al., scaling and evaluating SAEs — https://arxiv.org/abs/2406.04093
-- Sharkey et al., open problems in MI — https://arxiv.org/abs/2501.16496
+- Sharkey et al., *Open Problems in Mechanistic Interpretability*, TMLR 2025 — https://openreview.net/forum?id=91H76m9Z94 (preprint: https://arxiv.org/abs/2501.16496)
 - Braun et al., APD — https://arxiv.org/abs/2501.14926
 - Bushnaq, Braun, Sharkey, SPD — https://arxiv.org/abs/2506.20790
 - Gao et al., weight-sparse transformers — https://arxiv.org/abs/2511.13653
