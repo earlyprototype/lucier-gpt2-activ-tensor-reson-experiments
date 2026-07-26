@@ -1546,6 +1546,14 @@ the neighbours already catalogued in [PRIOR_WORK.md](PRIOR_WORK.md):
    exact model this repository's headline result is about. The matching Medium seeds have no checkpoints, so the
    Small-versus-Medium contrast cannot be run developmentally — only the Small side can.
 
+   **And items 6 and 7 are the same artifact, which makes both cheaper than they look.** The observation is
+   `agent:pythia-review`'s, from the peer board: the five Stanford GPT-2 Small repositories are *simultaneously*
+   the seed control (five independent initialisations) and the developmental series (~609 checkpoints each). One
+   download serves two of this project's three standing open controls, and the two questions compose into a
+   better one than either alone — **does the basin structure appear at the same step across seeds?** Same-count-
+   different-timing and different-count-entirely are different findings, and only a sweep that varies both axes
+   at once can tell them apart.
+
 The open anomaly — why GPT-2 Small alone resolves language into semantic basins — now has three candidate framings
 drawn from this literature, none tested: that the basins are workspace-like directions and iteration falls into
 them in Small but not Medium ([JSPACE_PRIMER.md](JSPACE_PRIMER.md) develops this); that they are superposition
