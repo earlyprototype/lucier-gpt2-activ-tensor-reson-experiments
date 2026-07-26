@@ -134,7 +134,12 @@ held-out sample of WebText, and **"all models still underfit WebText"** with hel
 given more training time. Every GPT-2 checkpoint studied by every paper in Part 5 is therefore an undertrained
 model, stopped for reasons never stated. No token count, no compute budget, no learning-rate schedule, no seed,
 and no intermediate checkpoints were published. This is the structural reason the Pythia suite exists, and the
-reason GPT-2 can support circuit analysis but not developmental analysis.
+reason **OpenAI's** GPT-2 can support circuit analysis but not developmental analysis.
+
+That last limitation is a fact about OpenAI's release, not about the architecture, and §3.2 gives the way round
+it: the Stanford replications of GPT-2 Small ship roughly 609 public checkpoints each across five seeds. Anything
+in this document that says the developmental question cannot be asked of GPT-2 means it cannot be asked of *these
+weights*.
 
 ### 1.3 The staged release, and what it was for
 
@@ -338,12 +343,29 @@ results.
   student of one.
 - **The Stanford CRFM "Mistral" GPT-2 replications** — CRFM being Stanford's Center for Research on Foundation
   Models (Karamcheti et al., 2021) — **five GPT-2 Small and five
-  GPT-2 Medium models trained from different random seeds**, released with intermediate checkpoints. Confirmed by
-  reading Gurnee et al.'s methods section (§5.5), which studies `GPT2-{small,medium}-[a-e]` and names
-  `stanford-crfm/arwen-gpt2-medium-x21` and `stanford-crfm/alias-gpt2-small-x21`. These are the *only* way to ask
-  a universality question about GPT-2 — "is this head/neuron a property of the architecture-plus-data or of this
-  particular initialisation?" — and their existence is why §5.5's result is possible at all. (Note the name
-  collision: nothing to do with Mistral AI.)
+  GPT-2 Medium models trained from different random seeds**. Confirmed by reading Gurnee et al.'s methods section
+  (§5.5), which studies `GPT2-{small,medium}-[a-e]` and names `stanford-crfm/arwen-gpt2-medium-x21` and
+  `stanford-crfm/alias-gpt2-small-x21`. These are the *only* way to ask a universality question about GPT-2 — "is
+  this head/neuron a property of the architecture-plus-data or of this particular initialisation?" — and their
+  existence is why §5.5's result is possible at all. (Note the name collision: nothing to do with Mistral AI.)
+
+  **They also carry intermediate checkpoints, and this is under-known.** `[primary data, read directly]` — the
+  Hugging Face refs endpoint for each repository, queried directly. The five **Small** seeds
+  (`alias-x21`, `battlestar-x49`, `caprica-x81`, `darkmatter-x343`, `expanse-x777`) each expose **604–609
+  checkpoints as git tags** named `checkpoint-{step}`, running from step 0 to step 400,000, on a schedule that is
+  dense exactly where it needs to be: every **10** steps to step 100, every **50** to step 1,000, every **100**
+  thereafter, then every **1,000** out to 400,000. Load one with
+  `from_pretrained("stanford-crfm/alias-gpt2-small-x21", revision="checkpoint-400")`.
+
+  The five **Medium** seeds (`arwen-x21`, `beren-x49`, `celebrimbor-x81`, `durin-x343`, `eowyn-x777`) expose
+  **zero** checkpoint tags — final weights only. That asymmetry is worth stating plainly because of where it
+  falls: the developmental question can be asked of GPT-2 Small, which is the model that exhibits this
+  repository's five-basin result, and *not* of GPT-2 Medium, which is its contrast case (§7).
+
+  For comparison, Pythia offers 154 checkpoints per model. On raw count and on early-window resolution the
+  Stanford GPT-2 Small series is finer — 10-step granularity through the first 100 steps against Pythia's
+  log-spaced 1, 2, 4, … 512. What it lacks is Pythia's reconstructible dataloader, so "what was in the data before
+  step *k*" stays unanswerable here.
 - **OpenWebText-trained reproductions** — community re-creations of the WebText recipe, including Karpathy's
   nanoGPT/minGPT lineage\*. Architecturally GPT-2, different weights, different data sample. Most published
   **sparse autoencoders** (SAEs — the feature-extraction tool explained in §5.5) for GPT-2 Small are trained on
@@ -810,8 +832,14 @@ Empirical support for the superposition picture of §5.1 in real models, and a b
 
 ---
 
-**Tigges, Hollinsworth, Geiger, Nanda — *Linear Representations of Sentiment in Large Language Models*
-(arXiv:2310.15154, October 2023).** `[preprint, unreviewed]`
+**Tigges, Hollinsworth, Geiger, Nanda — *Language Models Linearly Represent Sentiment*
+(BlackboxNLP 2024, https://aclanthology.org/2024.blackboxnlp-1.5/).** `[peer-reviewed]`
+*Cite this one under its published title.* The work circulates under two: the arXiv preprint
+(arXiv:2310.15154, 23 October 2023, still at v1 and never retitled) is *Linear Representations of
+Sentiment in Large Language Models*, and the peer-reviewed BlackboxNLP 2024 version is *Language
+Models Linearly Represent Sentiment*. Same four authors, same work. Both titles return the paper in
+a search and neither record points at the other, so a citation list carrying one of each looks like
+two papers.
 
 A model case study of what a *single direction* means across a broad distribution. Sentiment is represented
 approximately **linearly** — one direction, positive at one extreme and negative at the other — across a range of
@@ -1294,8 +1322,8 @@ parameters.
   2024)** `[peer-reviewed]` (NeurIPS 2024)\*. Induction-head *formation* dissected in a controlled synthetic
   setting with an "optogenetics-inspired" framework for clamping activations throughout training, identifying
   **three interacting subcircuits** whose interaction produces the phase change, and showing induction heads are
-  **diverse and additive** rather than singular. The developmental study GPT-2 cannot support, because GPT-2 has
-  no released intermediate checkpoints (§1.2).
+  **diverse and additive** rather than singular. The developmental study OpenAI's GPT-2 cannot support, because
+  those checkpoints were never released (§1.2) — though the Stanford replications of GPT-2 Small could (§3.2).
 - **Paulo, Marshall, Belrose, *Does Transformer Interpretability Transfer to RNNs?* (arXiv:2404.05971, April
   2024)** `[preprint, unreviewed]`. RNN = recurrent neural network, the pre-transformer architecture family that
   processes a sequence one step at a time while carrying a running state. Contrastive activation addition, the
@@ -1346,8 +1374,11 @@ parameters.
 - **Whether dense models of GPT-2's size are the right target.** The weight-sparse programme is a bet that they
   are not. *(§5.8.)*
 
-**Not studied, and unstudiable on GPT-2:** training dynamics. No intermediate checkpoints, no token count, no
-schedule (§1.2). Everything the field knows about *when* GPT-2's structure formed is inferred from other models.
+**Barely studied, and unstudiable on OpenAI's weights:** training dynamics. No intermediate checkpoints, no token
+count, no schedule (§1.2), so everything the field knows about *when* GPT-2's structure formed is inferred from
+other models. The qualifier matters: the Stanford replications of GPT-2 Small carry ~609 checkpoints per seed
+across five seeds (§3.2), so the developmental question is answerable on the GPT-2 *architecture* and has simply
+not been asked. That is an open opportunity, not a closed door.
 
 ---
 
@@ -1386,7 +1417,19 @@ the neighbours already catalogued in [PRIOR_WORK.md](PRIOR_WORK.md):
    architecture-and-data rather than run-specific. The corollary is a concrete experiment this repository is
    uniquely placed to run: **ATR on the five Stanford CRFM GPT-2 Small seeds** (§3.2) would separate
    "GPT-2 Small has five semantic basins" from "this checkpoint has five semantic basins" — the same
-   seed-variation control, applied to attractors instead of neurons.
+   seed-variation control, applied to attractors instead of neurons. Nothing new is needed but the model string.
+6. **And the seed control is available on all four cells of this project's 2×2, which neither half of the record
+   currently notes.** Five seeds for GPT-2 Small and five for GPT-2 Medium from Stanford (§3.2); nine seeds each
+   for `pythia-160m` and `pythia-410m` from EleutherAI. Run across all four, the question stops being "does this
+   checkpoint have basins" and becomes "is the basin count a property of the architecture-and-corpus cell" — which
+   is the question the refuted founding hypothesis was actually asking. The Pythia half of that resource is
+   catalogued in the companion Pythia review (opened as PR #56); the GPT-2 half is §3.2 here. Neither document
+   found the other's.
+7. **The developmental version of the question is answerable on GPT-2 Small, and only there.** §3.2: ~609
+   checkpoints per Stanford Small seed, 10-step resolution through the first 100 steps. "At which step does the
+   basin structure appear, and does it appear at the same point across seeds?" is a runnable experiment on the
+   exact model this repository's headline result is about. The matching Medium seeds have no checkpoints, so the
+   Small-versus-Medium contrast cannot be run developmentally — only the Small side can.
 
 The open anomaly — why GPT-2 Small alone resolves language into semantic basins — now has three candidate framings
 drawn from this literature, none tested: that the basins are workspace-like directions and iteration falls into
@@ -1556,7 +1599,7 @@ table is for when you meet one again fifty pages later.
 - Gould et al., successor heads — https://arxiv.org/abs/2312.09230
 - Gurnee et al., universal neurons — https://arxiv.org/abs/2401.12181
 - Gurnee et al., sparse probing — https://arxiv.org/abs/2305.01610
-- Tigges et al., linear sentiment — https://arxiv.org/abs/2310.15154
+- Tigges et al., *Language Models Linearly Represent Sentiment* — https://aclanthology.org/2024.blackboxnlp-1.5/ (preprint, under the earlier title *Linear Representations of Sentiment in Large Language Models*: https://arxiv.org/abs/2310.15154)
 - Geva et al., FFN key-value memories — https://arxiv.org/abs/2012.14913
 - Geva et al., promoting concepts — https://arxiv.org/abs/2203.14680
 - nostalgebraist, logit lens — https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-gpt-the-logit-lens
