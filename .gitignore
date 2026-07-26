@@ -40,8 +40,11 @@ env/
 # Local archive
 README_ORIGINAL.md
 
-# Local agent session config
-.claude/
+# Local agent session config — but skills and commands are shared repo config,
+# not local state. .claude/ itself stays tracked-able so the negations work.
+.claude/*
+!.claude/skills/
+!.claude/commands/
 
 # 2026-07-25: EXP_009 artifact regeneration (issue #25). These specific regenerated
 # outputs MUST be committed — the March originals were lost precisely because they
