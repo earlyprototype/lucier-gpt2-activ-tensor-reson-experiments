@@ -49,6 +49,13 @@ jobs:
         with:
           python-version: '3.12'
 
+      # Only pytest. The builders, the threads report and the drift check are
+      # all pure standard library, and the graph tests read JSON and walk the
+      # tree — none of it needs the repo's requirements.txt, which pulls torch
+      # and the model stack for the experiments themselves.
+      - name: Install pytest
+        run: python3 -m pip install --disable-pip-version-check --quiet pytest
+
       # The builders parse docs/FINDINGS.md, docs/JOURNEY_MAP.md,
       # docs/ISOMORPHISM.md and the experiments' dissolution tables. Each one
       # validates that every edge endpoint resolves to a real node and exits
