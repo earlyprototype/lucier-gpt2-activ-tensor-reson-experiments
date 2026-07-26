@@ -174,7 +174,7 @@ function startServer(rootDir) {
 // --- reporting -------------------------------------------------------------
 // Every assertion must run: a suite that silently stops short is a failure, not
 // a pass. Bump this when adding one.
-const TOTAL_ASSERTIONS = 15;
+const TOTAL_ASSERTIONS = 16;
 
 // --- ordered arrival budget (assertion 15) ---------------------------------
 // The index property is "the same bytes in, the same pixels out". These are
@@ -186,6 +186,24 @@ const TOTAL_ASSERTIONS = 15;
 const ORDERED_SETTLE_WINDOW_MS = 2500;
 const ORDERED_MAX_DRIFT_UNITS = 0;   // total |dx|+|dy| across every node
 const ORDERED_MAX_RELOAD_DELTA = 0;  // nodes allowed to differ between loads
+
+// --- legibility budget (assertion 16) --------------------------------------
+// Assertion 15 pins that the arrival is ordered and deterministic. It says
+// nothing about whether a reader can READ it, and those are genuinely
+// independent: reverting the grid pitch to the round numbers it started with
+// re-creates the original 4.94px-label bug -- an unreadable index -- and 15
+// still passes, because every node is still exactly where it deterministically
+// ought to be. That gap was measured, not theorised.
+//
+// So this is the budget that stops the readability work silently rotting. The
+// number is the same one viewer.html solves its pitch for
+// (ORDERED_TARGET_LABEL_PX), read the same way: node font size * getScale(),
+// with the claims-only arrival showing. Measured at LEGIBILITY_VIEWPORT
+// because label size is height-bound -- a narrower window legitimately yields
+// less, which is a known and documented limitation, not a regression.
+const LEGIBILITY_VIEWPORT = { width: 1600, height: 1000 };
+const MIN_EFFECTIVE_LABEL_PX = 11;
+const MIN_AXIS_HEADINGS = 2;   // at least one lane and one band named
 
 // --- mobile budget (assertion 12) ------------------------------------------
 // A real device (Nothing Phone 2a) showed the header + chip rows eating 66% of
@@ -1558,6 +1576,132 @@ async function main() {
                   `${tripDelta.worst.length ? '\n  ' + tripDelta.worst.join('\n  ') : ''}\n`
                 : 'round trip: NOT MEASURED\n') +
             (describeSince(snap15).join('\n') || 'no errors'));
+
+        // ------------------------------------------------------------------
+        // 16. The ordered index is legible, not merely ordered.
+        //
+        // An index is exhaustive, ordered, fast to scan and points elsewhere.
+        // Assertion 15 covers ordered. This covers the scanning: captions big
+        // enough to read, and axis headings naming what the lanes and bands
+        // are -- because a grid whose axes are anonymous is a pretty pattern,
+        // not an index.
+        //
+        // Both halves are load-bearing and neither implies the other. The
+        // pitch constants in viewer.html are derived from label metrics; put
+        // the original round numbers back and the whole grid inflates ~1.8x,
+        // fit() zooms out to contain it, captions land at ~5px -- and 15 still
+        // passes, every node still exactly where it belongs. Symmetrically the
+        // headings are an HTML overlay that could be dropped without moving a
+        // single node.
+        // ------------------------------------------------------------------
+        phase = 'legibility';
+        const snap16 = snapshotErrors();
+
+        let legibility = null;
+        {
+            const lCtx = await browser.newContext({ viewport: LEGIBILITY_VIEWPORT });
+            try {
+                const lPage = await lCtx.newPage();
+                lPage.on('pageerror', (e) => pageErrors.push({ phase, text: String(e) }));
+                lPage.on('console', (msg) => {
+                    if (msg.type() === 'error') consoleErrors.push({ phase, text: msg.text() });
+                });
+                lPage.on('response', (res) => {
+                    const rec = { phase, status: res.status(), url: res.url() };
+                    allResponses.push(rec);
+                    if (rec.status >= 400) badResponses.push(rec);
+                });
+                await lPage.route('**/*', async (route) => {
+                    const url = route.request().url();
+                    for (const asset of CDN_ASSETS) {
+                        if (url === asset.url || url.startsWith(asset.url.split('?')[0])) {
+                            await route.fulfill({
+                                status: 200,
+                                contentType: 'text/javascript; charset=utf-8',
+                                body: mirror[asset.url]
+                            });
+                            return;
+                        }
+                    }
+                    await route.continue();
+                });
+                await lPage.goto(`${base}/viewer.html`, { waitUntil: 'domcontentloaded' });
+                await waitLoaded(lPage);
+                await sleep(1200);
+
+                legibility = await lPage.evaluate(() => {
+                    const scale = network.getScale();
+                    // The font the index actually draws claims at. Read from the
+                    // viewer's own constant rather than re-derived here, so the
+                    // test cannot drift away from the thing it is policing.
+                    const font = (typeof ORDERED_FONT === 'number') ? ORDERED_FONT : 14;
+                    const drawn = network.body.data.nodes.get()
+                        .filter(n => n.hidden !== true)
+                        .map(n => (n.label || '').trim())
+                        .filter(Boolean);
+                    const overlay = document.getElementById('axis-overlay');
+                    const labels = overlay
+                        ? Array.from(overlay.querySelectorAll('.axis-label'))
+                            .filter(el => el.offsetWidth > 0 && (el.textContent || '').trim())
+                        : [];
+                    // A heading that swallows a click is worse than no heading:
+                    // it makes a node under it unreachable.
+                    let clickThrough = true;
+                    for (const el of labels) {
+                        const r = el.getBoundingClientRect();
+                        const hit = document.elementFromPoint(
+                            Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2));
+                        if (hit && hit.tagName !== 'CANVAS') { clickThrough = false; break; }
+                    }
+                    return {
+                        transposed: !!(window.orderedLayout && orderedLayout.transposed),
+                        scale: +scale.toFixed(3),
+                        font,
+                        effectivePx: +(font * scale).toFixed(2),
+                        drawnLabels: drawn.length,
+                        laneHeadings: labels.filter(el => el.classList.contains('axis-lane')).length,
+                        bandHeadings: labels.filter(el => el.classList.contains('axis-band')).length,
+                        headings: labels.length,
+                        clickThrough
+                    };
+                });
+            } finally {
+                await lCtx.close().catch(() => {});
+            }
+        }
+
+        const ok16 = !!legibility &&
+            // A transposed (narrow) arrival draws no captions by design, so the
+            // caption budget would be meaningless. This viewport is a desktop.
+            legibility.transposed === false &&
+            legibility.effectivePx >= MIN_EFFECTIVE_LABEL_PX &&
+            legibility.drawnLabels > 0 &&
+            legibility.laneHeadings >= 1 && legibility.bandHeadings >= 1 &&
+            legibility.headings >= MIN_AXIS_HEADINGS &&
+            legibility.clickThrough &&
+            cleanSince(snap16);
+        record(16,
+            'the ordered index is legible: captions at or above the target size ' +
+            'and named axes that do not swallow clicks',
+            ok16,
+            (legibility
+                ? `at ${LEGIBILITY_VIEWPORT.width}x${LEGIBILITY_VIEWPORT.height}: ` +
+                  `fit scale ${legibility.scale}, font ${legibility.font} -> ` +
+                  `effective label ${legibility.effectivePx}px ` +
+                  `(budget >= ${MIN_EFFECTIVE_LABEL_PX})` +
+                  `${legibility.effectivePx >= MIN_EFFECTIVE_LABEL_PX ? '' : ' <-- TOO SMALL TO READ'}\n` +
+                  `captions drawn: ${legibility.drawnLabels}` +
+                  `${legibility.drawnLabels ? '' : ' <-- NONE DRAWN'}` +
+                  `${legibility.transposed ? ' <-- TRANSPOSED, expected the wide index' : ''}\n` +
+                  `axis headings: ${legibility.laneHeadings} lane + ` +
+                  `${legibility.bandHeadings} band = ${legibility.headings}` +
+                  `${legibility.headings >= MIN_AXIS_HEADINGS &&
+                     legibility.laneHeadings >= 1 && legibility.bandHeadings >= 1
+                        ? '' : ' <-- AXES UNNAMED'}, ` +
+                  `click-through ${legibility.clickThrough}` +
+                  `${legibility.clickThrough ? '' : ' <-- HEADINGS EAT CLICKS'}`
+                : 'NOT MEASURED') +
+            '\n' + (describeSince(snap16).join('\n') || 'no errors'));
 
     } catch (err) {
         console.error('\n\x1b[31mHARNESS ERROR\x1b[0m:', err && err.stack || err);

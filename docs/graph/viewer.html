@@ -234,6 +234,43 @@
             position: relative;
         }
 
+        /* ---- axis headings for the ordered arrival ----
+           Below #legend and #fruit-panel in the stack (they are z-index 5) and
+           above the canvas, so a heading never hides a control. The whole
+           overlay and every label in it is pointer-events:none: the reader is
+           aiming at nodes, and an invisible 20px band across the top of the
+           canvas that swallows clicks is exactly the kind of thing nobody
+           finds until they file a bug about the graph being dead. */
+        #axis-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            overflow: hidden;
+            pointer-events: none;
+            display: none;
+        }
+
+        #axis-overlay.axis-visible { display: block; }
+
+        #axis-overlay .axis-label {
+            position: absolute;
+            pointer-events: none;
+            white-space: nowrap;
+            font-size: 11px;
+            line-height: 1.2;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: #61707c;
+            background: rgba(255,255,255,0.86);
+            border: 1px solid #e6eaed;
+            border-radius: 3px;
+            padding: 2px 6px;
+        }
+
+        #axis-overlay .axis-lane { font-weight: 600; color: #48586a; }
+        #axis-overlay .axis-across { transform: translateX(-50%); }
+        #axis-overlay .axis-down { transform: translateY(-50%); }
+
         /* ---- legend ---- */
         #legend {
             position: absolute;
@@ -251,6 +288,12 @@
             max-height: calc(100% - 120px);
             overflow-y: auto;
             z-index: 5;
+        }
+
+        #legend.legend-index {
+            max-width: 186px;
+            padding: 8px 10px;
+            font-size: 11px;
         }
 
         #legend h4 {
@@ -1649,6 +1692,13 @@
 
     <div id="container">
         <div id="graph">
+            <!-- Axis headings for the ordered arrival. An HTML overlay rather
+                 than canvas text so the headings stay the same size at every
+                 zoom instead of shrinking into the illegibility they exist to
+                 explain. pointer-events:none throughout — nothing here may
+                 intercept a click meant for a node. Empty and display:none in
+                 dissolution and isomorphism, which have their own layouts. -->
+            <div id="axis-overlay" aria-hidden="true"></div>
             <div id="legend"></div>
             <!-- Threads mode only: the report's ranked low-hanging fruit. An
                  absolutely-positioned overlay inside #graph, so no other mode's
@@ -1892,22 +1942,143 @@
         ];
         // What "by claim" means: the four types that carry an assertion.
         const ORDERED_CLAIM_TYPES = ['hypothesis', 'finding', 'question', 'concept'];
-        // The pitch numbers are tuned so the claims-only arrival comes out at
-        // roughly the aspect ratio of a desktop viewport: wide lanes and short
-        // bands, so fit() is limited by neither axis and the grid fills the
-        // screen instead of sitting in a letterboxed strip.
-        const ORDERED_COL = 220;          // px between columns inside a lane
-        const ORDERED_ROW = 128;          // px between rows inside a date band
-        const ORDERED_LANE_GAP = 110;     // px of air between type lanes
-        const ORDERED_DATE_GAP = 70;      // px of air between date bands
+        // ---------------------------------------------------------------------
+        // GRID PITCH — DERIVED FROM THE LABEL, NOT CHOSEN.
+        //
+        // DO NOT TIDY THESE BACK INTO ROUND NUMBERS. The first version of this
+        // grid used 220 / 128 / 110 / 70, picked because they looked like
+        // sensible spacing in the editor. They are arbitrary world units with
+        // no relation to how big a label actually is, and they came out ~1.8x
+        // more spread out than the labels needed: fit-to-extent then had to
+        // zoom to 0.353 to contain the result, and every node label rendered at
+        // 4.94px on a 1600x950 desktop. An index nobody can read is not an
+        // index. That is the bug these expressions prevent, and it is invisible
+        // in the source — it only shows up as mush on the screen.
+        //
+        // So the pitch is stated as a multiple of ORDERED_FONT, because the
+        // ONLY thing that decides whether the arrival is legible is the RATIO
+        // between the cell pitch and the text drawn in it. The absolute size is
+        // a free gauge with no effect at all: double every number below and
+        // fit() simply halves the zoom, landing on exactly the same picture.
+        // Which is why hand-picked constants cannot be "about right" — they can
+        // only be in the right ratio or the wrong one.
+        //
+        // If the labels need to change, change ORDERED_LABEL_EMS,
+        // ORDERED_LABEL_LINES or ORDERED_NODE_EMS and let the pitch follow —
+        // then re-measure. The measurement that matters is
+        //     node font size * network.getScale()
+        // read at 1600x950 with the claims-only arrival showing. It must stay
+        // at or above ORDERED_TARGET_LABEL_PX. docs/graph/tests/smoke_test.mjs
+        // pins determinism, not legibility; legibility is on you.
+        // ---------------------------------------------------------------------
+        const ORDERED_TARGET_LABEL_PX = 11;  // the number the pitch is solving for
+        const ORDERED_FONT = 14;             // world units, claim labels
+        const ORDERED_FONT_SMALL = 12;       // world units, everything else
+        // A label wraps at ORDERED_LABEL_EMS ems (~12 characters of Arial at
+        // this size) and is clipped after ORDERED_LABEL_LINES of them, which is
+        // where ORDERED_LABEL_CHARS comes from. Wrapping rather than running on
+        // is what lets sixteen columns fit across 1600px at all: the same 20
+        // characters on one line are ~155 world units wide, and sixteen of
+        // those do not fit at any zoom that leaves the text readable.
+        const ORDERED_LABEL_EMS = 6.5;
+        const ORDERED_LABEL_LINES = 2;
+        const ORDERED_LABEL_CHARS = 20;   // full text stays in the tooltip/panel
+        // Node radius ceiling. visual_config's sizes (up to 26) are drawn for a
+        // physics cloud, where a node has a neighbourhood of empty canvas
+        // around it; in the index a node shares its cell with its own label,
+        // and a 52-unit diamond above a 35-unit caption is what forced the row
+        // pitch — and therefore the zoom — to be twice what the text needed.
+        const ORDERED_NODE_EMS = 0.6;
+        const ORDERED_LABEL_WIDTH = Math.round(ORDERED_FONT * ORDERED_LABEL_EMS);
+        const ORDERED_LABEL_HEIGHT = Math.round(ORDERED_FONT * 1.25 * ORDERED_LABEL_LINES);
+        const ORDERED_NODE_MAX = Math.round(ORDERED_FONT * ORDERED_NODE_EMS);
+        const ORDERED_NODE_MIN = Math.round(ORDERED_FONT * 0.36);
+        // The reference size the vocabulary is compressed against, so the
+        // relative order of the shapes (hypothesis biggest, artefact smallest)
+        // survives the compression instead of everything clamping to one size.
+        const ORDERED_NODE_REF = 24;
+        // A column holds one wrapped label plus a hair of air; a row holds the
+        // node's full height plus the caption underneath it.
+        const ORDERED_COL = ORDERED_LABEL_WIDTH + Math.round(ORDERED_FONT * 0.6);
+        const ORDERED_ROW = ORDERED_LABEL_HEIGHT + 2 * ORDERED_NODE_MAX + Math.round(ORDERED_FONT * 0.35);
+        // Air at a lane/band boundary: a third of a cell. Stated as a fraction
+        // of the pitch it separates, for the same reason as everything else
+        // here — a boundary has to read as wider than the gutter inside a lane,
+        // and "a third of a cell" stays true if the cell ever changes size.
+        const ORDERED_LANE_GAP = Math.round(ORDERED_COL / 3);
+        const ORDERED_DATE_GAP = Math.round(ORDERED_ROW / 3);
         const ORDERED_MAX_LANE_COLS = 8;  // a lane never grows wider than this
         const ORDERED_CELL_ROWS = 3;      // target rows before a cell widens
-        const ORDERED_LABEL_CHARS = 26;   // full text stays in the tooltip/panel
         // vis sizes these shapes to fit their label, so an unconstrained one
         // inflates past 200 layout units and swallows its neighbours' cells.
         // Everything else draws its label underneath and stays node-sized.
         const LABEL_INSIDE_SHAPES = ['box', 'circle', 'database', 'ellipse', 'text'];
-        const ORDERED_INSIDE_LABEL_WIDTH = 96;
+        // A circle is sized to max(labelWidth, labelHeight) + margin, so it is
+        // the one shape whose caption cannot be traded for height: whatever you
+        // do to the wrap width, a full-length label produces a ~70-unit disc,
+        // which is wider than the row pitch the other nine lanes are packed at.
+        // Inside-label shapes therefore get their own, much shorter clip — the
+        // full text is one hover or one tap away, and the alternative is a
+        // question lane that overlaps the two rows either side of it.
+        const ORDERED_INSIDE_LABEL_CHARS = 10;
+        const ORDERED_INSIDE_LABEL_WIDTH = Math.round(ORDERED_FONT * 3.2);
+
+        // ---------------------------------------------------------------------
+        // NARROW SCREENS: A DIFFERENT GRID, ON PURPOSE.
+        //
+        // The arithmetic is not close. A comfortably readable label is ~11px
+        // and an average claim label is ~28 characters, so ~154px wide; a
+        // 393x830 phone leaves a 393x705 canvas, which holds about 2 columns of
+        // 27 rows = ~54 labelled nodes. The index has 93. No orientation, no
+        // pitch and no amount of effort fixes that — a fully labelled phone
+        // index at full extent is arithmetically impossible.
+        //
+        // So the narrow arrival does not pretend. It draws NO node captions at
+        // all: it is a shape-and-colour map with the axis headings naming the
+        // lanes and the bands, and the text arrives through search, the entry
+        // chips, and tapping a node.
+        //
+        // And it does not draw them at any zoom, which is worth stating because
+        // "hide them, bring them back when the reader pinches in" is the
+        // obvious fix and it does not work. A caption and the cell it sits in
+        // are both in world units, so zooming scales them together: if the
+        // caption is four times the cell's width at fit, it is four times the
+        // cell's width at every other zoom too. It is a ratio, not a size, and
+        // no camera move touches it.
+        //
+        // With no caption to clear, a cell only has to hold the node, so the
+        // pitch collapses to a small multiple of the node radius — and the
+        // nodes get BIGGER rather than smaller, because they are no longer
+        // competing with text for the cell. At the desktop pitch these same 93
+        // nodes render as 8px targets, which is under any thumb-sized minimum.
+        //
+        // The grid is also TRANSPOSED here — type down the page, date across —
+        // because the landscape ordering is ~2.3:1 and a phone canvas is 1:1.8,
+        // which is how a deterministic, correctly ordered index still managed
+        // to fill 19.6% of the screen and leave the rest white.
+        //
+        // DETERMINISM. This is the one thing in the arrival that is not a pure
+        // function of the data. Assertion 15's claim weakens from "a pure
+        // function of the data" to "a pure function of the data AND the
+        // viewport class". It is a CLASS, not a measurement: isMobileLayout()
+        // is a matchMedia boolean over one breakpoint, so every width below
+        // 768px produces byte-identical coordinates and so does every width
+        // above it. Nothing here may ever become a continuous function of the
+        // viewport — that would put a resize inside the layout and make two
+        // loads of the same data disagree.
+        // ---------------------------------------------------------------------
+        const ORDERED_NARROW_NODE_MAX = Math.round(ORDERED_FONT * 1.1);
+        // The lane pitch is the wider of the two because the grid is
+        // transposed: lanes run DOWN a canvas that is 1.8x taller than it is
+        // wide, so that is the axis with room to spend.
+        const ORDERED_NARROW_BAND_PITCH = Math.round(ORDERED_NARROW_NODE_MAX * 2.9);
+        const ORDERED_NARROW_LANE_PITCH = Math.round(ORDERED_NARROW_NODE_MAX * 4.0);
+        const ORDERED_NARROW_LANE_GAP = Math.round(ORDERED_NARROW_LANE_PITCH * 0.40);
+        const ORDERED_NARROW_DATE_GAP = Math.round(ORDERED_NARROW_BAND_PITCH * 0.40);
+        // box / circle / ellipse are sized BY their label, so with no label
+        // they collapse to a 10-unit dot. A fixed label width — of nothing —
+        // is what keeps them the size of the shapes around them.
+        const ORDERED_NARROW_INSIDE_WIDTH = 2 * ORDERED_NARROW_NODE_MAX - 10;
 
         // Severity gradient. "not-supported" sits immediately after "refuted":
         // "refuted" means the evidence contradicts the claim, "not-supported"
@@ -2068,6 +2239,14 @@
         // false every node is pinned, so the physics solver has no degrees of
         // freedom to move and the picture cannot wobble.
         let exploreMode = false;
+        // ---- edge emphasis ---------------------------------------------------
+        // The node the reader is currently making the subject — hovered, or
+        // selected. Drives which relationships are drawn at full strength; see
+        // applyEdgeEmphasis().
+        let edgeFocusNodeId = null;
+        // Last emphasis state written to the DataSet, so a mouse crossing the
+        // canvas does not rewrite 131 edges per frame.
+        let edgeEmphasisSignature = null;
 
         // ---- front matter ---------------------------------------------------
         // threads.json read for the entry points. Deliberately a separate
@@ -2512,12 +2691,38 @@
             return keys;
         }
 
+        // The two shapes of the grid. `transposed` is the narrow-screen class —
+        // see the ORDERED_NARROW_* comment for why a phone gets a different one
+        // and what that costs assertion 15's purity claim. Reading the class
+        // through one function keeps the "discrete class, never a measurement"
+        // rule in one place instead of scattered across the layout.
+        function orderedGridMetrics() {
+            if (isMobileLayout()) {
+                return {
+                    transposed: true,
+                    lanePitch: ORDERED_NARROW_LANE_PITCH,
+                    bandPitch: ORDERED_NARROW_BAND_PITCH,
+                    laneGap: ORDERED_NARROW_LANE_GAP,
+                    bandGap: ORDERED_NARROW_DATE_GAP
+                };
+            }
+            return {
+                transposed: false,
+                lanePitch: ORDERED_COL,
+                bandPitch: ORDERED_ROW,
+                laneGap: ORDERED_LANE_GAP,
+                bandGap: ORDERED_DATE_GAP
+            };
+        }
+
         function applyOrderedLayout(nodes) {
             if (!nodes || !nodes.length) return false;
 
             const lanes = orderedLanesFor(nodes);
             const bands = orderedDateBands(nodes);
             if (!lanes.length || !bands.length) return false;
+
+            const grid = orderedGridMetrics();
 
             // Bucket into (lane, band) cells, each sorted by id.
             const cells = {};
@@ -2555,21 +2760,25 @@
                 return max;
             });
 
-            const laneX = [];
-            let width = 0;
+            // Everything below is computed on the two grid AXES — `lane` runs
+            // along one, `band` along the other — and only mapped onto x/y at
+            // the very end. That is what makes the transposed narrow layout one
+            // extra line instead of a second copy of the arithmetic.
+            const laneAt = [];
+            let laneSpan = 0;
             lanes.forEach(function (type, lane) {
-                laneX.push(width);
-                width += laneCols[lane] * ORDERED_COL + ORDERED_LANE_GAP;
+                laneAt.push(laneSpan);
+                laneSpan += laneCols[lane] * grid.lanePitch + grid.laneGap;
             });
-            width = Math.max(0, width - ORDERED_LANE_GAP);
+            laneSpan = Math.max(0, laneSpan - grid.laneGap);
 
-            const bandY = [];
-            let height = 0;
+            const bandAt = [];
+            let bandSpan = 0;
             bands.forEach(function (b, band) {
-                bandY.push(height);
-                height += bandRows[band] * ORDERED_ROW + ORDERED_DATE_GAP;
+                bandAt.push(bandSpan);
+                bandSpan += bandRows[band] * grid.bandPitch + grid.bandGap;
             });
-            height = Math.max(0, height - ORDERED_DATE_GAP);
+            bandSpan = Math.max(0, bandSpan - grid.bandGap);
 
             // Centred on the origin: vis has nothing left to shift.
             Object.keys(cells).forEach(function (key) {
@@ -2578,10 +2787,29 @@
                 const band = Number(parts[1]);
                 const cols = laneCols[lane];
                 cells[key].forEach(function (node, i) {
-                    node.x = Math.round(laneX[lane] + (i % cols) * ORDERED_COL - width / 2);
-                    node.y = Math.round(bandY[band] + Math.floor(i / cols) * ORDERED_ROW - height / 2);
+                    const along = laneAt[lane] + (i % cols) * grid.lanePitch - laneSpan / 2;
+                    const down = bandAt[band] + Math.floor(i / cols) * grid.bandPitch - bandSpan / 2;
+                    node.x = Math.round(grid.transposed ? down : along);
+                    node.y = Math.round(grid.transposed ? along : down);
                     node.fixed = { x: true, y: true };
                 });
+            });
+
+            // Where the axis headings hang: the centre of each lane and each
+            // band, in world coordinates, plus which screen axis each one runs
+            // along. Computed here rather than in the overlay because this is
+            // the only place that knows the grid's arithmetic, and an overlay
+            // that re-derives it is an overlay that drifts out of step with it.
+            const laneCentres = lanes.map(function (type, lane) {
+                return Math.round(laneAt[lane] + ((laneCols[lane] - 1) / 2) * grid.lanePitch - laneSpan / 2);
+            });
+            // A band heading anchors to where the band BEGINS, not to its
+            // middle. The middle of a band is occupied — that is where the
+            // nodes and their captions are — whereas the run-up to it is the
+            // band gap, which is empty by construction. Same reason a ruler
+            // puts its number at the tick and not between two of them.
+            const bandAnchors = bands.map(function (b, band) {
+                return Math.round(bandAt[band] - grid.bandPitch * 0.36 - bandSpan / 2);
             });
 
             orderedLayout = {
@@ -2589,8 +2817,13 @@
                 laneCols: laneCols,
                 bands: bands,
                 bandRows: bandRows,
-                width: width,
-                height: height
+                transposed: grid.transposed,
+                laneAxis: grid.transposed ? 'y' : 'x',
+                bandAxis: grid.transposed ? 'x' : 'y',
+                laneCentres: laneCentres,
+                bandAnchors: bandAnchors,
+                width: grid.transposed ? bandSpan : laneSpan,
+                height: grid.transposed ? laneSpan : bandSpan
             };
             return true;
         }
@@ -2599,16 +2832,187 @@
         // and wrapped to a fixed column width. The untruncated text is still on
         // the node record, in the tooltip and in the details panel — nothing is
         // lost, it is only not shouted. Explore mode restores the full label.
-        function nodeDisplayLabel(node) {
-            if (!orderedLayoutActive || exploreMode) return node.label;
-            return truncate(node.label, ORDERED_LABEL_CHARS);
+        //
+        // On a narrow screen the arrival draws no caption at all, at any zoom;
+        // see the ORDERED_NARROW_* comment for why that is arithmetic and not
+        // defeatism. The full text is still on the node record, in the tooltip,
+        // and in the details panel a tap opens.
+        function orderedNarrowLayout() {
+            return orderedLayoutActive && !!orderedLayout && orderedLayout.transposed === true;
         }
 
+        // A leading "Q: " is type boilerplate, and the shape already says
+        // "question" — so inside a circle, where the clip is ORDERED_INSIDE_LABEL_CHARS
+        // characters wide, those three are 30% of the budget spent restating what
+        // the reader can see. Dropping them is worth more than it looks: it takes
+        // the question lane from two pairs of byte-identical drawn labels
+        // ("Q: Is the…" twice, "Q: What do…" twice) down to one, because the
+        // characters recovered are the first ones that actually differ.
+        const LABEL_TYPE_PREFIX = /^Q:\s*/;
+
+        function nodeDisplayLabel(node) {
+            if (!orderedLayoutActive || exploreMode) return node.label;
+            if (orderedNarrowLayout()) return '';
+            const inside = LABEL_INSIDE_SHAPES.indexOf(node.shape) !== -1;
+            const text = inside ? node.label.replace(LABEL_TYPE_PREFIX, '') : node.label;
+            return truncate(text, inside ? ORDERED_INSIDE_LABEL_CHARS : ORDERED_LABEL_CHARS);
+        }
+
+        // Every shape gets a wrap width in the index, not just the ones that
+        // draw their label inside. Without one a caption runs on for ~185 world
+        // units, which is wider than two columns: the labels collide with their
+        // neighbours' and fit() has to zoom out far enough to contain the
+        // overhang, which is the same 4.94px bug from the other direction.
         function nodeWidthConstraint(node) {
             if (!orderedLayoutActive || exploreMode) return false;
-            return (LABEL_INSIDE_SHAPES.indexOf(node.shape) !== -1)
+            const inside = LABEL_INSIDE_SHAPES.indexOf(node.shape) !== -1;
+            if (orderedNarrowLayout()) {
+                // Nothing to wrap here — this pins the label BOX of the shapes
+                // that are sized by it, so an unlabelled circle does not arrive
+                // as a 10-unit speck beside a 30-unit diamond.
+                return inside
+                    ? { minimum: ORDERED_NARROW_INSIDE_WIDTH, maximum: ORDERED_NARROW_INSIDE_WIDTH }
+                    : false;
+            }
+            return inside
                 ? { maximum: ORDERED_INSIDE_LABEL_WIDTH }
-                : false;
+                : { maximum: ORDERED_LABEL_WIDTH };
+        }
+
+        // The index's node sizes are a compression of visual_config's, not a
+        // replacement: the ratios between the shapes are preserved, the
+        // absolute heights are brought down to something a cell can hold above
+        // its own caption. On the narrow index there is no caption to hold, so
+        // the ceiling goes UP — the node is the only thing in the cell, and it
+        // is also the tap target. Outside the ordered arrival nothing changes.
+        function nodeDisplaySize(node) {
+            if (!orderedLayoutActive || exploreMode) return node.size;
+            const ceiling = orderedNarrowLayout() ? ORDERED_NARROW_NODE_MAX : ORDERED_NODE_MAX;
+            const floor = Math.max(ORDERED_NODE_MIN, Math.round(ceiling * 0.6));
+            const raw = Number(node.size);
+            if (!isFinite(raw) || raw <= 0) return ceiling;
+            return clamp(Math.round(raw * ceiling / ORDERED_NODE_REF), floor, ceiling);
+        }
+
+        function nodeDisplayFont(node) {
+            const size = (node.nodeType === 'claim') ? ORDERED_FONT : ORDERED_FONT_SMALL;
+            return { size: size, color: '#2c3e50' };
+        }
+
+        // =====================================================================
+        // QUIET EDGES — an index's edges are not its content.
+        //
+        // The ordered grid separates related nodes on purpose: a finding and
+        // the hypothesis it supports are in different lanes by definition, and
+        // often in different date bands too. Ordering the graph therefore made
+        // every edge long. Measured on arrival: 131 edges, mean length 997
+        // world units, 130,552 units of edge ink against 47,525 for the same
+        // data under physics — 2.75x more line on the page, sweeping across
+        // every lane boundary the grid was drawn to establish. The reader's
+        // first look at the index was mostly other people's arrows.
+        //
+        // So on arrival the edges recede to ORDERED_EDGE_QUIET_OPACITY, and
+        // they come back the moment a relationship is what the reader is
+        // actually asking about:
+        //
+        //   hover / select a node   -> that node's own edges, at full strength,
+        //                              which is the question "what is this
+        //                              connected to?" answered in place
+        //   an active search        -> all of them; a search is a claim about
+        //                              the whole graph, not one node
+        //   Explore                 -> all of them; explore IS the structure
+        //   threads mode            -> all of them; the gate edges are the
+        //                              entire point of that mode, and assertion
+        //                              14 checks they are drawn
+        //
+        // ONLY `color.opacity` is written. Not `hidden` — a hidden edge changes
+        // what vis's fit() and its physics see. Not `width`, not `color.color`,
+        // not `dashes` — assertion 14 reads exactly those three off the DataSet
+        // to prove the threads gate style has not leaked into evidence, and a
+        // readability change has no business touching them. And nothing here
+        // goes near a coordinate: quieting the edges cannot move a node.
+        // =====================================================================
+        const ORDERED_EDGE_QUIET_OPACITY = 0.07;
+
+        function edgesShouldRecede() {
+            return orderedLayoutActive && !exploreMode &&
+                renderMode !== 'threads' && !searchTerm;
+        }
+
+        function applyEdgeEmphasis() {
+            if (!edgesDataSet || !allEdges || !allEdges.length) return;
+            const recede = edgesShouldRecede();
+            const focus = recede ? edgeFocusNodeId : null;
+            const signature = recede ? ('quiet:' + (focus || '')) : 'loud';
+            if (signature === edgeEmphasisSignature) return;
+            edgeEmphasisSignature = signature;
+
+            edgesDataSet.update(allEdges.map(function (edge) {
+                const loud = !recede ||
+                    (focus !== null && (edge.from === focus || edge.to === focus));
+                // Rebuilt from the edge's own colour record every time, so the
+                // base colour is never read back out of a previously dimmed row.
+                const base = (edge.color && typeof edge.color === 'object')
+                    ? edge.color
+                    : (typeof edge.color === 'string' ? { color: edge.color } : {});
+                // "Loud" restores the edge's OWN opacity rather than forcing 1:
+                // the dissolution transitions are drawn at 0.85 on purpose, and
+                // a restore that hard-codes full strength repaints another
+                // mode's edges brighter than that mode ever asked for.
+                const full = (base.opacity === undefined) ? 1 : base.opacity;
+                return {
+                    id: edge.id,
+                    color: Object.assign({}, base, {
+                        opacity: loud ? full : ORDERED_EDGE_QUIET_OPACITY
+                    }),
+                    // The edge LABEL has to go too. It is drawn on a white
+                    // halo at full strength regardless of the edge's opacity,
+                    // so quieting only the line leaves 131 stencilled words
+                    // ("supports", "corrects", "qualifies") lying across the
+                    // index — which is most of the clutter the reader was
+                    // complaining about, still there.
+                    font: loud ? (edge.font || { size: 10 }) : { size: 0 }
+                };
+            }));
+        }
+
+        function setEdgeFocus(nodeId) {
+            const next = nodeId || null;
+            if (next === edgeFocusNodeId) return;
+            edgeFocusNodeId = next;
+            applyEdgeEmphasis();
+        }
+
+        // The one number the grid pitch is solving for, printed where the next
+        // person to touch ORDERED_COL will see it without having to build a
+        // harness first. Effective label size is font size * zoom, and nothing
+        // else; if this prints below ORDERED_TARGET_LABEL_PX on a desktop then
+        // the constants are wrong for this data, not the reader's eyesight.
+        function reportOrderedLegibility() {
+            if (!network || !orderedLayout) return;
+            const scale = network.getScale();
+            const px = ORDERED_FONT * scale;
+            console.log('Ordered index: ' +
+                (orderedLayout.transposed ? 'narrow (transposed, captions off)' : 'wide') +
+                ', fit scale ' + scale.toFixed(3) +
+                ', effective label ' + px.toFixed(2) + 'px' +
+                (orderedLayout.transposed
+                    ? ' — not drawn; see the ORDERED_NARROW_* comment'
+                    : ' (target >= ' + ORDERED_TARGET_LABEL_PX + 'px)'));
+        }
+
+        // Searching is how a reader reads one entry on a phone, and a search
+        // that cuts 93 nodes down to three and leaves the camera at full extent
+        // has handed them three 18px dots to find by eye. So on the narrow
+        // index — and only there — a search re-frames on what survived it. On a
+        // desktop the captions are legible where they already are, and moving
+        // the camera out from under someone who can see the answer is worse
+        // than leaving it alone.
+        function frameNarrowSearch() {
+            if (!orderedNarrowLayout() || !network || !nodesDataSet) return;
+            const alive = nodesDataSet.get().filter(function (n) { return n.hidden !== true; });
+            if (!alive.length) return;   // nothing matched: keep the last view
+            network.fit({ nodes: alive.map(function (n) { return n.id; }), animation: false });
         }
 
         // =====================================================================
@@ -2648,7 +3052,8 @@
                 const record = {
                     id: node.id,
                     label: nodeDisplayLabel(node),
-                    widthConstraint: nodeWidthConstraint(node)
+                    widthConstraint: nodeWidthConstraint(node),
+                    size: nodeDisplaySize(node)
                 };
                 if (exploreMode) {
                     record.fixed = false;
@@ -2662,6 +3067,9 @@
             nodesDataSet.update(updates);
 
             network.setOptions({ physics: { enabled: true } });
+            // Explore is where the structure IS the subject, so the edges come
+            // all the way back up; returning to the index quiets them again.
+            applyEdgeEmphasis();
             if (exploreMode) {
                 try { network.startSimulation(); } catch (e) { /* older vis builds */ }
                 showToast('Explore: physics on. Drag nodes; "Back to the index" restores the order.');
@@ -2671,6 +3079,7 @@
                 showToast('Back to the ordered index');
             }
             updateExploreButton();
+            updateAxisOverlay();
             updateSearchStatus();
         }
 
@@ -2680,28 +3089,234 @@
 
         // #legend is an overlay pinned to the top-left corner of the canvas, and
         // fit() knows nothing about it — so the leftmost lane (hypotheses, the
-        // thing a reader most wants first) lands underneath it. Shift the
-        // camera left by half the legend's width so the grid starts clear of
-        // it. This moves the VIEW, never a node: getPositions() is untouched
-        // and the arrival stays byte-identical.
+        // thing a reader most wants first) lands underneath it. Now that the
+        // captions are meant to be READ that is not a cosmetic problem: it
+        // hides a twelfth of the index behind a key.
+        //
+        // So the shift is measured rather than guessed. The old version moved
+        // the camera by half the legend's width, which was not enough to clear
+        // it; moving by all of it overran the right-hand edge and clipped the
+        // last concept column instead. What actually works is: ask for enough
+        // to clear the legend, take what the canvas has left on the other side,
+        // and shift by the smaller of the two.
+        //
+        // This moves the VIEW, never a node: getPositions() is untouched and
+        // the arrival stays byte-identical, which is what assertion 15's
+        // zero-tolerance round trip is checking.
         function fitOrderedLayout() {
             if (!network) return;
             network.fit({ animation: false });
             if (isMobileLayout()) return;   // the legend is a closed disclosure there
             const legend = document.getElementById('legend');
             const graph = document.getElementById('graph');
-            if (!legend || !graph) return;
+            if (!legend || !graph || !nodesDataSet) return;
             if (getComputedStyle(legend).display === 'none') return;
-            const overlay = legend.getBoundingClientRect().width;
-            const canvas = graph.getBoundingClientRect().width;
+            const legendRect = legend.getBoundingClientRect();
+            const graphRect = graph.getBoundingClientRect();
+            const overlay = legendRect.width;
+            const canvas = graphRect.width;
             if (!overlay || !canvas || overlay > canvas * 0.45) return;
             const scale = network.getScale();
             if (!isFinite(scale) || scale <= 0) return;
+
+            // Where the drawn index actually sits, in canvas px. The caption is
+            // as much "the index" as the node above it, so the extent is padded
+            // by half a wrapped label on each side.
+            const hidden = {};
+            nodesDataSet.get().forEach(function (n) { if (n.hidden === true) hidden[n.id] = true; });
+            const positions = network.getPositions();
+            let left = Infinity, right = -Infinity;
+            Object.keys(positions).forEach(function (id) {
+                if (hidden[id]) return;
+                const x = network.canvasToDOM(positions[id]).x;
+                if (x < left) left = x;
+                if (x > right) right = x;
+            });
+            if (!isFinite(left)) return;
+            const pad = (ORDERED_LABEL_WIDTH / 2) * scale;
+            left -= pad;
+            right += pad;
+
+            const want = (legendRect.right - graphRect.left) + 10 - left;
+            const room = canvas - 8 - right;
+            const shift = Math.max(0, Math.min(want, room));
+            if (shift < 1) return;
             const centre = network.getViewPosition();
             network.moveTo({
-                position: { x: centre.x - ((overlay + 24) / 2) / scale, y: centre.y },
+                position: { x: centre.x - shift / scale, y: centre.y },
                 scale: scale,
                 animation: false
+            });
+        }
+
+        // =====================================================================
+        // AXIS HEADINGS.
+        //
+        // The grid means "type across, date down", and until now nothing on
+        // screen said so: the reader got an arrangement with no key to it, and
+        // at fit scale not one node label was legible enough to infer it from.
+        //
+        // Drawn as HTML positioned over the canvas rather than as canvas text,
+        // for one reason: canvas text is in world units and scales with the
+        // graph, so at the zoom where the headings would be most useful — all
+        // the way out, looking at the whole index — they would be the least
+        // readable thing on the page. In screen space they are 11px at every
+        // zoom, which is the whole point.
+        //
+        // Only lanes and bands that currently have a VISIBLE node are labelled.
+        // Naming all ten lanes over a claims-only arrival would be a heading
+        // that describes the data rather than the picture, and would put five
+        // type names over empty canvas.
+        // =====================================================================
+        let axisOverlayItems = [];   // {el, axis: 'x'|'y', world}
+        let axisOverlayKey = null;   // which lanes/bands the DOM was built for
+        let axisOverlayView = null;  // last camera the labels were placed against
+
+        function axisBandText(band) {
+            if (band === '') return 'undated';
+            const t = Number(band);
+            return isFinite(t) ? formatDate(t) : String(band);
+        }
+
+        function updateAxisOverlay() {
+            const overlay = document.getElementById('axis-overlay');
+            if (!overlay) return;
+            const show = !!(orderedLayoutActive && !exploreMode && orderedLayout && network);
+            overlay.classList.toggle('axis-visible', show);
+            if (!show) {
+                if (axisOverlayItems.length) overlay.innerHTML = '';
+                axisOverlayItems = [];
+                axisOverlayKey = null;
+                axisOverlayView = null;
+                return;
+            }
+
+            const hidden = {};
+            (nodesDataSet ? nodesDataSet.get() : []).forEach(function (n) {
+                if (n.hidden === true) hidden[n.id] = true;
+            });
+            const laneLive = {}, bandLive = {};
+            allNodes.forEach(function (node) {
+                if (hidden[node.id]) return;
+                const lane = orderedLayout.lanes.indexOf(node.entityType || 'unknown');
+                const band = orderedLayout.bands.indexOf(orderedDateKey(node));
+                if (lane !== -1) laneLive[lane] = true;
+                if (band !== -1) bandLive[band] = true;
+            });
+
+            const key = orderedLayout.laneAxis + ':' +
+                Object.keys(laneLive).join(',') + '/' + Object.keys(bandLive).join(',');
+            if (key !== axisOverlayKey) {
+                axisOverlayKey = key;
+                axisOverlayView = null;
+                overlay.innerHTML = '';
+                axisOverlayItems = [];
+                const add = function (text, cls, axis, world) {
+                    const el = document.createElement('span');
+                    el.className = 'axis-label ' + cls +
+                        (axis === 'x' ? ' axis-across' : ' axis-down');
+                    el.textContent = text;
+                    overlay.appendChild(el);
+                    // Measured once, here: the text never changes, and reading
+                    // offsetWidth inside the draw loop would force a layout on
+                    // every frame of a pan.
+                    axisOverlayItems.push({
+                        el: el, axis: axis, world: world,
+                        halfW: el.offsetWidth / 2, halfH: el.offsetHeight / 2
+                    });
+                };
+                orderedLayout.lanes.forEach(function (type, i) {
+                    if (!laneLive[i]) return;
+                    add(type, 'axis-lane', orderedLayout.laneAxis, orderedLayout.laneCentres[i]);
+                });
+                orderedLayout.bands.forEach(function (band, i) {
+                    if (!bandLive[i]) return;
+                    add(axisBandText(band), 'axis-band', orderedLayout.bandAxis, orderedLayout.bandAnchors[i]);
+                });
+            }
+            positionAxisOverlay(true);
+        }
+
+        // Re-placed on every redraw, which is what makes the headings track a
+        // pan as well as a zoom. The camera signature short-circuit is not an
+        // optimisation nicety: vis fires afterDrawing continuously while the
+        // canvas is being dragged, and writing seventeen inline styles per
+        // frame is visible as jitter on the labels themselves.
+        function positionAxisOverlay(force) {
+            if (!network || !axisOverlayItems.length) return;
+            const graph = document.getElementById('graph');
+            if (!graph) return;
+            const scale = network.getScale();
+            const centre = network.getViewPosition();
+            const rect = graph.getBoundingClientRect();
+            const signature = scale + '|' + centre.x + '|' + centre.y + '|' +
+                Math.round(rect.width) + 'x' + Math.round(rect.height);
+            if (!force && signature === axisOverlayView) return;
+            axisOverlayView = signature;
+
+            // Band labels sit against the left edge, which on a desktop is
+            // where #legend lives — so they start just clear of it. On a phone
+            // the legend is a closed disclosure and there is nothing to clear.
+            const legend = document.getElementById('legend');
+            let inset = 6;
+            if (legend && getComputedStyle(legend).display !== 'none') {
+                const lr = legend.getBoundingClientRect();
+                if (lr.width) inset = Math.round(lr.right - rect.left) + 8;
+            }
+
+            // The two axes get two strips and must not land in each other's:
+            // the first date band anchors ABOVE the grid, which is exactly
+            // where the lane headings live, and without this the band chip
+            // paints over the lane name and you get "HESIS".
+            const TOP_STRIP = 30;
+
+            // A heading whose lane has scrolled off the canvas is a heading
+            // pointing at nothing, so it goes away entirely. One that is merely
+            // clipped — half a chip hanging off the left edge, which is what
+            // the first date band does at fit scale — is nudged back into view
+            // instead: a partly readable "26-03-0" is worse than either.
+            const EDGE_SLACK = 26;
+            // Axis-tick decimation. The items arrive in world order along their
+            // own axis, so one running "where the last one ended" per axis is
+            // enough: a heading that would land on top of the one before it is
+            // dropped rather than drawn, which is how a chart handles a crowded
+            // axis. Without this the narrow index shows "2026-" with the next
+            // band's chip sitting on the rest of it.
+            const lastEnd = { x: -Infinity, y: -Infinity };
+            axisOverlayItems.forEach(function (item) {
+                const dom = network.canvasToDOM(
+                    item.axis === 'x' ? { x: item.world, y: 0 } : { x: 0, y: item.world });
+                const el = item.el;
+                let at, half, lo, hi;
+                if (item.axis === 'x') {
+                    at = dom.x; half = item.halfW;
+                    lo = inset + half; hi = Math.max(lo, rect.width - 6 - half);
+                    if (at < inset - EDGE_SLACK || at > rect.width + EDGE_SLACK) {
+                        el.style.display = 'none';
+                        return;
+                    }
+                } else {
+                    at = dom.y; half = item.halfH;
+                    lo = TOP_STRIP + half; hi = Math.max(lo, rect.height - 6 - half);
+                    if (at < -EDGE_SLACK || at > rect.height + EDGE_SLACK) {
+                        el.style.display = 'none';
+                        return;
+                    }
+                }
+                const placed = clamp(at, lo, hi);
+                if (placed - half < lastEnd[item.axis] + 4) {
+                    el.style.display = 'none';
+                    return;
+                }
+                lastEnd[item.axis] = placed + half;
+                el.style.display = '';
+                if (item.axis === 'x') {
+                    el.style.left = Math.round(placed) + 'px';
+                    el.style.top = '6px';
+                } else {
+                    el.style.top = Math.round(placed) + 'px';
+                    el.style.left = inset + 'px';
+                }
             });
         }
 
@@ -3902,7 +4517,7 @@
                     widthConstraint: nodeWidthConstraint(node),
                     title: nodeTooltip(node),
                     shape: node.shape,
-                    size: node.size,
+                    size: nodeDisplaySize(node),
                     hidden: hidden,
                     opacity: retiredNow ? RETIRED_OPACITY : (dimmed ? 0.5 : 1),
                     borderWidth: retiredNow ? 3 : 2,
@@ -3913,7 +4528,7 @@
                         highlight: { background: shade(colour, 0.12), border: shade(border, -0.3) },
                         hover: { background: shade(colour, 0.08), border: shade(border, -0.3) }
                     },
-                    font: { size: node.nodeType === 'claim' ? 14 : 12, color: '#2c3e50' }
+                    font: nodeDisplayFont(node)
                 });
             });
 
@@ -3926,11 +4541,18 @@
             });
             edgesDataSet.update(edgeUpdates);
 
+            // After the hidden flags, never before: whether an edge is quiet is
+            // a separate question from whether it is drawn at all, and merging
+            // the two updates would make a chip change silently reset the
+            // emphasis the reader's hover had asked for.
+            applyEdgeEmphasis();
+
             let shown = 0;
             Object.keys(visible).forEach(function (id) { if (visible[id]) shown += 1; });
             updateSearchStatus(shown);
 
             renderLegend();
+            updateAxisOverlay();
         }
 
         function setColourMode(mode) {
@@ -4402,10 +5024,39 @@
             }
         }
 
+        // The ordered grid has two shapes and the breakpoint picks between them
+        // (see the ORDERED_NARROW_* comment), so crossing the breakpoint has to
+        // re-lay it out — otherwise a phone rotated into landscape keeps the
+        // transposed grid it was loaded with, and a desktop window dragged
+        // narrow keeps the wide one. Same function, same data: the result is
+        // byte-identical to a fresh load at that width, which is the whole of
+        // what "a pure function of the data and the viewport class" promises.
+        function reflowOrderedLayoutForBreakpoint() {
+            if (!orderedLayoutActive || !orderedLayout || exploreMode) return;
+            if (!network || !nodesDataSet || !allNodes.length) return;
+            if (orderedLayout.transposed === isMobileLayout()) return;
+            if (!applyOrderedLayout(allNodes)) return;
+            nodesDataSet.update(allNodes.map(function (node) {
+                return {
+                    id: node.id,
+                    x: node.x,
+                    y: node.y,
+                    fixed: node.fixed,
+                    label: nodeDisplayLabel(node),
+                    widthConstraint: nodeWidthConstraint(node),
+                    size: nodeDisplaySize(node)
+                };
+            }));
+            fitOrderedLayout();
+            updateAxisOverlay();
+        }
+
         window.addEventListener('resize', function () {
             // The ranked list lives in its own panel above 768px and inside the
             // legend disclosure below it, so a width change has to re-render.
             if (renderMode === 'threads') renderLegend();
+            reflowOrderedLayoutForBreakpoint();
+            positionAxisOverlay(true);
             if (!isMobileLayout()) {
                 closeAllDisclosures();
                 return;
@@ -4544,6 +5195,13 @@
             html += orderedLayoutLegendHtml();
 
             legend.innerHTML = html;
+            // In the ordered index the legend is an overlay competing with
+            // content it can hide, so it gives back some width. That is what
+            // leaves fitOrderedLayout() enough room to shift the grid clear of
+            // it without running the last lane off the right-hand edge — the
+            // two are a pair, and widening one without the other puts the
+            // hypothesis lane back underneath the key.
+            legend.classList.toggle('legend-index', orderedLayoutActive && !exploreMode);
         }
 
         // How to read the ordered arrival. Deliberately legend-note markup and
@@ -4768,7 +5426,7 @@
         // Overlays that live inside #graph and would otherwise be swallowed:
         // constructing a vis.Network clears its container, and some builds
         // clear it again on destroy(). Both are held aside and put back.
-        const GRAPH_OVERLAY_IDS = ['legend', 'fruit-panel'];
+        const GRAPH_OVERLAY_IDS = ['axis-overlay', 'legend', 'fruit-panel'];
 
         function detachGraphOverlays() {
             return GRAPH_OVERLAY_IDS.map(function (id) {
@@ -4836,6 +5494,30 @@
                 if (params.nodes.length > 0) {
                     focusOnNode(params.nodes[0]);
                 }
+            });
+
+            // ---- what makes a relationship the subject --------------------
+            // Hover is the desktop gesture, selection is the touch one; both
+            // mean "this node, and what it is attached to". blurNode falls back
+            // to whatever is still selected rather than to nothing, so moving
+            // the mouse off a node you have clicked does not throw away the
+            // emphasis you asked for.
+            network.on('hoverNode', function (params) { setEdgeFocus(params.node); });
+            network.on('blurNode', function () {
+                let selected = [];
+                try { selected = network.getSelectedNodes() || []; } catch (e) { /* older vis builds */ }
+                setEdgeFocus(selected.length ? selected[0] : null);
+            });
+            network.on('selectNode', function (params) {
+                setEdgeFocus((params.nodes && params.nodes[0]) || null);
+            });
+            network.on('deselectNode', function () { setEdgeFocus(null); });
+
+            // The headings are in screen space, so they have to be re-placed
+            // whenever the camera moves — which includes panning, not just
+            // zooming, so this rides the draw loop rather than the zoom event.
+            network.on('afterDrawing', function () {
+                positionAxisOverlay(false);
             });
 
             network.on('oncontext', function (params) {
@@ -5459,6 +6141,13 @@
             exploreMode = false;
             orderedLayoutActive = false;
             orderedLayout = null;
+            // Emphasis is per-render: the signature guards against rewriting
+            // edges that have not changed, so it has to be forgotten whenever
+            // the DataSet underneath it is replaced or the first
+            // applyVisualState() of the new graph would decide it had already
+            // done the work.
+            edgeFocusNodeId = null;
+            edgeEmphasisSignature = null;
 
             const select = document.getElementById('graph-select');
             if (select && select.value !== currentGraphKey) select.value = currentGraphKey;
@@ -5571,9 +6260,9 @@
                     widthConstraint: nodeWidthConstraint(node),
                     title: nodeTooltip(node),
                     shape: node.shape,
-                    size: node.size,
+                    size: nodeDisplaySize(node),
                     borderWidth: 2,
-                    font: { size: node.nodeType === 'claim' ? 14 : 12, color: '#2c3e50' },
+                    font: nodeDisplayFont(node),
                     color: { background: nodeDisplayColour(node, false) }
                 };
                 if (node.level !== undefined) record.level = node.level;
@@ -5634,6 +6323,8 @@
             if (orderedLayoutActive && network) {
                 setTimeout(function () {
                     fitOrderedLayout();
+                    updateAxisOverlay();
+                    reportOrderedLegibility();
                     const el = document.getElementById('loading');
                     if (el) el.classList.add('hidden');
                 }, 180);
@@ -5685,6 +6376,7 @@
             releaseEntryPoint();
             focusedNodeIds = null;
             applyVisualState();
+            frameNarrowSearch();
         });
 
         // Keyboard: space toggles playback unless typing.
