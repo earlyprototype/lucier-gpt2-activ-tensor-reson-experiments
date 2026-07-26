@@ -6,6 +6,7 @@ v1 bug: averaged 11 transitions over a divisor of 10, inflating every figure by
 Generation and analysis are now separate: trajectories are cached to disk so the
 masking analysis can be re-run without another sweep.
 """
+import hashlib
 import json
 import os
 import sys
@@ -43,10 +44,37 @@ def load(tl_name, hf_name):
 
 
 # ---- generate (or reuse) ------------------------------------------------
+# The cache is only valid for the inputs that produced it. Reusing it across a
+# change to MAX_ITER, the prompt set, the model list, or the engine would
+# silently publish stale measurements under new-looking parameters, so the
+# manifest is compared and a mismatch forces regeneration.
+def manifest():
+    return {"models": sorted(MODELS), "max_iter": MAX_ITER,
+            "n_prompts": len(prompts),
+            "prompts_sha": hashlib.sha256(
+                "␟".join(prompts).encode()).hexdigest()[:16],
+            "engine_sha": hashlib.sha256(
+                open(os.path.join(REPO, "atr_engine.py"), "rb").read()
+            ).hexdigest()[:16]}
+
+
+want = manifest()
+traj = None
 if os.path.exists(cache_path):
-    traj = torch.load(cache_path)
-    print(f"reusing cached trajectories: {cache_path}")
-else:
+    # weights_only: the cache is committed to the repo, so it is a file a third
+    # party can modify. Unrestricted torch.load unpickles, i.e. executes.
+    blob = torch.load(cache_path, map_location="cpu", weights_only=True)
+    if blob.get("manifest") == want:
+        traj = blob["traj"]
+        print(f"reusing cached trajectories: {cache_path}")
+    else:
+        print("cache manifest mismatch — regenerating.")
+        for k in set(want) | set(blob.get("manifest", {})):
+            if blob.get("manifest", {}).get(k) != want.get(k):
+                print(f"    {k}: cached={blob.get('manifest', {}).get(k)!r} "
+                      f"now={want.get(k)!r}")
+
+if traj is None:
     traj = {}
     for name, hf_name in MODELS.items():
         print(f"sweeping {name} ...", flush=True)
@@ -60,7 +88,7 @@ else:
             traj[name]["means"].append(
                 torch.stack([s["mean_vector"].float().detach() for s in snaps]))
         del model
-    torch.save(traj, cache_path)
+    torch.save({"manifest": want, "traj": traj}, cache_path)
     print(f"cached -> {cache_path}")
 
 
@@ -81,20 +109,28 @@ for name in MODELS:
         prof = M.abs().mean(0)
         order = prof.argsort(descending=True)
         e = prof ** 2
+        # 12 significant figures, not 5: a saturating model reported as 1.00000
+        # is otherwise indistinguishable from one at 0.999996, and the whole
+        # question here is whether the alignment is exact or merely close.
         r = {"prompt": pi,
-             "unmasked": round(tail_cos(M), 5),
+             "unmasked": round(tail_cos(M), 12),
              "energy_top10": round(e[order[:10]].sum().item() / e.sum().item(), 4)}
         for k in KS:
-            r[f"top{k}"] = round(tail_cos(M[:, order[k:]]), 5)
+            r[f"top{k}"] = round(tail_cos(M[:, order[k:]]), 12)
         rows.append(r)
     for key in ["unmasked"] + [f"top{k}" for k in KS] + ["energy_top10"]:
-        agg[key] = round(sum(r[key] for r in rows) / len(rows), 5)
+        agg[key] = round(sum(r[key] for r in rows) / len(rows), 12)
+    # Distance from 1 for the saturating cases, where the leading digits hide it.
+    agg["unmasked_1_minus_cos"] = round(1.0 - agg["unmasked"], 12)
+    agg["masked_top10_1_minus_cos"] = round(1.0 - agg["top10"], 12)
     report[name] = {"per_prompt": rows, "mean": agg,
                     "d_model": d["d_model"], "n_layers": d["n_layers"]}
 
     print(f"\n{name}  (d_model={d['d_model']}, {d['n_layers']} layers)")
     print(f"  energy in top-10 coords: {agg['energy_top10']:.1%}")
-    print(f"  {'unmasked':>10}: {agg['unmasked']:.5f}")
+    print(f"  1-cos: unmasked {agg['unmasked_1_minus_cos']:.3e}   "
+          f"mask-top10 {agg['masked_top10_1_minus_cos']:.3e}")
+    print(f"  {'unmasked':>10}: {agg['unmasked']:.9f}")
     for k in KS:
         delta = agg[f"top{k}"] - agg["unmasked"]
         print(f"  {'mask top'+str(k):>10}: {agg[f'top{k}']:.5f}   ({delta:+.5f})")

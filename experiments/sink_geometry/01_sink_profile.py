@@ -78,7 +78,12 @@ for name, hf_name in MODELS.items():
             _, c = model.run_with_cache(p, names_filter=lambda n: n == site)
         states.append(c[site][0].float())
 
-    content = torch.stack([s[1:].abs().mean(0) for s in states])   # skip BOS
+    # Skip position 0 only where it is actually BOS. Q1 above establishes that
+    # TransformerLens prepends for GPT-2 and not for the NeoX family, so an
+    # unconditional s[1:] would silently drop a real content token from every
+    # Pythia profile and bias the cross-family comparison this section rests on.
+    has_bos = e["bos"]["prepends_bos"]
+    content = torch.stack([(s[1:] if has_bos else s).abs().mean(0) for s in states])
     pos0 = torch.stack([s[0].abs() for s in states])
     prof = content.mean(0)
     med = prof.median().item()
@@ -101,12 +106,14 @@ for name, hf_name in MODELS.items():
         "energy_frac_top20": round(energy.topk(20).values.sum().item() / tot, 4),
     }
     e["position_0"] = {
+        "is_bos": has_bos,          # position 0 is BOS for GPT-2, content for Pythia
         "pos0_norm": round(pos0.norm(dim=1).mean().item(), 1),
-        "content_norm": round(torch.stack(
-            [s[1:].norm(dim=1).mean() for s in states]).mean().item(), 1),
+        "rest_norm": round(torch.stack(
+            [(s[1:] if has_bos else s).norm(dim=1).mean()
+             for s in states]).mean().item(), 1),
     }
     e["position_0"]["ratio"] = round(
-        e["position_0"]["pos0_norm"] / e["position_0"]["content_norm"], 3)
+        e["position_0"]["pos0_norm"] / e["position_0"]["rest_norm"], 3)
 
     m = e["magnitude"]
     print(f"  site {site}  d_model={model.cfg.d_model}", flush=True)
@@ -116,8 +123,9 @@ for name, hf_name in MODELS.items():
     print(f"  energy fraction  top1={m['energy_frac_top1']}  "
           f"top5={m['energy_frac_top5']}  top10={m['energy_frac_top10']}  "
           f"top20={m['energy_frac_top20']}", flush=True)
-    print(f"  BOS-position norm {e['position_0']['pos0_norm']} vs content "
-          f"{e['position_0']['content_norm']} (ratio {e['position_0']['ratio']})",
+    tag = "BOS" if has_bos else "content"
+    print(f"  position-0 ({tag}) norm {e['position_0']['pos0_norm']} vs rest "
+          f"{e['position_0']['rest_norm']} (ratio {e['position_0']['ratio']})",
           flush=True)
 
     report[name] = e

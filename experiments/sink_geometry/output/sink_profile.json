@@ -38,8 +38,9 @@
       "energy_frac_top20": 0.9248
     },
     "position_0": {
+      "is_bos": true,
       "pos0_norm": 417.4,
-      "content_norm": 416.3,
+      "rest_norm": 416.3,
       "ratio": 1.003
     }
   },
@@ -82,8 +83,9 @@
       "energy_frac_top20": 0.9386
     },
     "position_0": {
+      "is_bos": true,
       "pos0_norm": 310.0,
-      "content_norm": 841.1,
+      "rest_norm": 841.1,
       "ratio": 0.369
     }
   },
@@ -104,31 +106,32 @@
       "cfg.default_prepend_bos": false
     },
     "magnitude": {
-      "median_abs": 3.908,
-      "max_abs": 5.7,
+      "median_abs": 3.751,
+      "max_abs": 5.5,
       "ratio_max_to_median": 1.5,
       "top10_coord_idx": [
         621,
         544,
-        409,
         650,
+        409,
         376,
         196,
         663,
         177,
         322,
-        516
+        421
       ],
       "top10_shared_by_all_prompts": 0,
-      "energy_frac_top1": 0.0028,
+      "energy_frac_top1": 0.0029,
       "energy_frac_top5": 0.0123,
-      "energy_frac_top10": 0.0233,
-      "energy_frac_top20": 0.044
+      "energy_frac_top10": 0.0232,
+      "energy_frac_top20": 0.0438
     },
     "position_0": {
+      "is_bos": false,
       "pos0_norm": 67.6,
-      "content_norm": 108.7,
-      "ratio": 0.622
+      "rest_norm": 104.0,
+      "ratio": 0.65
     }
   },
   "pythia-410m": {
@@ -148,15 +151,15 @@
       "cfg.default_prepend_bos": false
     },
     "magnitude": {
-      "median_abs": 0.875,
-      "max_abs": 16.3,
-      "ratio_max_to_median": 18.7,
+      "median_abs": 0.813,
+      "max_abs": 16.9,
+      "ratio_max_to_median": 20.8,
       "top10_coord_idx": [
         125,
         180,
         876,
-        16,
         47,
+        16,
         974,
         766,
         529,
@@ -164,15 +167,16 @@
         464
       ],
       "top10_shared_by_all_prompts": 3,
-      "energy_frac_top1": 0.1503,
-      "energy_frac_top5": 0.3225,
-      "energy_frac_top10": 0.4039,
-      "energy_frac_top20": 0.4687
+      "energy_frac_top1": 0.1801,
+      "energy_frac_top5": 0.3453,
+      "energy_frac_top10": 0.4236,
+      "energy_frac_top20": 0.4856
     },
     "position_0": {
+      "is_bos": false,
       "pos0_norm": 28.2,
-      "content_norm": 49.4,
-      "ratio": 0.571
+      "rest_norm": 47.0,
+      "ratio": 0.6
     }
   }
 }

@@ -13,7 +13,7 @@ sinks — that are far larger than the rest and roughly state-independent (Sun e
 [arXiv:2402.17762](https://arxiv.org/abs/2402.17762)). Writing consecutive iterates as `x = c + a`,
 `y = c + b` with `|c| >> |a|,|b|`:
 
-```
+```text
 cos(x, y) = (|c|² + c·(a+b) + a·b) / (|x||y|)  ≈  1 + small
 ```
 
@@ -35,7 +35,12 @@ over content positions. (`01_sink_profile.py` → `output/sink_profile.json`.)
 | gpt2 | 42.8× | **10/10** | **90.8%** |
 | gpt2-medium | 71.4× | 8/10 | **93.4%** |
 | pythia-160m | 1.5× | **0/10** | 2.3% |
-| pythia-410m | 18.7× | 3/10 | 40.4% |
+| pythia-410m | 20.8× | 3/10 | 42.4% |
+
+Position 0 is excluded from these profiles **only where it is BOS** — i.e. for the GPT-2 models
+(see §2). An earlier version of `01_sink_profile.py` dropped it unconditionally, which silently
+removed a real content token from every Pythia profile; that is fixed, and the Pythia-410m figures
+above are the corrected ones (they were 18.7× and 40.4% before).
 
 **Massive activations at the ATR read site are a GPT-2 phenomenon.** GPT-2 Small puts over 90% of
 its final-layer residual energy into ten of 768 coordinates, and they are *the same ten for every
@@ -46,10 +51,12 @@ across prompts, max only 1.5× the median.
 ~90%-sink-dominated space against a ~2% one. That asymmetry is real regardless of what it does to
 any particular metric.
 
-**The sink is coordinate-structured, not position-structured.** Position-0 norm relative to the
-content mean is 1.003× (gpt2) and 0.369× (gpt2-medium) — position 0 carries no unusual norm in
-either. "The L2 renormalisation rescales whatever sits at position 0" is not the sharp worry;
-"the L2 renormalisation is dominated by ten coordinates" is.
+**The sink is coordinate-structured, not position-structured.** Position-0 norm relative to the mean
+over remaining positions is 1.003× (gpt2) and 0.369× (gpt2-medium) — the BOS position carries no
+unusual norm in either. "The L2 renormalisation rescales whatever sits at position 0" is not the
+sharp worry; "the L2 renormalisation is dominated by ten coordinates" is. (For the Pythia models the
+same ratio is 0.65 and 0.60, but there position 0 is an ordinary content token, so it is not a
+statement about sinks at all.)
 
 ---
 
@@ -90,14 +97,21 @@ transitions. Mask fixed per trajectory as the coordinates with largest mean |val
 | model | energy in top-10 | unmasked | mask top-1 | mask top-10 | mask top-50 |
 |---|---|---|---|---|---|
 | gpt2 | 70.8% | **0.9167** | **0.9933** | 0.9847 | 0.9939 |
-| gpt2-medium | 92.3% | 1.00000 | 1.00000 | 1.00000 | 1.00000 |
-| pythia-160m | 5.5% | 1.00000 | 1.00000 | 1.00000 | 1.00000 |
+| gpt2-medium | 92.3% | 0.999999926 | 1.000 | 1.000 | 1.000 |
+| pythia-160m | 5.5% | 1.000000006 | 1.000 | 1.000 | 1.000 |
 | pythia-410m | 11.4% | 0.7552 | 0.7537 | 0.7690 | 0.7586 |
 
+**On the saturating figures.** They are reported here to twelve significant figures precisely because
+five would hide the question. Neither is exactly 1: GPT-2 Medium's is `1 − cos = 7.4e-08`, and
+Pythia-160m's reads `−6.0e-09`, i.e. marginally *above* 1, which is only possible as round-off. Both
+sit at float32 epsilon, so the defensible claim is **convergence to numerical precision**, not exact
+equality — and the distinction does not affect any conclusion below.
+
 **GPT-2 Medium and Pythia-160m: convergence is genuine.** GPT-2 Medium holds 92.3% of its energy in
-ten coordinates and still returns *exactly* 1.00000 after those ten are deleted — and after fifty
-are. The remaining 8% is itself perfectly aligned step to step. This is the strongest of the two
-claims in `SCALING_ARTEFACT_ANALYSIS.md`'s closing judgement, and it passes a test built to break it.
+ten coordinates and still returns 1.000 to within round-off after those ten are deleted — and after
+fifty. The remaining 8% of the energy is itself aligned step to step at the same precision. This is
+the stronger of the two claims in `SCALING_ARTEFACT_ANALYSIS.md`'s closing judgement, and it passes a
+test built to break it.
 
 **Pythia-410m: unmoved.** ±0.014 across every masking. Non-convergence is not sink geometry.
 
@@ -147,8 +161,14 @@ python3 experiments/sink_geometry/01_sink_profile.py      # ~10 min CPU, downloa
 python3 experiments/sink_geometry/02_masking_control.py   # reuses output/trajectories.pt if present
 ```
 
-`02` caches trajectories to `output/trajectories.pt` (committed, 4.2 MB) so the masking analysis can
-be re-run without another sweep. Delete it to regenerate.
+`02` caches trajectories to `output/trajectories.pt` (committed, ~4.2 MB) so the masking analysis can
+be re-run without another sweep. The cache carries a **manifest** — model list, `MAX_ITER`, prompt
+count, a hash of the prompt text, and a hash of `atr_engine.py` — and regenerates itself on any
+mismatch, printing which field changed. So editing the config or the engine cannot silently republish
+stale measurements under new-looking parameters. Delete the file to force a rebuild regardless.
+
+The cache is loaded with `weights_only=True, map_location="cpu"`. It is a committed artifact, so it
+is a file a third party can modify, and an unrestricted `torch.load` unpickles — that is, executes.
 
 **Note on `transformers` 5.x:** it renamed GPTNeoX's `embed_out` to `lm_head`, which the pinned
 TransformerLens release still reaches for. Both scripts alias it before conversion; without that,
