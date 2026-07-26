@@ -3,7 +3,7 @@
  * Headless browser smoke + interaction test for docs/graph/viewer.html.
  *
  * Serves docs/graph on a free port, drives the viewer with Playwright's
- * bundled Chromium, and asserts fifteen things:
+ * bundled Chromium, and asserts sixteen things:
  *
  *   1. viewer.html loads with ZERO pageerror and ZERO console-error events
  *   2. a <canvas> exists and vis-network has actually rendered nodes
@@ -30,12 +30,18 @@
  *      only sense the reader can perceive — every node pinned, zero
  *      displacement over a settle window), and a round trip out to another
  *      graph and back restores those coordinates EXACTLY, not approximately
+ *  16. that ordered index is LEGIBLE, not merely ordered: captions render at
+ *      or above ORDERED_TARGET_LABEL_PX once the grid is fitted, the lane and
+ *      date-band axes are actually named, and those headings do not swallow
+ *      clicks meant for the graph underneath them
  *
  * Assertions 1-11, 13 and 14 run at 1600x1000. Assertion 12 opens a second,
  * phone-sized context (393x830, isMobile + hasTouch) so the narrow-screen
  * layout is pinned without disturbing the desktop measurements the others
  * depend on. Assertion 15 opens two further desktop contexts, because "the
- * same every load" is only testable across genuinely separate loads.
+ * same every load" is only testable across genuinely separate loads, and
+ * assertion 16 opens one more at 1600x1000: caption size is a function of the
+ * fitted zoom, so it has to be read on a window whose size is known.
  *
  * Assertion 13 and assertion 15 are deliberately complementary, and both are
  * load-bearing. 13 pins the mode flags on the way back from another graph
@@ -1654,7 +1660,16 @@ async function main() {
                         if (hit && hit.tagName !== 'CANVAS') { clickThrough = false; break; }
                     }
                     return {
-                        transposed: !!(window.orderedLayout && orderedLayout.transposed),
+                        // `typeof`, not `window.orderedLayout`: the viewer
+                        // declares it as a top-level `let`, which creates a
+                        // declarative binding rather than a property of window.
+                        // Reading it through window yields undefined always, so
+                        // the transposed check silently answered "false" even on
+                        // a phone where the layout really is transposed -- an
+                        // assertion that cannot fail. Measured, not guessed.
+                        transposed: (typeof orderedLayout !== 'undefined' && orderedLayout)
+                            ? !!orderedLayout.transposed
+                            : null,
                         scale: +scale.toFixed(3),
                         font,
                         effectivePx: +(font * scale).toFixed(2),

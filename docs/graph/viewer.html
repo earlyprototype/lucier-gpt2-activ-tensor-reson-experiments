@@ -2894,7 +2894,14 @@
             return clamp(Math.round(raw * ceiling / ORDERED_NODE_REF), floor, ceiling);
         }
 
+        // Guarded like nodeDisplayLabel/nodeWidthConstraint/nodeDisplaySize, and
+        // for the same reason: these sizes and this colour are chosen to make the
+        // ordered grid's pitch work. Dissolution and isomorphism draw their own
+        // layouts and never asked for index typography — without the guard they
+        // silently inherited it, because unlike its three siblings this one
+        // returned the ordered values unconditionally.
         function nodeDisplayFont(node) {
+            if (!orderedLayoutActive || exploreMode) return node.font;
             const size = (node.nodeType === 'claim') ? ORDERED_FONT : ORDERED_FONT_SMALL;
             return { size: size, color: '#2c3e50' };
         }
@@ -4721,8 +4728,14 @@
         // A manual narrowing supersedes the entry point that produced it: the
         // focus set the entry point installed is dropped by the chip handlers,
         // so the label must not keep claiming it is still in force.
+        // Every entry point is released by a manual filter or a search, not just
+        // the three that pin an id set. `by claim` and `by question` set the type
+        // row, so toggling a type chip is exactly the gesture that makes them no
+        // longer true — leaving the chip lit and the status line still claiming
+        // "the claims" describes a view that is no longer on screen. `everything`
+        // is the neutral state and has nothing to release.
         function releaseEntryPoint() {
-            if (ENTRY_SET_KEYS.indexOf(activeEntryPoint) === -1) return;
+            if (activeEntryPoint === 'everything') return;
             activeEntryPoint = 'everything';
             syncEntryChipClasses();
         }
@@ -4816,6 +4829,15 @@
 
         function applyEntryPoint(key) {
             if (!activeTypes || !Object.keys(activeTypes).length) return;
+            // Checked before anything is mutated. This used to bail out further
+            // down, after the search box, the timeline cursor, the status row and
+            // the readiness row had all been reset — but before syncChipClasses()
+            // and applyVisualState() ran, so the model had moved and the chips and
+            // canvas had not. Refusing early is the only way to refuse cleanly.
+            if (ENTRY_SET_KEYS.indexOf(key) !== -1 && !entryPointIds[key]) {
+                showToast('Nothing recorded for that entry point');
+                return;
+            }
 
             focusedNodeIds = null;
             searchTerm = '';
@@ -4837,10 +4859,6 @@
                 Object.keys(activeTypes).forEach(function (t) { activeTypes[t] = (t === 'question'); });
             } else if (ENTRY_SET_KEYS.indexOf(key) !== -1) {
                 const set = entryPointIds[key];
-                if (!set) {
-                    showToast('Nothing recorded for that entry point');
-                    return;
-                }
                 // The id set decides membership here, not the type row.
                 Object.keys(activeTypes).forEach(function (t) { activeTypes[t] = true; });
                 focusedNodeIds = Object.assign({}, set);

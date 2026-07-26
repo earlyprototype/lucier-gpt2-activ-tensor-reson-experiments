@@ -269,13 +269,13 @@ a regeneration cannot silently rewrite the epistemic record. It skips rather tha
 all three graphs actually draw, that the model switch re-renders, that search and the details panel
 and the timeline scrubber work, that returning to Evidence from another graph restores its own
 layout with no hierarchical leak, that the phone budget holds — and that nothing lands in the console. Its
-fifteen assertions cover all four views. The fourteenth is Threads: that the overlay renders from
+sixteen assertions cover all four views. The fourteenth is Threads: that the overlay renders from
 `_data/threads.json` — readiness colours reaching the vis DataSet, the ranked low-hanging-fruit
 list populated from the report and driving the graph when a row is clicked, `blocks` / `blocked-by`
 drawn as gate edges — and that none of it leaks, so after Threads → Dissolution → Evidence the
 synthesised blocker hubs are gone, status colours are back, the gate edges have their evidence
 style again and the graph is still clickable. If `_data/threads.json` has not been generated that
-assertion fails with an actionable message and the other fourteen still run.
+assertion fails with an actionable message and the other fifteen still run.
 
 The fifteenth pins the ordered arrival, which is the property the front door rests on: two loads in
 separate browser contexts must put every node on the same integer coordinates, nothing may move
@@ -285,7 +285,17 @@ and back must restore those coordinates exactly rather than approximately. Asser
 this: it checks the mode flags on the return path and tolerates generous positional drift, because
 it was written when the arrival was still a physics cloud. Dropping the ordered layout on the way
 back leaves 13 green and only 15 red. Both budgets are exact — one unit of tolerance is one unit of
-physics. It needs Playwright
+physics.
+
+The sixteenth pins the other half of the front door: that the ordered index can be *read*. It
+measures the effective caption size — node font times the fitted zoom — against
+`ORDERED_TARGET_LABEL_PX`, checks that at least one type lane and one date band are actually
+named, and clicks through each heading to confirm the screen-space overlay does not intercept a
+click meant for the node beneath it. Assertion 15 cannot see any of this either: put the grid
+pitch back to the round numbers it started with and the captions collapse to ~5px, which is the
+bug the readability pass existed to fix — and 15 stays green, because every node is still exactly
+where it deterministically belongs. Both halves were confirmed by injecting each fault into a
+throwaway copy and watching 16 go red on its own. It needs Playwright
 (`npm i -D playwright`, or set `PLAYWRIGHT_PATH`); the two CDN scripts are served from a local
 mirror so a bad day at unpkg cannot turn into a red test.
 
