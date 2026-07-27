@@ -53,15 +53,17 @@ tokenises strings through `to_tokens`, which prepends the beginning-of-sequence 
 1720). Measured on the engine's own call path: a 4-token probe becomes **5 tokens for `gpt2` and `gpt2-medium`**
 and stays **4 for `pythia-160m` and `pythia-410m`**.
 
-**So position 0 is a structural sink token on the GPT-2 arm and ordinary content on the Pythia arm.** Nobody chose
-this. It is a library default that varies by model family and is invisible at the call site.
+**So position 0 holds the special token `<|endoftext|>` on the GPT-2 arm and an ordinary content token on the
+Pythia arm.** That is token construction, and it is measured. Whether that position then *functions* as an
+attention sink here is an inference from the literature, not a measurement made in this repository — see the
+coordinate-versus-positional note below. Nobody chose this: it is a library default that varies by model family and is invisible at the call site.
 
 **Why it is an artefact candidate rather than an intrinsic variable.** Every axis in section 2 is a property of
 the models. This is a property of *how we called them*, and it is not symmetric across the comparison, which is
 precisely the shape of thing this section exists to catch. It is closest in kind to §1.1: both concern what the
 apparatus does to the tensor before the model sees it. §1.1 clears the global rescale for the *forward map* via
-LayerNorm scale-invariance; that argument says nothing about tokenisation, and nothing about what fraction of the
-conserved norm belongs to a sink.
+LayerNorm scale-invariance; that argument says nothing about tokenisation, and nothing about how the conserved
+norm is distributed across positions.
 
 **What it puts at risk, in order.**
 
@@ -73,14 +75,20 @@ conserved norm belongs to a sink.
    remainder. Note the distinction that is easy to blur: massive activations are a **coordinate** phenomenon,
    attention sinks are a **positional** one; they are associated but not identical, and whether position 0 carries
    anomalous energy *in ATR trajectories specifically* is unmeasured.
-3. **A regime no model was trained in.** From iteration 1 the re-injection overwrites position 0, so the loop
-   preserves the sink's structural role while replacing its contents. Only the GPT-2 arm enters this regime.
+3. **A regime no model was trained in — conditional on the sink hypothesis.** From iteration 1 the re-injection
+   overwrites position 0, so whatever role that position plays is preserved *structurally* while its *contents*
+   are replaced. If position 0 is acting as a sink, that is a configuration no model was trained in, and only the
+   GPT-2 arm enters it. Untested, and it rests on the inference flagged above.
 
 **What it does not explain.** Not the Small-versus-Medium divergence: both carry the BOS and behave completely
 differently.
 
-**Cheapest control.** Recompute the position-indexed metrics with position 0 dropped on both arms — this makes the
-arms comparable for the first time and needs no forward passes. Then, if it matters, add a GPT-2 arm run with
+**Cheapest control.** Align the slices: **GPT-2 `[1:]` against Pythia `[:]`**. Dropping index 0 from *both* arms —
+the form first written here, and wrong — strips GPT-2's BOS and Pythia's first genuine content token together,
+trading one misalignment for another. Needs no forward passes. Two limits, both real: this is a **sensitivity
+check, not a restoration of comparability**, since the BOS participates in the GPT-2 forward pass and conditions
+every other position through attention, so removing it from the metric does not remove it from the computation;
+and the states being compared were produced under different conditioning either way. Then, if it matters, add a GPT-2 arm run with
 `prepend_bos=False` to match Pythia's regime. Do not go the other way: Pythia was not trained on BOS-prefixed
 sequences, so prepending one there introduces an artefact rather than removing one.
 
@@ -221,8 +229,8 @@ Nothing above is withdrawn. What follows is a gap in coverage, not a contradicti
 The closing judgement clears normalisation, decoding and readout jitter, and on that basis attributes the
 cross-model differences to depth, corpus, width and token geometry. **Tokenisation is not on either list**, and
 §1.1b establishes that the two arms of the comparison do not tokenise alike: TransformerLens prepends a
-beginning-of-sequence token for GPT-2 and not for the NeoX family, so position 0 is a structural sink on one arm
-and content on the other.
+beginning-of-sequence token for GPT-2 and not for the NeoX family, so position 0 holds a special token on one arm
+and ordinary content on the other.
 
 That is an apparatus difference *between the models being compared*, which is a stronger category of problem than
 an apparatus property they share, and none of the executed tests probes it. Test 1 in particular — the cross-model
@@ -235,5 +243,7 @@ intrinsic attribution is well-supported for the channels tested and open for thi
 
 This also adds a line to the remaining-work list, alongside Test 2 (the depth control, still not run):
 
-- **Test 4 (tokenisation control): not run.** Recompute position-indexed metrics with position 0 dropped on both
-  arms; optionally add a `prepend_bos=False` GPT-2 arm. No forward passes required for the first half.
+- **Test 4 (tokenisation control): not run.** Recompute position-indexed metrics over aligned slices — GPT-2
+  `[1:]` against Pythia `[:]`, not index 0 dropped from both — as a sensitivity check; then, to remove the BOS
+  from the computation rather than only from the metric, add a `prepend_bos=False` GPT-2 arm. No forward passes
+  required for the first half.

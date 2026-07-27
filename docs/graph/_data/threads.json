@@ -186,7 +186,7 @@
         },
         {
           "file": "docs/FINDINGS.md",
-          "line": 643,
+          "line": 647,
           "text": "| H4 | Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector) | **Untested**: protocol scaffolded (`experiments/gpt2_small/spectral_resonance.ipynb`), not run. |"
         },
         {
@@ -483,12 +483,12 @@
               },
               {
                 "file": "docs/FINDINGS.md",
-                "line": 467,
+                "line": 471,
                 "text": "build (issue #8) should be phase-aware: probe both phases and the pivot M."
               },
               {
                 "file": "docs/FINDINGS.md",
-                "line": 647,
+                "line": 651,
                 "text": "| H-J1 | `prolet` sits inside the verbalizable (J-lens) subspace, `Divine` outside | **Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)**: the point estimate runs slightly the other way at pilot confidence (`Divine` at least as lens-ex"
               }
             ]

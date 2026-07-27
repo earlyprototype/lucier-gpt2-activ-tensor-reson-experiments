@@ -22,14 +22,17 @@
 > GPT-NeoX family. Measured: a 4-token probe becomes **5 tokens on `gpt2` and `gpt2-medium`** and stays
 > **4 on `pythia-160m` and `pythia-410m`**.
 >
-> So **position 0 is `<|endoftext|>`, a structural sink, on the GPT-2 arm and an ordinary content token on the
-> Pythia arm** — and for the same prompt the two arms have sequences of different length. Any metric averaged
+> So **position 0 holds the special token `<|endoftext|>` on the GPT-2 arm and an ordinary content token on the
+> Pythia arm** (whether it then behaves as an attention sink here is an untested inference, not a measurement) — and for the same prompt the two arms have sequences of different length. Any metric averaged
 > over positions is averaging over different denominators, and position *i* is not the same token across arms.
 > Control 1 below (`cos_sim_diagnostic.ipynb`) is computed this way.
 >
 > This does **not** invalidate the within-model results, and it cannot explain the Small-versus-Medium
 > divergence (both carry the BOS). It bounds the **cross-model** readings. Before running or re-reading any
-> cross-arm comparison, either drop position 0 on both arms, or add a `prepend_bos=False` GPT-2 arm.
+> cross-arm comparison, align the slices — **GPT-2 `[1:]` against Pythia `[:]`**, not index 0 dropped from both,
+> which would strip a genuine Pythia content token. That is a sensitivity check only: the BOS conditions the whole
+> GPT-2 forward pass through attention, so taking it out of the metric does not take it out of the computation.
+> Only a `prepend_bos=False` GPT-2 arm does that.
 > `experiments/gpt2_small/11_suppression_test.py:607-610` shows the accounting (`# [1, L], BOS at 0`,
 > `n_tokens_no_bos`).
 >
