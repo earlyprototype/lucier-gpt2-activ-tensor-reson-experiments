@@ -3522,6 +3522,32 @@
 
             if (exploreMode) {
                 try { network.startSimulation(); } catch (e) { /* older vis builds */ }
+
+                // FRAME IT. Releasing the pins lets the solver expand the graph
+                // far past the index's extent while the camera is still on the
+                // index's zoom and pan. Measured share of nodes left on canvas
+                // after switching Index -> Network without this:
+                //
+                //     desktop 1600x950   100% on arrival ->  9.7%, 8.6% at +6s
+                //     phone   393x830    100% on arrival -> 13.1%, 11.4% at +6s
+                //
+                // It never recovers, because the framing on a fresh load comes
+                // from initNetwork's stabilization handler and startSimulation()
+                // on an already-built network does not re-run it. An explicit
+                // fit() puts it back to 100%, so this is a missing call and not
+                // a layout fault.
+                //
+                // Fitted twice deliberately: once now, so the switch is never
+                // off-screen even for a frame, and once when the solver settles,
+                // because the extent it settles to is not the extent it starts
+                // from. The guard matters — the reader can be back in the index
+                // long before 60 iterations finish.
+                network.fit();
+                network.once('stabilizationIterationsDone', function () {
+                    if (exploreMode && network) network.fit({ animation: true });
+                });
+                try { network.stabilize(60); } catch (e) { /* older vis builds */ }
+
                 showToast('Network view: physics on. Drag nodes; Index restores the ordered grid.');
             } else {
                 try { network.stopSimulation(); } catch (e) { /* older vis builds */ }
@@ -6330,9 +6356,23 @@
                 setAllStatusChips(true);
                 setAllTypeChips(true);
             }
-            // "Reset view" means the state the reader arrived in, which is the
-            // ordered index — not physics, and not everything at once.
-            if (exploreMode) setExploreMode(false);
+            // "Reset view" resets the view the reader is IN. It deliberately
+            // does not change which view that is.
+            //
+            // This used to read `if (exploreMode) setExploreMode(false);` under
+            // a comment claiming the arrival state "is the ordered index" —
+            // true when the index was the only view, false from the moment
+            // DEFAULT_VIEW became VIEW_NETWORK. Because setExploreMode routes
+            // through setViewMode with `remember` defaulting to true, one click
+            // moved a Network reader to the Index and PERSISTED it:
+            //
+            //     fresh arrival        view=network  stored=null
+            //     click "Reset View"   view=index    stored="index"
+            //     new page             view=index                  <- forever
+            //
+            // The reader never chose the index. That is exactly the over-reach
+            // this branch was asked to undo, coming back through a control
+            // labelled "Reset".
             if (renderMode !== 'dissolution') {
                 applyDefaultTypeSelection();
                 syncChipClasses();

@@ -3,7 +3,7 @@
  * Headless browser smoke + interaction test for docs/graph/viewer.html.
  *
  * Serves docs/graph on a free port, drives the viewer with Playwright's
- * bundled Chromium, and asserts seventeen things:
+ * bundled Chromium, and asserts eighteen things:
  *
  *   1. viewer.html loads with ZERO pageerror and ZERO console-error events
  *   2. a <canvas> exists and vis-network has actually rendered nodes
@@ -39,6 +39,10 @@
  *      first-time visitor arrives in Network with physics running, nothing
  *      pinned and every type in play; Index pins all of it; both round trips
  *      are exact in both directions; and the choice survives a fresh load
+ *  18. the switch leaves the reader looking at the graph, and "Reset View"
+ *      neither changes which view they are in nor stores one for them --
+ *      17 checks the state the switch reaches, not the camera it leaves
+ *      behind, and both of those shipped green underneath it
  *
  * Assertions 1-11, 13 and 14 run at 1600x1000. Assertion 12 opens a second,
  * phone-sized context (393x830, isMobile + hasTouch) so the narrow-screen
@@ -195,7 +199,7 @@ function startServer(rootDir) {
 // --- reporting -------------------------------------------------------------
 // Every assertion must run: a suite that silently stops short is a failure, not
 // a pass. Bump this when adding one.
-const TOTAL_ASSERTIONS = 17;
+const TOTAL_ASSERTIONS = 18;
 
 // --- ordered arrival budget (assertion 15) ---------------------------------
 // The index property is "the same bytes in, the same pixels out". These are
@@ -2053,6 +2057,203 @@ async function main() {
                 : 'persistence: NOT MEASURED\n') +
             viewNotes.map(n => n + '\n').join('') +
             (describeSince(snap17).join('\n') || 'no errors'));
+
+        // ---------------------------------------------------------------- 18
+        // What the reader is actually LOOKING AT after using the switch.
+        //
+        // Assertion 17 proves the switch reaches the right state. It says
+        // nothing about the camera, and nothing about the controls around it —
+        // so both of these shipped with 17 green:
+        //
+        //   a. FRAMING. Index -> Network releases the pins and the solver
+        //      expands the graph well past the index's extent, but the camera
+        //      stayed on the index's zoom and pan. Measured before the fix:
+        //      9.7% of nodes still on canvas at 1600x950, 13.1% at 393x830,
+        //      and still 8.6% / 11.4% six seconds later — it never recovered.
+        //      Every flag assertion 17 reads was correct the whole time.
+        //
+        //   b. RESET VIEW MUST NOT CHOOSE A VIEW. resetView() used to force the
+        //      index and persist the choice, so one click moved a Network
+        //      reader into the index permanently. It compounds with (a): when
+        //      the graph flies off-screen, "Reset View" is the obvious
+        //      recovery, so the natural sequence ended with the reader stuck in
+        //      the view they never picked.
+        //
+        // The budget is deliberately loose. This failure is an order of
+        // magnitude, not a few percent, and a tight threshold here would only
+        // make the assertion flap on solver noise.
+        phase = 'view-framing';
+        const snap18 = snapshotErrors();
+        const MIN_ONSCREEN_PCT = 60;
+
+        let fArrival = null, fAfterSwitch = null, fReset = null, fResetReload = null;
+        const frameNotes = [];
+
+        {
+            const fCtx = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
+            try {
+                const fPage = await fCtx.newPage();
+                fPage.on('pageerror', (e) => pageErrors.push({ phase, text: (e && e.stack) || String(e) }));
+                fPage.on('console', (msg) => {
+                    if (msg.type() === 'error') consoleErrors.push({ phase, text: msg.text() });
+                });
+                fPage.on('response', (res) => {
+                    const rec = { phase, status: res.status(), url: res.url() };
+                    allResponses.push(rec);
+                    if (rec.status >= 400) badResponses.push(rec);
+                });
+                await fPage.route('**/*', async (route) => {
+                    const url = route.request().url();
+                    for (const asset of CDN_ASSETS) {
+                        if (url === asset.url || url.startsWith(asset.url.split('?')[0])) {
+                            await route.fulfill({
+                                status: 200,
+                                contentType: 'text/javascript; charset=utf-8',
+                                body: mirror[asset.url]
+                            });
+                            return;
+                        }
+                    }
+                    await route.continue();
+                });
+
+                // Share of drawn nodes whose canvas point lies inside the
+                // container. Read through canvasToDOM so it is the camera being
+                // measured, not the layout — a correct layout framed wrongly is
+                // exactly the bug.
+                const onScreen = (p) => p.evaluate(() => {
+                    const c = network.body.container;
+                    const ids = Object.keys(network.getPositions());
+                    let inside = 0;
+                    ids.forEach((id) => {
+                        const pt = network.canvasToDOM(network.getPositions([id])[id]);
+                        if (pt.x >= 0 && pt.x <= c.clientWidth &&
+                            pt.y >= 0 && pt.y <= c.clientHeight) inside++;
+                    });
+                    return {
+                        total: ids.length,
+                        inside,
+                        pct: ids.length ? +(100 * inside / ids.length).toFixed(1) : 0
+                    };
+                });
+
+                await fPage.goto(`${base}/viewer.html`, { waitUntil: 'domcontentloaded' });
+                await waitLoaded(fPage);
+                await sleep(1400);
+                fArrival = await onScreen(fPage);
+
+                // (a) out to the index and back, by clicking, then let the
+                // released solver run well past the settle the fix fits on.
+                frameNotes.push(`click #view-index: ${await clickView(fPage, 'view-index')}`);
+                await settle(fPage);
+                frameNotes.push(`click #view-network: ${await clickView(fPage, 'view-network')}`);
+                await sleep(5000);
+                fAfterSwitch = await onScreen(fPage);
+
+                // (b) Reset View, from Network, must leave the view alone AND
+                // leave the stored preference alone.
+                //
+                // Checked on a page that has NOT touched the switch, which is
+                // how the bug presented: a first-time visitor, nothing stored,
+                // one click on Reset, and they are in the index for good. Doing
+                // it on the page above would prove less — that page clicked its
+                // way to Network, so a stored 'network' there is correct and
+                // the assertion could not tell "reset wrote it" from "the click
+                // wrote it".
+                const rCtx = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
+                try {
+                    const rPage = await rCtx.newPage();
+                    rPage.on('pageerror', (e) => pageErrors.push({ phase, text: (e && e.stack) || String(e) }));
+                    rPage.on('console', (msg) => {
+                        if (msg.type() === 'error') consoleErrors.push({ phase, text: msg.text() });
+                    });
+                    await rPage.route('**/*', async (route) => {
+                        const url = route.request().url();
+                        for (const asset of CDN_ASSETS) {
+                            if (url === asset.url || url.startsWith(asset.url.split('?')[0])) {
+                                await route.fulfill({
+                                    status: 200,
+                                    contentType: 'text/javascript; charset=utf-8',
+                                    body: mirror[asset.url]
+                                });
+                                return;
+                            }
+                        }
+                        await route.continue();
+                    });
+                    await rPage.goto(`${base}/viewer.html`, { waitUntil: 'domcontentloaded' });
+                    await waitLoaded(rPage);
+                    await sleep(1200);
+                    const rBefore = await readView(rPage);
+                    frameNotes.push(`before Reset: view=${rBefore.view} ` +
+                        `stored=${rBefore.stored === null ? 'nothing' : rBefore.stored}`);
+
+                    await rPage.evaluate(() => { resetView(); });
+                    await sleep(1600);
+                    fReset = await readView(rPage);
+
+                    // Same context, fresh page: if Reset persisted a choice,
+                    // this is where it shows up. Reading it from the OTHER
+                    // context would only report what the switch clicks stored.
+                    const rPage2 = await rCtx.newPage();
+                    await rPage2.route('**/*', async (route) => {
+                        const url = route.request().url();
+                        for (const asset of CDN_ASSETS) {
+                            if (url === asset.url || url.startsWith(asset.url.split('?')[0])) {
+                                await route.fulfill({
+                                    status: 200,
+                                    contentType: 'text/javascript; charset=utf-8',
+                                    body: mirror[asset.url]
+                                });
+                                return;
+                            }
+                        }
+                        await route.continue();
+                    });
+                    await rPage2.goto(`${base}/viewer.html`, { waitUntil: 'domcontentloaded' });
+                    await waitLoaded(rPage2);
+                    await sleep(1200);
+                    fResetReload = await readView(rPage2);
+                } finally {
+                    await rCtx.close().catch(() => {});
+                }
+            } catch (e) {
+                frameNotes.push(`framing probe failed: ${(e && e.message) || e}`);
+            } finally {
+                await fCtx.close().catch(() => {});
+            }
+        }
+
+        const framingOk = !!fArrival && !!fAfterSwitch &&
+            fArrival.pct >= MIN_ONSCREEN_PCT && fAfterSwitch.pct >= MIN_ONSCREEN_PCT;
+        // Reset must be a no-op on WHICH view, and must not write a preference
+        // the reader never expressed.
+        const resetOk = !!fReset && !!fResetReload &&
+            fReset.view === 'network' && fReset.stored === null &&
+            fResetReload.view === 'network' && fResetReload.stored === null;
+
+        record(18,
+            'using the switch leaves the graph on screen, and "Reset View" ' +
+            'neither changes which view the reader is in nor remembers one for them',
+            framingOk && resetOk && cleanSince(snap18),
+            (fArrival && fAfterSwitch
+                ? `nodes on canvas: arrival ${fArrival.inside}/${fArrival.total} (${fArrival.pct}%), ` +
+                  `after index -> network ${fAfterSwitch.inside}/${fAfterSwitch.total} ` +
+                  `(${fAfterSwitch.pct}%, budget >= ${MIN_ONSCREEN_PCT}%)` +
+                  `${framingOk ? '' : ' <-- SWITCHED TO AN OFF-SCREEN GRAPH'}\n`
+                : 'framing: NOT MEASURED\n') +
+            (fReset
+                ? `after Reset View from Network: view=${fReset.view} ` +
+                  `stored=${fReset.stored === null ? 'nothing' : fReset.stored}` +
+                  `${fReset.view === 'network' && fReset.stored === null ? '' : ' <-- RESET CHANGED THE VIEW'}\n`
+                : 'reset: NOT MEASURED\n') +
+            (fResetReload
+                ? `reload afterwards: view=${fResetReload.view} ` +
+                  `stored=${fResetReload.stored === null ? 'nothing' : fResetReload.stored}` +
+                  `${fResetReload.view === 'network' ? '' : ' <-- RESET WAS PERSISTED'}\n`
+                : 'reload after reset: NOT MEASURED\n') +
+            frameNotes.map(n => n + '\n').join('') +
+            (describeSince(snap18).join('\n') || 'no errors'));
 
     } catch (err) {
         console.error('\n\x1b[31mHARNESS ERROR\x1b[0m:', err && err.stack || err);
