@@ -3,7 +3,7 @@
  * Headless browser smoke + interaction test for docs/graph/viewer.html.
  *
  * Serves docs/graph on a free port, drives the viewer with Playwright's
- * bundled Chromium, and asserts sixteen things:
+ * bundled Chromium, and asserts seventeen things:
  *
  *   1. viewer.html loads with ZERO pageerror and ZERO console-error events
  *   2. a <canvas> exists and vis-network has actually rendered nodes
@@ -24,24 +24,39 @@
  *      leaks: after threads -> dissolution -> evidence the hub nodes are gone,
  *      status colours are back, gate edges are undashed and evidence is still
  *      clickable
- *  15. the evidence graph ARRIVES as a deterministic ordered index: two
- *      independent loads in separate browser contexts put every node on the
- *      same coordinates, nothing drifts after arrival (physics is off in the
- *      only sense the reader can perceive — every node pinned, zero
- *      displacement over a settle window), and a round trip out to another
- *      graph and back restores those coordinates EXACTLY, not approximately
+ *  15. the evidence graph's INDEX view is a deterministic ordered index: two
+ *      independent loads in separate browser contexts, each asked for the
+ *      index through the switch, put every node on the same coordinates,
+ *      nothing drifts once it is drawn (physics is off in the only sense the
+ *      reader can perceive — every node pinned, zero displacement over a
+ *      settle window), and a round trip out to another graph and back restores
+ *      those coordinates EXACTLY, not approximately
  *  16. that ordered index is LEGIBLE, not merely ordered: captions render at
  *      or above ORDERED_TARGET_LABEL_PX once the grid is fitted, the lane and
  *      date-band axes are actually named, and those headings do not swallow
  *      clicks meant for the graph underneath them
+ *  17. the NETWORK/INDEX view switch is real, reversible and remembered: a
+ *      first-time visitor arrives in Network with physics running, nothing
+ *      pinned and every type in play; Index pins all of it; both round trips
+ *      are exact in both directions; and the choice survives a fresh load
  *
  * Assertions 1-11, 13 and 14 run at 1600x1000. Assertion 12 opens a second,
  * phone-sized context (393x830, isMobile + hasTouch) so the narrow-screen
  * layout is pinned without disturbing the desktop measurements the others
  * depend on. Assertion 15 opens two further desktop contexts, because "the
- * same every load" is only testable across genuinely separate loads, and
- * assertion 16 opens one more at 1600x1000: caption size is a function of the
- * fitted zoom, so it has to be read on a window whose size is known.
+ * same every load" is only testable across genuinely separate loads,
+ * assertion 16 opens one more at 1600x1000 (caption size is a function of the
+ * fitted zoom, so it has to be read on a window whose size is known), and
+ * assertion 17 opens one more still, because a first-time visitor is by
+ * definition a context with empty localStorage.
+ *
+ * THE DEFAULT VIEW MOVED. viewer.html's DEFAULT_VIEW is VIEW_NETWORK: the
+ * evidence graph opens force-directed, and the ordered index is one tap away
+ * rather than the thing that arrives. Assertions 15 and 16 were written when
+ * the index was the arrival, so they now ASK for it first -- through the same
+ * chip a reader clicks, not by poking the flag, so a switch that stopped
+ * working would take them down with it. Neither budget moved: both are still
+ * tolerance-zero, and both still measure the index and nothing else.
  *
  * Assertion 13 and assertion 15 are deliberately complementary, and both are
  * load-bearing. 13 pins the mode flags on the way back from another graph
@@ -180,7 +195,7 @@ function startServer(rootDir) {
 // --- reporting -------------------------------------------------------------
 // Every assertion must run: a suite that silently stops short is a failure, not
 // a pass. Bump this when adding one.
-const TOTAL_ASSERTIONS = 16;
+const TOTAL_ASSERTIONS = 17;
 
 // --- ordered arrival budget (assertion 15) ---------------------------------
 // The index property is "the same bytes in, the same pixels out". These are
@@ -339,6 +354,28 @@ async function canvasInk(page) {
             fraction: total ? nonBg / total : 0
         };
     });
+}
+
+// The evidence graph opens in NETWORK view (viewer.html's DEFAULT_VIEW).
+// Anything that wants to measure the ORDERED INDEX has to ask for it first --
+// and asks the way a reader does, by clicking the switch in #chip-bar, so that
+// a switch which silently stopped working takes the index assertions down with
+// it instead of leaving them measuring a physics cloud and calling it a grid.
+// Returns what it did, so the assertion can report "no #view-index" rather than
+// timing out somewhere further along.
+async function enterIndexView(page) {
+    const outcome = await page.evaluate(() => {
+        const el = document.getElementById('view-index');
+        if (!el) return 'no #view-index in the DOM';
+        const group = document.getElementById('view-switch');
+        if (group && group.classList.contains('mode-hidden')) return 'switch hidden';
+        if (el.classList.contains('view-active')) return 'already in index view';
+        el.click();
+        return 'clicked';
+    });
+    await sleep(900);
+    await settle(page);
+    return outcome;
 }
 
 async function typeSearch(page, term) {
@@ -1351,9 +1388,18 @@ async function main() {
         }
 
         // ---------------------------------------------------------------- 15
-        // The evidence graph arrives as a deterministic ordered index.
+        // The evidence graph's INDEX view is a deterministic ordered index.
         //
-        // This is the single property the ordered-arrival change rests on, and
+        // The index is no longer what arrives -- viewer.html's DEFAULT_VIEW is
+        // VIEW_NETWORK, on the owner's instruction -- so this asks for it
+        // first, by clicking #view-index the way a reader does. That is the
+        // only change: the property being measured, and the zero tolerance it
+        // is measured to, are exactly as they were. Asking through the DOM
+        // rather than through setViewMode() is deliberate; a switch that
+        // stopped being wired up would fail here rather than quietly leaving
+        // this assertion measuring a physics cloud and calling it a grid.
+        //
+        // This is the single property the ordered index rests on, and
         // it is the one thing none of assertions 1-14 can see. Assertion 13
         // checks the mode FLAGS after a round trip and tolerates half the
         // distinct-x count drifting away, because it was written when the
@@ -1369,7 +1415,7 @@ async function main() {
         //      integer pair. Comparing within one page would prove nothing —
         //      it is the second *load* that has to agree.
         //
-        //   b. NOTHING MOVES AFTER ARRIVAL. "Physics off" is asserted as the
+        //   b. NOTHING MOVES ONCE IT IS DRAWN. "Physics off" is asserted as the
         //      reader experiences it rather than as an options flag, because
         //      the viewer deliberately leaves physics.enabled true (assertion
         //      13 requires it) and instead pins every node. Both halves are
@@ -1453,6 +1499,7 @@ async function main() {
         let arrivalA = null, arrivalB = null, afterDrift = null, afterTrip = null;
         let driftDelta = null, reloadDelta = null, tripDelta = null;
         const orderedNotes = [];
+        const enterNotes = [];
 
         for (const which of ['A', 'B']) {
             const oCtx = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
@@ -1486,6 +1533,11 @@ async function main() {
 
                 await oPage.goto(`${base}/viewer.html`, { waitUntil: 'domcontentloaded' });
                 await waitLoaded(oPage);
+                // A fresh context has empty localStorage, so both loads open in
+                // Network. Ask for the index through the switch. Recorded per
+                // context because "the same every load" has to mean the same
+                // gesture every load too.
+                enterNotes.push(`${which}: ${await enterIndexView(oPage)}`);
 
                 if (which === 'A') {
                     arrivalA = await readOrdered(oPage);
@@ -1508,6 +1560,11 @@ async function main() {
                     await oPage.selectOption('#graph-select', 'evidence');
                     await waitLoaded(oPage);
                     await sleep(1500);
+                    // Deliberately NOT re-clicking the switch here. The reader
+                    // chose Index before the detour, and the graph they left in
+                    // Index is the graph they must come back to; a viewer that
+                    // needs the switch pressed again after every graph change
+                    // has a preference it does not honour.
                     afterTrip = await readOrdered(oPage);
                     tripDelta = displacement(arrivalA.coords, afterTrip.coords);
                 } else {
@@ -1570,6 +1627,7 @@ async function main() {
                   `${reloadDelta.worst.length ? '\n  ' + reloadDelta.worst.join('\n  ') : ''}` +
                   `${reloadDelta.missing.length ? '\n  missing: ' + reloadDelta.missing.join(', ') : ''}\n`
                 : 'second load: NOT MEASURED\n') +
+            `entered the index by clicking the switch: ${enterNotes.join('; ') || 'NOT ATTEMPTED'}\n` +
             orderedNotes.map(n => n + '\n').join('') +
             (tripDelta
                 ? `back from dissolution: ${tripDelta.movedCount} nodes differ, ` +
@@ -1604,6 +1662,7 @@ async function main() {
         const snap16 = snapshotErrors();
 
         let legibility = null;
+        let legibilityEntry = 'not attempted';
         {
             const lCtx = await browser.newContext({ viewport: LEGIBILITY_VIEWPORT });
             try {
@@ -1633,6 +1692,9 @@ async function main() {
                 });
                 await lPage.goto(`${base}/viewer.html`, { waitUntil: 'domcontentloaded' });
                 await waitLoaded(lPage);
+                // Same reason as assertion 15: this measures the INDEX, and the
+                // index is no longer what arrives.
+                legibilityEntry = await enterIndexView(lPage);
                 await sleep(1200);
 
                 legibility = await lPage.evaluate(() => {
@@ -1699,6 +1761,7 @@ async function main() {
             'the ordered index is legible: captions at or above the target size ' +
             'and named axes that do not swallow clicks',
             ok16,
+            `entered the index by clicking the switch: ${legibilityEntry}\n` +
             (legibility
                 ? `at ${LEGIBILITY_VIEWPORT.width}x${LEGIBILITY_VIEWPORT.height}: ` +
                   `fit scale ${legibility.scale}, font ${legibility.font} -> ` +
@@ -1717,6 +1780,279 @@ async function main() {
                   `${legibility.clickThrough ? '' : ' <-- HEADINGS EAT CLICKS'}`
                 : 'NOT MEASURED') +
             '\n' + (describeSince(snap16).join('\n') || 'no errors'));
+
+        // ---------------------------------------------------------------- 17
+        // The view switch: two co-equal readings, reversibly.
+        //
+        // The index replaced the graph instead of joining it. It is now one of
+        // two views, and NETWORK -- force-directed, physics running, nothing
+        // pinned, every type in play -- is what a first-time visitor gets.
+        // That makes three separate things breakable, and none of 1-16 can see
+        // any of them:
+        //
+        //   a. THE DEFAULT. A context with empty localStorage must land in
+        //      Network, and "Network" has to mean it: physics option on, ZERO
+        //      pinned nodes, and the full type set. Not the 93-claim index
+        //      default drawn as a cloud -- that is the index's node set wearing
+        //      the graph's layout, which is neither view, and it is exactly
+        //      what happens if the claims-only default is left keyed to the
+        //      graph instead of to the view.
+        //
+        //   b. BOTH ROUND TRIPS, BOTH DIRECTIONS. This file has been bitten
+        //      twice by a return path that half-worked (see the comment above
+        //      `layoutOverride = null`), so each direction is measured on its
+        //      own terms rather than assumed from the other:
+        //        index -> network -> index  restores the SAME INTEGERS. Zero
+        //          tolerance, for the same reason assertion 15 has none: one
+        //          unit of drift is one unit of physics.
+        //        network -> index -> network leaves physics GENUINELY RUNNING.
+        //          Not "the option is true" -- the option is true in the index
+        //          too, by design. Nodes have to actually move, which is the
+        //          only reading a stale `fixed` cannot forge.
+        //
+        //   c. THE PREFERENCE PERSISTS. Checked by reloading the page, in both
+        //      directions, because a preference that is only remembered in a
+        //      JS variable is not remembered at all. Both reloads matter: one
+        //      that only ever stores 'index' would also pass a viewer that had
+        //      simply gone back to opening on the index.
+        //
+        // Assertions 15 and 16 lean on this: both now enter the index by
+        // clicking #view-index, so a broken switch fails three assertions
+        // rather than silently redefining what two of them measure.
+        // ------------------------------------------------------------------
+        phase = 'view-switch';
+        const snap17 = snapshotErrors();
+
+        // Everything the switch can get wrong, read off the live network.
+        // `unpinnedNodes` counts `fixed === false` specifically rather than
+        // "not pinned": vis leaves `fixed` undefined on a node nobody ever
+        // pinned, and undefined is how a node that was never released looks.
+        const readView = (p) => p.evaluate(() => {
+            const pos = network.getPositions();
+            const ids = Object.keys(pos).sort();
+            const items = nodesDataSet.get();
+            const types = (typeof activeTypes !== 'undefined' && activeTypes) ? activeTypes : {};
+            const typeKeys = Object.keys(types);
+            const group = document.getElementById('view-switch');
+            let stored;
+            try { stored = window.localStorage.getItem('lucier-graph-view'); }
+            catch (e) { stored = 'THREW'; }
+            return {
+                view: (typeof currentView === 'function') ? currentView() : null,
+                explore: (typeof exploreMode !== 'undefined') ? !!exploreMode : null,
+                stored,
+                ordered: (typeof orderedLayoutActive !== 'undefined') ? !!orderedLayoutActive : null,
+                overrideCleared: typeof layoutOverride === 'undefined' || layoutOverride === null,
+                hierarchical: !!(network.layoutEngine && network.layoutEngine.options &&
+                    network.layoutEngine.options.hierarchical &&
+                    network.layoutEngine.options.hierarchical.enabled),
+                physicsOption: !!network.physics.options.enabled,
+                totalNodes: items.length,
+                pinnedNodes: items.filter(n => n.fixed && n.fixed.x === true && n.fixed.y === true).length,
+                unpinnedNodes: items.filter(n => n.fixed === false).length,
+                visibleNodes: items.filter(n => n.hidden !== true).length,
+                typesOn: typeKeys.filter(k => types[k] !== false).length,
+                typesTotal: typeKeys.length,
+                switchShown: !!(group && !group.classList.contains('mode-hidden')),
+                lit: ['view-network', 'view-index']
+                    .filter(id => {
+                        const el = document.getElementById(id);
+                        return el && el.classList.contains('view-active');
+                    }).join(',') || 'none',
+                distinctX: new Set(ids.map(id => Math.round(pos[id].x))).size,
+                coords: ids.map(id => `${id}:${Math.round(pos[id].x)},${Math.round(pos[id].y)}`)
+            };
+        });
+
+        const clickView = async (p, id) => {
+            const outcome = await p.evaluate((which) => {
+                const el = document.getElementById(which);
+                if (!el) return `no #${which}`;
+                const group = document.getElementById('view-switch');
+                if (group && group.classList.contains('mode-hidden')) return 'switch hidden';
+                const rect = el.getBoundingClientRect();
+                if (rect.width < 40 || rect.height < 40) {
+                    // Not fatal on a desktop -- the 40x40 floor is the mobile
+                    // rule -- but worth carrying into the report.
+                    el.click();
+                    return `clicked (${Math.round(rect.width)}x${Math.round(rect.height)})`;
+                }
+                el.click();
+                return 'clicked';
+            }, id);
+            await sleep(900);
+            return outcome;
+        };
+
+        let vArrival = null, vIndex1 = null, vNetwork1 = null, vIndex2 = null;
+        let vMoved = null, vReloadIndex = null, vReloadNetwork = null;
+        let indexTripDelta = null;
+        const viewNotes = [];
+
+        {
+            const vCtx = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
+            try {
+                const vPage = await vCtx.newPage();
+                vPage.on('pageerror', (e) => pageErrors.push({ phase, text: (e && e.stack) || String(e) }));
+                vPage.on('console', (msg) => {
+                    if (msg.type() === 'error') consoleErrors.push({ phase, text: msg.text() });
+                });
+                vPage.on('response', (res) => {
+                    const rec = { phase, status: res.status(), url: res.url() };
+                    allResponses.push(rec);
+                    if (rec.status >= 400) badResponses.push(rec);
+                });
+                await vPage.route('**/*', async (route) => {
+                    const url = route.request().url();
+                    for (const asset of CDN_ASSETS) {
+                        if (url === asset.url || url.startsWith(asset.url.split('?')[0])) {
+                            await route.fulfill({
+                                status: 200,
+                                contentType: 'text/javascript; charset=utf-8',
+                                body: mirror[asset.url]
+                            });
+                            return;
+                        }
+                    }
+                    await route.continue();
+                });
+
+                // (a) first-time visitor: nothing stored, nothing remembered.
+                await vPage.goto(`${base}/viewer.html`, { waitUntil: 'domcontentloaded' });
+                await waitLoaded(vPage);
+                await sleep(1200);
+                vArrival = await readView(vPage);
+
+                // -> index
+                viewNotes.push(`click #view-index: ${await clickView(vPage, 'view-index')}`);
+                await settle(vPage);
+                vIndex1 = await readView(vPage);
+
+                // -> network. Sampled immediately and again a beat later: the
+                // question is whether the solver is integrating, and the only
+                // honest answer is that the nodes are somewhere else now.
+                viewNotes.push(`click #view-network: ${await clickView(vPage, 'view-network')}`);
+                const beforeMove = await readView(vPage);
+                await sleep(1400);
+                vNetwork1 = await readView(vPage);
+                vMoved = displacement(beforeMove.coords, vNetwork1.coords);
+
+                // -> index again. Same integers, or the return path is
+                // recomputing the grid from something other than the data.
+                viewNotes.push(`click #view-index: ${await clickView(vPage, 'view-index')}`);
+                await settle(vPage);
+                vIndex2 = await readView(vPage);
+                indexTripDelta = displacement(vIndex1.coords, vIndex2.coords);
+
+                // (c) the preference survives a real load, both ways round.
+                await vPage.reload({ waitUntil: 'domcontentloaded' });
+                await waitLoaded(vPage);
+                await sleep(1200);
+                vReloadIndex = await readView(vPage);
+
+                viewNotes.push(`click #view-network: ${await clickView(vPage, 'view-network')}`);
+                await vPage.reload({ waitUntil: 'domcontentloaded' });
+                await waitLoaded(vPage);
+                await sleep(1200);
+                vReloadNetwork = await readView(vPage);
+            } finally {
+                await vCtx.close().catch(() => {});
+            }
+        }
+        phase = 'view-switch';
+
+        const defaultOk = !!vArrival &&
+            vArrival.view === 'network' && vArrival.explore === true &&
+            vArrival.ordered === true && vArrival.switchShown === true &&
+            vArrival.lit === 'view-network' &&
+            vArrival.physicsOption === true && !vArrival.hierarchical &&
+            vArrival.overrideCleared &&
+            vArrival.pinnedNodes === 0 &&
+            vArrival.unpinnedNodes === vArrival.totalNodes &&
+            // The full default node set, not the index's 93 claims.
+            vArrival.visibleNodes === vArrival.totalNodes &&
+            vArrival.typesOn === vArrival.typesTotal && vArrival.typesTotal > 0;
+
+        const indexOk = !!vIndex1 &&
+            vIndex1.view === 'index' && vIndex1.lit === 'view-index' &&
+            vIndex1.pinnedNodes === vIndex1.totalNodes && vIndex1.totalNodes > 0 &&
+            vIndex1.distinctX > 1 && vIndex1.distinctX < vIndex1.totalNodes &&
+            vIndex1.visibleNodes < vIndex1.totalNodes;
+
+        const backToNetworkOk = !!vNetwork1 && !!vMoved &&
+            vNetwork1.view === 'network' && vNetwork1.lit === 'view-network' &&
+            vNetwork1.physicsOption === true &&
+            vNetwork1.pinnedNodes === 0 &&
+            vNetwork1.unpinnedNodes === vNetwork1.totalNodes &&
+            vNetwork1.visibleNodes === vNetwork1.totalNodes &&
+            vNetwork1.typesOn === vNetwork1.typesTotal &&
+            // Physics genuinely running, not merely enabled.
+            vMoved.total > 0;
+
+        const indexTripOk = !!indexTripDelta &&
+            indexTripDelta.missingCount === 0 &&
+            indexTripDelta.movedCount <= ORDERED_MAX_RELOAD_DELTA &&
+            indexTripDelta.total <= ORDERED_MAX_RELOAD_DELTA &&
+            !!vIndex2 && vIndex2.pinnedNodes === vIndex2.totalNodes;
+
+        const persistOk = !!vReloadIndex && !!vReloadNetwork &&
+            vReloadIndex.view === 'index' && vReloadIndex.stored === 'index' &&
+            vReloadIndex.pinnedNodes === vReloadIndex.totalNodes &&
+            vReloadNetwork.view === 'network' && vReloadNetwork.stored === 'network' &&
+            vReloadNetwork.pinnedNodes === 0;
+
+        const ok17 = defaultOk && indexOk && backToNetworkOk && indexTripOk &&
+            persistOk && cleanSince(snap17);
+        record(17,
+            'the NETWORK/INDEX view switch is co-equal, reversible and remembered ' +
+            '(Network is the default and really unpinned, both round trips are exact, ' +
+            'the choice survives a reload)',
+            ok17,
+            (vArrival
+                ? `first visit (empty storage): view=${vArrival.view} lit=${vArrival.lit} ` +
+                  `stored=${vArrival.stored === null ? 'nothing' : vArrival.stored} ` +
+                  `switchShown=${vArrival.switchShown} ` +
+                  `pinned=${vArrival.pinnedNodes}/${vArrival.totalNodes} ` +
+                  `released=${vArrival.unpinnedNodes}/${vArrival.totalNodes} ` +
+                  `visible=${vArrival.visibleNodes}/${vArrival.totalNodes} ` +
+                  `types=${vArrival.typesOn}/${vArrival.typesTotal} ` +
+                  `physicsOption=${vArrival.physicsOption} distinctX=${vArrival.distinctX}` +
+                  `${defaultOk ? '' : ' <-- NOT THE NETWORK VIEW'}\n`
+                : 'first visit: NOT MEASURED\n') +
+            (vIndex1
+                ? `-> index: view=${vIndex1.view} lit=${vIndex1.lit} ` +
+                  `pinned=${vIndex1.pinnedNodes}/${vIndex1.totalNodes} ` +
+                  `visible=${vIndex1.visibleNodes}/${vIndex1.totalNodes} ` +
+                  `distinctX=${vIndex1.distinctX}` +
+                  `${indexOk ? '' : ' <-- NOT THE INDEX'}\n`
+                : '-> index: NOT MEASURED\n') +
+            (vNetwork1
+                ? `-> network: view=${vNetwork1.view} lit=${vNetwork1.lit} ` +
+                  `pinned=${vNetwork1.pinnedNodes}/${vNetwork1.totalNodes} ` +
+                  `released=${vNetwork1.unpinnedNodes}/${vNetwork1.totalNodes} ` +
+                  `visible=${vNetwork1.visibleNodes}/${vNetwork1.totalNodes} ` +
+                  `types=${vNetwork1.typesOn}/${vNetwork1.typesTotal} ` +
+                  `physicsOption=${vNetwork1.physicsOption}, ` +
+                  `solver moved ${vMoved ? vMoved.movedCount : '?'} nodes ` +
+                  `${vMoved ? vMoved.total : '?'} units in 1400ms` +
+                  `${backToNetworkOk ? '' : ' <-- PHYSICS NOT ACTUALLY RUNNING'}\n`
+                : '-> network: NOT MEASURED\n') +
+            (indexTripDelta
+                ? `index -> network -> index: ${indexTripDelta.movedCount} nodes differ, ` +
+                  `total delta ${indexTripDelta.total} units (budget ${ORDERED_MAX_RELOAD_DELTA}), ` +
+                  `pinned=${vIndex2.pinnedNodes}/${vIndex2.totalNodes}` +
+                  `${indexTripOk ? '' : ' <-- ROUND TRIP NOT EXACT'}` +
+                  `${indexTripDelta.worst.length ? '\n  ' + indexTripDelta.worst.join('\n  ') : ''}\n`
+                : 'index round trip: NOT MEASURED\n') +
+            (vReloadIndex && vReloadNetwork
+                ? `after reload with 'index' remembered: view=${vReloadIndex.view} ` +
+                  `stored=${vReloadIndex.stored} pinned=${vReloadIndex.pinnedNodes}/${vReloadIndex.totalNodes}\n` +
+                  `after reload with 'network' remembered: view=${vReloadNetwork.view} ` +
+                  `stored=${vReloadNetwork.stored} pinned=${vReloadNetwork.pinnedNodes}/${vReloadNetwork.totalNodes}` +
+                  `${persistOk ? '' : ' <-- PREFERENCE NOT PERSISTED'}\n`
+                : 'persistence: NOT MEASURED\n') +
+            viewNotes.map(n => n + '\n').join('') +
+            (describeSince(snap17).join('\n') || 'no errors'));
 
     } catch (err) {
         console.error('\n\x1b[31mHARNESS ERROR\x1b[0m:', err && err.stack || err);

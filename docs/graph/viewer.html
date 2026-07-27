@@ -221,6 +221,57 @@
             color: #ffffff;
         }
 
+        /* ---- the view switch ----
+           Deliberately NOT styled like the entry chips. An entry point is one
+           of six doors into the same picture and any of them can be the way in;
+           these two are mutually exclusive states of the picture itself, so
+           they read as a segmented control — one shared pill, a hard divider,
+           and only ever one half lit. Sharing the entry-chip look would invite
+           the reading "Network is another kind of index", which is the exact
+           confusion the switch exists to end. */
+        #view-switch .view-chip {
+            opacity: 1;
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.30);
+            font-weight: 600;
+            border-radius: 0;
+            margin: 0;
+        }
+
+        #view-switch .view-chip:first-of-type {
+            border-radius: 12px 0 0 12px;
+        }
+
+        #view-switch .view-chip:last-of-type {
+            border-radius: 0 12px 12px 0;
+            border-left-width: 0;
+        }
+
+        #view-switch .view-chip:hover {
+            background: rgba(255,255,255,0.20);
+        }
+
+        #view-switch .view-chip.view-active,
+        #view-switch .view-chip.view-active:hover {
+            background: #27ae60;
+            border-color: #2ecc71;
+            color: #ffffff;
+        }
+
+        /* The group is a control, so its two halves must not be separated by
+           the chip-group gap the way independent filters are. Written with
+           enough specificity to beat the narrow-screen `#chip-bar .chip-group
+           { gap: 8px }` further down the file, which would otherwise split the
+           pill in two on the one screen where it matters most. */
+        #chip-bar #view-switch.chip-group {
+            gap: 0;
+        }
+
+        /* The label still needs its own air, since the gap is now zero. */
+        #view-switch .chip-group-label {
+            margin-right: 6px;
+        }
+
         #container {
             display: flex;
             flex: 1;
@@ -1614,7 +1665,11 @@
                     <span class="control-label">Model</span>
                     <select id="model-select" onchange="selectDissolutionModel(this.value)"></select>
                 </span>
-                <button id="btn-explore" onclick="toggleExplore()">Explore</button>
+                <!-- `Explore` used to live here. It was a one-way excursion out
+                     of the index and back, which is not what the graph is: the
+                     force-directed reading is a VIEW, so it moved into the
+                     view switch in #chip-bar. toggleExplore()/setExploreMode()
+                     still work and still mean the same thing. -->
                 <button id="btn-show-all" onclick="filterNodes('all')">Show All</button>
                 <button id="btn-reset" onclick="resetView()">Reset View</button>
                 <button id="btn-reload" onclick="reloadData()">Refresh Data</button>
@@ -1637,6 +1692,25 @@
     </div>
 
     <div id="chip-bar">
+        <!-- The view switch. Two co-equal readings of the same nodes and the
+             same edges — not a filter, not an entry point, and not a graph:
+             #graph-select picks WHICH data, this picks HOW it is drawn.
+
+             It rides in #chip-bar rather than in the header because that is the
+             one place that is free on a phone: the chip bar is already the
+             Filters disclosure below 768px, so the switch costs zero chrome
+             budget and inherits the 40x40 tap target the mobile .chip rule
+             gives every chip. Above 768px the chip bar is always on screen, so
+             the switch is permanently visible there. -->
+        <div class="chip-group" id="view-switch">
+            <span class="chip-group-label">View</span>
+            <button type="button" class="chip view-chip view-active" id="view-network"
+                    aria-pressed="true" title="Force-directed: physics on, nothing pinned"
+                    onclick="setViewMode('network')">Network</button>
+            <button type="button" class="chip view-chip" id="view-index"
+                    aria-pressed="false" title="Ordered grid: type across, date down"
+                    onclick="setViewMode('index')">Index</button>
+        </div>
         <!-- Front matter: an index's contents page. Each of these SETS the
              graph's state rather than navigating away. The last three are
              computed from _data/threads.json and from the corrects / retires /
@@ -2080,6 +2154,75 @@
         // is what keeps them the size of the shapes around them.
         const ORDERED_NARROW_INSIDE_WIDTH = 2 * ORDERED_NARROW_NODE_MAX - 10;
 
+        // ---------------------------------------------------------------------
+        // ARROW WEIGHT ON THE NARROW INDEX.
+        //
+        // An arrowhead in vis is sized by the EDGE, never by the node it points
+        // at. end-points.js draws the closed path (0,0) (-1,0.3) (-0.9,0)
+        // (-1,-0.3) scaled by
+        //
+        //     length = 15 * arrows.to.scaleFactor + 3 * edge.width
+        //
+        // so its ink is 0.27 * length^2 — it grows as the SQUARE of a number
+        // the edge style alone controls, while the node beside it is capped by
+        // the layout at ORDERED_NARROW_NODE_MAX. Nothing in the grid can push
+        // back on that, which is how the two ended up the same size.
+        //
+        // MEASURED, at 393x830, on the widths this data actually carries — note
+        // that these are NOT the 1..4 in RELATIONSHIP_STYLES, because
+        // edgeWidth() prefers rel.weight and the evidence relationships run
+        // 3..8 with a median of 6:
+        //
+        //     median arrow length   33.0 units   (15*1 + 3*6)
+        //     median arrowhead ink  294 u^2
+        //     median node ink       616 u^2      (disc of r = median size 14)
+        //     ratio                 47.8%
+        //
+        // Half a node each, 126 of them. That is not a connector, that is a
+        // second class of object on the canvas.
+        //
+        // And the 7% arrival opacity does not save it — checked rather than
+        // assumed. vis's drawArrowHead() takes its fill from the same
+        // getColor() the line strokes with, which returns
+        // overrideOpacity(values.color, values.opacity); the head really does
+        // fade to 0.07 with its line. It still reads as solid because a FILLED
+        // 33-unit triangle at 7% covers ~40x the area of a 6-unit line at 7%.
+        // Opacity was never the lever. Size is.
+        //
+        // So the edges get the compression the nodes already got.
+        // nodeDisplaySize() squeezes visual_config's vocabulary by
+        // ceiling/ORDERED_NODE_REF so the RATIOS between the shapes survive the
+        // squeeze; the edge vocabulary is squeezed by the same factor, applied
+        // to the width and the arrow scaleFactor TOGETHER so that `length`
+        // above scales linearly and the head shrinks with its line instead of
+        // outliving it.
+        //
+        //     scale 15/24 = 0.625 -> median length 20.6, ink 115 u^2, ratio 18.6%
+        //
+        // Linear and unclamped on purpose. A floor would flatten the bottom of
+        // the vocabulary, which is precisely the relative weight this has to
+        // preserve: a `refutes` edge must still read heavier than a `cites`
+        // one. The lightest width in the vocabulary (1) still lands at 0.625
+        // units, which vis draws.
+        //
+        // Narrow index only. The desktop index keeps visual_config's widths,
+        // because assertion 14 reads width / color.color / dashes straight off
+        // the DataSet at 1600x1000 to prove the threads gate style has not
+        // leaked into evidence — rescaling them there would make that assertion
+        // measure two unrelated things at once. Network view keeps them too:
+        // its nodes are drawn at visual_config's own sizes, so the arrows are
+        // already in proportion to them.
+        //
+        // Re-measure the way the numbers above were measured: read
+        // network.body.edges[id].edgeType.getArrowData(...).length for every
+        // edge, and network.body.nodes[id].options.size for every node, on a
+        // 393x830 context with the narrow index showing.
+        const NARROW_EDGE_SCALE = ORDERED_NARROW_NODE_MAX / ORDERED_NODE_REF;
+        // The head-to-node ink budget the scale above is solving for, kept next
+        // to it so the next person can check the arithmetic without re-deriving
+        // vis's arrow geometry: 0.27*length^2 <= NARROW_ARROW_INK_BUDGET*pi*r^2.
+        const NARROW_ARROW_INK_BUDGET = 0.25;
+
         // Severity gradient. "not-supported" sits immediately after "refuted":
         // "refuted" means the evidence contradicts the claim, "not-supported"
         // means the evidence simply failed to back it (a null result), and
@@ -2227,17 +2370,81 @@
         let activeBasins = {};             // terminal basin -> bool
         let basinColours = {};             // basin -> hex, rebuilt per model
 
-        // ---- ordered arrival / explore state --------------------------------
-        // True once applyOrderedLayout() has pinned this graph's nodes. False
-        // for dissolution (hierarchical) and isomorphism (side-pinned), which
-        // keep the layouts they already had.
+        // ---- ordered arrival / view state -----------------------------------
+        // True when this graph HAS an ordered index available: applyOrderedLayout()
+        // has computed and stored a grid position for every node. False for
+        // dissolution (hierarchical) and isomorphism (side-pinned), which keep
+        // the layouts they already had and where the view switch is therefore
+        // inert. Note "available", not "showing" — indexViewActive() is the
+        // question "is the grid on screen right now".
         let orderedLayoutActive = false;
         // Shape of the live ordered layout (lanes, bands, extent), for the
         // legend. null while another render mode supplies its own layout.
         let orderedLayout = null;
-        // The reader ENTERS physics; they do not arrive in it. While this is
-        // false every node is pinned, so the physics solver has no degrees of
-        // freedom to move and the picture cannot wobble.
+
+        // =====================================================================
+        // THE VIEW SWITCH — two co-equal readings of one graph.
+        //
+        //   NETWORK  force-directed. Physics running, nothing pinned, full
+        //            captions, edges at their own strength, every type in play.
+        //            This is the graph as it was before the index existed, and
+        //            it is what a first-time reader arrives in.
+        //   INDEX    the ordered grid. Type across, date down, every node
+        //            pinned to an integer coordinate, edges quiet, axes named.
+        //
+        // Same nodes, same edges, same DataSets, same vis.Network. Only the
+        // layout, the typography and the default scope differ — which is
+        // exactly why this is a switch over one render and NOT a second render
+        // mode: nothing here touches `layoutOverride`, so the hierarchical
+        // layout leak that loadAndInitialize() guards against is not reachable
+        // from the switch at all. Read the comment above `layoutOverride =
+        // null` before changing that.
+        //
+        // Built ON TOP OF the pre-existing explore flag rather than beside it.
+        // Two independent booleans both meaning "physics is running" is how a
+        // viewer ends up drawing the index's clipped captions over an unpinned
+        // cloud; there is exactly one, and `exploreMode === true` IS the
+        // network view.
+        // =====================================================================
+        const VIEW_NETWORK = 'network';
+        const VIEW_INDEX = 'index';
+        // THE OWNER'S CALL, written down once. The graph they already had is
+        // the graph the page opens on; the index is a view of it, not a
+        // replacement for it. One edit here flips the default for a first-time
+        // visitor and nothing else in this file has an opinion.
+        const DEFAULT_VIEW = VIEW_NETWORK;
+        const VIEW_STORAGE_KEY = 'lucier-graph-view';
+
+        // A remembered choice beats the default. Anything else — storage
+        // disabled, private mode, a value some older build wrote — falls back
+        // to the default instead of throwing: localStorage.getItem can THROW in
+        // a locked-down browser rather than merely returning null, so this is
+        // guarded and not just null-checked. A viewer that white-screens
+        // because cookies are off is a worse bug than a forgotten preference.
+        function readStoredView() {
+            try {
+                const raw = window.localStorage.getItem(VIEW_STORAGE_KEY);
+                if (raw === VIEW_NETWORK || raw === VIEW_INDEX) return raw;
+            } catch (e) { /* storage unavailable: the default stands */ }
+            return DEFAULT_VIEW;
+        }
+
+        function storeView(view) {
+            try { window.localStorage.setItem(VIEW_STORAGE_KEY, view); } catch (e) { /* ditto */ }
+        }
+
+        // The reader's standing preference, which is not the same thing as what
+        // is on screen: on a graph with no index (isomorphism, dissolution) the
+        // preference is remembered but cannot be honoured, and switching back
+        // to evidence must land where the reader left off rather than on the
+        // default.
+        let preferredView = readStoredView();
+
+        // Which reading is on screen. true = NETWORK (every node released, the
+        // solver has its degrees of freedom back); false = INDEX (every node
+        // pinned, so the solver has nothing to integrate and the picture cannot
+        // wobble). Still called exploreMode because Explore is what it grew out
+        // of and setExploreMode()/toggleExplore() still drive it.
         let exploreMode = false;
         // ---- edge emphasis ---------------------------------------------------
         // The node the reader is currently making the subject — hovered, or
@@ -2247,6 +2454,11 @@
         // Last emphasis state written to the DataSet, so a mouse crossing the
         // canvas does not rewrite 131 edges per frame.
         let edgeEmphasisSignature = null;
+        // Which edge weight the DataSet is currently carrying (see
+        // NARROW_EDGE_SCALE), so a resize that does not cross the breakpoint —
+        // which on a phone is every scroll-driven toolbar resize — costs
+        // nothing.
+        let edgeWeightSignature = null;
 
         // ---- front matter ---------------------------------------------------
         // threads.json read for the entry points. Deliberately a separate
@@ -2850,9 +3062,29 @@
         // characters recovered are the first ones that actually differ.
         const LABEL_TYPE_PREFIX = /^Q:\s*/;
 
+        // The narrow index's "no caption" label is a SPACE, not the empty
+        // string, and that is not a style choice.
+        //
+        // vis's Label.setOptions() only marks the label dirty when
+        // isValidLabel() passes, and isValidLabel is
+        // `typeof v === 'string' && v !== ''`. Assigning '' therefore does not
+        // re-measure anything — it sets options.label to undefined so nothing
+        // is DRAWN, while the cached text metrics from whatever the label used
+        // to be survive untouched. For every shape that is sized by its own
+        // label box that is a stale size, not a hidden caption: switching from
+        // Network to the narrow index left the twelve question circles at
+        // radius 234 instead of 15, measured, because their unwrapped
+        // network-view captions were still what vis thought their labels were.
+        // The same bug fires on a desktop window dragged narrow while the index
+        // is showing.
+        //
+        // A single space is a valid label, so it re-measures. It draws nothing,
+        // and nodeWidthConstraint() below is what actually sets the box.
+        const ORDERED_NARROW_BLANK_LABEL = ' ';
+
         function nodeDisplayLabel(node) {
             if (!orderedLayoutActive || exploreMode) return node.label;
-            if (orderedNarrowLayout()) return '';
+            if (orderedNarrowLayout()) return ORDERED_NARROW_BLANK_LABEL;
             const inside = LABEL_INSIDE_SHAPES.indexOf(node.shape) !== -1;
             const text = inside ? node.label.replace(LABEL_TYPE_PREFIX, '') : node.label;
             return truncate(text, inside ? ORDERED_INSIDE_LABEL_CHARS : ORDERED_LABEL_CHARS);
@@ -2942,7 +3174,7 @@
         const ORDERED_EDGE_QUIET_OPACITY = 0.07;
 
         function edgesShouldRecede() {
-            return orderedLayoutActive && !exploreMode &&
+            return indexViewActive() &&
                 renderMode !== 'threads' && !searchTerm;
         }
 
@@ -2990,6 +3222,133 @@
             applyEdgeEmphasis();
         }
 
+        // =====================================================================
+        // EDGE WEIGHT — see the NARROW_EDGE_SCALE comment for the measurements.
+        //
+        // Deliberately separate from applyEdgeEmphasis(). Emphasis writes
+        // color.opacity and font and nothing else, on purpose, because
+        // assertion 14 reads width / color.color / dashes off the DataSet to
+        // prove the threads gate style has not leaked into evidence. This
+        // writes width and arrows and nothing else. Merging them would put a
+        // per-hover rewrite in charge of the numbers that assertion reads.
+        //
+        // Nothing here goes near a coordinate. Edge width has no input into
+        // vis's fit() or its layout, so on every breakpoint the nodes are
+        // exactly where they were.
+        // =====================================================================
+        function narrowEdgeScale() {
+            // Gated on the VIEWPORT, not on the view. Scoping this to the
+            // ordered index left the complaint that prompted it — "the arrows
+            // are too thick relative to the elements (on phone)" — standing in
+            // the view a phone now opens on. Measured at 393x830, median
+            // arrowhead against median node area:
+            //
+            //     index view    16.1%   (scaled)
+            //     network view  27.2%   (unscaled, and it is the default)
+            //
+            // so the reader most likely to hit it was the one still getting it.
+            // The scale is derived from the index's node ceiling, but network
+            // view's nodes on a phone land within a unit of that ceiling, so it
+            // is the right factor for both.
+            //
+            // matchMedia is read directly rather than through isMobileLayout():
+            // that helper closes over a `const` declared ~2000 lines below, and
+            // this runs during the first render.
+            const narrow = typeof window.matchMedia === 'function' &&
+                window.matchMedia('(max-width: 768px)').matches;
+            return narrow ? NARROW_EDGE_SCALE : 1;
+        }
+
+        // vis's `arrows` is a string ('to', '', 'to;from') in the form
+        // normalizeArrows() produces, and scaleFactor only exists in the object
+        // form — so the string is PARSED rather than replaced. An edge with no
+        // head (analogous-to, breaks-down-at, both drawn headless on purpose)
+        // must not grow one here, which is what a blanket `{to: {...}}` would
+        // do to fourteen of them.
+        function arrowsAtScale(raw, scale) {
+            if (raw && typeof raw === 'object') return raw;  // already explicit; leave it alone
+            const ends = String(raw === undefined || raw === null ? 'to' : raw)
+                .split(';')
+                .map(function (s) { return s.trim(); })
+                .filter(Boolean);
+            const spec = {};
+            ['to', 'from', 'middle'].forEach(function (end) {
+                spec[end] = { enabled: ends.indexOf(end) !== -1, scaleFactor: scale };
+            });
+            return spec;
+        }
+
+        function applyEdgeWeight() {
+            if (!edgesDataSet || !allEdges || !allEdges.length) return;
+            const scale = narrowEdgeScale();
+            const signature = String(scale);
+            if (signature === edgeWeightSignature) return;
+            edgeWeightSignature = signature;
+            const narrow = scale !== 1;
+            edgesDataSet.update(allEdges.map(function (edge) {
+                return {
+                    id: edge.id,
+                    // Rebuilt from the edge's own record every time, never read
+                    // back out of a previously scaled row — otherwise crossing
+                    // the breakpoint twice would compound the scale.
+                    width: edge.width * scale,
+                    // On the way back to full weight the original string form
+                    // is restored rather than an object with scaleFactor 1, so
+                    // a wide DataSet is byte-identical to one that never
+                    // visited the narrow breakpoint.
+                    arrows: narrow ? arrowsAtScale(edge.arrows, scale) : edge.arrows
+                };
+            }));
+        }
+
+        // The head-to-node ink ratio, printed where the next person to touch
+        // NARROW_EDGE_SCALE will see it without building a harness first — the
+        // same idea as reportOrderedLegibility(), for the same reason. vis's
+        // own arrow geometry is asked rather than re-derived, so this cannot
+        // drift away from what is drawn.
+        function reportNarrowArrowWeight() {
+            if (!network || !edgesDataSet || narrowEdgeScale() === 1) return;
+            const median = function (values) {
+                if (!values.length) return 0;
+                const s = values.slice().sort(function (a, b) { return a - b; });
+                const m = s.length >> 1;
+                return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+            };
+            let ctx;
+            try {
+                ctx = document.querySelector('#graph canvas').getContext('2d');
+            } catch (e) { return; }
+            const lengths = [];
+            Object.keys(network.body.edges).forEach(function (id) {
+                const edge = network.body.edges[id];
+                if (!edge || !edge.edgeType) return;
+                const values = edge.getFormattingValues();
+                if (values.hidden || !values.toArrow) return;
+                try {
+                    const data = edge.edgeType.getArrowData(
+                        ctx, 'to', edge.edgeType.getViaNode(), false, false, values);
+                    if (data && isFinite(data.length)) lengths.push(data.length);
+                } catch (e) { /* an edge vis cannot place has no head to measure */ }
+            });
+            const sizes = [];
+            Object.keys(network.body.nodes).forEach(function (id) {
+                const node = network.body.nodes[id];
+                if (!node || !node.options || node.options.hidden) return;
+                const size = Number(node.options.size);
+                if (isFinite(size) && size > 0) sizes.push(size);
+            });
+            if (!lengths.length || !sizes.length) return;
+            // 0.27 * length^2 is the area of vis's arrow polygon; pi * r^2 is
+            // the node as a disc of its drawn radius.
+            const head = 0.27 * Math.pow(median(lengths), 2);
+            const node = Math.PI * Math.pow(median(sizes), 2);
+            console.log('Narrow index arrows: scale ' + NARROW_EDGE_SCALE.toFixed(3) +
+                ', median head ' + median(lengths).toFixed(1) + ' units = ' + head.toFixed(0) +
+                'u^2 against a median node of ' + node.toFixed(0) + 'u^2 — ' +
+                (head / node * 100).toFixed(1) + '% (budget <= ' +
+                (NARROW_ARROW_INK_BUDGET * 100).toFixed(0) + '%)');
+        }
+
         // The one number the grid pitch is solving for, printed where the next
         // person to touch ORDERED_COL will see it without having to build a
         // harness first. Effective label size is font size * zoom, and nothing
@@ -3023,46 +3382,112 @@
         }
 
         // =====================================================================
-        // Explore: the mode the reader ENTERS.
+        // DRIVING THE VIEW SWITCH. See the VIEW_NETWORK/VIEW_INDEX block above
+        // for what the two views are and why there is only one flag.
         //
-        // On the way in every node is released and the solver takes over. On
-        // the way out the pinned coordinates computed at load are written back
-        // verbatim, so the ordered arrangement returns exactly — the same
-        // integers, not merely the same shape. `physics.enabled` itself is
-        // never switched off: with every node fixed the solver has nothing to
-        // integrate, which is what "physics off on arrival" means in practice
-        // and what keeps the network's own options honest for the round-trip
-        // assertions.
+        // Entering NETWORK: every node is released — `fixed: false` and no
+        // coordinate written — and the solver takes over. Entering INDEX: the
+        // grid is RECOMPUTED from the data and the resulting integers are
+        // written back, so the ordered arrangement returns exactly, the same
+        // integers and not merely the same shape.
+        //
+        // `physics.enabled` itself is never switched off in either direction.
+        // With every node fixed the solver has nothing to integrate, which is
+        // what "physics off in the index" means in practice, and it is what
+        // keeps the network's own options honest for assertion 15's round trip.
         // =====================================================================
-        function exploreAvailable() {
+        function indexViewActive() {
+            return orderedLayoutActive && !exploreMode;
+        }
+
+        function currentView() {
+            return exploreMode ? VIEW_NETWORK : VIEW_INDEX;
+        }
+
+        // There is something to switch between only where an index exists.
+        // Isomorphism pins its own columns and dissolution renders
+        // hierarchically; both leave orderedLayoutActive false, and the switch
+        // goes inert there exactly as the Explore button already did.
+        function viewSwitchAvailable() {
             return orderedLayoutActive && !!network && !!nodesDataSet;
         }
 
-        function updateExploreButton() {
+        function updateViewSwitch() {
+            const view = currentView();
+            const group = document.getElementById('view-switch');
+            if (group) group.classList.toggle('mode-hidden', !orderedLayoutActive);
+            [[VIEW_NETWORK, 'view-network'], [VIEW_INDEX, 'view-index']].forEach(function (pair) {
+                const el = document.getElementById(pair[1]);
+                if (!el) return;
+                const on = orderedLayoutActive && pair[0] === view;
+                el.classList.toggle('view-active', on);
+                el.setAttribute('aria-pressed', on ? 'true' : 'false');
+            });
+            // The header button this superseded. Gone from the markup, but a
+            // fork that still has it keeps a working control rather than a dead
+            // one that lies about which view is showing.
             const btn = document.getElementById('btn-explore');
-            if (!btn) return;
-            btn.textContent = exploreMode ? 'Back to the index' : 'Explore';
-            btn.setAttribute('aria-pressed', exploreMode ? 'true' : 'false');
-            btn.classList.toggle('mode-hidden', !orderedLayoutActive);
+            if (btn) {
+                btn.textContent = exploreMode ? 'Back to the index' : 'Explore';
+                btn.setAttribute('aria-pressed', exploreMode ? 'true' : 'false');
+                btn.classList.toggle('mode-hidden', !orderedLayoutActive);
+            }
         }
 
-        function setExploreMode(on) {
-            const want = !!on;
-            if (!exploreAvailable()) {
-                exploreMode = false;
-                updateExploreButton();
+        // Called under its old name by applyModeVisibility() and
+        // loadAndInitialize(), which have done so since before there was a
+        // switch. Kept rather than renamed at every call site, because the one
+        // thing this function has always meant — "make the control agree with
+        // the state" — has not changed.
+        function updateExploreButton() {
+            updateViewSwitch();
+        }
+
+        // options.remember === false   do not write the preference (used when
+        //                              the switch is being restored, not chosen)
+        // options.scope    === 'keep'  leave the chip row alone
+        function setViewMode(view, options) {
+            const want = (view === VIEW_NETWORK) ? VIEW_NETWORK : VIEW_INDEX;
+            const opts = options || {};
+
+            // The preference is the READER'S, so it is recorded even when the
+            // graph on screen cannot honour it: asking for Network while
+            // isomorphism is showing and then switching to evidence must land
+            // in Network, not back on the default.
+            if (opts.remember !== false) {
+                preferredView = want;
+                storeView(want);
+            }
+            if (!viewSwitchAvailable() || want === currentView()) {
+                updateViewSwitch();
                 return;
             }
-            exploreMode = want;
+            exploreMode = (want === VIEW_NETWORK);
 
-            const updates = allNodes.map(function (node) {
+            // INDEX is entered from the DATA, never from whatever is on screen.
+            // applyOrderedLayout() is a pure function of the nodes and the
+            // viewport class, so recomputing it here costs nothing and closes
+            // the one hole a stored layout leaves: a window that crossed the
+            // 768px breakpoint while Network was showing would otherwise hand
+            // the reader the other breakpoint's grid, because
+            // reflowOrderedLayoutForBreakpoint() deliberately does nothing
+            // while the grid is not being drawn.
+            if (!exploreMode) applyOrderedLayout(allNodes);
+
+            nodesDataSet.update(allNodes.map(function (node) {
                 const record = {
                     id: node.id,
                     label: nodeDisplayLabel(node),
                     widthConstraint: nodeWidthConstraint(node),
-                    size: nodeDisplaySize(node)
+                    size: nodeDisplaySize(node),
+                    font: nodeDisplayFont(node)
                 };
                 if (exploreMode) {
+                    // Released, and given no coordinate at all. Writing the
+                    // grid position back unpinned would not be the network view
+                    // the reader had before the index existed — it would be a
+                    // force-directed run seeded from a grid, which converges
+                    // somewhere else.
                     record.fixed = false;
                 } else {
                     if (node.x !== undefined) record.x = node.x;
@@ -3070,24 +3495,75 @@
                     record.fixed = (node.fixed === undefined) ? false : node.fixed;
                 }
                 return record;
-            });
-            nodesDataSet.update(updates);
+            }));
+
+            // Each view arrives on its own default scope — the same one a fresh
+            // load in that view would give: NETWORK is the whole graph (175
+            // nodes on evidence), INDEX is the 93 claims. Switching view is a
+            // statement about which READING you want, so it re-states that
+            // reading's scope rather than carrying the other one's filter
+            // across. A reader who lands in Network still holding the
+            // claims-only chip row is looking at the index's node set drawn as
+            // a cloud, which is neither view.
+            if (opts.scope !== 'keep') {
+                focusedNodeIds = null;
+                applyDefaultTypeSelection();
+                syncChipClasses();
+            }
 
             network.setOptions({ physics: { enabled: true } });
-            // Explore is where the structure IS the subject, so the edges come
-            // all the way back up; returning to the index quiets them again.
-            applyEdgeEmphasis();
+            // Network view is where the structure IS the subject, so the edges
+            // come all the way back up and back to full weight; the index
+            // quiets them and, on a phone, compresses them again.
+            applyEdgeWeight();
+            // Repaints labels, sizes, fonts, hidden flags, the legend and the
+            // edge emphasis in one pass, from the flag that has just changed.
+            applyVisualState();
+
             if (exploreMode) {
                 try { network.startSimulation(); } catch (e) { /* older vis builds */ }
-                showToast('Explore: physics on. Drag nodes; "Back to the index" restores the order.');
+                showToast('Network view: physics on. Drag nodes; Index restores the ordered grid.');
             } else {
                 try { network.stopSimulation(); } catch (e) { /* older vis builds */ }
-                fitOrderedLayout();
-                showToast('Back to the ordered index');
+                // REDRAW BEFORE FITTING. vis sizes a node when it DRAWS it —
+                // node.width/height are set in resize(ctx) — and fit() reads
+                // those cached sizes. Rewriting 175 labels and immediately
+                // asking for a fit therefore measures the extent of the OTHER
+                // view's captions: full-length and unwrapped, ~185 world units
+                // each instead of ORDERED_LABEL_WIDTH's 91. Measured: fit scale
+                // 0.457 instead of 0.873, every caption at 6.39px. That is the
+                // 4.94px illegible-index bug from the ORDERED_COL comment
+                // arriving by a completely different route, and assertion 16 is
+                // what caught it.
+                //
+                // A setTimeout alone does NOT fix it, which is worth stating
+                // because it is the obvious fix: the index has just pinned
+                // every node and stopped the simulation, so there is no render
+                // loop left to produce the draw the deferred fit is waiting
+                // for. redraw() is synchronous and unconditional, so it is the
+                // thing that actually re-measures. The timeout stays anyway, to
+                // let the disclosure/legend reflow this switch may have caused
+                // land before fitOrderedLayout() reads the legend's width.
+                setTimeout(function () {
+                    if (!indexViewActive() || !network) return;   // switched back meanwhile
+                    network.redraw();
+                    fitOrderedLayout();
+                    updateAxisOverlay();
+                    reportOrderedLegibility();
+                    reportNarrowArrowWeight();
+                }, 60);
+                showToast('Index view: type across, date down');
             }
-            updateExploreButton();
+            updateViewSwitch();
             updateAxisOverlay();
             updateSearchStatus();
+        }
+
+        // Explore WAS the network view all along; it just could not be arrived
+        // in and could not be remembered. Both names are kept working because
+        // they are the documented way in for anything outside this file.
+        function setExploreMode(on) {
+            setViewMode(on ? VIEW_NETWORK : VIEW_INDEX);
         }
 
         function toggleExplore(force) {
@@ -3188,7 +3664,7 @@
         function updateAxisOverlay() {
             const overlay = document.getElementById('axis-overlay');
             if (!overlay) return;
-            const show = !!(orderedLayoutActive && !exploreMode && orderedLayout && network);
+            const show = !!(indexViewActive() && orderedLayout && network);
             overlay.classList.toggle('axis-visible', show);
             if (!show) {
                 if (axisOverlayItems.length) overlay.innerHTML = '';
@@ -4292,7 +4768,12 @@
             // Dissolution is not an index of claims: it has no types, no dates
             // and no threads report to point at.
             toggle('entry-points', dissolution);
-            updateExploreButton();
+            // The switch is hidden, not merely disabled, wherever there is no
+            // index to switch to — dissolution renders hierarchically and
+            // isomorphism pins its own columns, so on those two "Network" and
+            // "Index" would both be lies. updateViewSwitch() reads
+            // orderedLayoutActive for exactly that.
+            updateViewSwitch();
             // Switching graphs swaps which chip groups are live, so the
             // "Filters (n of m)" count has to be recomputed, and any open
             // disclosure closed before its contents change underneath it.
@@ -4801,13 +5282,22 @@
             });
         }
 
-        // The arrival shows claims only: 93 assertions read better as an index
+        // The INDEX shows claims only: 93 assertions read better as an index
         // than 175 nodes do, and runs, models, documents and artefacts are one
         // chip (or one entry point) away. Applied to the evidence graph itself;
         // isomorphism and threads open on everything they have.
+        //
+        // The claims-only default belongs to the INDEX and not to the graph.
+        // Network view is the force-directed reading the owner already had, and
+        // that had all 175 nodes in it: narrowing it to 93 would hand them back
+        // a graph with the runs, models, documents and artefacts silently
+        // missing and no filter lit to say so. exploreMode is read rather than
+        // preferredView because what matters here is which view is actually
+        // being built, not which one the reader would prefer on a graph that
+        // has one.
         function indexDefaultsToClaims() {
-            return renderMode === 'evidence' && currentGraphKey === 'evidence' &&
-                claimTypesAvailable().length > 0;
+            return !exploreMode && renderMode === 'evidence' &&
+                currentGraphKey === 'evidence' && claimTypesAvailable().length > 0;
         }
 
         function applyClaimsOnlyTypes() {
@@ -4878,7 +5368,10 @@
             syncReadinessChipClasses();
             syncEntryChipClasses();
             applyVisualState();
-            if (orderedLayoutActive) fitOrderedLayout();
+            // The index is framed by fitOrderedLayout(), which also shifts the
+            // camera clear of the legend; the network view has no grid to clear
+            // it from and takes vis's own fit.
+            if (indexViewActive()) fitOrderedLayout();
             else if (network) network.fit({ animation: true });
         }
 
@@ -4907,10 +5400,13 @@
                 text = shown + ' of ' + total + ' nodes — ' +
                     (ENTRY_LABELS[activeEntryPoint] || 'everything');
             }
+            // Which of the two readings is on screen, said in words, because
+            // the switch is one tap away inside a closed Filters disclosure on
+            // a phone and the picture alone does not name itself.
             if (orderedLayoutActive) {
                 text += exploreMode
-                    ? ' · explore mode: physics on'
-                    : ' · ordered: type across, date down';
+                    ? ' · network view: physics on'
+                    : ' · index view: type across, date down';
             }
             el.textContent = text;
         }
@@ -5050,7 +5546,7 @@
         // byte-identical to a fresh load at that width, which is the whole of
         // what "a pure function of the data and the viewport class" promises.
         function reflowOrderedLayoutForBreakpoint() {
-            if (!orderedLayoutActive || !orderedLayout || exploreMode) return;
+            if (!indexViewActive() || !orderedLayout) return;
             if (!network || !nodesDataSet || !allNodes.length) return;
             if (orderedLayout.transposed === isMobileLayout()) return;
             if (!applyOrderedLayout(allNodes)) return;
@@ -5074,6 +5570,10 @@
             // legend disclosure below it, so a width change has to re-render.
             if (renderMode === 'threads') renderLegend();
             reflowOrderedLayoutForBreakpoint();
+            // Arrow weight is a function of the breakpoint too (see
+            // NARROW_EDGE_SCALE). Its own signature makes every resize that
+            // does not cross 768px free, so this is safe on a stream of them.
+            applyEdgeWeight();
             positionAxisOverlay(true);
             if (!isMobileLayout()) {
                 closeAllDisclosures();
@@ -5219,15 +5719,27 @@
             // it without running the last lane off the right-hand edge — the
             // two are a pair, and widening one without the other puts the
             // hypothesis lane back underneath the key.
-            legend.classList.toggle('legend-index', orderedLayoutActive && !exploreMode);
+            legend.classList.toggle('legend-index', indexViewActive());
         }
 
-        // How to read the ordered arrival. Deliberately legend-note markup and
-        // deliberately last: the status/shape/edge legend rows above are what
+        // How to read whichever view is showing. Deliberately legend-note markup
+        // and deliberately last: the status/shape/edge legend rows above are what
         // the smoke test keys its gradient assertions on, and nothing here adds
         // a .legend-row to that sequence.
         function orderedLayoutLegendHtml() {
             if (!orderedLayoutActive || !orderedLayout) return '';
+            // In Network view the axes below describe a grid that is not on the
+            // screen. A legend that explains the other view is worse than no
+            // legend: it tells the reader to look for lanes in a cloud.
+            if (exploreMode) {
+                return '<div class="legend-section"><h4>Network view</h4>' +
+                    '<div class="legend-note">Force-directed: position is what the solver ' +
+                    'settled on, not a statement about the data. Drag anything; it stays ' +
+                    'where you put it until physics is disturbed again.</div>' +
+                    '<div class="legend-note">Switch to <b>Index</b> for the same nodes ' +
+                    'ordered by type and assertion date — computed from the data, identical ' +
+                    'on every load.</div></div>';
+            }
             const lanes = orderedLayout.lanes.join(' · ');
             const dated = orderedLayout.bands.filter(function (b) { return b !== ''; });
             let html = '<div class="legend-section"><h4>Arrangement</h4>' +
@@ -5241,8 +5753,8 @@
                 '<div class="legend-note">The layout is computed from the data, not settled by ' +
                 'physics: identical on every load, and nothing moves under you. ' +
                 (exploreMode
-                    ? 'You are in <b>Explore</b>; "Back to the index" restores it exactly.'
-                    : 'Press <b>Explore</b> to release it into physics.') + '</div></div>';
+                    ? 'You are in <b>Network</b> view; <b>Index</b> restores this grid exactly.'
+                    : 'Switch to <b>Network</b> to release it into physics.') + '</div></div>';
             return html;
         }
 
@@ -5830,7 +6342,10 @@
             navigationHistory = [];
             updateBreadcrumb();
             applyVisualState();
-            if (orderedLayoutActive) fitOrderedLayout();
+            // The index is framed by fitOrderedLayout(), which also shifts the
+            // camera clear of the legend; the network view has no grid to clear
+            // it from and takes vis's own fit.
+            if (indexViewActive()) fitOrderedLayout();
             else if (network) network.fit({ animation: true });
         }
 
@@ -6155,17 +6670,22 @@
             await loadIndexOverlay();
 
             // Every graph arrives in its own arrival state; nothing about the
-            // previous one survives the switch.
+            // previous one survives the switch. exploreMode is cleared here and
+            // re-derived from `preferredView` further down, once we know
+            // whether this graph has an index for the switch to point at — a
+            // graph with none (dissolution, isomorphism) must not inherit the
+            // previous one's view, only the previous one's preference.
             exploreMode = false;
             orderedLayoutActive = false;
             orderedLayout = null;
-            // Emphasis is per-render: the signature guards against rewriting
-            // edges that have not changed, so it has to be forgotten whenever
-            // the DataSet underneath it is replaced or the first
-            // applyVisualState() of the new graph would decide it had already
-            // done the work.
+            // Emphasis and weight are per-render: the signatures guard against
+            // rewriting edges that have not changed, so they have to be
+            // forgotten whenever the DataSet underneath them is replaced, or
+            // the first applyVisualState() of the new graph would decide it had
+            // already done the work.
             edgeFocusNodeId = null;
             edgeEmphasisSignature = null;
+            edgeWeightSignature = null;
 
             const select = document.getElementById('graph-select');
             if (select && select.value !== currentGraphKey) select.value = currentGraphKey;
@@ -6251,6 +6771,14 @@
                 // would otherwise arrive as a physics cloud.
                 const sided = applySideLayout(allNodes);
                 orderedLayoutActive = sided ? false : applyOrderedLayout(allNodes);
+                // Which of the two readings arrives. The preference is consulted
+                // HERE and nowhere else in the load path, so a graph with no
+                // index simply leaves this false and the switch inert, rather
+                // than needing a special case of its own. Note that the grid was
+                // computed either way, on the line above: the network view does
+                // not draw it, but it must exist on the node records for the
+                // switch to be able to restore it exactly.
+                exploreMode = orderedLayoutActive && preferredView === VIEW_NETWORK;
 
                 buildChips();
                 if (renderMode === 'threads') buildReadinessChips();
@@ -6284,9 +6812,20 @@
                     color: { background: nodeDisplayColour(node, false) }
                 };
                 if (node.level !== undefined) record.level = node.level;
-                if (node.x !== undefined) record.x = node.x;
-                if (node.y !== undefined) record.y = node.y;
-                if (node.fixed !== undefined) record.fixed = node.fixed;
+                if (exploreMode) {
+                    // NETWORK arrives with NO coordinate at all — not with the
+                    // grid's coordinates released. Handing vis a starting
+                    // position is handing it a different force-directed
+                    // arrival, and the whole point of this view is that it is
+                    // the graph the reader already had. `fixed: false` is
+                    // stated rather than omitted so a rebuild cannot inherit a
+                    // pin from the DataSet it replaced.
+                    record.fixed = false;
+                } else {
+                    if (node.x !== undefined) record.x = node.x;
+                    if (node.y !== undefined) record.y = node.y;
+                    if (node.fixed !== undefined) record.fixed = node.fixed;
+                }
                 return record;
             });
 
@@ -6320,8 +6859,12 @@
                 network.setData({ nodes: nodesDataSet, edges: edgesDataSet });
             }
 
+            // Before applyVisualState(), so the first paint already carries the
+            // right edge weight rather than a frame of full-weight arrows on a
+            // phone. Reads exploreMode, which is settled above.
+            applyEdgeWeight();
             applyVisualState();
-            updateExploreButton();
+            updateViewSwitch();
 
             // Layered layouts settle instantly; fit once the DOM has painted.
             if (renderMode === 'dissolution' && network) {
@@ -6332,17 +6875,23 @@
                 }, 60);
             }
 
-            // The ordered arrival is settled the instant it is drawn: every
-            // node is pinned, so there is nothing to stabilise and nothing to
-            // wait for. Frame it (after initNetwork's own 100ms physics kick,
-            // which with pinned nodes is a no-op) and drop the overlay rather
-            // than leaving the reader on a progress bar for a layout that is
-            // already finished.
-            if (orderedLayoutActive && network) {
+            // The INDEX arrival is settled the instant it is drawn: every node
+            // is pinned, so there is nothing to stabilise and nothing to wait
+            // for. Frame it (after initNetwork's own 100ms physics kick, which
+            // with pinned nodes is a no-op) and drop the overlay rather than
+            // leaving the reader on a progress bar for a layout that is already
+            // finished.
+            //
+            // The NETWORK arrival is the opposite and takes the path it always
+            // took: vis stabilises, reports progress, and initNetwork's
+            // `stabilizationIterationsDone` listener drops the overlay. Fitting
+            // it here would frame a layout that has not happened yet.
+            if (indexViewActive() && network) {
                 setTimeout(function () {
                     fitOrderedLayout();
                     updateAxisOverlay();
                     reportOrderedLegibility();
+                    reportNarrowArrowWeight();
                     const el = document.getElementById('loading');
                     if (el) el.classList.add('hidden');
                 }, 180);
