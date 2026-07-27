@@ -286,8 +286,9 @@ are studying the same weights. A reader collating results across the MI literatu
   `cfg.default_prepend_bos` is set. In `loading_from_pretrained.py`, `GPTNeoXForCausalLM` (the Pythia family)
   carries an explicit `"default_prepend_bos": False`; **GPT-2 has no such override and falls through to the global
   default of `True`.** So any GPT-2 experiment that hands a *string* to `run_with_cache`, `to_tokens` or `forward`
-  is running with `<|endoftext|>` at position 0 — a dedicated sink token — even though the tokeniser alone would
-  not have put one there. §5.4 and §7 depend on this distinction; the measured confirmation, and the cross-model
+  is running with `<|endoftext|>` at position 0 — a dedicated special token — even though the tokeniser alone would
+  not have put one there. (Whether that position then *functions* as an attention sink is an inference from the
+  literature below, not something measured here.) §5.4 and §7 depend on this distinction; the measured confirmation, and the cross-model
   consequence, are recorded there.
 - The famous unspeakable tokens are in the vocabulary and can be checked directly: `ĠSolidGoldMagikarp` = id
   **43453**, `Ġpetertodd` = id **37444** (verified in `vocab.json`). These exist because the tokeniser's corpus
@@ -929,13 +930,16 @@ than quietly rewritten, because the original claim was in a merged document.
 The tokeniser fact is right (§2.3). The application is not: `atr_engine.py` passes a raw **string** to
 `run_with_cache` (lines 125, 183, 310, 343), TransformerLens tokenises strings with
 `cfg.default_prepend_bos`, and GPT-2 inherits the global default of `True`. **Position 0 in every ATR trajectory
-on GPT-2 is `<|endoftext|>` — a dedicated structural sink, not content.** The repository already knew this in one
+on GPT-2 is `<|endoftext|>` — a dedicated special token, not content.** Whether it then *functions* as an
+attention sink in these trajectories is an inference from the sink literature, not a measurement: the only
+sink-adjacent measurement in hand is coordinate-structured, and massive activations are a coordinate phenomenon
+while attention sinks are a positional one. Treat "sink at position 0" as an open hypothesis below.** The repository already knew this in one
 place and not the other: `experiments/gpt2_small/11_suppression_test.py:607` is commented `# [1, L], BOS at 0` and
 line 610 records `"n_tokens_no_bos": L - 1`. Two files disagreed and this document read the wrong one.
 
 The correction sharpens the control rather than weakening it. The sink is not a diffuse worry about "whatever sits
-at position 0"; it has a known address, and "does the L2 renormalisation rescale a structural sink along with the
-content?" becomes directly testable.
+at position 0"; it has a known address, so "does the L2 renormalisation rescale a position carrying
+disproportionate norm along with the content?" becomes directly testable.
 
 **And it creates a cross-model confound neither this document nor its Pythia companion had identified.** Measured
 by `agent:pythia-review` with `torch` and `transformer-lens`, on the engine's own call path
@@ -1503,18 +1507,21 @@ the neighbours already catalogued in [PRIOR_WORK.md](PRIOR_WORK.md):
    information sits.
 
    The control this needs is not the one an earlier version of this document specified. **Position 0 in every
-   GPT-2 ATR trajectory is `<|endoftext|>`, a structural sink** (§2.3, §5.4) — TransformerLens prepends it for
+   GPT-2 ATR trajectory is `<|endoftext|>`, a special token** (§2.3, §5.4) — TransformerLens prepends it for
    GPT-2 and *not* for Pythia. So finding 2's position-uniformity claim, stated across the 2×2, currently compares
    a GPT-2 arm whose position 0 is a non-content sink against a Pythia arm whose position 0 is an ordinary token.
    Three consequences, in order of how much they bite:
 
    - **The cross-model version of finding 2 is confounded until this is controlled.** "All positions collapse to
-     one vector" means something different when one of those positions is a structural sink. The cheap fix is to
-     re-run the position-uniformity measurement with position 0 excluded on both arms, which makes the arms
-     comparable for the first time; `11_suppression_test.py` already computes `n_tokens_no_bos` and shows how.
+     one vector" means something different when one of those positions holds a non-content token. The cheap fix
+     is to align the slices — **GPT-2 `[1:]` against Pythia `[:]`**, *not* index 0 dropped from both, which would
+     strip a genuine Pythia content token and trade one misalignment for another. And it is a sensitivity check
+     only: the BOS conditions the whole GPT-2 forward pass through attention, so removing it from the metric does
+     not remove it from the computation — only a `prepend_bos=False` GPT-2 arm does that.
+     `11_suppression_test.py` already computes `n_tokens_no_bos` and shows the accounting.
    - **The within-GPT-2 version is sharpened, not weakened.** The sink has a known address, so "does the L2
-     renormalisation rescale a structural sink along with the content?" is directly testable rather than a
-     diffuse worry.
+     renormalisation rescale a position carrying disproportionate norm along with the content?" is directly
+     testable rather than a diffuse worry — conditional on the sink hypothesis, which remains untested.
    - **Sequence lengths differ by one between arms for the same prompt**, which quietly affects any per-position
      average.
 
