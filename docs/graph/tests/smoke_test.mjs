@@ -254,6 +254,8 @@ const consoleErrors = [];// {phase, text}
 const badResponses = []; // {phase, status, url}
 const allResponses = [];
 let phase = 'boot';
+// Filled in by main() once the CDN mirror has been populated on disk.
+let mirror = {};
 
 function snapshotErrors() {
     return { pe: pageErrors.length, ce: consoleErrors.length, bad: badResponses.length };
@@ -360,6 +362,62 @@ async function canvasInk(page) {
     });
 }
 
+// Attach the three collectors every page needs, together, so a page cannot be
+// half-instrumented.
+//
+// This exists because a page WAS half-instrumented. Assertion 18 opens its own
+// contexts to check framing and Reset View; the reset pages were given a
+// pageerror listener, or none at all, and never a response listener. Since 18
+// ends in `cleanSince(snap18)`, that meant a thrown error or a 404 raised
+// during exactly the checks 18 was added for would have gone unrecorded and
+// left it green -- the same "assertion that cannot fail" shape 15, 16 and 18
+// were each written to close, reappearing inside one of them.
+//
+// Every listener reads the module-level `phase` when it FIRES, not when it is
+// attached, so attributions follow whatever phase is current.
+function instrumentPage(page) {
+    page.on('pageerror', (e) => {
+        pageErrors.push({ phase, text: (e && e.stack) || String(e) });
+    });
+    page.on('console', (msg) => {
+        if (msg.type() === 'error') consoleErrors.push({ phase, text: msg.text() });
+    });
+    page.on('response', (res) => {
+        const rec = { phase, status: res.status(), url: res.url() };
+        allResponses.push(rec);
+        if (rec.status >= 400) badResponses.push(rec);
+    });
+    return page;
+}
+
+// Serve the two CDN scripts from the local mirror. Paired with instrumentPage
+// above: a page that routes but is not instrumented is the bug this fixes.
+async function mirrorCdn(page) {
+    await page.route('**/*', async (route) => {
+        const url = route.request().url();
+        for (const asset of CDN_ASSETS) {
+            if (url === asset.url || url.startsWith(asset.url.split('?')[0])) {
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'text/javascript; charset=utf-8',
+                    body: mirror[asset.url]
+                });
+                return;
+            }
+        }
+        await route.continue();
+    });
+    return page;
+}
+
+// One call that cannot produce a partially-wired page.
+async function newInstrumentedPage(ctx) {
+    const page = await ctx.newPage();
+    instrumentPage(page);
+    await mirrorCdn(page);
+    return page;
+}
+
 // The evidence graph opens in NETWORK view (viewer.html's DEFAULT_VIEW).
 // Anything that wants to measure the ORDERED INDEX has to ask for it first --
 // and asks the way a reader does, by clicking the switch in #chip-bar, so that
@@ -418,7 +476,9 @@ async function main() {
     console.log(`  vis-network + marked served from local mirror ${MIRROR_DIR} ` +
         `(the page still requests the CDN URLs; interception keeps the run hermetic)\n`);
 
-    const mirror = Object.fromEntries(
+    // Assigned, not declared: `mirror` is bound at module scope so the page
+    // helpers defined above main() can serve from the same map.
+    mirror = Object.fromEntries(
         CDN_ASSETS.map(a => [a.url, fs.readFileSync(path.join(MIRROR_DIR, a.file), 'utf8')])
     );
 
@@ -1605,7 +1665,7 @@ async function main() {
 
         const ok15 = shapeOk && determinismOk && stillOk && tripOk && cleanSince(snap15);
         record(15,
-            'the evidence graph arrives as a deterministic ordered index ' +
+            'the evidence graph\'s Index view is a deterministic ordered index ' +
             '(identical coordinates across two loads, nothing moving on arrival, ' +
             'restored exactly after a round trip)',
             ok15,
@@ -1838,8 +1898,14 @@ async function main() {
             const types = (typeof activeTypes !== 'undefined' && activeTypes) ? activeTypes : {};
             const typeKeys = Object.keys(types);
             const group = document.getElementById('view-switch');
+            // Key read from the page, not hardcoded here, for the same reason
+            // assertion 16 reads ORDERED_FONT off the viewer: a rename in
+            // viewer.html would otherwise leave 17 and 18 reading a key nobody
+            // writes, seeing `stored === null` forever, and passing.
             let stored;
-            try { stored = window.localStorage.getItem('lucier-graph-view'); }
+            const storageKey = (typeof VIEW_STORAGE_KEY === 'string')
+                ? VIEW_STORAGE_KEY : 'lucier-graph-view';
+            try { stored = window.localStorage.getItem(storageKey); }
             catch (e) { stored = 'THREW'; }
             return {
                 view: (typeof currentView === 'function') ? currentView() : null,
@@ -2092,30 +2158,7 @@ async function main() {
         {
             const fCtx = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
             try {
-                const fPage = await fCtx.newPage();
-                fPage.on('pageerror', (e) => pageErrors.push({ phase, text: (e && e.stack) || String(e) }));
-                fPage.on('console', (msg) => {
-                    if (msg.type() === 'error') consoleErrors.push({ phase, text: msg.text() });
-                });
-                fPage.on('response', (res) => {
-                    const rec = { phase, status: res.status(), url: res.url() };
-                    allResponses.push(rec);
-                    if (rec.status >= 400) badResponses.push(rec);
-                });
-                await fPage.route('**/*', async (route) => {
-                    const url = route.request().url();
-                    for (const asset of CDN_ASSETS) {
-                        if (url === asset.url || url.startsWith(asset.url.split('?')[0])) {
-                            await route.fulfill({
-                                status: 200,
-                                contentType: 'text/javascript; charset=utf-8',
-                                body: mirror[asset.url]
-                            });
-                            return;
-                        }
-                    }
-                    await route.continue();
-                });
+                const fPage = await newInstrumentedPage(fCtx);
 
                 // Share of drawn nodes whose canvas point lies inside the
                 // container. Read through canvasToDOM so it is the camera being
@@ -2162,25 +2205,7 @@ async function main() {
                 // wrote it".
                 const rCtx = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
                 try {
-                    const rPage = await rCtx.newPage();
-                    rPage.on('pageerror', (e) => pageErrors.push({ phase, text: (e && e.stack) || String(e) }));
-                    rPage.on('console', (msg) => {
-                        if (msg.type() === 'error') consoleErrors.push({ phase, text: msg.text() });
-                    });
-                    await rPage.route('**/*', async (route) => {
-                        const url = route.request().url();
-                        for (const asset of CDN_ASSETS) {
-                            if (url === asset.url || url.startsWith(asset.url.split('?')[0])) {
-                                await route.fulfill({
-                                    status: 200,
-                                    contentType: 'text/javascript; charset=utf-8',
-                                    body: mirror[asset.url]
-                                });
-                                return;
-                            }
-                        }
-                        await route.continue();
-                    });
+                    const rPage = await newInstrumentedPage(rCtx);
                     await rPage.goto(`${base}/viewer.html`, { waitUntil: 'domcontentloaded' });
                     await waitLoaded(rPage);
                     await sleep(1200);
@@ -2195,21 +2220,7 @@ async function main() {
                     // Same context, fresh page: if Reset persisted a choice,
                     // this is where it shows up. Reading it from the OTHER
                     // context would only report what the switch clicks stored.
-                    const rPage2 = await rCtx.newPage();
-                    await rPage2.route('**/*', async (route) => {
-                        const url = route.request().url();
-                        for (const asset of CDN_ASSETS) {
-                            if (url === asset.url || url.startsWith(asset.url.split('?')[0])) {
-                                await route.fulfill({
-                                    status: 200,
-                                    contentType: 'text/javascript; charset=utf-8',
-                                    body: mirror[asset.url]
-                                });
-                                return;
-                            }
-                        }
-                        await route.continue();
-                    });
+                    const rPage2 = await newInstrumentedPage(rCtx);
                     await rPage2.goto(`${base}/viewer.html`, { waitUntil: 'domcontentloaded' });
                     await waitLoaded(rPage2);
                     await sleep(1200);
