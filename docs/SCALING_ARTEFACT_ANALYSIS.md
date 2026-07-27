@@ -41,6 +41,52 @@ The per-iteration L2 rescale multiplies the entire tensor by one scalar (same ra
 
 **Definitive position:** Normalisation is numerically essential and approximately inert for the forward map: inert up to LayerNorm's epsilon term and floating-point precision, not exactly. It is not the source of the Pythia-410m fragmentation pattern.
 
+### 1.1b Tokenisation asymmetry across the 2×2: OPEN ARTEFACT CANDIDATE (added 2026-07-26)
+
+A fourth apparatus channel, not examined anywhere above, and the only one that differs *between the models being
+compared* rather than applying to all of them equally.
+
+**What it is.** `atr_engine.py` hands a raw string to `run_with_cache` (lines 125, 183, 310, 343). TransformerLens
+tokenises strings through `to_tokens`, which prepends the beginning-of-sequence token when
+`cfg.default_prepend_bos` is set. In `loading_from_pretrained.py` only `GPTNeoXForCausalLM` carries an explicit
+`"default_prepend_bos": False` (line 537); GPT-2 has no override and inherits the global default `True` (line
+1720). Measured on the engine's own call path: a 4-token probe becomes **5 tokens for `gpt2` and `gpt2-medium`**
+and stays **4 for `pythia-160m` and `pythia-410m`**.
+
+**So position 0 is a structural sink token on the GPT-2 arm and ordinary content on the Pythia arm.** Nobody chose
+this. It is a library default that varies by model family and is invisible at the call site.
+
+**Why it is an artefact candidate rather than an intrinsic variable.** Every axis in section 2 is a property of
+the models. This is a property of *how we called them*, and it is not symmetric across the comparison, which is
+precisely the shape of thing this section exists to catch. It is closest in kind to §1.1: both concern what the
+apparatus does to the tensor before the model sees it. §1.1 clears the global rescale for the *forward map* via
+LayerNorm scale-invariance; that argument says nothing about tokenisation, and nothing about what fraction of the
+conserved norm belongs to a sink.
+
+**What it puts at risk, in order.**
+
+1. **Position-indexed cross-model claims.** Sequences differ in length by one for the same prompt, so per-position
+   means run over different denominators, and position *i* is not the same token across arms. Position uniformity
+   is the exposed claim.
+2. **The energy budget.** The global L2 rescale conserves total norm. If a small coordinate set dominates that
+   norm — and on GPT-2 it does — the rescale is largely setting *its* magnitude, with content riding the
+   remainder. Note the distinction that is easy to blur: massive activations are a **coordinate** phenomenon,
+   attention sinks are a **positional** one; they are associated but not identical, and whether position 0 carries
+   anomalous energy *in ATR trajectories specifically* is unmeasured.
+3. **A regime no model was trained in.** From iteration 1 the re-injection overwrites position 0, so the loop
+   preserves the sink's structural role while replacing its contents. Only the GPT-2 arm enters this regime.
+
+**What it does not explain.** Not the Small-versus-Medium divergence: both carry the BOS and behave completely
+differently.
+
+**Cheapest control.** Recompute the position-indexed metrics with position 0 dropped on both arms — this makes the
+arms comparable for the first time and needs no forward passes. Then, if it matters, add a GPT-2 arm run with
+`prepend_bos=False` to match Pythia's regime. Do not go the other way: Pythia was not trained on BOS-prefixed
+sequences, so prepending one there introduces an artefact rather than removing one.
+
+Raised by `agent:pythia-review` (peer board, discussion #59); verified against the TransformerLens source and by
+execution. Recorded as [FINDINGS.md](FINDINGS.md) caveat 17, with F5 qualified accordingly.
+
 ### 1.2 Readout (unembedding): OPEN ARTEFACT CANDIDATE
 
 ATR interprets internal state by projecting the residual (after `ln_final` in the usual readout path) to token logits via the unembedding matrix.
@@ -165,3 +211,29 @@ The attribution tests proposed above were run at series close ([FINDINGS.md](FIN
 - **Test 2 (depth control, layers 0–11 vs 0–23): still not run.** The cleanest remaining attribution test.
 
 **Final position:** the guiding principle at the top of this document was applied and the answer landed on the intrinsic side: readout ambiguity is real but secondary; normalisation is inert up to LayerNorm's epsilon term; the cross-model landscape differences are properties of the models. The one place the readout-first principle earns its keep permanently is `Divine`, where dynamics and decoding genuinely come apart.
+
+---
+
+## Amendment (2026-07-26): the closing judgement covered three apparatus channels, and there is a fourth
+
+Nothing above is withdrawn. What follows is a gap in coverage, not a contradiction.
+
+The closing judgement clears normalisation, decoding and readout jitter, and on that basis attributes the
+cross-model differences to depth, corpus, width and token geometry. **Tokenisation is not on either list**, and
+§1.1b establishes that the two arms of the comparison do not tokenise alike: TransformerLens prepends a
+beginning-of-sequence token for GPT-2 and not for the NeoX family, so position 0 is a structural sink on one arm
+and content on the other.
+
+That is an apparatus difference *between the models being compared*, which is a stronger category of problem than
+an apparatus property they share, and none of the executed tests probes it. Test 1 in particular — the cross-model
+`cos_sim` chart the first bullet rests on — is computed over position-indexed tensors whose position 0 means
+different things on the two arms.
+
+**Revised position:** the judgement stands as *three apparatus channels exonerated*, not as *apparatus excluded*.
+Restoring the stronger reading needs one cheap run: the position-0-excluded recomputation in §1.1b. Until then the
+intrinsic attribution is well-supported for the channels tested and open for this one.
+
+This also adds a line to the remaining-work list, alongside Test 2 (the depth control, still not run):
+
+- **Test 4 (tokenisation control): not run.** Recompute position-indexed metrics with position 0 dropped on both
+  arms; optionally add a `prepend_bos=False` GPT-2 arm. No forward passes required for the first half.

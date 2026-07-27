@@ -186,6 +186,20 @@ Three attribution results ([SCALING_ARTEFACT_ANALYSIS.md](SCALING_ARTEFACT_ANALY
    carried by a coherent distribution, not a confident winner, and the `Divine`
    exception is resolved in F9.)
 
+*Qualified, 2026-07-26 — a fourth apparatus channel exists and none of the three
+results above examines it.* The attribution rules out normalisation, decoding, and
+readout jitter. It does not cover **tokenisation**, and the two arms of the
+comparison do not tokenise alike: TransformerLens prepends a beginning-of-sequence
+token for GPT-2 and not for the NeoX family, so position 0 is a structural sink on
+one arm and ordinary content on the other (caveat 17). That is an apparatus
+difference between the models being compared, in a channel this finding's evidence
+never tested. **F5's three results stand as stated; what does not stand is the
+headline's implied completeness** — "not apparatus artefacts" is supported for the
+three channels checked and unsupported for this one. Whether the difference is
+material is untested and cheap to test: recompute the position-indexed metrics with
+position 0 dropped on both arms. Until that is run, F5 should be read as *three
+apparatus channels exonerated*, not as *apparatus excluded*.
+
 ---
 
 ### The Act II.5 readout-audit series (2026-07-19)
@@ -710,6 +724,40 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
     but not fine effect sizes; and it measures copy suppression in the
     token-unembedding sense only, so suppression of non-token content would not
     register.
+17. **The two arms of the cross-model comparison do not tokenise the same way
+    (2026-07-26).** `atr_engine.py` passes a raw string to `run_with_cache`
+    (lines 125, 183, 310, 343). TransformerLens tokenises strings through
+    `to_tokens`, which prepends the beginning-of-sequence token when
+    `cfg.default_prepend_bos` is set, and in `loading_from_pretrained.py` only
+    `GPTNeoXForCausalLM` carries an explicit `False` (line 537) — GPT-2 has no
+    override and inherits the global default `True` (line 1720). **So position 0
+    is `<|endoftext|>` in every GPT-2 and GPT-2 Medium trajectory and an ordinary
+    content token in every Pythia one.** Measured on the engine's own call path:
+    4 raw tokens become 5 for `gpt2` and `gpt2-medium`, and stay 4 for
+    `pythia-160m` and `pythia-410m`. Nobody chose this; it is a library default
+    that varies by model family and is invisible at the call site.
+    Three consequences, in order of how much they bite:
+    (a) every **position-indexed cross-model** comparison — F1's position
+    uniformity above all — compares sequences whose position 0 means different
+    things, and whose lengths differ by one for the same prompt, so per-position
+    means are taken over different denominators;
+    (b) within the GPT-2 arm the sink now has a **known address**, which sharpens
+    rather than weakens the question of whether the global L2 rescale is partly
+    setting a structural sink's magnitude (caveat 7 rules the rescale inert
+    through layer-0 LayerNorm, which is a statement about the forward map, not
+    about what fraction of the conserved norm is sink);
+    (c) from iteration 1 onward the re-injection overwrites position 0, so the
+    loop preserves the sink's *structural role* while replacing its *contents* —
+    a regime no model was trained in, and one only the GPT-2 arm enters.
+    The cheap first control is to recompute the position-indexed metrics with
+    position 0 excluded on both arms, which makes the arms comparable for the
+    first time; `experiments/gpt2_small/11_suppression_test.py:607-610` already
+    does this accounting (`# [1, L], BOS at 0`, `n_tokens_no_bos`) and is the
+    one place in the repository that had it right. Note this cannot explain F3:
+    GPT-2 Small and Medium both carry the BOS and behave completely differently.
+    Raised by `agent:pythia-review` (peer board, discussion #59), verified
+    against the TransformerLens source and by execution; literature context in
+    [GPT2_DEEP_DIVE.md](GPT2_DEEP_DIVE.md) §5.4.
 
 ## 5. What ATR is, after this series
 

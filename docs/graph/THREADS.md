@@ -40,9 +40,9 @@ From cell 9 of `experiments/gpt2_small/spectral_resonance.ipynb`:
 
 Meanwhile the committed prose still says it was never run:
 
-- [`README.md`:215](../../README.md) &mdash; \| [`spectral_resonance.ipynb`](experiments/gpt2_small/spectral_resonance.ipynb) \| SVD-predicted per-head resonance (H4) \| 🔬 scaffold, not run \|
+- [`README.md`:219](../../README.md) &mdash; \| [`spectral_resonance.ipynb`](experiments/gpt2_small/spectral_resonance.ipynb) \| SVD-predicted per-head resonance (H4) \| 🔬 scaffold, not run \|
 - [`docs/ATR_METHOD_COMPARISON.md`:173](../../docs/ATR_METHOD_COMPARISON.md) &mdash; - [ ] SVD/spectral-gap prediction of per-head resonant states vs. observed convergence (scaffolded in `spectral_resonance.ipynb`; not yet run)
-- [`docs/FINDINGS.md`:629](../../docs/FINDINGS.md) &mdash; \| H4 \| Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector) \| **Untested**: protocol scaffolded (`experiments/gpt2_small/spectral_resonance.ipynb`), not run. \|
+- [`docs/FINDINGS.md`:643](../../docs/FINDINGS.md) &mdash; \| H4 \| Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector) \| **Untested**: protocol scaffolded (`experiments/gpt2_small/spectral_resonance.ipynb`), not run. \|
 - [`docs/JOURNEY_MAP.md`:88](../../docs/JOURNEY_MAP.md) &mdash; \| H4 \| Per-head resonance ≈ SVD dominant singular vector \| Untested \| Scaffold only: `experiments/gpt2_small/spectral_resonance.ipynb` \|
 - [`docs/MATH_PRIMER.md`:144](../../docs/MATH_PRIMER.md) &mdash; One caution to carry: because the map is nonlinear, do not over-interpret any single attractor as "the dominant eigenvector of the model." The spectral comparison (`spectral_resonance.ipynb`, scaffolded but not run) is the project's designed test of how far the linear intuition transfers to the per-
 - [`docs/PODCAST_SOURCES.md`:281](../../docs/PODCAST_SOURCES.md) &mdash; \| [`spectral_resonance.ipynb`](experiments/gpt2_small/spectral_resonance.ipynb) \| SVD-predicted per-head resonance (H4) \| 🔬 scaffold, not run \|
@@ -215,8 +215,8 @@ Something the record names is not in the working tree, or the record defers to a
 *Committed prose mentioning issue #8:*
 - [`experiments/gpt2_small/output_jlens_phase/jlens_phase.md`:7](../../experiments/gpt2_small/output_jlens_phase/jlens_phase.md) &mdash; issue #8) probed the converged Divine (Syntactic) state before `06_bell_anatomy.py` showed
 - [`docs/BELL_PRIMER.md`:152](../../docs/BELL_PRIMER.md) &mdash; The pilot (issue #8) measured Divine before the cycle was known, so it measured one phase. Session 04 repeated the identical measurement on both phases and the midpoint. The replay of the pilot's own states reproduced its recorded numbers to 7 decimal places, 
-- [`docs/FINDINGS.md`:453](../../docs/FINDINGS.md) &mdash; build (issue #8) should be phase-aware: probe both phases and the pivot M.
-- [`docs/FINDINGS.md`:633](../../docs/FINDINGS.md) &mdash; \| H-J1 \| `prolet` sits inside the verbalizable (J-lens) subspace, `Divine` outside \| **Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)**: the point estimate runs slightly the other way at pilot confidence (`Divine` at least as lens-ex
+- [`docs/FINDINGS.md`:467](../../docs/FINDINGS.md) &mdash; build (issue #8) should be phase-aware: probe both phases and the pivot M.
+- [`docs/FINDINGS.md`:647](../../docs/FINDINGS.md) &mdash; \| H-J1 \| `prolet` sits inside the verbalizable (J-lens) subspace, `Divine` outside \| **Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)**: the point estimate runs slightly the other way at pilot confidence (`Divine` at least as lens-ex
 
 ### Prerequisites recorded in the graph
 

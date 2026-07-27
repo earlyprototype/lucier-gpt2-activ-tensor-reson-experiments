@@ -14,6 +14,28 @@
 4. Commit to `cross-model` and push after each notebook completes — results must not sit uncommitted again.
 5. Runs are CPU (`device: cpu` in prior configs). Sweeps take on the order of an hour each; diagnostics that read existing `.pt` files are minutes.
 
+> **Known design defect in the 2×2, found 2026-07-26 — read before interpreting any position-indexed comparison.**
+>
+> The arms of this plan **do not tokenise the same way.** `atr_engine.py` passes a raw string to
+> `run_with_cache`, and TransformerLens prepends the beginning-of-sequence token when
+> `cfg.default_prepend_bos` is set — `True` for GPT-2 by global default, explicitly `False` for the
+> GPT-NeoX family. Measured: a 4-token probe becomes **5 tokens on `gpt2` and `gpt2-medium`** and stays
+> **4 on `pythia-160m` and `pythia-410m`**.
+>
+> So **position 0 is `<|endoftext|>`, a structural sink, on the GPT-2 arm and an ordinary content token on the
+> Pythia arm** — and for the same prompt the two arms have sequences of different length. Any metric averaged
+> over positions is averaging over different denominators, and position *i* is not the same token across arms.
+> Control 1 below (`cos_sim_diagnostic.ipynb`) is computed this way.
+>
+> This does **not** invalidate the within-model results, and it cannot explain the Small-versus-Medium
+> divergence (both carry the BOS). It bounds the **cross-model** readings. Before running or re-reading any
+> cross-arm comparison, either drop position 0 on both arms, or add a `prepend_bos=False` GPT-2 arm.
+> `experiments/gpt2_small/11_suppression_test.py:607-610` shows the accounting (`# [1, L], BOS at 0`,
+> `n_tokens_no_bos`).
+>
+> Full statement: [FINDINGS.md](docs/FINDINGS.md) caveat 17 and the F5 qualification;
+> [SCALING_ARTEFACT_ANALYSIS.md](docs/SCALING_ARTEFACT_ANALYSIS.md) §1.1b and the 2026-07-26 amendment.
+
 ## Execution order (decisiveness per unit cost)
 
 ### 1. `experiments/cos_sim_diagnostic.ipynb` — Control 1
