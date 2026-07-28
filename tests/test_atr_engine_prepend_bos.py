@@ -71,7 +71,14 @@ def _params(func):
     defaults = [None] * (len(args) - len(func.args.defaults)) + [
         ast.literal_eval(d) for d in func.args.defaults
     ]
-    return list(zip([a.arg for a in args], defaults))
+    # strict=True pins the padding above, not the AST. The two lists are equal
+    # by construction -- `defaults` is padded to len(args) on the line before --
+    # so this can never fire on a real signature. It fires if someone edits that
+    # padding wrong, at which point a bare zip() would silently truncate and this
+    # helper would go on comparing a SHORTER parameter list, quietly passing the
+    # drift check it exists to fail. Free assertion on an invariant that is
+    # otherwise only true by inspection.
+    return list(zip([a.arg for a in args], defaults, strict=True))
 
 
 def _run_with_cache_calls(node):
