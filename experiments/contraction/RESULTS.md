@@ -2,7 +2,8 @@
 
 **Short answer: the collapse is exact to the limit of the stored precision, and cannot be pushed
 further without a new run. The settling speed does not track model size — inside each family, the
-two sizes disagree about which direction it goes.**
+two sizes disagree about which direction it goes. And the loop's per-step shrink factor, which a
+hypothesis on file assumes is 1 at rest, is measurably not.**
 
 **Run:** 2026-07-28, analysis only — no forward passes, no model loaded.
 **Status:** executed; scripts in this directory, all inputs already in the repository.
@@ -62,6 +63,14 @@ If those dimensions were also behind its ragged settling curve, deleting them sh
 actual explanation is the delay: GPT-2 Small barely moves for the first thirty iterations and then
 settles quickly, so no single rate describes it — see below.
 
+**M5, which turned out not to need a run at all.** A third item on the same issue asks for the size of
+the shrink the loop applies at each step. It is filed as blocked, because the number is never written
+down. But it can be worked out from what *is* written down, and the answer is not what the record
+assumes. The loop shrinks the state to **29%** of its size each round in one run, **10%** in another —
+a steady figure, not 100%. A hypothesis on file (H-pos0) says this figure is 1, i.e. that at rest the
+shrink does nothing. It isn't, and because the model is known to be sensitive to the size of what it
+is fed, that difference cannot be waved away. Detail below.
+
 ---
 
 ## Terms used here
@@ -76,6 +85,7 @@ settles quickly, so no single rate describes it — see below.
 | **half-life** | Iterations needed to halve the remaining difference. |
 | **R²** | Goodness of fit, 0 to 1. Near 1 means a single constant rate describes the process; low means it does not. |
 | **H-pos0** | The hypothesis that position 0's forward map is autonomous, up to one scalar per position. Assumes exact position collapse. |
+| ***c* / rescale factor** | The loop resizes the state before each step so its total size returns to the seed's. *c* is that resize: seed size ÷ current size. *c* = 1 would mean no resizing happens. |
 
 ---
 
