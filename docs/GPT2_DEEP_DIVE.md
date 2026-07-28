@@ -334,6 +334,155 @@ citing interpretability as the reason, so there the two are genuinely distinct a
 re-run.** This is the same distinction that produced a documented `W_U`/`W_E` disagreement between agents in the
 sibling repository, and it is cheap to state and expensive to rediscover.
 
+### 2.5 How information moves between positions
+
+§2.1 gives the forward pass as a sequence of operations. This section reads the same pass along the other axis —
+across token positions rather than across layers — because that is the axis ATR's position-collapse observation
+lives on, and the two readings license different conclusions.
+
+**Only one operation in GPT-2 moves information between positions.** Take the block from §2.1:
+
+```
+x = x + Attn( LN₁(x) )
+x = x + MLP(  LN₂(x) )
+```
+
+LayerNorm normalises over the 768 feature dimensions *within* a position. The MLP maps ℝ⁷⁶⁸ → ℝ⁷⁶⁸ and is
+applied to each position separately with the same weights. The residual addition is elementwise. None of the
+three can see any position but its own. **Attention is the only cross-position operation in the architecture.**
+
+The useful picture is *n* parallel lanes, one per token, each carrying a 768-vector from the embedding up to the
+unembedding. The MLPs and LayerNorms act within a lane. Attention is the only place where lanes touch, and it
+touches them exactly 144 times in GPT-2 Small — 12 layers × 12 heads.
+
+#### What attention actually does
+
+Each head splits into two circuits, in the Anthropic decomposition (§5.1) — **QK decides *where* to read from,
+OV decides *what* gets written**:
+
+```
+A      = softmax( mask( LN₁(x) W_Q W_Kᵀ LN₁(x)ᵀ / √64 ) )      # (n × n) attention pattern
+head_i = Σ_{j} A_ij · ( LN₁(x)_j W_V W_O )                     # what lands at position i
+```
+
+The output at position *i* is a **weighted average of value vectors from other positions**, with the weights
+supplied by QK and the content supplied by OV. This is worth stating plainly because it bounds what attention
+can do: it cannot compute a new direction out of nothing, it can only *transport* directions that some position
+already carries, scaled by a weight in [0, 1] and rotated by W_OW_V. Everything nonlinear about a position's own
+content happens in the MLP, in its own lane.
+
+#### The causal mask, and position 0
+
+The mask sets *A_ij* = 0 for *j* > *i* — the `attn.bias` buffer of §2.1, applied as −∞ before the softmax. So *A*
+is **lower-triangular**: position *i* reads from positions 0…*i* and from nothing later. This is what makes GPT-2
+autoregressive, and it is enforced identically in every one of the 144 heads.
+
+Now read row 0 of that triangle. Position 0 has exactly one unmasked entry — itself. A softmax over a single
+surviving score is **exactly 1.0**, not approximately: every other term in the row is exp(−∞) = 0. So for every
+head in every layer:
+
+```
+head_0 = 1.0 · ( LN₁(x)_0 W_V W_O )
+```
+
+**Position 0's attention output depends on position 0's residual stream and on nothing else in the sequence.**
+Combine that with the per-position nature of LayerNorm, the MLP, and the residual add, and the conclusion is
+exact rather than approximate:
+
+> **In a single GPT-2 forward pass, position 0's output is a function of position 0's input alone.** Write it
+> *F₀ : ℝ⁷⁶⁸ → ℝ⁷⁶⁸*. Changing any other token in the prompt — or all of them — cannot change what comes out at
+> position 0. This is a property of the causal mask, not an empirical finding, and it holds in every decoder-only
+> transformer, at every layer, for every prompt.
+
+That is a strong statement, so it is worth being clear about what it does *not* say. It does not say position 0 is
+unimportant. The attention-sink literature (§5.4) reports that early positions absorb large attention mass
+regardless of semantic relevance, which would make position 0 heavily *read* even though it reads nothing —
+though whether position 0 functions as a sink *in these trajectories* is an open hypothesis in this repository,
+not a measurement (§5.4 states the reasons). The directional point survives either way: influence runs **outward**
+from position 0 to everything after it, and never back.
+
+#### What this licenses under ATR, and what it does not
+
+ATR iterates the whole (*n* × 768) tensor. Three implementation facts change the analysis, and two of them cut
+against the clean statement above:
+
+1. **Positional embeddings are added once, not once per iteration.** The loop injects at
+   `blocks.0.hook_resid_pre`, which sits *after* `wte + wpe`, and the hook overwrites the whole tensor
+   (`atr_engine.py`, `injection_hook`). So `wpe` enters at iteration 0 and is overwritten from iteration 1
+   onward. **After the first injection, the only thing distinguishing one position from another is the causal
+   mask** — position 0 is not "the position with `wpe[0]` in it", it is "the position that can see least".
+2. **The renormalisation is global.** `current_tensor.norm()` with no arguments is the **Frobenius norm over the
+   entire (n × 768) tensor**, not a per-position norm (`atr_engine.py:170-172`, `330-332`; already noted in
+   [SCALING_ARTEFACT_ANALYSIS.md](SCALING_ARTEFACT_ANALYSIS.md) as "one scalar, same ratio across all positions").
+   Every position is multiplied by *c_n* = ‖x⁰‖_F / ‖xⁿ‖_F, a single number computed from **all** positions.
+3. **Pre-LN means F₀ is not scale-invariant.** For *c* > 0, LayerNorm is blind to scale — LN(*c*·*x*) = LN(*x*) —
+   but the residual path is not. Writing *g₀* for the block contributions at position 0:
+   *F₀*(*c*·*x*) = *c*·*x* + *g₀*(LN(*x*)). The residual carries the rescale, the block output does not. **This is
+   precisely why the energy renormalisation is a live part of the dynamics rather than a no-op.**
+
+Put together, the per-iteration update at position 0 is:
+
+```
+x₀ⁿ⁺¹ = cₙ · x₀ⁿ + g₀( LN(x₀ⁿ) )
+```
+
+So the honest statement is: **position 0's ATR trajectory is autonomous up to one scalar per iteration.** It is
+not a closed system — *c_n* is a channel through which the rest of the sequence reaches it — but that channel is
+**one-dimensional**. The other positions can rescale position 0; they cannot rotate it, and they cannot supply it
+with a direction it does not already have. Against the 768 dimensions available to any other position's inputs,
+that is an unusually thin coupling.
+
+#### The constraint this puts on the attractor
+
+Position collapse is an established observation in this project: `position_similarity` → 1.0000 by iteration ~10
+([TECHNICAL.md](TECHNICAL.md) §Observed Dynamics), and it holds for the noise null too (F4). Suppose it is exact,
+and suppose the state has settled — all positions equal to one shared vector *x**, unchanging under iteration.
+Then ‖xⁿ‖_F is constant, so *c_n* = 1, and the update above reduces to:
+
+> ***x**\* = F₀(x\*)* — **the shared attractor must be a fixed point of the single-position map.**
+
+This is a real constraint and not a restatement. The full system is a map on ℝ^(n×768); the conclusion says its
+attractor is pinned inside the fixed-point set of a map on ℝ⁷⁶⁸. Position 0 gets no say in where the *other*
+positions go, but it is the one position that cannot be *dragged* anywhere, so whatever the sequence agrees on,
+position 0 has to have been willing to sit at unaided.
+
+The same argument applies unchanged to the period-2 cycle of F9: if the cycle is position-uniform, its two phases
+must be a **period-2 orbit of F₀**. F14 attributes the cycle to one attention head, L11.H8 — and at position 0
+that head can only attend to position 0, so its OV circuit is acting on the position's own value vector. The
+cycle, if it survives at position 0, is not a cross-position phenomenon at all.
+
+#### A registered prediction
+
+**Prediction.** Run ATR on a **single-token prompt** (*n* = 1). At *n* = 1 the Frobenius norm *is* position 0's
+norm, so the global rescale becomes exactly the rescale position 0 would apply to itself, and the loop implements
+*F₀* iterated with energy renormalisation and nothing else. **That run should converge to the same vector the
+125-prompt sweep converges to** — the `prolet` attractor, or whichever basin the seed falls into.
+
+**What the prediction does not claim.** It will *not* reproduce a multi-position run step for step. Off the fixed
+point, *c_n* in the multi-position run is computed from all positions and differs from the *n* = 1 run's scalar,
+so the two trajectories can take different routes. The claim is about **where they end up, not how they get
+there** — an earlier informal statement of this idea overreached by predicting trajectory-level identity, and
+that stronger version is false for exactly this reason.
+
+**What would falsify it.** If the *n* = 1 run converges somewhere else, then one of the premises fails, and each
+failure is informative:
+
+- Position collapse is *approximate*, not exact — 0.9999 and 1.0000 are different claims here, and the current
+  measurement does not distinguish them. The residual disagreement between positions would then be load-bearing.
+- Or the attractor is **sustained by the coupling** — held in place by the *c_n* channel rather than being a
+  fixed point of *F₀* at all.
+
+Both are cheaper to test than they look: the run is a single prompt of one token, and the discriminating
+measurement is `position_similarity` reported at full precision rather than rounded to 4 dp.
+
+**One caveat that changes the seeding, not the argument.** Position 0 in every GPT-2 ATR trajectory is
+`<|endoftext|>`, because TransformerLens prepends it (§7, and the confound it raises for finding 2). So *x₀*'s
+iteration-0 value is `wte[50256] + wpe[0]` — **identical for every prompt in the 125-prompt sweep**. Position 0
+starts in the same place every time and evolves under a map that nothing else can rotate. If the basins differ
+across prompts, that difference cannot have originated at position 0; it has to arrive through *c_n*, or through
+positions that collapse *onto* position 0's trajectory rather than the reverse. A `prepend_bos=False` arm is the
+control that separates these, and it is the same arm the finding-2 confound already calls for.
+
 ---
 
 ## Part 3 — The versions
