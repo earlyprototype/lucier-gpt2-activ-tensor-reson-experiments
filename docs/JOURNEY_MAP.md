@@ -73,7 +73,7 @@
 | 13 | The five basins are regime-specific, not weight-universal | Null model (2026-07) | Noise → 18 non-semantic basins, ~0 overlap; real count 5 below random CI [11,17] |
 | 14 | Basin labels survive convergence gating, with two corrections | Gated re-sweep (2026-07) | 73% pass the lag-1 gate by iter 120; ~10 prompts move Anarch→prolet, 1 moves solidarity→Anarch |
 | 15 | `Divine` is a readout-stable / tensor-unsettled object | Gated + diagnostic (2026-07) | 34/34 lag-1 gate failures are `Divine`; decode constant while tensor moves. *Resolved 2026-07-19: an exact period-2 limit cycle (FINDINGS F9); fails the lag-1 gate by construction, converged at lag 2 for the audited trajectory (F15).* |
-| 16 | Cross-model differences are intrinsic dynamics, not apparatus | Diagnostics (2026-07) | cos_sim_mean verdicts are tensor-level; normalisation inert up to LayerNorm's epsilon term |
+| 16 | Cross-model differences are intrinsic dynamics, not apparatus | Diagnostics (2026-07) | cos_sim_mean verdicts are tensor-level; normalisation inert up to LayerNorm's epsilon term. *Amended 2026-07-28: the inertness half is withdrawn pending re-derivation — LayerNorm ignores a global rescale but the residual path around it does not, so the block is not invariant (FINDINGS caveat 7; `experiments/preln_rescale_check.py`). The tensor-level half is unaffected, and §1.1's separate ruling that the rescale preserves the mix — and so is not the Pythia-410m fragmentation source — still stands.* |
 
 ---
 
