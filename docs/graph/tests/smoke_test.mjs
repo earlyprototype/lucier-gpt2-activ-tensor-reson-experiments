@@ -1831,7 +1831,21 @@ async function main() {
                   `fit scale ${legibility.scale}, font ${legibility.font} -> ` +
                   `effective label ${legibility.effectivePx}px ` +
                   `(budget >= ${MIN_EFFECTIVE_LABEL_PX})` +
-                  `${legibility.effectivePx >= MIN_EFFECTIVE_LABEL_PX ? '' : ' <-- TOO SMALL TO READ'}\n` +
+                  `${legibility.effectivePx >= MIN_EFFECTIVE_LABEL_PX ? '' : ' <-- TOO SMALL TO READ'}` +
+                  // Early warning, on a PASS. Caption size is font x the zoom
+                  // that fits the grid, so it shrinks every time a claim is
+                  // added to the record -- registering the 94th cost 0.72px.
+                  // Without this line the first person to add a claim sees a
+                  // viewer assertion go red for an edit to FINDINGS.md and has
+                  // no way to connect the two.
+                  `${legibility.effectivePx >= MIN_EFFECTIVE_LABEL_PX &&
+                     legibility.effectivePx - MIN_EFFECTIVE_LABEL_PX < 1
+                        ? `\n  NOTE: only ${(legibility.effectivePx - MIN_EFFECTIVE_LABEL_PX).toFixed(2)}px above the floor. ` +
+                          `Captions shrink as the record grows (~0.7px per claim), so the next claim ` +
+                          `registered in docs/FINDINGS.md is likely to fail this assertion. That would ` +
+                          `be the grid outgrowing the viewport, not a viewer regression -- the fix is to ` +
+                          `stop fitting the whole grid, not to lower the floor.`
+                        : ''}\n` +
                   `captions drawn: ${legibility.drawnLabels}` +
                   `${legibility.drawnLabels ? '' : ' <-- NONE DRAWN'}` +
                   `${legibility.transposed ? ' <-- TRANSPOSED, expected the wide index' : ''}\n` +
