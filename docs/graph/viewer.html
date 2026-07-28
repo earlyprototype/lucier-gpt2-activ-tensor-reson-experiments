@@ -268,6 +268,11 @@
         }
 
         /* The label still needs its own air, since the gap is now zero. */
+        /* The canvas-mounted twin of #view-switch. Desktop has room for the
+           real one in the filter bar, so this is a phone-only control and is
+           display:none here; the narrow-screen block turns it on. */
+        .view-float { display: none; }
+
         #view-switch .chip-group-label {
             margin-right: 6px;
         }
@@ -1357,6 +1362,47 @@
                 display: flex;
             }
 
+            /* Anchored to the chrome's own measured bottom (the same custom
+               property the disclosures use) so it tracks the header instead of
+               guessing at it. Sits over the canvas, which on a phone is empty
+               in this corner in every one of the four graphs.
+               `mode-hidden` still wins: dissolution and isomorphism draw their
+               own layouts and have no index to switch to. */
+            .view-float {
+                position: fixed;
+                top: calc(var(--mobile-chrome-bottom, 132px) + 10px);
+                left: 10px;
+                z-index: 315;
+                display: flex;
+                gap: 0;
+                border-radius: 999px;
+                overflow: hidden;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.28);
+            }
+
+            .view-float.mode-hidden { display: none; }
+
+            .view-float-chip {
+                /* 40px tall so it is a real touch target, and opaque so the
+                   graph never shows through and makes the label unreadable. */
+                min-height: 40px;
+                padding: 0 14px;
+                border: 1px solid #b9c2c8;
+                background: #ffffff;
+                color: #2c3e50;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+
+            .view-float-chip + .view-float-chip { border-left: none; }
+
+            .view-float-chip.view-active {
+                background: #2c3e50;
+                border-color: #2c3e50;
+                color: #ffffff;
+            }
+
             #chip-bar .chip-group {
                 gap: 8px;
             }
@@ -1689,6 +1735,31 @@
                     aria-expanded="false" aria-controls="legend"
                     onclick="toggleDisclosure('mobile-legend-toggle')">Legend</button>
         </div>
+    </div>
+
+    <!-- The same view switch, on the canvas, for phones only.
+         #view-switch lives in #chip-bar, which is display:none on a phone until
+         the reader taps "Filters". That made the switch unreachable in practice:
+         nothing about a disclosure labelled Filters suggests it contains the
+         control for HOW the graph is drawn, and the owner reported exactly that
+         -- "on my phone I don't see index option to change view". Measured: zero
+         pixels of it on arrival; it only appears at 59x40 after the tap.
+         Putting it on the canvas rather than in #mobile-toolbar is deliberate:
+         that row already carries Filters / More / Legend, and "Filters" grows to
+         "Filters (12 of 18)", so a fourth control there wraps the row and costs
+         ~46px of a 160px chrome budget that is already at 125px. Floating it
+         costs zero chrome, which is why assertion 12 is unaffected.
+         Kept as a second control rather than moved, because moving the node
+         between containers at a breakpoint is the kind of thing this file has
+         already been bitten by; updateViewSwitch() drives both from one place,
+         so they cannot disagree. -->
+    <div class="view-float mode-hidden" id="view-float">
+        <button type="button" class="view-float-chip view-active" id="view-float-network"
+                aria-pressed="true" title="Force-directed: physics on, nothing pinned"
+                onclick="setViewMode('network')">Network</button>
+        <button type="button" class="view-float-chip" id="view-float-index"
+                aria-pressed="false" title="Ordered grid: type across, date down"
+                onclick="setViewMode('index')">Index</button>
     </div>
 
     <div id="chip-bar">
@@ -3414,9 +3485,19 @@
 
         function updateViewSwitch() {
             const view = currentView();
-            const group = document.getElementById('view-switch');
-            if (group) group.classList.toggle('mode-hidden', !orderedLayoutActive);
-            [[VIEW_NETWORK, 'view-network'], [VIEW_INDEX, 'view-index']].forEach(function (pair) {
+            // Both switches, from one place. #view-switch is the desktop
+            // control in the filter bar; #view-float is its phone-only twin on
+            // the canvas, which exists because #chip-bar is display:none until
+            // the reader taps "Filters". Driving them from a single loop is the
+            // point -- two controls for one piece of state is only safe while
+            // nothing can update one and forget the other.
+            ['view-switch', 'view-float'].forEach(function (id) {
+                const group = document.getElementById(id);
+                if (group) group.classList.toggle('mode-hidden', !orderedLayoutActive);
+            });
+            [[VIEW_NETWORK, 'view-network'], [VIEW_INDEX, 'view-index'],
+             [VIEW_NETWORK, 'view-float-network'], [VIEW_INDEX, 'view-float-index']
+            ].forEach(function (pair) {
                 const el = document.getElementById(pair[1]);
                 if (!el) return;
                 const on = orderedLayoutActive && pair[0] === view;
