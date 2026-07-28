@@ -1,0 +1,50 @@
+name: engine
+
+# Contract tests for atr_engine.py, the canonical ATR loop (docs/ENGINE.md).
+#
+# Separate from graph.yml on purpose: that workflow checks the *record* against
+# the repository, this one checks the *engine* against the calls the record was
+# produced by. Both are cheap; conflating them would make a red build ambiguous.
+#
+# requirements.txt is not installed. It pulls torch and the model stack, and
+# nothing here needs a forward pass: tests/ reads atr_engine.py as source and
+# skips the handful of tests that import it. The consequence is worth stating
+# plainly -- CI proves the default call shape is unchanged, it does not prove
+# prepend_bos does what TransformerLens documents. That check belongs on the
+# machine that runs the sweeps, against a real model, once.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract:
+    name: engine contract tests
+    runs-on: ubuntu-latest
+    steps:
+      # persist-credentials: false -- this job never pushes.
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pytest
+        run: python3 -m pip install --disable-pip-version-check --quiet pytest
+
+      # -rs so the skipped, torch-dependent tests are listed by name with their
+      # reason. A silent skip and a passing test look identical in a summary
+      # line, and these are exactly the tests whose absence should be visible.
+      - name: Engine contract tests
+        run: python3 -m pytest tests/ -q -rs

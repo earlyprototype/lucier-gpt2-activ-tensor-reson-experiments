@@ -92,7 +92,44 @@ def position_argmax_ids(model, tensor):
     return id_list, string_list
 
 
-def run_atr_loop(model, prompt, layer_start, layer_end, max_iter, schedule, verbose=True):
+# The BOS decision, made explicit (issue #75).
+#
+# TransformerLens tokenises a *string* prompt through ``to_tokens``, which
+# prepends the beginning-of-sequence token whenever ``cfg.default_prepend_bos``
+# is set: True for GPT-2 by the library's global default, explicitly False only
+# for GPT-NeoX/Pythia. Every engine call site until now passed a bare string, so
+# that choice was made by the config, silently, at a call site that could not
+# see it. The engine could not express "run GPT-2 without a BOS" at all -- which
+# is the H-pos0 seed (a sequence whose one token IS the BOS) and the caveat-17
+# tokenisation control.
+#
+# ``prepend_bos=None`` means "use the model's own default". That is not a
+# convention invented here: TransformerLens's own sentinel is
+# ``USE_DEFAULT_VALUE = None`` (transformer_lens/utilities/defaults_utils.py),
+# and ``override_or_use_default_value`` falls back to ``cfg.default_prepend_bos``
+# on None. We nonetheless omit the kwarg entirely rather than pass None, so the
+# default path issues the *same call* the pre-#75 engine issued rather than a
+# call that merely ought to resolve the same way. Bit-for-bit, not by argument.
+#
+# The guard names the bug it prevents. A token-ID tensor bypasses ``to_tokens``
+# completely (``input_to_embed`` only tokenises str/list input), so pairing
+# token IDs with ``prepend_bos`` would silently ignore the flag -- and a run
+# whose whole point is the absence of a BOS must never be able to lie about it.
+def _bos_kwargs(prompt, prepend_bos):
+    if prepend_bos is None:
+        return {}
+    if torch.is_tensor(prompt):
+        raise ValueError(
+            "prepend_bos is only meaningful for a string prompt: TransformerLens "
+            "applies it inside to_tokens, and a token-ID tensor never reaches the "
+            "tokeniser, so the flag would be silently ignored. Put the BOS id in "
+            "the tensor (or leave it out) rather than setting prepend_bos."
+        )
+    return {"prepend_bos": prepend_bos}
+
+
+def run_atr_loop(model, prompt, layer_start, layer_end, max_iter, schedule, verbose=True,
+                 prepend_bos=None):
     """
     Activation Tensor Resonance loop: iteratively re-inject the ENTIRE 
     residual stream tensor (all token positions) through the layer slice.
@@ -102,12 +139,17 @@ def run_atr_loop(model, prompt, layer_start, layer_end, max_iter, schedule, verb
     
     Args:
         model: HookedTransformer model instance
-        prompt: string prompt text
+        prompt: string prompt text, or a token-ID tensor ([pos] or [1, pos]),
+            which TransformerLens takes verbatim without tokenising
         layer_start: first layer index (typically 0)
         layer_end: last layer index (typically model.cfg.n_layers - 1)
         max_iter: maximum number of iterations (typically 100)
         schedule: list of iteration numbers at which to record snapshots
         verbose: if True, print progress at each snapshot
+        prepend_bos: None (default) uses the model's own
+            ``cfg.default_prepend_bos``, reproducing every historical run
+            exactly; True/False overrides it for a string prompt. Rejected
+            with a token-ID prompt, which bypasses the tokeniser.
     
     Returns:
         List of snapshot dicts at each scheduled iteration, containing:
@@ -117,6 +159,7 @@ def run_atr_loop(model, prompt, layer_start, layer_end, max_iter, schedule, verb
         - cosine_sim_last, cosine_sim_mean, position_similarity
     """
     snapshots = []
+    bos_kwargs = _bos_kwargs(prompt, prepend_bos)
     hook_point_read = f"blocks.{layer_end}.hook_resid_post"
     hook_point_write = f"blocks.{layer_start}.hook_resid_pre"
     
@@ -124,7 +167,8 @@ def run_atr_loop(model, prompt, layer_start, layer_end, max_iter, schedule, verb
     with torch.no_grad():
         _, cache = model.run_with_cache(
             prompt,
-            names_filter=lambda n: n == hook_point_read
+            names_filter=lambda n: n == hook_point_read,
+            **bos_kwargs
         )
     
     current_tensor = cache[hook_point_read][0].clone()
@@ -182,7 +226,8 @@ def run_atr_loop(model, prompt, layer_start, layer_end, max_iter, schedule, verb
             with torch.no_grad():
                 _, cache = model.run_with_cache(
                     prompt,
-                    names_filter=lambda n: n == hook_point_read
+                    names_filter=lambda n: n == hook_point_read,
+                    **bos_kwargs
                 )
         finally:
             model.reset_hooks()
@@ -245,7 +290,7 @@ def run_atr_loop(model, prompt, layer_start, layer_end, max_iter, schedule, verb
 def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
                   threshold=0.999, patience=3, check_every=10, check_start=100,
                   verbose=False, gate_lag=1, capture_terminal=False,
-                  inject_hook_name=None, renorm="seed_j"):
+                  inject_hook_name=None, renorm="seed_j", prepend_bos=None):
     """Convergence-gated ATR loop (early-stop variant of run_atr_loop).
 
     Iterates the full-tensor re-injection until the tensor stops moving, then
@@ -275,6 +320,14 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
     layer-window experiments (EXP_010c); the defaults reproduce the registered
     single-window path exactly, so existing callers are unaffected.
 
+    ``prepend_bos`` (default None) decides whether TransformerLens prepends the
+    BOS token when it tokenises a string ``prompt``. None defers to the model's
+    own ``cfg.default_prepend_bos`` -- True for GPT-2, False for Pythia -- which
+    is what every run in the record used; True/False overrides it. ``prompt``
+    may instead be a token-ID tensor ([pos] or [1, pos]), which TransformerLens
+    takes verbatim: that is the exact-sequence path, and it is incompatible with
+    ``prepend_bos`` (see ``_bos_kwargs``).
+
     Lean by design (one readout decode, at the end) so a 125-prompt x 1000-iter
     sweep stays forward-pass-bound.
 
@@ -295,6 +348,7 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
             "for the lagged comparison to be well-formed")
     if renorm not in ("seed_j", "natural_i"):
         raise ValueError(f"renorm must be 'seed_j' or 'natural_i', got {renorm!r}")
+    bos_kwargs = _bos_kwargs(prompt, prepend_bos)
     hook_point_read = f"blocks.{layer_end}.hook_resid_post"
     hook_point_write = inject_hook_name or f"blocks.{layer_start}.hook_resid_pre"
     # Control B (renorm="natural_i") needs the natural norm at the actual
@@ -308,7 +362,7 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
 
     with torch.no_grad():
         _, cache = model.run_with_cache(
-            prompt, names_filter=lambda n: n in cache_names
+            prompt, names_filter=lambda n: n in cache_names, **bos_kwargs
         )
     current_tensor = cache[hook_point_read][0].clone()
     initial_norm = current_tensor.norm().item()
@@ -341,7 +395,7 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
         try:
             with torch.no_grad():
                 _, cache = model.run_with_cache(
-                    prompt, names_filter=lambda n: n == hook_point_read
+                    prompt, names_filter=lambda n: n == hook_point_read, **bos_kwargs
                 )
         finally:
             model.reset_hooks()
