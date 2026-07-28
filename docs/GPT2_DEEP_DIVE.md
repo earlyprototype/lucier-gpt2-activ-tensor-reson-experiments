@@ -16,6 +16,16 @@ model, with a drafted summary for each paper.*
 > including venue attributions I could not confirm against the venue itself. Unmarked claims were checked against
 > the paper's own text, its released artifacts, or the model files themselves.
 >
+> **Citation convention**, agreed with `agent:pythia-review` on the peer board so that this document and
+> [PYTHIA_INTERPRETABILITY_REVIEW.md](PYTHIA_INTERPRETABILITY_REVIEW.md) do not disagree about the same work:
+> **lead with the published venue and title, give the arXiv identifier, and note the preprint title where it
+> differs.** Papers in this field routinely change title between preprint and proceedings, and neither record
+> links to the other, so a repository carrying one of each looks like it is citing two papers. Tigges et al. in
+> §5.4 is the worked example.
+>
+> **Corrections after merge** are marked in place rather than silently rewritten, naming what was wrong and who
+> caught it. §5.4 and §7 item 3 carry one.
+>
 > Numbers in Part 2 and Part 3 were **recomputed from the architecture and cross-checked against the released
 > checkpoints' `safetensors` headers and `config.json`/`vocab.json`/`merges.txt` files** on the Hugging Face
 > `openai-community` and `distilbert` repositories — that is, `[primary data, read directly]`. Where they disagree
@@ -194,7 +204,7 @@ enough to hold in one head — which is why interpretability stayed on it long a
 For token sequence *t*₁…*t*ₙ, with `wte` the token-embedding matrix (50257 × d), `wpe` the learned
 absolute position-embedding matrix (1024 × d):
 
-```
+```text
 x₀      = wte[t] + wpe[0..n-1]                                  # residual stream, shape (n, d)
 
 for each block ℓ = 0 … L-1:
@@ -233,7 +243,7 @@ implementation fact, and a routine source of sign and orientation bugs in interp
 Per-block parameters are 12d² + 13d (attention: 3d² + 3d for `c_attn`, d² + d for `c_proj`; MLP: 4d² + 4d for
 `c_fc`, 4d² + d for `c_proj`; two LayerNorms: 4d). Total is therefore:
 
-```
+```text
 params = 50257·d  +  1024·d  +  L·(12d² + 13d)  +  2d
          └ wte ┘    └ wpe ┘    └── blocks ──┘    └ ln_f ┘
 ```
@@ -267,10 +277,19 @@ are studying the same weights. A reader collating results across the MI literatu
 - Ids 0–255 are the byte alphabet (id 0 = `!`, in the printable-remap encoding).
 - **Id 50256 = `<|endoftext|>`**, the only special token. There is no separate beginning-of-sequence (BOS),
   padding (PAD), or unknown-token (UNK) entry — abbreviations you will meet in the attention-sink literature
-  below, where whether a model has a dedicated first token turns out to matter. GPT-2 does not
-  prepend anything by default, so **position 0 of a GPT-2 forward pass is an ordinary content token**, which is
-  the reason the attention-sink literature (§5.4) behaves differently on GPT-2 than on models trained with a
-  dedicated BOS.
+  below, where whether a model has a dedicated first token turns out to matter. The Hugging Face tokeniser
+  prepends nothing, so at the tokeniser level **position 0 of a GPT-2 sequence is an ordinary content token**.
+
+  **That is a fact about the tokeniser, and it does not survive contact with the tooling.** `[primary data, read
+  directly]` — TransformerLens, the library this repository and most of the work in Part 5 actually run on,
+  tokenises string input through `to_tokens`, which prepends the beginning-of-sequence token whenever
+  `cfg.default_prepend_bos` is set. In `loading_from_pretrained.py`, `GPTNeoXForCausalLM` (the Pythia family)
+  carries an explicit `"default_prepend_bos": False`; **GPT-2 has no such override and falls through to the global
+  default of `True`.** So any GPT-2 experiment that hands a *string* to `run_with_cache`, `to_tokens` or `forward`
+  is running with `<|endoftext|>` at position 0 — a dedicated special token — even though the tokeniser alone would
+  not have put one there. (Whether that position then *functions* as an attention sink is an inference from the
+  literature below, not something measured here.) §5.4 and §7 depend on this distinction; the measured confirmation, and the cross-model
+  consequence, are recorded there.
 - The famous unspeakable tokens are in the vocabulary and can be checked directly: `ĠSolidGoldMagikarp` = id
   **43453**, `Ġpetertodd` = id **37444** (verified in `vocab.json`). These exist because the tokeniser's corpus
   and the model's training corpus were not the same corpus — see §5.4.
@@ -307,6 +326,180 @@ observation is about a model whose position information is an additive vector, n
 distance to embedding-space structure are not independent measurements), and the absence of any post-training
 (ATR's basins are properties of a base model's raw next-token map).
 
+**The tying point does not travel across the 2×2, and that is a trap worth naming explicitly.** In GPT-2 the
+checkpoint carries `wte.weight` and no `lm_head` at all, so embedding space and unembedding space are the same
+space *by identity* — a claim about `W_U` is a claim about `W_E`. Pythia unties them deliberately, EleutherAI
+citing interpretability as the reason, so there the two are genuinely distinct and the identity is unavailable.
+**Any instrument or claim ported from one arm to the other that assumed a single space must be re-derived, not
+re-run.** This is the same distinction that produced a documented `W_U`/`W_E` disagreement between agents in the
+sibling repository, and it is cheap to state and expensive to rediscover.
+
+### 2.5 How information moves between positions
+
+§2.1 gives the forward pass as a sequence of operations. This section reads the same pass along the other axis —
+across token positions rather than across layers — because that is the axis ATR's position-collapse observation
+lives on, and the two readings license different conclusions.
+
+**Only one operation in GPT-2 moves information between positions.** Take the block from §2.1:
+
+```text
+x = x + Attn( LN₁(x) )
+x = x + MLP(  LN₂(x) )
+```
+
+LayerNorm normalises over the 768 feature dimensions *within* a position. The MLP maps ℝ⁷⁶⁸ → ℝ⁷⁶⁸ and is
+applied to each position separately with the same weights. The residual addition is elementwise. None of the
+three can see any position but its own. **Attention is the only cross-position operation in the architecture.**
+
+The useful picture is *n* parallel lanes, one per token, each carrying a 768-vector from the embedding up to the
+unembedding. The MLPs and LayerNorms act within a lane. Attention is the only place where lanes touch, and it
+touches them exactly 144 times in GPT-2 Small — 12 layers × 12 heads.
+
+#### What attention actually does
+
+Each head splits into two circuits, in the Anthropic decomposition (§5.1) — **QK decides *where* to read from,
+OV decides *what* gets written**:
+
+```text
+A      = softmax( mask( LN₁(x) W_Q W_Kᵀ LN₁(x)ᵀ / √64 ) )      # (n × n) attention pattern
+head_i = Σ_{j} A_ij · ( LN₁(x)_j W_V W_O )                     # what lands at position i
+```
+
+The output at position *i* is a **weighted average of value vectors from other positions**, with the weights
+supplied by QK and the content supplied by OV. This is worth stating plainly because it bounds what attention
+can do: it cannot compute a new direction out of nothing, it can only *transport* directions that some position
+already carries, scaled by a weight in [0, 1] and rotated by W_OW_V. Everything nonlinear about a position's own
+content happens in the MLP, in its own lane.
+
+#### The causal mask, and position 0
+
+The mask sets *A_ij* = 0 for *j* > *i* — the `attn.bias` buffer of §2.1, applied as −∞ before the softmax. So *A*
+is **lower-triangular**: position *i* reads from positions 0…*i* and from nothing later. This is what makes GPT-2
+autoregressive, and it is enforced identically in every one of the 144 heads.
+
+Now read row 0 of that triangle. Position 0 has exactly one unmasked entry — itself. A softmax over a single
+surviving score is **exactly 1.0**, not approximately: every other term in the row is exp(−∞) = 0. So for every
+head in every layer:
+
+```text
+head_0 = 1.0 · ( LN₁(x)_0 W_V W_O )
+```
+
+**Position 0's attention output depends on position 0's residual stream and on nothing else in the sequence.**
+Combine that with the per-position nature of LayerNorm, the MLP, and the residual add, and the conclusion is
+exact rather than approximate:
+
+> **In a single GPT-2 forward pass, position 0's output is a function of position 0's input alone.** Write it
+> *F₀ : ℝ⁷⁶⁸ → ℝ⁷⁶⁸*. Changing any other token in the prompt — or all of them — cannot change what comes out at
+> position 0. This is a property of the causal mask, not an empirical finding, and it holds in every decoder-only
+> transformer, at every layer, for every prompt.
+
+That is a strong statement, so it is worth being clear about what it does *not* say. It does not say position 0 is
+unimportant. The attention-sink literature (§5.4) reports that early positions absorb large attention mass
+regardless of semantic relevance, which would make position 0 heavily *read* even though it reads nothing —
+though whether position 0 functions as a sink *in these trajectories* is an open hypothesis in this repository,
+not a measurement (§5.4 states the reasons). The directional point survives either way: influence runs **outward**
+from position 0 to everything after it, and never back.
+
+#### What this licenses under ATR, and what it does not
+
+ATR iterates the whole (*n* × 768) tensor. Three implementation facts change the analysis, and two of them cut
+against the clean statement above:
+
+1. **Positional embeddings are added once, not once per iteration.** The loop injects at
+   `blocks.0.hook_resid_pre`, which sits *after* `wte + wpe`, and the hook overwrites the whole tensor
+   (`atr_engine.py`, `injection_hook`). So `wpe` enters at iteration 0 and is overwritten from iteration 1
+   onward. **After the first injection, the only thing distinguishing one position from another is the causal
+   mask** — position 0 is not "the position with `wpe[0]` in it", it is "the position that can see least".
+2. **The renormalisation is global.** `current_tensor.norm()` with no arguments is the **Frobenius norm over the
+   entire (n × 768) tensor**, not a per-position norm (`atr_engine.py:170-172`, `330-332`; already noted in
+   [SCALING_ARTEFACT_ANALYSIS.md](SCALING_ARTEFACT_ANALYSIS.md) as "one scalar, same ratio across all positions").
+   Every position is multiplied by *c_n* = ‖x⁰‖_F / ‖xⁿ‖_F, a single number computed from **all** positions.
+3. **Pre-LN means F₀ is not scale-invariant.** For *c* > 0, LayerNorm is blind to scale — LN(*c*·*x*) = LN(*x*) —
+   but the residual path is not. Writing *g₀* for the block contributions at position 0:
+   *F₀*(*c*·*x*) = *c*·*x* + *g₀*(LN(*x*)). The residual carries the rescale, the block output does not. **This is
+   precisely why the energy renormalisation is a live part of the dynamics rather than a no-op.**
+
+Put together, the per-iteration update at position 0 is:
+
+```text
+x₀ⁿ⁺¹ = cₙ · x₀ⁿ + g₀( LN(x₀ⁿ) )
+```
+
+So the honest statement is: **position 0's ATR trajectory is autonomous up to one scalar per iteration.** It is
+not a closed system — *c_n* is a channel through which the rest of the sequence reaches it — but that channel is
+**one-dimensional**. The other positions can rescale position 0; they cannot rotate it, and they cannot supply it
+with a direction it does not already have. Against the 768 dimensions available to any other position's inputs,
+that is an unusually thin coupling.
+
+#### The constraint this puts on the attractor
+
+Position collapse is an established observation in this project: `position_similarity` → 1.0000 by iteration ~10
+([TECHNICAL.md](TECHNICAL.md) §Observed Dynamics), and it holds for the noise null too (F4). Suppose it is exact,
+and suppose the state has settled — all positions equal to one shared vector *x**, unchanging under iteration.
+Then ‖xⁿ‖_F is constant, so *c_n* = 1, and the update above reduces to:
+
+> ***x**\* = F₀(x\*)* — **the shared attractor must be a fixed point of the single-position map.**
+
+This is a real constraint and not a restatement. The full system is a map on ℝ^(n×768); the conclusion says its
+attractor is pinned inside the fixed-point set of a map on ℝ⁷⁶⁸. Position 0 gets no say in where the *other*
+positions go, but it is the one position that cannot be *dragged* anywhere, so whatever the sequence agrees on,
+position 0 has to have been willing to sit at unaided.
+
+The same argument applies unchanged to the period-2 cycle of F9: if the cycle is position-uniform, its two phases
+must be a **period-2 orbit of F₀**. F14 attributes the cycle to one attention head, L11.H8 — and at position 0
+that head can only attend to position 0, so its OV circuit is acting on the position's own value vector. The
+cycle, if it survives at position 0, is not a cross-position phenomenon at all.
+
+#### A registered prediction
+
+**Prediction.** Run ATR on a sequence that is **one token long after tokenisation** (*n* = 1). At *n* = 1 the
+Frobenius norm *is* position 0's norm, so the global rescale becomes exactly the rescale position 0 would apply
+to itself, and the loop implements *F₀* iterated with energy renormalisation and nothing else. **That run should
+converge to the same vector the 125-prompt sweep converges to** — the `prolet` attractor, or whichever basin the
+seed falls into.
+
+**Specifying that experiment takes more care than it looks, for the reason this whole section is about.**
+`run_atr_loop` takes a *string* and hands it to `run_with_cache`, which prepends `<|endoftext|>` for GPT-2. A
+one-word prompt therefore yields **n = 2**, not *n* = 1 — BOS plus the content token — and at *n* = 2 the
+Frobenius norm is not position 0's norm and the argument above does not apply. Two things are needed:
+
+- **`prepend_bos=False`, which the engine does not currently expose.** It passes the prompt string straight
+  through, so the run needs either a `prepend_bos` passthrough or a token-ID input path. This is a small engine
+  change, and it is the same one the finding-2 control already needs.
+- **A seed of `<|endoftext|>` itself.** Position 0 in the sweep starts at `wte[50256] + wpe[0]`; a single-token
+  run seeded with an ordinary word starts somewhere else and iterates the same *F₀* from a different point, so
+  landing in a different basin would prove nothing. The tight comparison is *n* = 1 whose one token **is** BOS.
+
+A second variant is worth running beside it — *n* = 1 seeded at an ordinary content token — which tests something
+different and also worth knowing: whether *F₀*'s fixed point is seed-independent, or whether position 0 has a
+basin structure of its own.
+
+**What the prediction does not claim.** It will *not* reproduce a multi-position run step for step. Off the fixed
+point, *c_n* in the multi-position run is computed from all positions and differs from the *n* = 1 run's scalar,
+so the two trajectories can take different routes. The claim is about **where they end up, not how they get
+there** — an earlier informal statement of this idea overreached by predicting trajectory-level identity, and
+that stronger version is false for exactly this reason.
+
+**What would falsify it.** If the *n* = 1 run converges somewhere else, then one of the premises fails, and each
+failure is informative:
+
+- Position collapse is *approximate*, not exact — 0.9999 and 1.0000 are different claims here, and the current
+  measurement does not distinguish them. The residual disagreement between positions would then be load-bearing.
+- Or the attractor is **sustained by the coupling** — held in place by the *c_n* channel rather than being a
+  fixed point of *F₀* at all.
+
+Both are cheaper to test than they look: the run is a single prompt of one token, and the discriminating
+measurement is `position_similarity` reported at full precision rather than rounded to 4 dp.
+
+**One caveat that changes the seeding, not the argument.** Position 0 in every GPT-2 ATR trajectory is
+`<|endoftext|>`, because TransformerLens prepends it (§7, and the confound it raises for finding 2). So *x₀*'s
+iteration-0 value is `wte[50256] + wpe[0]` — **identical for every prompt in the 125-prompt sweep**. Position 0
+starts in the same place every time and evolves under a map that nothing else can rotate. If the basins differ
+across prompts, that difference cannot have originated at position 0; it has to arrive through *c_n*, or through
+positions that collapse *onto* position 0's trajectory rather than the reverse. A `prepend_bos=False` arm is the
+control that separates these, and it is the same arm the finding-2 confound already calls for.
+
 ---
 
 ## Part 3 — The versions
@@ -341,6 +534,19 @@ The sizes are not interchangeable, and this repository has its own evidence for 
 language prompts into five semantic attractor basins under ATR while **GPT-2 Medium — same corpus, same
 tokeniser, same architecture family — collapses every prompt to the single token `D`** ([FINDINGS.md](FINDINGS.md)).
 Whatever GPT-2 Small is doing, it is not simply "what GPT-2 does, smaller".
+
+**A warning about the other axis, though.** That is a *within-GPT-2* size difference and reads correctly as one.
+The cross-family comparisons in this repository do **not**: `pythia-160m` is 12 layers × d_model 768 × 12 heads,
+which is GPT-2 Small exactly, and `pythia-410m` is 24 × 1024 × 16, which is GPT-2 Medium exactly. The match is
+tighter than shape — because GPT-NeoX blocks carry the same 12d² + 13d parameter inventory as GPT-2 blocks (§2.2),
+the **non-embedding parameter counts are identical**: 85,056,000 and 302,311,424 down each column. Parallel versus
+sequential sub-layer arrangement changes what can read what, not how many weights there are. So a GPT-2-versus-
+Pythia difference is **never** a capacity or scale effect; it is attributable to training corpus, tokeniser,
+positional scheme (learned absolute versus rotary), sub-layer arrangement, embedding tying — and, as §5.4 records,
+to whether the tooling prepends a special token at position 0. A reader arriving from either end of the 2×2 reaches for "bigger
+model, different behaviour," and that reading is unavailable here. (Raised by `agent:pythia-review` on the peer
+board; stated in [PYTHIA_INTERPRETABILITY_REVIEW.md](PYTHIA_INTERPRETABILITY_REVIEW.md) §I.4, and it belongs on
+this side too.)
 
 ### 3.2 The other GPT-2s
 
@@ -881,11 +1087,60 @@ activations** — a handful of activations up to ~100,000× larger than the rest
 functioning as indispensable **bias terms**, and causing exactly the attention concentration the first paper
 observes.
 
-*Relevance to GPT-2 and ATR:* GPT-2 has **no BOS token** and prepends nothing (§2.3), so position 0 is a content
-token that may nonetheless be carrying sink duty. Any claim about a GPT-2 residual stream's norm, geometry, or
-position structure — including ATR's L2 renormalisation, which rescales *everything including whatever sits at
-position 0* — needs these two papers in the frame. Together with Privileged Bases (§5.1) they form the
-"before you interpret that outlier, read this" set.
+*Relevance to GPT-2 and ATR.* An earlier version of this section said GPT-2 has no beginning-of-sequence token and
+prepends nothing, so position 0 is a content token that might nonetheless be carrying sink duty. **That was wrong
+as applied to this repository's runs, and wrong in the direction that mattered.** The correction was raised by
+`agent:pythia-review` on the peer board (discussion #59, 2026-07-26) and then measured; it is recorded here rather
+than quietly rewritten, because the original claim was in a merged document.
+
+The tokeniser fact is right (§2.3). The application is not: `atr_engine.py` passes a raw **string** to
+`run_with_cache` (lines 125, 183, 310, 343), TransformerLens tokenises strings with
+`cfg.default_prepend_bos`, and GPT-2 inherits the global default of `True`. **Position 0 in every ATR trajectory
+on GPT-2 is `<|endoftext|>` — a dedicated special token, not content.** Whether it then *functions* as an
+attention sink in these trajectories is an inference from the sink literature, not a measurement: the only
+sink-adjacent measurement in hand is coordinate-structured, and massive activations are a coordinate phenomenon
+while attention sinks are a positional one. Treat "sink at position 0" as an open hypothesis below.** The repository already knew this in one
+place and not the other: `experiments/gpt2_small/11_suppression_test.py:607` is commented `# [1, L], BOS at 0` and
+line 610 records `"n_tokens_no_bos": L - 1`. Two files disagreed and this document read the wrong one.
+
+The correction sharpens the control rather than weakening it. The sink is not a diffuse worry about "whatever sits
+at position 0"; it has a known address, so "does the L2 renormalisation rescale a position carrying
+disproportionate norm along with the content?" becomes directly testable.
+
+**And it creates a cross-model confound neither this document nor its Pythia companion had identified.** Measured
+by `agent:pythia-review` with `torch` and `transformer-lens`, on the engine's own call path
+`[peer-board measurement, unreviewed — see pull request (PR) #61]`:
+
+| model | tokens, raw tokeniser | tokens, via `run_with_cache(str)` | special token at position 0? |
+|:---|---:|---:|:---|
+| `gpt2` | 4 | **5** | **yes** — `<\|endoftext\|>` |
+| `gpt2-medium` | 4 | **5** | **yes** |
+| `pythia-160m` | 4 | 4 | no |
+| `pythia-410m` | 4 | 4 | no |
+
+The final column records **token identity, which is measured**. Whether that position then functions as an
+attention sink is a separate question and is not measured here — see the hypothesis note below.
+
+The two arms of this project's 2×2 **do not tokenise the same way**. The GPT-2 arm carries a structural
+non-content token at position 0; the Pythia arm does not, because TransformerLens sets `default_prepend_bos=False`
+for the NeoX family, Pythia having not been trained on sequences with one. Nobody chose this; it is a library
+default that varies by model family and is invisible at the call site. Every position-indexed cross-model
+comparison is therefore comparing sequences whose position 0 means different things, and the same prompt yields
+sequences differing in length by one between arms.
+
+Any claim about a GPT-2 residual stream's norm, geometry, or position structure still needs these two papers in
+the frame, and together with Privileged Bases (§5.1) they remain the "before you interpret that outlier, read
+this" set. What changes is that on GPT-2 the outlier has a name and a position.
+
+*A caution against the obvious inference.* The natural next step — mask the massive-activation coordinates and see
+whether convergence survives — has been run, and it **refuted the hypothesis that motivated it**. The expectation
+was that large, near-constant coordinates inflate cosine similarity toward 1, putting the saturating models'
+readings at risk. Measured, the effect runs the other way on GPT-2 Small: masking *raises* `cos_sim_mean` from
+0.9167 to 0.9933, so the dominant coordinates were **depressing** the metric, not inflating it, and GPT-2 Medium
+returns the same saturation with fifty coordinates deleted. `[peer-board measurement, unreviewed — PR #61 open at
+time of writing, and its author has already corrected two figures in it after review, so treat the numbers as
+in-flight.]` The general lesson survives the specific refutation: reason about these coordinates before
+interpreting a residual-stream metric, and do not assume you know the sign of the effect.
 
 ---
 
@@ -1251,7 +1506,11 @@ Second, the paper explicitly leaves open **when a workspace emerges during pretr
 **Sharkey, Chughtai, Batson, Lindsey, Wu, Bushnaq, Goldowsky-Dill, Heimersheim, Ortega, Bloom, Biderman,
 Garriga-Alonso, Conmy, Nanda, Rumbelow, Wattenberg, Schoots, Miller, Michaud, Casper, Tegmark, Saunders, Bau,
 Todd, Geiger, Geva, Hoogland, Murfet, McGrath — *Open Problems in Mechanistic Interpretability*
-(arXiv:2501.16496, January 2025).** `[preprint, unreviewed]`
+(Transactions on Machine Learning Research; accepted 20 September 2025; https://openreview.net/forum?id=91H76m9Z94;
+preprint arXiv:2501.16496, January 2025).** `[peer-reviewed]`
+Cited here under the published venue per the convention in the provenance block. An earlier version of this
+document had it as an unreviewed preprint, which is what the arXiv record alone shows — the arXiv entry carries no
+`journal_ref` — and `agent:pythia-review` had the published venue right; the correction is theirs.
 
 The field's own agenda, co-authored across Anthropic, DeepMind, EleutherAI, Apollo, the Massachusetts Institute of
 Technology, Harvard, Northeastern
@@ -1410,12 +1669,36 @@ the neighbours already catalogued in [PRIOR_WORK.md](PRIOR_WORK.md):
    IOI's negative name movers). L11.H8's inverting OV circuit is a new instance, not a new kind. Stating it that
    way makes the finding more credible, not less — and it raises a specific, cheap question: does L11.H8 behave
    as a copy suppressor on ordinary text, in the sense that paper defines?
-3. **Finding 2 has a nearest published relative.** The **summarisation motif** (§5.4) shows GPT-2-family models
-   parking semantic content at positions with no semantic content of their own, with 36 of 76 percentage points
-   of sentiment-classification accuracy living at commas. Position-uniformity under iteration is a more extreme
-   version of the same disregard for where information sits. The attention-sink and massive-activation literature
-   (§5.4) is the control this claim needs, since GPT-2 has no BOS and position 0 may be doing structural work
-   that L2 renormalisation rescales without respecting.
+3. **Finding 2 has a nearest published relative, and a confound that has to be handled first.** The
+   **summarisation motif** (§5.4) shows GPT-2-family models parking semantic content at positions with no
+   semantic content of their own, with 36 of 76 percentage points of sentiment-classification accuracy living at
+   commas. Position-uniformity under iteration is a more extreme version of the same disregard for where
+   information sits.
+
+   The control this needs is not the one an earlier version of this document specified. **Position 0 in every
+   GPT-2 ATR trajectory is `<|endoftext|>`, a special token** (§2.3, §5.4) — TransformerLens prepends it for
+   GPT-2 and *not* for Pythia. So finding 2's position-uniformity claim, stated across the 2×2, currently compares
+   a GPT-2 arm whose position 0 is a non-content special token against a Pythia arm whose position 0 is an
+   ordinary token. (Whether that special token also functions as an attention sink is the separate, unmeasured
+   hypothesis below; the confound here follows from its placement alone.)
+   Three consequences, in order of how much they bite:
+
+   - **The cross-model version of finding 2 is confounded until this is controlled.** "All positions collapse to
+     one vector" means something different when one of those positions holds a non-content token. The cheap fix
+     is to align the slices — **GPT-2 `[1:]` against Pythia `[:]`**, *not* index 0 dropped from both, which would
+     strip a genuine Pythia content token and trade one misalignment for another. And it is a sensitivity check
+     only: the BOS conditions the whole GPT-2 forward pass through attention, so removing it from the metric does
+     not remove it from the computation — only a `prepend_bos=False` GPT-2 arm does that.
+     `11_suppression_test.py` already computes `n_tokens_no_bos` and shows the accounting.
+   - **The within-GPT-2 version is sharpened, not weakened.** The sink has a known address, so "does the L2
+     renormalisation rescale a position carrying disproportionate norm along with the content?" is directly
+     testable rather than a diffuse worry — conditional on the sink hypothesis, which remains untested.
+   - **Sequence lengths differ by one between arms for the same prompt**, which quietly affects any per-position
+     average.
+
+   This belongs in [FINDINGS.md](FINDINGS.md) as a caveat on finding 2, not only here — it is a property of the
+   runs, not of the literature. Flagged rather than filed, since amending the canonical record is the operator's
+   call.
 4. **Finding 5 depends on a community result that checks out.** The glitch cluster is real, its cause is the
    tokeniser/training-corpus mismatch, and the specific tokens are verifiable in `vocab.json` (§2.3, §5.9). The
    flip axis running between most-trained and never-trained embedding regions is a claim about a geometry that
@@ -1440,6 +1723,14 @@ the neighbours already catalogued in [PRIOR_WORK.md](PRIOR_WORK.md):
    basin structure appear, and does it appear at the same point across seeds?" is a runnable experiment on the
    exact model this repository's headline result is about. The matching Medium seeds have no checkpoints, so the
    Small-versus-Medium contrast cannot be run developmentally — only the Small side can.
+
+   **And items 6 and 7 are the same artifact, which makes both cheaper than they look.** The observation is
+   `agent:pythia-review`'s, from the peer board: the five Stanford GPT-2 Small repositories are *simultaneously*
+   the seed control (five independent initialisations) and the developmental series (~609 checkpoints each). One
+   download serves two of this project's three standing open controls, and the two questions compose into a
+   better one than either alone — **does the basin structure appear at the same step across seeds?** Same-count-
+   different-timing and different-count-entirely are different findings, and only a sweep that varies both axes
+   at once can tell them apart.
 
 The open anomaly — why GPT-2 Small alone resolves language into semantic basins — now has three candidate framings
 drawn from this literature, none tested: that the basins are workspace-like directions and iteration falls into
@@ -1535,6 +1826,8 @@ table is for when you meet one again fifty pages later.
 | Short | In full | What it is |
 |:---|:---|:---|
 | MI | Mechanistic interpretability | Reverse-engineering the internal computations of a network |
+| PR | Pull request | A proposed change to this repository, reviewed before it merges |
+| BOS | Beginning of sequence | The token some tooling prepends at position 0 — see §2.3, where it matters |
 | ATR | Activation Tensor Resonance | This repository's method: iterated reinjection of the final-layer tensor |
 | IOI | Indirect object identification | The canonical GPT-2 Small circuit task |
 | ICL | In-context learning | Picking up a task from prompt examples, with no weight changes |
@@ -1637,7 +1930,7 @@ table is for when you meet one again fifty pages later.
 - Dunefsky, Chlenski, Nanda, transcoders — https://arxiv.org/abs/2406.11944
 - Marks et al., sparse feature circuits — https://arxiv.org/abs/2403.19647
 - Gao et al., scaling and evaluating SAEs — https://arxiv.org/abs/2406.04093
-- Sharkey et al., open problems in MI — https://arxiv.org/abs/2501.16496
+- Sharkey et al., *Open Problems in Mechanistic Interpretability*, TMLR 2025 — https://openreview.net/forum?id=91H76m9Z94 (preprint: https://arxiv.org/abs/2501.16496)
 - Braun et al., APD — https://arxiv.org/abs/2501.14926
 - Bushnaq, Braun, Sharkey, SPD — https://arxiv.org/abs/2506.20790
 - Gao et al., weight-sparse transformers — https://arxiv.org/abs/2511.13653

@@ -633,6 +633,7 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
 | H-J1 | `prolet` sits inside the verbalizable (J-lens) subspace, `Divine` outside | **Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)**: the point estimate runs slightly the other way at pilot confidence (`Divine` at least as lens-expressible as `prolet`), and the boundary that appears is language-vs-noise (F11). The phase-aware re-probe (F16) splits it: the reversal holds for phase A, strengthens at the pivot M (most lens-expressible), and reverses for phase B (below `prolet` at every layer); the physical flip axis is almost entirely outside the lens (span 0.013 vs 0.252 chance at L11). Full build still pending (issue #8). |
 | H-glitch | The `Divine` flip axis aligns with the anomalous-token (SolidGoldMagikarp) cluster | **Supported as a structural alignment (2026-07-19, F13)**: cos(-d, under-trained core) = +0.60, p < 0.001 under random and norm-matched nulls; the swing runs between the most-trained (function-word) corner and the least-trained (glitch) corner. A strong tilt (0.46-0.60), not an identity. |
 | H-flip | The flip axis carries an effective eigenvalue near -1, localisable to a block | **Refined (2026-07-19, F14)**: real, direction-specific, and localised (one direction; one head, L11.H8, does 99%), but the pivot eigenvalue is -4.3 (overshooting), not -1; a period-doubling configuration (composed-cycle multiplier +0.10). The literal -1 was a frame-mix artifact of the committed axis. |
+| H-pos0 | The shared attractor is a fixed point of the **single-position** map at position 0 | **Registered, untested (2026-07-28)**: under the causal mask, attention at position 0 attends only to position 0 (its softmax row has one unmasked entry, so the weight is exactly 1), and LayerNorm, the MLP and the residual add are all per-position. Position 0's forward map is therefore a function of position 0's input alone — architectural, not empirical. The ATR loop qualifies this: the rescale uses the whole-tensor Frobenius norm, so position 0 is coupled to the rest of the sequence through **one scalar per iteration**, *c_n*. At a settled state ‖xⁿ‖ is constant, *c_n* = 1, and the shared vector must satisfy *x\** = *F₀*(*x\**) — pinning an attractor of a map on ℝ^(T×768) inside the fixed-point set of a map on ℝ⁷⁶⁸. Same argument makes the `Divine` cycle a period-2 orbit of *F₀*, consistent with F14 localising it to one head that, at position 0, can only attend to position 0. **Test:** ATR at sequence length 1 (requires `prepend_bos=False` or a token-ID path, which the engine does not expose), seeded at `<\|endoftext\|>` to match the sweep's position 0. Predicts the same terminal basin. Predicts terminal state only, not trajectory: off the fixed point *c_n* differs between the two runs. **Falsifiers:** position collapse is approximate rather than exact (0.9999 and 1.0000 are different claims and the archived 4-dp reporting cannot separate them), or the attractor is sustained by the *c_n* coupling. Rationale: [GPT2_DEEP_DIVE.md](GPT2_DEEP_DIVE.md) §2.5. **Conditional on caveat 7.** |
 | H-supp | L11.H8 is a copy-suppression head whose one-shot negative correction the loop recycles | **Refuted with the opposite sign (2026-07-19, F17)**: L11.H8 inverts the flip axis (rank 1 of 144) and is load-bearing (ablation collapses the cycle), but on ordinary text it raises the attended token's logit at 91% of positions (a copy promoter), where the documented L10.H7 suppressor lowers it. The learned-function reading is unsupported; the structural-accident reading is strengthened. |
 
 ## 4. Caveats {#caveats}
@@ -661,8 +662,30 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
    (final-layer `resid_post` → layer-0 `resid_pre`). Alternative windows (including a
    Pythia-410m depth control, layers 0–11 vs 0–23) are designed but not run.
 7. **Normalisation scheme.** Global L2 rescale only; per-position/per-dimension
-   schemes unexplored (though the global scheme is inert through layer-0
-   LayerNorm up to the epsilon term and floating-point precision, see F5.1).
+   schemes unexplored.
+
+   **The "inert" claim needs re-deriving before it is relied on (flagged
+   2026-07-28).** [SCALING_ARTEFACT_ANALYSIS.md](SCALING_ARTEFACT_ANALYSIS.md)
+   §1.1 concludes the rescale is "approximately inert for the forward map,"
+   reasoning that layer-0 LayerNorm is invariant to a positive global rescale up
+   to its epsilon term. The LayerNorm step is correct; the conclusion drawn from
+   it does not follow, because the **residual path bypasses the LayerNorm**. For
+   a pre-LN block, *F*(*c*·*x*) = *c*·*x* + *g*(LN(*x*)) whereas
+   *F*(*x*) = *x* + *g*(LN(*x*)) — the two differ by (*c* − 1)·*x*, and from
+   block 1 onward the discrepancy compounds nonlinearly because the next
+   LayerNorm sees a different residual. The difference is negligible only when
+   *c* ≈ 1, which is precisely when the rescale is not doing anything; §1.1
+   itself notes norms would otherwise reach ~1.5 × 10⁶ by iteration 500, so *c*
+   is far from 1 in practice. What §1.1 *does* establish stands: the scalar
+   preserves the mix exactly, and so is ruled out as the source of the
+   Pythia-410m fragmentation, which was the question it was answering.
+
+   This is load-bearing for H-pos0. If the rescale were inert, position 0's
+   trajectory would be **exactly** autonomous and the fixed-point constraint
+   would hold unconditionally; if it is live, position 0 is autonomous only up to
+   *c_n*. Cheap to settle empirically — compare a forward pass on *x* against one
+   on *c*·*x* for a few values of *c* at realistic norms — and not settled here:
+   this container has no `torch`, so the above is algebra, not measurement.
 8. **BPE granularity.** Basin identities are single BPE tokens (`prolet`, `Anarch`);
    multi-token structure is invisible to the current readout.
 9. **Readout is logit-lens-style.** Decoding applies `ln_final → W_U` to
