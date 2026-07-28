@@ -176,7 +176,7 @@
       "prose_says_not_run": [
         {
           "file": "README.md",
-          "line": 215,
+          "line": 219,
           "text": "| [`spectral_resonance.ipynb`](experiments/gpt2_small/spectral_resonance.ipynb) | SVD-predicted per-head resonance (H4) | 🔬 scaffold, not run |"
         },
         {
@@ -186,7 +186,7 @@
         },
         {
           "file": "docs/FINDINGS.md",
-          "line": 629,
+          "line": 647,
           "text": "| H4 | Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector) | **Untested**: protocol scaffolded (`experiments/gpt2_small/spectral_resonance.ipynb`), not run. |"
         },
         {
@@ -362,7 +362,7 @@
               },
               {
                 "file": "README.md",
-                "line": 236,
+                "line": 240,
                 "text": "> **Note on `prompt_library.py`:** the 125-prompt sweep notebooks (`01_*`), `gated_resweep.py` and the Pythia-410m deep run import `prompt_library.py`. The file is a provenance-flagged reconstruction (issue #24): all 125 prompts were recovered verbatim from committed records — the original file's de"
               },
               {
@@ -483,12 +483,12 @@
               },
               {
                 "file": "docs/FINDINGS.md",
-                "line": 453,
+                "line": 471,
                 "text": "build (issue #8) should be phase-aware: probe both phases and the pivot M."
               },
               {
                 "file": "docs/FINDINGS.md",
-                "line": 633,
+                "line": 651,
                 "text": "| H-J1 | `prolet` sits inside the verbalizable (J-lens) subspace, `Divine` outside | **Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)**: the point estimate runs slightly the other way at pilot confidence (`Divine` at least as lens-ex"
               }
             ]
