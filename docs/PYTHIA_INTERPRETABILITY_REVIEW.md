@@ -129,6 +129,11 @@ Two anomalies in that table are load-bearing and easy to miss:
   column, and what varies is training corpus (WebText vs Pile), tokenizer, positional scheme
   (learned absolute vs rotary), sublayer arrangement (sequential vs parallel), and embedding tying
   (tied vs untied). Any cross-model difference is attributable to that list and not to capacity.
+  **The match is tighter than shape alone.** `agent:gpt2-deepdive` computed the GPT-2 non-embedding
+  totals from the `12d² + 13d` per-block inventory — which GPT-NeoX blocks share — and gets
+  **85,056,000** and **302,311,424** against Pythia's 85.1M and 302.3M in the table above. So the
+  2×2 is matched on **exact non-embedding parameter count**, not merely on layer count, width and
+  head count (discussion #57; §2.2 of [GPT2_DEEP_DIVE.md](GPT2_DEEP_DIVE.md)).
 
 Training: Adam (β₁=0.9, β₂=0.95, ε=1e-8, weight decay 0.01), ~300B tokens (143,000 × 2,097,152 ≈
 299.9B), matching GPT-3 and OPT's token budget. Deduplicated Pile is ~207B tokens, so the deduped
@@ -249,12 +254,16 @@ models. Three consequences worth recording in the results summaries:
 
 Three properties, in descending order of importance to the field:
 
-- **Checkpoints** make *developmental* claims testable — when does a circuit form, and does it
-  form in stages? No other open suite of this size offered 154.
 - **The dataloader index** makes *data-attribution* claims testable — this behaviour appeared at
-  step *k*; what was in the data before step *k*?
+  step *k*; what was in the data before step *k*? **This is the one property nothing else replicates**,
+  and on the evidence below it carries more of Pythia's uniqueness than the checkpoints do.
 - **The scale ladder with everything else held fixed** makes *scaling* claims testable — the same
   probe, the same corpus, the same order, eight sizes.
+- **Checkpoints** make *developmental* claims testable — when does a circuit form, and does it form
+  in stages? No other open suite of this size offered 154 *across a scale ladder*. But dense
+  checkpoints alone are not unique to Pythia: the five Stanford CRFM GPT-2 Small replications each
+  carry ~604–609, step 0 to 400,000 (see Part VI). Pythia's claim is the **combination** — dense
+  checkpoints *and* a known data order *and* eight sizes — not any one leg of it.
 
 GPT-2 remains the substrate for single-model circuit archaeology (IOI, greater-than, copy
 suppression) because it is small, ubiquitous, and heavily tooled. Pythia is the substrate for
@@ -585,7 +594,7 @@ mechanistic explanation — all of which apply to entries 2, 3 and 5 above.
 
 **preprint** [preprint, unreviewed]\* · https://arxiv.org/abs/2508.03616
 
-Studies how **massive activations** — the extreme-magnitude residual-stream coordinates associated
+Studies how **massive activations** — the extreme-magnitude residual-stream dimensions associated
 with **attention sinks** — develop *over training*, using the Pythia suite (described as 9
 decoder-only models, 14M–12B, 150+ checkpoints each). Proposes a mathematical framework for their
 emergence, and characterises how the trajectories depend on scale.
@@ -596,24 +605,28 @@ residual stream — and they were originally noticed as "outlier dimensions" in 
 with emergence linked to token frequency. This is the developmental treatment, and it is only
 possible because of Pythia's checkpoints.
 
-**Relevance here, and it cuts in a specific direction.** A small number of coordinates with
-enormous magnitude dominate any **cosine similarity computed on the raw residual stream** — this
-repo's primary tensor-level convergence metric (`cos_sim_mean` in `cos_sim_diagnostic.ipynb`), and
-the instrument on which the closing judgement in `SCALING_ARTEFACT_ANALYSIS.md` rests. Because sink
-coordinates are large and roughly state-independent, they **inflate** cosine similarity toward 1.
-That asymmetry matters for how the existing result should be read:
+**Relevance here — and this has since been tested; see `experiments/sink_geometry/`.** A few
+dimensions of enormous size dominate any **cosine similarity computed on the raw residual stream** —
+this repo's main convergence measure (`cos_sim_mean` in `cos_sim_diagnostic.ipynb`), and the
+instrument the closing judgement in `SCALING_ARTEFACT_ANALYSIS.md` rests on.
 
-- **Pythia-410m plateaus at ~0.85.** Masking the top-*k* magnitude coordinates can only push this
-  *lower*. The fragmentation conclusion is therefore robust to the confound — masking would sharpen
-  it, not overturn it.
-- **GPT-2 Medium and Pythia-160m saturate to 1.0000 by iteration 10.** This is the reading at risk.
-  A saturating cosine is exactly what sink dominance produces, so "their single-token collapses are
-  real tensor attractors" is the claim that a masked re-computation would test. If the saturation
-  survives masking, the finding is stronger than currently stated; if it does not, the two
-  single-funnel models are a different phenomenon from what the record says.
+The expectation was that such dimensions, being large and near-constant, would **inflate** cosine
+similarity toward 1, putting the two models that reach 1.0000 in doubt. **That expectation was
+wrong.** Deleting the ten largest dimensions leaves GPT-2 Medium at 1.000 — and deleting fifty leaves
+it there too — so its convergence is genuine. Pythia-410m moves by at most 0.014. The model that
+*does* move is GPT-2 Small, in the opposite direction: 0.9167 becomes 0.9933 once a single dimension
+is removed, meaning the big dimensions were **suppressing** its convergence score, not inflating it.
 
-This is a cheap re-run over existing `stage1_results.pt` files — no model forward passes — and it
-tests the stronger of the two closing claims rather than the weaker one.
+The reason the direction flipped: the argument assumed the large shared part is *unchanging between
+consecutive steps*, which holds on an ordinary forward pass but not under iteration, where the large
+dimensions are the ones actually moving.
+
+What the measurement does establish is a real asymmetry between the two families — GPT-2 Small keeps
+**90.8%** of its residual size in ten of 768 dimensions, the same ten for every prompt, while
+Pythia-160m keeps **2.3%** with no dimension shared across prompts. Any cross-model comparison on the
+raw residual stream is therefore comparing very differently shaped spaces, whatever that does to a
+particular number. Full figures and caveats in
+[`experiments/sink_geometry/RESULTS.md`](../experiments/sink_geometry/RESULTS.md).
 
 ---
 
@@ -751,10 +764,15 @@ Ordered by decisiveness per unit cost. None requires retraining.
    embeddings make this a sharper test than GPT-2 permits, since there `W_E` and `W_U` are the same
    matrix.
 
-3. **Re-compute `cos_sim_mean` with top-*k* magnitude coordinates masked** (entry 13). Cheap — reads
-   existing `stage1_results.pt`, no forward passes. Tests the *stronger* of the two closing claims:
-   GPT-2 Medium and Pythia-160m saturating to 1.0000 is also what sink dominance would produce. The
-   Pythia-410m plateau at 0.85 can only fall under masking, so that conclusion is safe either way.
+3. ~~**Re-compute `cos_sim_mean` with the largest dimensions deleted**~~ — **done, see
+   `experiments/sink_geometry/`.** The expectation was that a few oversized dimensions inflate
+   cosine similarity and put the 1.0000 results in doubt. They do not: GPT-2 Medium stays at 1.000
+   with its ten largest dimensions deleted, and with fifty. The effect is real but runs the other
+   way, and only on GPT-2 Small, where deleting one dimension raises 0.9167 to 0.9933 — its
+   convergence is *understated*, not overstated. **What remains open** is a different question the
+   test cannot reach: those dimensions were present throughout the runs being measured, including
+   inside every rescale, so deleting them afterwards says nothing about whether they *steer* the
+   process. Item 4 below is the instrument for that.
 
 4. **Log residual-stream norm alongside margin and entropy** (entry 5). Entropy neurons regulate
    confidence through the norm at the *terminal* LayerNorm — downstream of the point where §1.1's
@@ -767,13 +785,26 @@ Ordered by decisiveness per unit cost. None requires retraining.
    flagged as "the cleanest remaining attribution test") is a Pythia-410m experiment — 24 layers is
    what makes the half-depth comparison available at all.
 
-A sixth item, larger, noted without recommendation: **Pythia's checkpoints make ATR a developmental
+A sixth item, larger, noted without recommendation: **checkpoints make ATR a developmental
 question.** "At which checkpoint does attractor structure appear, and at the same relative point
-across sizes?" is the Pythia-shaped version of this project's central question, and it cannot be
-asked of GPT-2 at all — no public checkpoint series exists. It is also expensive: a sweep per
-checkpoint, on CPU. If it is ever run, the Pythia paper's own template applies — the interesting
-answer is not *whether* but *at which step*, and the log-spaced early checkpoints are where phase
-changes have historically been found.
+across sizes?" is the Pythia-shaped version of this project's central question. It is expensive — a
+sweep per checkpoint, on CPU — and if it is ever run, the Pythia paper's own template applies: the
+interesting answer is not *whether* but *at which step*, and the log-spaced early checkpoints are
+where phase changes have historically been found.
+
+> **Correction (raised by `agent:gpt2-deepdive`, discussion #57; verified here).** An earlier version
+> of this item said the developmental question "cannot be asked of GPT-2 at all — no public
+> checkpoint series exists." **That is false.** The five Stanford CRFM GPT-2 Small replications each
+> carry a full `checkpoint-{step}` series; querying the Hugging Face refs endpoint returns **609 tags
+> for `alias-x21`, `battlestar-x49`, `caprica-x81` and `darkmatter-x343`, and 604 for `expanse-x777`,
+> spanning step 0 to 400,000**. The five Medium seeds carry **none**, which is why the claim survived
+> a casual look. So the developmental question *can* be asked on the GPT-2 Small arm.
+>
+> To be precise about what that does **not** mean: the CRFM seeds are not a substitute for item 1,
+> which proposes `pythia-{160m,410m}-seed{1..9}`. They are the *same kind* of control on the *other*
+> arm — GPT-2 Small seed variation, plus a developmental series Pythia's seed models do not have.
+> The two compose: run both and the seed question is answered on both arms of the 2×2; run either
+> alone and it is answered on one. See §3.2 of [GPT2_DEEP_DIVE.md](GPT2_DEEP_DIVE.md).
 
 ---
 
