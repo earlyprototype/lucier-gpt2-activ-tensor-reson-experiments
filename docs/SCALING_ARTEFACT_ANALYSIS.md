@@ -39,7 +39,13 @@ The per-iteration L2 rescale multiplies the entire tensor by one scalar (same ra
 
 **Caveat on alternatives:** Per-dimension or max-dimension rescales are a different intervention: they can distort the relative geometry LayerNorm then sees. They are not equivalent to the current global L2 step.
 
-**Definitive position:** Normalisation is numerically essential and approximately inert for the forward map: inert up to LayerNorm's epsilon term and floating-point precision, not exactly. It is not the source of the Pythia-410m fragmentation pattern.
+**Definitive position (amended 2026-07-28 — the second clause is withdrawn):** Normalisation is numerically essential, and it is **not** the source of the Pythia-410m fragmentation pattern. That half stands on its own argument: the scalar preserves the mix exactly, so it cannot revive weak dimensions, which is the specific artefact story this section was written to test.
+
+The "approximately inert for the forward map" clause does not follow and should not be relied on. **The premise is right and the inference is wrong.** LayerNorm output is indeed invariant to a positive global rescale up to its epsilon term — but a pre-LN block's residual path goes *around* that LayerNorm. Writing *g* for the block contribution, *F*(*c*·*x*) = *c*·*x* + *g*(LN(*x*)) against *F*(*x*) = *x* + *g*(LN(*x*)): the two differ by (*c* − 1)·*x*, and from the next block onward the gap compounds, because that block's LayerNorm now sees a different residual.
+
+Demonstrated in `experiments/preln_rescale_check.py` (pure standard library, no model needed). Over a 12-block pre-LN stack, cos(*F*(*c*·*x*), *F*(*x*)) is 1.000000 at *c* = 1.001, **0.936 at *c* = 2, and 0.505 at *c* = 10** — while max \|LN(*c*·*x*) − LN(*x*)\| stays at 9.9 × 10⁻⁵, confirming the premise at the same time. The rescale is inert exactly when *c* ≈ 1, which is when it is doing nothing; this section's own note that norms would otherwise reach ~1.5 million by iteration 500 says *c* is nowhere near 1 in practice.
+
+Random weights and *d* = 64, so this settles the **structure** of the argument, not the size of the effect in GPT-2. Measuring the real per-iteration *c* and the real departure needs `torch` and the actual weights. Until then, treat the forward map as **scale-sensitive**, and see [FINDINGS.md](FINDINGS.md) caveat 7, where H-pos0 is explicitly conditional on this.
 
 ### 1.1b Tokenisation asymmetry across the 2×2: OPEN ARTEFACT CANDIDATE (added 2026-07-26)
 

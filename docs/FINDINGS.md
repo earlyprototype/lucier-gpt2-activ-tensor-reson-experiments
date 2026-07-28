@@ -703,9 +703,31 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
    This is load-bearing for H-pos0. If the rescale were inert, position 0's
    trajectory would be **exactly** autonomous and the fixed-point constraint
    would hold unconditionally; if it is live, position 0 is autonomous only up to
-   *c_n*. Cheap to settle empirically — compare a forward pass on *x* against one
-   on *c*·*x* for a few values of *c* at realistic norms — and not settled here:
-   this container has no `torch`, so the above is algebra, not measurement.
+   *c_n*.
+
+   **Demonstrated on a minimal pre-LN block (2026-07-28).**
+   `experiments/preln_rescale_check.py` — pure standard library, no model
+   required — builds a 12-block pre-LN stack and compares *F*(*c*·*x*) against
+   *F*(*x*):
+
+   | *c* | cos after 1 block | cos after 12 blocks |
+   |---:|---:|---:|
+   | 1.001 | 1.000000 | 1.000000 |
+   | 2 | 0.964846 | 0.936244 |
+   | 10 | 0.834534 | 0.505334 |
+
+   The premise checks out — max \|LN(*c*·*x*) − LN(*x*)\| is 9.9 × 10⁻⁵ at
+   *c* = 2, epsilon-scale as §1.1 says. The conclusion does not: the block is
+   demonstrably not invariant, and the gap compounds with depth. Inert at
+   *c* = 1.001, which is the regime where the rescale does nothing.
+
+   **This settles the structure of the argument, not the magnitude in GPT-2** —
+   the weights are random and *d* = 64. What *c* actually takes in these runs is
+   still unmeasured; if per-block norm growth is near the ~4.5% figure quoted in
+   [PRIOR_WORK.md](PRIOR_WORK.md) (itself an unreviewed community measurement),
+   twelve blocks compound to ≈1.7×, putting *c* ≈ 0.6 per iteration — far from 1
+   and inside the range where the table above shows a real effect. Confirming
+   that needs `torch` and the actual weights, which this container does not have.
 8. **BPE granularity.** Basin identities are single BPE tokens (`prolet`, `Anarch`);
    multi-token structure is invisible to the current readout.
 9. **Readout is logit-lens-style.** Decoding applies `ln_final → W_U` to
@@ -780,9 +802,15 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
     (b) within the GPT-2 arm the special token has a **known address**, which
     makes testable — rather than merely worrying — the question of whether the
     global L2 rescale is partly setting the magnitude of a position that carries
-    disproportionate norm (caveat 7 rules the rescale inert through layer-0
-    LayerNorm, which is a statement about the forward map, not about how the
-    conserved norm is distributed across positions);
+    disproportionate norm (*amended 2026-07-28: this clause previously read
+    "caveat 7 rules the rescale inert through layer-0 LayerNorm, which is a
+    statement about the forward map, not about how the conserved norm is
+    distributed across positions". Caveat 7 no longer rules that — as amended
+    the same day it records that the "approximately inert" conclusion does not
+    follow, because the residual path bypasses that LayerNorm. The point here
+    **strengthens**: the old wording conceded the forward map and asked only
+    about distribution across positions; with the forward-map claim itself in
+    question, both halves are open*);
     (c) from iteration 1 onward the re-injection overwrites position 0, so
     whatever role that position plays is preserved *structurally* while its
     *contents* are replaced — if the sink hypothesis holds, that is a regime no
