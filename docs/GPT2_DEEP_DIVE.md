@@ -204,7 +204,7 @@ enough to hold in one head — which is why interpretability stayed on it long a
 For token sequence *t*₁…*t*ₙ, with `wte` the token-embedding matrix (50257 × d), `wpe` the learned
 absolute position-embedding matrix (1024 × d):
 
-```
+```text
 x₀      = wte[t] + wpe[0..n-1]                                  # residual stream, shape (n, d)
 
 for each block ℓ = 0 … L-1:
@@ -243,7 +243,7 @@ implementation fact, and a routine source of sign and orientation bugs in interp
 Per-block parameters are 12d² + 13d (attention: 3d² + 3d for `c_attn`, d² + d for `c_proj`; MLP: 4d² + 4d for
 `c_fc`, 4d² + d for `c_proj`; two LayerNorms: 4d). Total is therefore:
 
-```
+```text
 params = 50257·d  +  1024·d  +  L·(12d² + 13d)  +  2d
          └ wte ┘    └ wpe ┘    └── blocks ──┘    └ ln_f ┘
 ```
@@ -342,7 +342,7 @@ lives on, and the two readings license different conclusions.
 
 **Only one operation in GPT-2 moves information between positions.** Take the block from §2.1:
 
-```
+```text
 x = x + Attn( LN₁(x) )
 x = x + MLP(  LN₂(x) )
 ```
@@ -360,7 +360,7 @@ touches them exactly 144 times in GPT-2 Small — 12 layers × 12 heads.
 Each head splits into two circuits, in the Anthropic decomposition (§5.1) — **QK decides *where* to read from,
 OV decides *what* gets written**:
 
-```
+```text
 A      = softmax( mask( LN₁(x) W_Q W_Kᵀ LN₁(x)ᵀ / √64 ) )      # (n × n) attention pattern
 head_i = Σ_{j} A_ij · ( LN₁(x)_j W_V W_O )                     # what lands at position i
 ```
@@ -381,7 +381,7 @@ Now read row 0 of that triangle. Position 0 has exactly one unmasked entry — i
 surviving score is **exactly 1.0**, not approximately: every other term in the row is exp(−∞) = 0. So for every
 head in every layer:
 
-```
+```text
 head_0 = 1.0 · ( LN₁(x)_0 W_V W_O )
 ```
 
@@ -422,7 +422,7 @@ against the clean statement above:
 
 Put together, the per-iteration update at position 0 is:
 
-```
+```text
 x₀ⁿ⁺¹ = cₙ · x₀ⁿ + g₀( LN(x₀ⁿ) )
 ```
 
@@ -453,10 +453,27 @@ cycle, if it survives at position 0, is not a cross-position phenomenon at all.
 
 #### A registered prediction
 
-**Prediction.** Run ATR on a **single-token prompt** (*n* = 1). At *n* = 1 the Frobenius norm *is* position 0's
-norm, so the global rescale becomes exactly the rescale position 0 would apply to itself, and the loop implements
-*F₀* iterated with energy renormalisation and nothing else. **That run should converge to the same vector the
-125-prompt sweep converges to** — the `prolet` attractor, or whichever basin the seed falls into.
+**Prediction.** Run ATR on a sequence that is **one token long after tokenisation** (*n* = 1). At *n* = 1 the
+Frobenius norm *is* position 0's norm, so the global rescale becomes exactly the rescale position 0 would apply
+to itself, and the loop implements *F₀* iterated with energy renormalisation and nothing else. **That run should
+converge to the same vector the 125-prompt sweep converges to** — the `prolet` attractor, or whichever basin the
+seed falls into.
+
+**Specifying that experiment takes more care than it looks, for the reason this whole section is about.**
+`run_atr_loop` takes a *string* and hands it to `run_with_cache`, which prepends `<|endoftext|>` for GPT-2. A
+one-word prompt therefore yields **n = 2**, not *n* = 1 — BOS plus the content token — and at *n* = 2 the
+Frobenius norm is not position 0's norm and the argument above does not apply. Two things are needed:
+
+- **`prepend_bos=False`, which the engine does not currently expose.** It passes the prompt string straight
+  through, so the run needs either a `prepend_bos` passthrough or a token-ID input path. This is a small engine
+  change, and it is the same one the finding-2 control already needs.
+- **A seed of `<|endoftext|>` itself.** Position 0 in the sweep starts at `wte[50256] + wpe[0]`; a single-token
+  run seeded with an ordinary word starts somewhere else and iterates the same *F₀* from a different point, so
+  landing in a different basin would prove nothing. The tight comparison is *n* = 1 whose one token **is** BOS.
+
+A second variant is worth running beside it — *n* = 1 seeded at an ordinary content token — which tests something
+different and also worth knowing: whether *F₀*'s fixed point is seed-independent, or whether position 0 has a
+basin structure of its own.
 
 **What the prediction does not claim.** It will *not* reproduce a multi-position run step for step. Off the fixed
 point, *c_n* in the multi-position run is computed from all positions and differs from the *n* = 1 run's scalar,
@@ -526,7 +543,7 @@ the **non-embedding parameter counts are identical**: 85,056,000 and 302,311,424
 sequential sub-layer arrangement changes what can read what, not how many weights there are. So a GPT-2-versus-
 Pythia difference is **never** a capacity or scale effect; it is attributable to training corpus, tokeniser,
 positional scheme (learned absolute versus rotary), sub-layer arrangement, embedding tying — and, as §5.4 records,
-to whether the tooling puts a sink at position 0. A reader arriving from either end of the 2×2 reaches for "bigger
+to whether the tooling prepends a special token at position 0. A reader arriving from either end of the 2×2 reaches for "bigger
 model, different behaviour," and that reading is unavailable here. (Raised by `agent:pythia-review` on the peer
 board; stated in [PYTHIA_INTERPRETABILITY_REVIEW.md](PYTHIA_INTERPRETABILITY_REVIEW.md) §I.4, and it belongs on
 this side too.)
@@ -1094,12 +1111,15 @@ disproportionate norm along with the content?" becomes directly testable.
 by `agent:pythia-review` with `torch` and `transformer-lens`, on the engine's own call path
 `[peer-board measurement, unreviewed — see pull request (PR) #61]`:
 
-| model | tokens, raw tokeniser | tokens, via `run_with_cache(str)` | sink at position 0? |
+| model | tokens, raw tokeniser | tokens, via `run_with_cache(str)` | special token at position 0? |
 |:---|---:|---:|:---|
 | `gpt2` | 4 | **5** | **yes** — `<\|endoftext\|>` |
 | `gpt2-medium` | 4 | **5** | **yes** |
 | `pythia-160m` | 4 | 4 | no |
 | `pythia-410m` | 4 | 4 | no |
+
+The final column records **token identity, which is measured**. Whether that position then functions as an
+attention sink is a separate question and is not measured here — see the hypothesis note below.
 
 The two arms of this project's 2×2 **do not tokenise the same way**. The GPT-2 arm carries a structural
 non-content token at position 0; the Pythia arm does not, because TransformerLens sets `default_prepend_bos=False`
@@ -1658,7 +1678,9 @@ the neighbours already catalogued in [PRIOR_WORK.md](PRIOR_WORK.md):
    The control this needs is not the one an earlier version of this document specified. **Position 0 in every
    GPT-2 ATR trajectory is `<|endoftext|>`, a special token** (§2.3, §5.4) — TransformerLens prepends it for
    GPT-2 and *not* for Pythia. So finding 2's position-uniformity claim, stated across the 2×2, currently compares
-   a GPT-2 arm whose position 0 is a non-content sink against a Pythia arm whose position 0 is an ordinary token.
+   a GPT-2 arm whose position 0 is a non-content special token against a Pythia arm whose position 0 is an
+   ordinary token. (Whether that special token also functions as an attention sink is the separate, unmeasured
+   hypothesis below; the confound here follows from its placement alone.)
    Three consequences, in order of how much they bite:
 
    - **The cross-model version of finding 2 is confounded until this is controlled.** "All positions collapse to
