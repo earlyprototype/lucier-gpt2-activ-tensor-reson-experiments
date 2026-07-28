@@ -81,11 +81,11 @@ def measure(name, tensor, iteration):
 def load_runs():
     runs = []
     for label, tensor in torch.load(
-        CONVERGED, map_location="cpu", weights_only=False
+        CONVERGED, map_location="cpu", weights_only=True
     ).items():
         runs.append((label, tensor, "converged"))
     for path in sorted(glob.glob(STATES)):
-        state = torch.load(path, map_location="cpu", weights_only=False)
+        state = torch.load(path, map_location="cpu", weights_only=True)
         runs.append((state["label"], state["current_tensor"], str(state["iteration"])))
     return runs
 

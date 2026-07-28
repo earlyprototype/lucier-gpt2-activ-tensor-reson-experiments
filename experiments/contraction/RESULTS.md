@@ -7,7 +7,8 @@ two sizes disagree about which direction it goes.**
 **Run:** 2026-07-28, analysis only — no forward passes, no model loaded.
 **Status:** executed; scripts in this directory, all inputs already in the repository.
 **Origin:** issue [#71](https://github.com/earlyprototype/lucier-gpt2-activ-tensor-reson-experiments/issues/71),
-items **M1** and **M2**.
+items **M1**, **M2** and — unexpectedly — **M5**, which was filed as gated but turns out to be partly
+measurable from what is already on disk.
 
 ---
 
@@ -228,19 +229,122 @@ dimensions are not the cause of the ragged fit. The latency above is.
 ### Cross-check on the long runs
 
 The 1000-iteration GPT-2 Small runs, on a non-uniform schedule (0, 100, 250, 500, then every 10 from
-800):
+800). **This cross-check turns out to support almost nothing, for a reason worth stating.**
 
-| Run | Snapshots | Step-to-step | vs last iterate |
-|---|---|---|---|
-| Divine_Syntactic | 25 | −0.035, R² 1.00 | −0.042, R² 0.99 |
-| Control_noise | 25 | −0.009, R² 0.67 | −0.002, R² 0.11 |
-| Control_prolet_Semantic | 25 | only 2 usable points — no fit | — |
+| Run | Snaps | Gap used | Dropped | Step-to-step | vs last iterate |
+|---|---|---|---|---|---|
+| Divine_Syntactic | 25 | 100 | 3 | no fit | −0.042, R² 0.99 |
+| Control_noise | 25 | 10 | 4 | −0.028, R² 0.76 | −0.002, R² 0.11 |
+| Control_prolet_Semantic | 25 | 100 | 1 | no fit | no fit |
 
-These are consistent with GPT-2 Small being the slow-to-start model, but they are weak evidence: the
-schedule puts only four points before iteration 800, so the phase that matters is barely sampled. A
-note on this in `02_contraction_rate.py`: the x axis must be the recorded iteration, not the snapshot
-index. Using the index treats 800 iterations as 4 steps and inflates the slope by two orders of
-magnitude — an error made and corrected while preparing this analysis.
+The schedule mixes gaps of 10, 100, 150, 250 and 300. That breaks the step estimator in a way the
+iteration-vs-index fix does **not** repair: `1 − cos(vₜ, vₜ₊D)` carries a factor `(1 − e^(−λD))²`, so a
+100-iteration gap and a 10-iteration gap are not the same quantity. Putting the recorded iteration on
+the x axis fixes the *spacing* of the points but not *what is being plotted*. The effect is visible
+directly in `Control_noise`: 1.97e−1 at a 300-gap, then 2.1e−2 at the first 10-gap — a drop that is
+mostly the gap change, not the dynamics.
+
+`step_points()` now keeps a single gap width and reports how many usable points that discards. Once
+that guard is applied, two of the three runs have no usable step fit at all, and `Control_noise`
+covers only its 10-step tail.
+
+**This corrects an earlier version of this file**, which reported step slopes of −0.035 and −0.009
+here. Those were fitted across mixed gaps and were wrong; the corrected `Control_noise` figure is
+−0.028, three times the biased one. The conclusion these runs were cited for — that GPT-2 Small is
+slow to start — rests on the 61-iteration trajectories, which are uniformly spaced at D = 1 and are
+unaffected. It does not depend on this table, which is as well, because this table now says very
+little.
+
+Two errors were made and corrected while preparing this analysis, both in the step estimator:
+regressing against snapshot index rather than recorded iteration (inflating the slope by two orders
+of magnitude), and then fitting across unequal gaps (the bias above). The second was caught in review,
+not by me.
+
+---
+
+## M5 — the rescale factor, which turns out not to need a run
+
+`experiments/contraction/03_rescale_factor.py`.
+
+#71 files **M5** — record the per-iteration rescale factor *c_n* — as `GATED` `EXPERIMENT`, on the
+grounds that the ratio is "currently never recorded" and needs one line adding to the loop. **It is
+partly recoverable from committed data already**, because of the order of operations in the loop
+(`atr_engine.py:211-216`):
+
+```python
+for i in 1..max_iter:
+    current_norm = ||current_tensor||          # PRE-rescale
+    current_tensor *= initial_norm / current_norm
+    ... forward pass ...
+    current_tensor = new state                 # NOT rescaled
+    ... snapshot recorded here ...
+```
+
+Every recorded state is post-forward and **pre-rescale**. So a snapshot's norm is exactly the
+denominator of *c* for the next iteration: *c*ₙ₊₁ = `initial_norm` / ‖xₙ‖. The archives dropped
+`tensor_norm` but kept `last_norm`, and once positions have collapsed ‖x‖ = √(seq_len) · ‖any
+position‖. That identity is verified against the state files (which record both) before anything
+uses it — it holds to 2–6 × 10⁻⁷. `initial_norm` is recorded directly.
+
+### The measurement
+
+| Run | seq | initial_norm | settled ‖x‖ | ***c*** | amplification |
+|---|---|---|---|---|---|
+| Divine_Syntactic | 10 | 1468.49 | 5098.14 | **0.2880** | 3.47× |
+| Control_noise | 10 | 397.18 | 4017.69 | **0.0989** | 10.12× |
+| Control_prolet_Semantic | 12 | 1392.65 | 5230.65 | **0.2662** | 3.76× |
+
+*c* settles fast and then holds: from iteration 100 to 1000 the spread is 2×10⁻⁴ to 6×10⁻³. It is a
+**stable constant**.
+
+### Why this matters: it contradicts a step in H-pos0
+
+#75 states the H-pos0 argument as:
+
+> At a settled, position-uniform state ‖xⁿ‖ is constant, so ***c_n* = 1**, and the shared vector must
+> satisfy ***x\* = F₀(x\*)***
+
+The first clause is right — ‖xⁿ‖ *is* constant at settlement. **The inference from it is not.** The
+rescale target is the *initial* norm, and the settled norm is 3.5–10× that, so *c* settles to a
+constant that is emphatically **not 1**: 0.288, 0.099, 0.266 in the three committed runs. "Constant"
+and "equal to 1" are different claims and only the first is true.
+
+The consequence is that the fixed-point condition is not *x\** = *F₀*(*x\**) but
+
+> *x\** = *c* · *x\** + *g₀*(LN(*x\**))   with *c* ≈ 0.29 measured
+
+**This is load-bearing rather than pedantic, because of #69.** If the map were scale-invariant the
+scalar would wash out and the clean form would be recoverable. #69 established it is not: cos(*F*(*c*·*x*),
+*F*(*x*)) is 0.936 at *c* = 2 and 0.505 at *c* = 10. The measured amplification is 3.5–10×, which is
+squarely inside the range where #69 says the map is *not* invariant. The scalar cannot be dropped.
+
+**What survives.** H-pos0's structure is unaffected: position 0's trajectory is still autonomous up
+to one scalar, and the *n* = 1 run still implements that same rescaled map, so the experiment is
+still the right experiment. What needs rewording is the intermediate claim and the clean fixed-point
+form.
+
+**What may sharpen.** #75 predicts the *n* = 1 run converges to the same terminal basin, treating the
+differing *c* as a trajectory-level difference only. But if the fixed point depends on *c*, and *c* is
+a stable constant fixed by the seed's initial norm — which differs between an *n* = 1 run and the
+sweep — then **the terminal states have a reason to differ too**, not just the routes. That is a
+sharper and more falsifiable prediction than the one on file. It is offered as a consequence worth
+checking, not a result: it assumes LN(*c*·*x*) ≈ LN(*x*), which #69 says holds only to ~10⁻⁵ at the
+LayerNorm and not at all around the residual path.
+
+**Three runs, one model, one family of prompts.** *c* differs between the two content prompts (0.288,
+0.266) and the noise control (0.099), and the noise control is also the one that lands elsewhere.
+Whether *c* tracks basin identity is not answerable from three runs and is not claimed here.
+
+### What still needs the one-line change
+
+- Iterations 1–99, which no snapshot samples — so the *approach* of *c_n* to its settled value is
+  unobserved, and only the settled value is in hand.
+- The pre-collapse regime, where reconstructing ‖x‖ from `last_norm` is not exact. The iteration-0
+  values are printed marked with `*` and are not used.
+- Any run whose `seq_len` and `initial_norm` were not archived — which is all of the cross-model ones.
+
+So M5 should move from `GATED` to **partly delivered**: the settled value is measured, the transient
+still needs a run.
 
 ---
 
@@ -263,6 +367,14 @@ decide it.
 
 **Not settled.** Whether pythia-410m converges at all given more iterations, or is a genuinely
 different regime. 60 iterations is not enough to tell, and extending it is a new run.
+
+**Settled, and not previously known.** The rescale factor *c* settles to a stable constant that is
+**not 1** — 0.288, 0.099, 0.266 across three committed runs. This contradicts a stated step in the
+H-pos0 argument (#75), and because the map is not scale-invariant (#69) the scalar cannot be dropped
+from the fixed-point condition. M5 was filed as gated; its settled value did not need a run.
+
+**Not settled.** How *c_n* reaches that constant. No snapshot samples iterations 1–99, and by
+iteration 100 it has already arrived.
 
 **Gated.** Both of the above need forward passes and are blocked by
 [`docs/ATR_PAUSE.md`](../../docs/ATR_PAUSE.md).

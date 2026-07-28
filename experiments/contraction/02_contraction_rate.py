@@ -23,8 +23,12 @@ Two estimators are reported, because the obvious one is biased:
                     and steepens near the end regardless of the dynamics. The
                     final 20% of points are dropped to blunt that; it is still
                     the weaker of the two.
-  step-to-step      1 - cos(v_t, v_t+1).  References no fixed point at all.
-                    This is the primary number.
+  step-to-step      1 - cos(v_t, v_t+D).  References no fixed point at all.
+                    This is the primary number, but it is only comparable across
+                    steps of equal width D: the deviation carries a factor
+                    (1 - exp(-lambda*D))^2, so gaps of 10 and 100 iterations are
+                    not the same quantity. step_points() enforces one width and
+                    reports what that discards.
 
 Where the two agree, the rate is real. R^2 is reported throughout: a geometric
 approach is a straight line on these axes, so a low R^2 means the process is not
@@ -72,18 +76,46 @@ def unit(trajectory):
 
 
 def step_points(trajectory, iterations, mask_top=0):
-    """log(1 - cos(v_t, v_t+1)) against the midpoint of each step."""
+    """log(1 - cos(v_t, v_t+D)) against the midpoint of each step.
+
+    Only steps of a single, constant width D are returned. This matters and is
+    easy to miss: for a geometric approach to a fixed point the deviation
+    carries a factor (1 - exp(-lambda*D))^2, so a 100-iteration gap and a
+    10-iteration gap are not on the same scale, and fitting them together biases
+    the slope no matter how the x axis is labelled. Putting the recorded
+    iteration on the x axis fixes the *spacing* of the points but not the
+    *quantity* being plotted.
+
+    The uniformly-spaced trajectories (D = 1 throughout) are unaffected. The
+    divine_motion long runs are recorded on gaps of 10, 100, 150, 250 and 300
+    and are not, which is what this guard exists for. Where several widths are
+    available the one yielding the most usable points is kept, and the caller is
+    told which via the returned width.
+
+    Returns (points, width, dropped) -- dropped counts usable points discarded
+    for having the wrong width, so a caller can report the truncation instead of
+    silently presenting a partial fit as a whole one.
+    """
     trajectory = trajectory.to(torch.float64).clone()
     if mask_top:
         biggest = trajectory.abs().mean(0).argsort(descending=True)[:mask_top]
         trajectory[:, biggest] = 0.0
     v = unit(trajectory)
-    points = []
+
+    by_width = {}
     for i in range(len(v) - 1):
         deviation = 1.0 - (v[i] @ v[i + 1]).clamp(max=1.0).item()
-        if deviation > FLOOR:
-            points.append(((iterations[i] + iterations[i + 1]) / 2, math.log(deviation)))
-    return points
+        if deviation <= FLOOR:
+            continue
+        width = iterations[i + 1] - iterations[i]
+        midpoint = (iterations[i] + iterations[i + 1]) / 2
+        by_width.setdefault(width, []).append((midpoint, math.log(deviation)))
+
+    if not by_width:
+        return [], None, 0
+    width = max(by_width, key=lambda w: len(by_width[w]))
+    total = sum(len(p) for p in by_width.values())
+    return by_width[width], width, total - len(by_width[width])
 
 
 def anchored_points(trajectory, iterations):
@@ -112,7 +144,7 @@ def half_life(fit):
 
 
 def report_trajectories():
-    bundle = torch.load(TRAJECTORIES, map_location="cpu", weights_only=False)
+    bundle = torch.load(TRAJECTORIES, map_location="cpu", weights_only=True)
     manifest = bundle["manifest"]
 
     print("Contraction rate of the state trajectory, per model, per prompt")
@@ -132,7 +164,7 @@ def report_trajectories():
         fits = []
         for index, means in enumerate(bundle["traj"][model]["means"]):
             iterations = list(range(means.shape[0]))
-            steps = step_points(means, iterations)
+            steps, _width, _dropped = step_points(means, iterations)
             step_fit = least_squares(steps)
             anchor_fit = least_squares(anchored_points(means, iterations))
             midpoint = len(steps) // 2
@@ -159,7 +191,7 @@ def report_masking():
     the other three models, which that run found insensitive to masking,
     unchanged. This is a prediction that can fail.
     """
-    bundle = torch.load(TRAJECTORIES, map_location="cpu", weights_only=False)
+    bundle = torch.load(TRAJECTORIES, map_location="cpu", weights_only=True)
     print("Does masking the oversized dimensions straighten the fit?")
     print()
     header = f"{'model':<14}{'prompt':>7}" + "".join(
@@ -171,7 +203,7 @@ def report_masking():
         for index, means in enumerate(bundle["traj"][model]["means"]):
             iterations = list(range(means.shape[0]))
             cells = [
-                fmt(least_squares(step_points(means, iterations, mask_top=k)))
+                fmt(least_squares(step_points(means, iterations, mask_top=k)[0]))
                 for k in (0, 10, 50)
             ]
             print(f"{model:<14}{index:>7}" + "".join(f"{c:>20}" for c in cells))
@@ -182,26 +214,45 @@ def report_long_runs():
     """Cross-check on the 1000-iteration GPT-2 Small runs.
 
     These are recorded on a deliberately non-uniform schedule (0, 100, 250, 500,
-    then every 10 from 800). The x axis must be the recorded iteration, not the
-    snapshot index -- treating the index as the iteration compresses 800 steps
-    into 4 and inflates the slope by two orders of magnitude.
+    then every 10 from 800), which costs the step estimator twice over.
+
+    First, the x axis must be the recorded iteration, not the snapshot index --
+    treating the index as the iteration compresses 800 steps into 4 and inflates
+    the slope by two orders of magnitude.
+
+    Second, and less obvious: the *quantity* also depends on the gap width, so
+    even with a correct x axis the widths cannot be mixed. step_points() keeps
+    only one width; this reports which, and how much was dropped, so a fit over
+    a fifth of the run is not mistaken for a fit over all of it.
+
+    The anchored estimator is unaffected -- it measures every point against one
+    fixed reference, so gap width does not enter.
     """
     print("Cross-check: the 1000-iteration runs (non-uniform schedule)")
     print(f"  source: {os.path.relpath(SNAPSHOTS, REPO)}")
     print()
-    header = f"{'run':<26}{'snapshots':>11}{'step-to-step':>20}{'vs last iterate':>20}"
+    header = (
+        f"{'run':<26}{'snaps':>7}{'gap used':>10}{'dropped':>9}"
+        f"{'step-to-step':>20}{'vs last iterate':>20}"
+    )
     print(header)
     print("-" * len(header))
     for path in sorted(glob.glob(SNAPSHOTS)):
-        run = torch.load(path, map_location="cpu", weights_only=False)
+        run = torch.load(path, map_location="cpu", weights_only=True)
         snapshots = run["snapshots"]
         iterations = [s["iteration"] for s in snapshots]
         means = torch.stack([s["mean_vector"] for s in snapshots])
+        steps, width, dropped = step_points(means, iterations)
         print(
-            f"{run['label']:<26}{len(iterations):>11}"
-            f"{fmt(least_squares(step_points(means, iterations))):>20}"
+            f"{run['label']:<26}{len(iterations):>7}"
+            f"{('-' if width is None else str(width)):>10}{dropped:>9}"
+            f"{fmt(least_squares(steps)):>20}"
             f"{fmt(least_squares(anchored_points(means, iterations))):>20}"
         )
+    print()
+    print("  'dropped' counts points above the floor discarded for having a")
+    print("  different gap width. Where it is large, the step fit covers only")
+    print("  part of the run and the anchored column is the better guide.")
     print()
 
 
