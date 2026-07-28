@@ -55,11 +55,11 @@
     "answered_on_disk_unrecorded": 1,
     "blockers": 8,
     "shared_blockers": 2,
-    "open_threads": 21,
-    "low_hanging_fruit": 21,
+    "open_threads": 22,
+    "low_hanging_fruit": 22,
     "frontier": 16,
     "thin_concepts": 3,
-    "silent_claims": 32,
+    "silent_claims": 33,
     "unreferenced_artefacts": 39,
     "orphan_scripts": 3
   },
@@ -176,7 +176,7 @@
       "prose_says_not_run": [
         {
           "file": "README.md",
-          "line": 216,
+          "line": 219,
           "text": "| [`spectral_resonance.ipynb`](experiments/gpt2_small/spectral_resonance.ipynb) | SVD-predicted per-head resonance (H4) | 🔬 scaffold, not run |"
         },
         {
@@ -186,7 +186,7 @@
         },
         {
           "file": "docs/FINDINGS.md",
-          "line": 629,
+          "line": 649,
           "text": "| H4 | Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector) | **Untested**: protocol scaffolded (`experiments/gpt2_small/spectral_resonance.ipynb`), not run. |"
         },
         {
@@ -362,7 +362,7 @@
               },
               {
                 "file": "README.md",
-                "line": 237,
+                "line": 240,
                 "text": "> **Note on `prompt_library.py`:** the 125-prompt sweep notebooks (`01_*`), `gated_resweep.py` and the Pythia-410m deep run import `prompt_library.py`. The file is a provenance-flagged reconstruction (issue #24): all 125 prompts were recovered verbatim from committed records — the original file's de"
               },
               {
@@ -483,12 +483,12 @@
               },
               {
                 "file": "docs/FINDINGS.md",
-                "line": 453,
+                "line": 473,
                 "text": "build (issue #8) should be phase-aware: probe both phases and the pivot M."
               },
               {
                 "file": "docs/FINDINGS.md",
-                "line": 633,
+                "line": 653,
                 "text": "| H-J1 | `prolet` sits inside the verbalizable (J-lens) subspace, `Divine` outside | **Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)**: the point estimate runs slightly the other way at pilot confidence (`Divine` at least as lens-ex"
               }
             ]
@@ -1349,6 +1349,24 @@
       ],
       "verdict": "needs-compute",
       "reason": "the record states the work has not been done (\"…gate, all at iteration 120, which is the gate's earliest possible firing point rather than a measured settling time: the true iteration lies somewhere between 100 and 120 and finer cadence was never run (caveat 5).\") and names no script for it, so answering it requires a fresh run",
+      "rank_tier": 3
+    },
+    {
+      "claim": "h-pos0",
+      "label": "H-pos0: The shared attractor is a fixed point of the single-position map at position 0",
+      "type": "hypothesis",
+      "status": "untested",
+      "asserted": "2026-07-28",
+      "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions",
+      "description": "The shared attractor is a fixed point of the single-position map at position 0. Disposition: Registered, untested (2026-07-28): under the causal mask, attention at position 0 attends only to position 0 (its softmax row has one unmasked entry, so the weight is exactly 1), and LayerNorm, the MLP and the residual add are all per-position. Position 0's forward map is therefore a function of position 0's input alone — architectural, not empirical. The ATR loop qualifies this: the rescale uses the whole-tensor Frobenius norm, so position 0 is coupled to the rest of the sequence through one scalar per iteration, c_n. At a settled state ‖xⁿ‖ is constant, c_n = 1, and the shared vector must satisfy *x\\ = F₀(*x\\) — pinning an attractor of a map on ℝ^(T×768) inside the fixed-point set of a map on ℝ⁷⁶⁸. Same argument makes the Divine cycle a period-2 orbit of F₀, consistent with F14 localising it to one head that, at position 0, can only attend to position 0. Test: ATR at sequence length 1 (requires prepend_bos=False or a token-ID path, which the engine does not expose), seeded at <\\",
+      "pending_language": [
+        "untested"
+      ],
+      "blockers": [],
+      "runs": [],
+      "evidence": [],
+      "verdict": "needs-compute",
+      "reason": "the record states the work has not been done (\"Disposition: Registered, untested (2026-07-28): under the causal mask, attention at position 0 attends only to position 0 (its softmax row has one unmasked entry, so the weight is exactly 1), and LayerNorm, the MLP and…\") and names no script for it, so answering it requires a fresh run",
       "rank_tier": 3
     },
     {
@@ -2213,6 +2231,19 @@
     {
       "rank_tier": 3,
       "tier_name": "needs-compute",
+      "claim": "h-pos0",
+      "label": "H-pos0: The shared attractor is a fixed point of the single-position map at position 0",
+      "status": "untested",
+      "reason": "the record states the work has not been done (\"Disposition: Registered, untested (2026-07-28): under the causal mask, attention at position 0 attends only to position 0 (its softmax row has one unmasked entry, so the weight is exactly 1), and LayerNorm, the MLP and…\") and names no script for it, so answering it requires a fresh run",
+      "quoted_result": null,
+      "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions",
+      "cheap": false,
+      "scripts": [],
+      "rank": 10
+    },
+    {
+      "rank_tier": 3,
+      "tier_name": "needs-compute",
       "claim": "h0-determinism",
       "label": "H0: Results are deterministic",
       "status": "supported",
@@ -2224,7 +2255,7 @@
         "experiments/gpt2_small/00_reproducibility_gate.ipynb",
         "experiments/gpt2_small/04_readout_confidence.py"
       ],
-      "rank": 10
+      "rank": 11
     },
     {
       "rank_tier": 3,
@@ -2237,7 +2268,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
       "cheap": false,
       "scripts": [],
-      "rank": 11
+      "rank": 12
     },
     {
       "rank_tier": 3,
@@ -2250,7 +2281,7 @@
       "doc_ref": "docs/FINDINGS.md#caveats",
       "cheap": false,
       "scripts": [],
-      "rank": 12
+      "rank": 13
     },
     {
       "rank_tier": 3,
@@ -2263,7 +2294,7 @@
       "doc_ref": "docs/FINDINGS.md#caveats",
       "cheap": false,
       "scripts": [],
-      "rank": 13
+      "rank": 14
     },
     {
       "rank_tier": 3,
@@ -2276,7 +2307,7 @@
       "doc_ref": "docs/FINDINGS.md#caveats",
       "cheap": false,
       "scripts": [],
-      "rank": 14
+      "rank": 15
     },
     {
       "rank_tier": 3,
@@ -2289,7 +2320,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
       "cheap": false,
       "scripts": [],
-      "rank": 15
+      "rank": 16
     },
     {
       "rank_tier": 3,
@@ -2302,7 +2333,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
       "cheap": false,
       "scripts": [],
-      "rank": 16
+      "rank": 17
     },
     {
       "rank_tier": 4,
@@ -2318,7 +2349,7 @@
         "experiments/gpt2_small/05_jlens_pilot.py",
         "experiments/gpt2_small/10_jlens_phase.py"
       ],
-      "rank": 17
+      "rank": 18
     },
     {
       "rank_tier": 4,
@@ -2331,7 +2362,7 @@
       "doc_ref": "docs/FINDINGS.md#f11-j-lens-pilot-the-prolet-insidedivine-outside-prediction-did-not-hold-the-boundary-that-appeared-is-language-vs-noise",
       "cheap": false,
       "scripts": [],
-      "rank": 18
+      "rank": 19
     },
     {
       "rank_tier": 5,
@@ -2344,7 +2375,7 @@
       "doc_ref": "docs/FINDINGS.md#f8-the-prolet-basin-is-a-coherent-cluster-of-related-tokens-not-a-single-token-permutation-tested",
       "cheap": false,
       "scripts": [],
-      "rank": 19
+      "rank": 20
     },
     {
       "rank_tier": 5,
@@ -2357,7 +2388,7 @@
       "doc_ref": "docs/FINDINGS.md#f11-j-lens-pilot-the-prolet-insidedivine-outside-prediction-did-not-hold-the-boundary-that-appeared-is-language-vs-noise",
       "cheap": false,
       "scripts": [],
-      "rank": 20
+      "rank": 21
     },
     {
       "rank_tier": 5,
@@ -2373,7 +2404,7 @@
         "experiments/gpt2_small/01_attractor_dominance.ipynb",
         "experiments/gpt2_small/gated_resweep.py"
       ],
-      "rank": 21
+      "rank": 22
     }
   ],
   "frontier": [
@@ -2960,6 +2991,18 @@
           "relates-to"
         ],
         "doc_ref": "docs/JOURNEY_MAP.md#5-glossary"
+      },
+      {
+        "claim": "h-pos0",
+        "label": "H-pos0: The shared attractor is a fixed point of the single-position map at position 0",
+        "type": "hypothesis",
+        "status": "untested",
+        "asserted": "2026-07-28",
+        "degree": 1,
+        "edge_types": [
+          "documented-in"
+        ],
+        "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions"
       },
       {
         "claim": "q-flip-axis-generality",

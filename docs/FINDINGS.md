@@ -170,6 +170,10 @@ fixed points of the weight geometry.
 
 ### F5: The cross-model differences are intrinsic, not apparatus artefacts
 
+> **Read the heading as *three apparatus channels exonerated*, not as *apparatus excluded* (qualified
+> 2026-07-26).** A fourth channel — tokenisation — differs between the two arms and is untested. Full
+> statement at the end of this finding and in caveat 17.
+
 Three attribution results ([SCALING_ARTEFACT_ANALYSIS.md](SCALING_ARTEFACT_ANALYSIS.md)):
 
 1. **Normalisation exonerated:** the global L2 rescale is effectively invisible to
@@ -185,6 +189,22 @@ Three attribution results ([SCALING_ARTEFACT_ANALYSIS.md](SCALING_ARTEFACT_ANALY
    basins' argmax confidence is in fact low, p(top-1) 0.064-0.086; the labels are
    carried by a coherent distribution, not a confident winner, and the `Divine`
    exception is resolved in F9.)
+
+*Qualified, 2026-07-26 — a fourth apparatus channel exists and none of the three
+results above examines it.* The attribution rules out normalisation, decoding, and
+readout jitter. It does not cover **tokenisation**, and the two arms of the
+comparison do not tokenise alike: TransformerLens prepends a beginning-of-sequence
+token for GPT-2 and not for the NeoX family, so position 0 holds a special token on
+one arm and ordinary content on the other (caveat 17). That is an apparatus
+difference between the models being compared, in a channel this finding's evidence
+never tested. **F5's three results stand as stated; what does not stand is the
+headline's implied completeness** — "not apparatus artefacts" is supported for the
+three channels checked and unsupported for this one. Whether the difference is
+material is untested and cheap to test: recompute the position-indexed metrics over
+aligned slices — GPT-2 `[1:]` against Pythia `[:]` — as a sensitivity check, and, to
+remove the BOS from the computation rather than only from the metric, add a
+`prepend_bos=False` GPT-2 arm. Until that is run, F5 should be read as *three
+apparatus channels exonerated*, not as *apparatus excluded*.
 
 ---
 
@@ -633,6 +653,7 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
 | H-J1 | `prolet` sits inside the verbalizable (J-lens) subspace, `Divine` outside | **Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)**: the point estimate runs slightly the other way at pilot confidence (`Divine` at least as lens-expressible as `prolet`), and the boundary that appears is language-vs-noise (F11). The phase-aware re-probe (F16) splits it: the reversal holds for phase A, strengthens at the pivot M (most lens-expressible), and reverses for phase B (below `prolet` at every layer); the physical flip axis is almost entirely outside the lens (span 0.013 vs 0.252 chance at L11). Full build still pending (issue #8). |
 | H-glitch | The `Divine` flip axis aligns with the anomalous-token (SolidGoldMagikarp) cluster | **Supported as a structural alignment (2026-07-19, F13)**: cos(-d, under-trained core) = +0.60, p < 0.001 under random and norm-matched nulls; the swing runs between the most-trained (function-word) corner and the least-trained (glitch) corner. A strong tilt (0.46-0.60), not an identity. |
 | H-flip | The flip axis carries an effective eigenvalue near -1, localisable to a block | **Refined (2026-07-19, F14)**: real, direction-specific, and localised (one direction; one head, L11.H8, does 99%), but the pivot eigenvalue is -4.3 (overshooting), not -1; a period-doubling configuration (composed-cycle multiplier +0.10). The literal -1 was a frame-mix artifact of the committed axis. |
+| H-pos0 | The shared attractor is a fixed point of the **single-position** map at position 0 | **Registered, untested (2026-07-28)**: under the causal mask, attention at position 0 attends only to position 0 (its softmax row has one unmasked entry, so the weight is exactly 1), and LayerNorm, the MLP and the residual add are all per-position. Position 0's forward map is therefore a function of position 0's input alone — architectural, not empirical. The ATR loop qualifies this: the rescale uses the whole-tensor Frobenius norm, so position 0 is coupled to the rest of the sequence through **one scalar per iteration**, *c_n*. At a settled state ‖xⁿ‖ is constant, *c_n* = 1, and the shared vector must satisfy *x\** = *F₀*(*x\**) — pinning an attractor of a map on ℝ^(T×768) inside the fixed-point set of a map on ℝ⁷⁶⁸. Same argument makes the `Divine` cycle a period-2 orbit of *F₀*, consistent with F14 localising it to one head that, at position 0, can only attend to position 0. **Test:** ATR at sequence length 1 (requires `prepend_bos=False` or a token-ID path, which the engine does not expose), seeded at `<\|endoftext\|>` to match the sweep's position 0. Predicts the same terminal basin. Predicts terminal state only, not trajectory: off the fixed point *c_n* differs between the two runs. **Falsifiers:** position collapse is approximate rather than exact (0.9999 and 1.0000 are different claims and the archived 4-dp reporting cannot separate them), or the attractor is sustained by the *c_n* coupling. Rationale: [GPT2_DEEP_DIVE.md](GPT2_DEEP_DIVE.md) §2.5. **Conditional on caveat 7.** |
 | H-supp | L11.H8 is a copy-suppression head whose one-shot negative correction the loop recycles | **Refuted with the opposite sign (2026-07-19, F17)**: L11.H8 inverts the flip axis (rank 1 of 144) and is load-bearing (ablation collapses the cycle), but on ordinary text it raises the attended token's logit at 91% of positions (a copy promoter), where the documented L10.H7 suppressor lowers it. The learned-function reading is unsupported; the structural-accident reading is strengthened. |
 
 ## 4. Caveats {#caveats}
@@ -661,8 +682,30 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
    (final-layer `resid_post` → layer-0 `resid_pre`). Alternative windows (including a
    Pythia-410m depth control, layers 0–11 vs 0–23) are designed but not run.
 7. **Normalisation scheme.** Global L2 rescale only; per-position/per-dimension
-   schemes unexplored (though the global scheme is inert through layer-0
-   LayerNorm up to the epsilon term and floating-point precision, see F5.1).
+   schemes unexplored.
+
+   **The "inert" claim needs re-deriving before it is relied on (flagged
+   2026-07-28).** [SCALING_ARTEFACT_ANALYSIS.md](SCALING_ARTEFACT_ANALYSIS.md)
+   §1.1 concludes the rescale is "approximately inert for the forward map,"
+   reasoning that layer-0 LayerNorm is invariant to a positive global rescale up
+   to its epsilon term. The LayerNorm step is correct; the conclusion drawn from
+   it does not follow, because the **residual path bypasses the LayerNorm**. For
+   a pre-LN block, *F*(*c*·*x*) = *c*·*x* + *g*(LN(*x*)) whereas
+   *F*(*x*) = *x* + *g*(LN(*x*)) — the two differ by (*c* − 1)·*x*, and from
+   block 1 onward the discrepancy compounds nonlinearly because the next
+   LayerNorm sees a different residual. The difference is negligible only when
+   *c* ≈ 1, which is precisely when the rescale is not doing anything; §1.1
+   itself notes norms would otherwise reach ~1.5 × 10⁶ by iteration 500, so *c*
+   is far from 1 in practice. What §1.1 *does* establish stands: the scalar
+   preserves the mix exactly, and so is ruled out as the source of the
+   Pythia-410m fragmentation, which was the question it was answering.
+
+   This is load-bearing for H-pos0. If the rescale were inert, position 0's
+   trajectory would be **exactly** autonomous and the fixed-point constraint
+   would hold unconditionally; if it is live, position 0 is autonomous only up to
+   *c_n*. Cheap to settle empirically — compare a forward pass on *x* against one
+   on *c*·*x* for a few values of *c* at realistic norms — and not settled here:
+   this container has no `torch`, so the above is algebra, not measurement.
 8. **BPE granularity.** Basin identities are single BPE tokens (`prolet`, `Anarch`);
    multi-token structure is invisible to the current readout.
 9. **Readout is logit-lens-style.** Decoding applies `ln_final → W_U` to
@@ -710,6 +753,58 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
     but not fine effect sizes; and it measures copy suppression in the
     token-unembedding sense only, so suppression of non-token content would not
     register.
+17. **The two arms of the cross-model comparison do not tokenise the same way
+    (2026-07-26).** `atr_engine.py` passes a raw string to `run_with_cache`
+    (lines 125, 183, 310, 343). TransformerLens tokenises strings through
+    `to_tokens`, which prepends the beginning-of-sequence token when
+    `cfg.default_prepend_bos` is set, and in `loading_from_pretrained.py` only
+    `GPTNeoXForCausalLM` carries an explicit `False` (line 537) — GPT-2 has no
+    override and inherits the global default `True` (line 1720). **So position 0
+    holds the special token `<|endoftext|>` in every GPT-2 and GPT-2 Medium
+    trajectory and an ordinary content token in every Pythia one.** That much is
+    token construction and is measured. Whether that position then *functions* as
+    an attention sink in these trajectories is an inference from the sink
+    literature ([GPT2_DEEP_DIVE.md](GPT2_DEEP_DIVE.md) §5.4), **not** a
+    measurement made here: the only sink-adjacent measurement in hand is
+    coordinate-structured, and massive activations are a coordinate phenomenon
+    while attention sinks are a positional one. Treat "sink at position 0" as an
+    open hypothesis throughout this caveat. Measured on the engine's own call path:
+    4 raw tokens become 5 for `gpt2` and `gpt2-medium`, and stay 4 for
+    `pythia-160m` and `pythia-410m`. Nobody chose this; it is a library default
+    that varies by model family and is invisible at the call site.
+    Three consequences, in order of how much they bite:
+    (a) every **position-indexed cross-model** comparison — F1's position
+    uniformity above all — compares sequences whose position 0 means different
+    things, and whose lengths differ by one for the same prompt, so per-position
+    means are taken over different denominators;
+    (b) within the GPT-2 arm the special token has a **known address**, which
+    makes testable — rather than merely worrying — the question of whether the
+    global L2 rescale is partly setting the magnitude of a position that carries
+    disproportionate norm (caveat 7 rules the rescale inert through layer-0
+    LayerNorm, which is a statement about the forward map, not about how the
+    conserved norm is distributed across positions);
+    (c) from iteration 1 onward the re-injection overwrites position 0, so
+    whatever role that position plays is preserved *structurally* while its
+    *contents* are replaced — if the sink hypothesis holds, that is a regime no
+    model was trained in, and one only the GPT-2 arm enters. Conditional on the
+    hypothesis, and untested.
+    The cheap first control is to align the slices: **GPT-2 `[1:]` against
+    Pythia `[:]`**. Dropping index 0 from *both* arms — the form first written
+    here, and wrong — would strip GPT-2's BOS and simultaneously strip Pythia's
+    first genuine content token, replacing one misalignment with another.
+    `experiments/gpt2_small/11_suppression_test.py:607-610` has the accounting
+    (`# [1, L], BOS at 0`, `n_tokens_no_bos`) and is the one place in the
+    repository that had it right. Two limits on that control, both real: it is a
+    **sensitivity check, not a restoration of comparability**, because the BOS
+    participates in the GPT-2 forward pass and conditions every other position
+    through attention, so removing it from the *metric* does not remove it from
+    the *computation*; and the two arms still differ in what conditioned the
+    states being compared. Only a `prepend_bos=False` GPT-2 arm removes the BOS
+    from the computation itself. Note this cannot explain F3:
+    GPT-2 Small and Medium both carry the BOS and behave completely differently.
+    Raised by `agent:pythia-review` (peer board, discussion #59), verified
+    against the TransformerLens source and by execution; literature context in
+    [GPT2_DEEP_DIVE.md](GPT2_DEEP_DIVE.md) §5.4.
 
 ## 5. What ATR is, after this series
 
