@@ -267,15 +267,35 @@ a regeneration cannot silently rewrite the epistemic record. It skips rather tha
 
 `smoke_test.mjs` serves the directory, drives `viewer.html` in headless Chromium and asserts that
 all three graphs actually draw, that the model switch re-renders, that search and the details panel
-and the timeline scrubber work, that returning to Evidence from another graph restores the
-force-directed layout, that the phone budget holds — and that nothing lands in the console. Its
-fourteen assertions cover all four views. The fourteenth is Threads: that the overlay renders from
+and the timeline scrubber work, that returning to Evidence from another graph restores its own
+layout with no hierarchical leak, that the phone budget holds — and that nothing lands in the console. Its
+sixteen assertions cover all four views. The fourteenth is Threads: that the overlay renders from
 `_data/threads.json` — readiness colours reaching the vis DataSet, the ranked low-hanging-fruit
 list populated from the report and driving the graph when a row is clicked, `blocks` / `blocked-by`
 drawn as gate edges — and that none of it leaks, so after Threads → Dissolution → Evidence the
 synthesised blocker hubs are gone, status colours are back, the gate edges have their evidence
 style again and the graph is still clickable. If `_data/threads.json` has not been generated that
-assertion fails with an actionable message and the other thirteen still run. It needs Playwright
+assertion fails with an actionable message and the other fifteen still run.
+
+The fifteenth pins the ordered arrival, which is the property the front door rests on: two loads in
+separate browser contexts must put every node on the same integer coordinates, nothing may move
+over a 2.5s window after arrival (every node pinned, zero displacement — that is what "physics off"
+means here, since `physics.enabled` deliberately stays `true`), and a round trip out to Dissolution
+and back must restore those coordinates exactly rather than approximately. Assertion 13 cannot see
+this: it checks the mode flags on the return path and tolerates generous positional drift, because
+it was written when the arrival was still a physics cloud. Dropping the ordered layout on the way
+back leaves 13 green and only 15 red. Both budgets are exact — one unit of tolerance is one unit of
+physics.
+
+The sixteenth pins the other half of the front door: that the ordered index can be *read*. It
+measures the effective caption size — node font times the fitted zoom — against
+`ORDERED_TARGET_LABEL_PX`, checks that at least one type lane and one date band are actually
+named, and clicks through each heading to confirm the screen-space overlay does not intercept a
+click meant for the node beneath it. Assertion 15 cannot see any of this either: put the grid
+pitch back to the round numbers it started with and the captions collapse to ~5px, which is the
+bug the readability pass existed to fix — and 15 stays green, because every node is still exactly
+where it deterministically belongs. Both halves were confirmed by injecting each fault into a
+throwaway copy and watching 16 go red on its own. It needs Playwright
 (`npm i -D playwright`, or set `PLAYWRIGHT_PATH`); the two CDN scripts are served from a local
 mirror so a bad day at unpkg cannot turn into a red test.
 
@@ -301,25 +321,106 @@ Everything runs locally and nothing is uploaded. The page does make two external
 pulls `vis-network` from unpkg and `marked` from jsDelivr at load time. Offline, the graph will
 not draw — vendor those two scripts locally if you need it to.
 
+### Arrival: the graph is the index
+
+The evidence graph is the front door of this project, and it opens as an **index**, not as a
+settled physics cloud. Four things follow from that, and they are the contract:
+
+**1. The layout is computed, not simulated.** On load every node is placed by a pure function of
+the data — `applyOrderedLayout()` in `viewer.html` — and pinned with vis's `fixed`. Nothing
+consults a random seed, the clock, the viewport or the previous render, so two consecutive loads
+put every node on the same integer coordinates. The physics solver is left switched on but has no
+degrees of freedom to move: with every node pinned there is nothing to integrate, so there is no
+stabilisation wobble and nothing shifts under the pointer while you are reading. Measured at
+1600x950: settled 96ms after first paint, zero drift within a load, and byte-identical positions
+across loads (`network.getPositions()` compared verbatim).
+
+**2. It is ordered so it can be read.** One lane per entity type across the screen — hypotheses,
+findings, questions, concepts, then runs, models, docs, artefacts, prior work — and assertion date
+down it, earliest band at the top, undated last. So a lane is a chronology: the findings run in
+date order, the hypotheses of the same week sit level with them, and the colour of each is its
+disposition. Inside one (type, date) cell nodes wrap into a small block sorted by id, so nothing
+about the arrangement is arbitrary. The **Arrangement** section at the bottom of the legend says
+this on the page.
+
+**3. Physics is a mode you enter, not the state you arrive in.** The **Explore** button releases
+every node and hands the graph to the solver. **Back to the index** re-pins the coordinates
+computed at load — the same integers, not merely the same shape — and re-frames. The same has to
+hold on the return leg of every graph switch, because leaking a layout across a switch is exactly
+the bug documented above `layoutOverride = null` in `loadAndInitialize()`: evidence -> explore /
+dissolution / isomorphism / threads -> evidence all restore the identical arrangement, verified by
+comparing `network.getPositions()` before and after. The ordered layout deliberately does *not* use
+`layoutOverride`; it pins node coordinates, exactly as the isomorphism side layout does, so
+`layoutOverride` stays `null` for the whole evidence family and cannot be the thing that leaks.
+
+**4. It opens on the claims.** 93 assertions read as an index; 175 nodes do not. The type chips
+arrive with `run`, `model`, `null-model`, `doc`, `artefact` and `prior-work` off — one click on a
+chip, on **everything**, or on **Show All** brings them back. Dissolution, isomorphism and threads
+open on everything they have.
+
+Isomorphism keeps its side-pinned columns and dissolution keeps its hierarchical layered layout;
+the ordered grid is for the graphs that would otherwise arrive as a cloud, which is evidence and
+threads.
+
+### Search
+
+Search is the largest control on the page and has a line of its own above everything else, because
+looking something up is what an index is for. It matches **labels, ids and description text** —
+plus paths, scripts, sides, roles, dissolution tokens and, in threads mode, the report's own
+wording — so `Brouwer` finds both the discovery and the concept without you knowing either id, and
+`period-2` finds the twelve nodes that discuss it. The line underneath reports how much of the
+index you are looking at: `93 of 175 nodes — the claims`, or `12 of 175 match "period-2"`.
+
+### Front matter: entry points
+
+The `Index` chip row is the contents page. Each entry sets the graph's whole state — chips, focus,
+timeline cursor — rather than navigating anywhere:
+
+| chip | id | what it sets |
+| --- | --- | --- |
+| by claim | `#entry-claims` | the arrival state: the four claim types, all statuses |
+| by question | `#entry-questions` | the `question` type only |
+| what's open | `#entry-open` | the open threads from `_data/threads.json` |
+| what changed | `#entry-changed` | both ends of every `corrects` / `retires` / `supersedes` edge |
+| what's blocked | `#entry-blocked` | blocked claims *and* the blockers gating them |
+| everything | `#entry-everything` | all 175 nodes, every chip on |
+
+`what's open` and `what's blocked` read `_data/threads.json` through `loadIndexOverlay()`, which is
+a separate global from the threads-mode overlay so the two can never be confused. If the file is
+missing the load warns (never errors) and the entry points that depend on it are hidden rather than
+left to disappoint; `what changed` and `what's blocked` also draw on edges the graph already
+carries, so `what's blocked` survives a missing report. Any manual chip click or a search
+supersedes the entry point that set the view, and says so in the line under the search box.
+
 ### The graph selector
 
 The **Graph** dropdown in the header swaps between Evidence, Dissolution, Isomorphism and Threads
 without reloading the page. It defaults to Evidence.
 
 - **Evidence** and **Isomorphism** render in evidence mode: status colouring, status/type filter
-  chips, the timeline scrubber, the details panel and copy-evidence-chain all apply. In the
-  isomorphism graph, claims that declare a `side` are pinned into columns — acoustic on the left,
-  transformer on the right, shared down the middle.
+  chips, the timeline scrubber, the details panel and copy-evidence-chain all apply. Evidence
+  arrives in the ordered index grid described above. In the isomorphism graph, claims that declare
+  a `side` are pinned into columns instead — acoustic on the left, transformer on the right, shared
+  down the middle — with physics still resolving `y`, so it keeps the layout it always had.
 - **Dissolution** renders in its own mode: a left-to-right layered layout with one column per
   iteration band, node size scaled by how many prompts pass through that token, edge width by how
   many prompts make that transition, and colour by the terminal basin the path ends in. A **Model**
   dropdown picks between the six sweeps and a **Register** chip row filters by prompt register. The
   timeline scrubber is hidden here — dissolution is ordered by iteration count, not by date, so a
   date cursor would mean nothing. The status and type chips are hidden for the same reason.
-- **Threads** renders the evidence nodes in the same force-directed layout, coloured by readiness,
-  with a readiness chip row in place of the status row, a ranked low-hanging-fruit list at the top
-  right, and no timeline. Details, search, focus and the markdown reader work exactly as they do in
+- **Threads** renders the evidence nodes in the same ordered arrival as the evidence graph,
+  coloured by readiness, with a readiness chip row in place of the status row, a ranked
+  low-hanging-fruit list at the top right, and no timeline. Details, search, focus and the markdown reader work exactly as they do in
   evidence mode; the readiness block sits above the epistemic record rather than instead of it.
+
+### The timeline, demoted
+
+The scrubber is a good instrument at the wrong altitude: it needs you to already know which node to
+watch, so it cannot be the greeting. It has moved out of the fixed 58px bar across the bottom of
+the window and into the chip bar, sitting alongside the status and type filters as one more axis
+you can slice by. Every id, handler and behaviour is unchanged — `#timeline`, `#timeline-play`,
+`#timeline-bar`, `onTimelineInput()`, the space-bar playback shortcut and the hide-in-dissolution/
+threads rule all work exactly as before. The window's bottom edge now belongs to the graph.
 
 ### On a phone
 
@@ -342,15 +443,19 @@ the controls. Nothing is removed — every control is still reachable, and the d
 - Tapping a node opens the details panel as a **bottom sheet** with its own scroll and a close
   button, over the full-width graph, instead of a 380px side panel that pushed the graph off the
   edge.
-- The timeline bar stays where it is, compacted from 58px to 46px.
+- The **Index** entry points and the timeline ride inside the same **Filters** disclosure as the
+  chips, so the front matter and the scrubber cost nothing from the chrome budget.
+- The timeline is no longer a fixed bar across the bottom, so the details bottom sheet and the
+  graph both reach the bottom edge of the window.
 
 All three disclosures are `<button aria-expanded>`, so they work from the keyboard; `Escape`
 closes whichever is open, then the details sheet. Every touch target is at least 40x40 CSS px, and
 the expand/collapse transitions respect `prefers-reduced-motion`.
 
 Measured at 393x830 (a Nothing Phone 2a viewport), in all three graph modes and in Threads, with
-the Filters panel both shut and open: 125px of chrome above the graph, a 659px graph — 79% of the
-viewport — and no horizontal page scroll.
+the Filters panel both shut and open: 125px of chrome above the graph, a 705px graph — 84.9% of
+the viewport — and no horizontal page scroll. (It was 659px / 79% before the timeline moved off the
+bottom edge.)
 
 ### Run order
 

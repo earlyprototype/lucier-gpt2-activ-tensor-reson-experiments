@@ -21,8 +21,11 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            /* keeps the graph clear of the fixed timeline bar */
-            padding-bottom: 58px;
+            /* The timeline used to be a fixed bar pinned to the bottom of the
+               window and this padding kept the graph clear of it. It now lives
+               inside #chip-bar as one filter axis among the others, so the
+               bottom of the window belongs to the graph again. */
+            padding-bottom: 0;
         }
 
         #header {
@@ -34,9 +37,9 @@
         }
 
         #header h1 {
-            font-size: 22px;
+            font-size: 21px;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .status-badge {
@@ -58,12 +61,46 @@
             align-items: center;
         }
 
+        /* =====================================================================
+           Search is the primary affordance, not the fifth control in a row.
+           `flex-basis: 100%` inside the wrapping #controls row gives it a line
+           of its own above everything else; the phone breakpoint puts it back
+           on one line with the graph selector so the mobile chrome budget is
+           untouched.
+           ===================================================================== */
         #search {
-            padding: 8px 12px;
+            flex: 1 1 100%;
+            width: auto;
+            min-width: 240px;
+            padding: 12px 16px;
             border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            width: 280px;
+            border-radius: 6px;
+            font-size: 17px;
+            line-height: 1.2;
+            color: #2c3e50;
+            box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35);
+        }
+
+        #search::placeholder {
+            color: #95a5a6;
+        }
+
+        #search:focus {
+            outline: none;
+            box-shadow: inset 0 0 0 2px #3498db, 0 0 0 3px rgba(52,152,219,0.35);
+        }
+
+        /* Live "what am I looking at" readout under the search box. */
+        #search-status {
+            flex: 1 1 100%;
+            font-size: 12px;
+            color: #bdc3c7;
+            line-height: 1.25;
+            min-height: 15px;
+            margin-top: -2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         button {
@@ -104,10 +141,11 @@
         /* ---- filter chips ---- */
         #chip-bar {
             background: #34495e;
-            padding: 8px 20px;
+            padding: 7px 20px;
             display: flex;
             flex-wrap: wrap;
-            gap: 14px;
+            row-gap: 7px;
+            column-gap: 14px;
             align-items: center;
             flex: 0 0 auto;
         }
@@ -160,6 +198,85 @@
             border: 1px solid rgba(0,0,0,0.25);
         }
 
+        /* ---- front matter: entry points ----
+           These are not filters. A filter narrows what you already have; an
+           entry point *sets* the whole state — chips, focus and view — so the
+           graph opens on a question. They read as navigation, never as the
+           half-lit "off" state of a filter chip. */
+        .entry-chip {
+            opacity: 1;
+            background: rgba(255,255,255,0.10);
+            border-color: rgba(255,255,255,0.34);
+            font-weight: 600;
+        }
+
+        .entry-chip:hover {
+            background: rgba(255,255,255,0.24);
+        }
+
+        .entry-chip.entry-active,
+        .entry-chip.entry-active:hover {
+            background: #3498db;
+            border-color: #5dade2;
+            color: #ffffff;
+        }
+
+        /* ---- the view switch ----
+           Deliberately NOT styled like the entry chips. An entry point is one
+           of six doors into the same picture and any of them can be the way in;
+           these two are mutually exclusive states of the picture itself, so
+           they read as a segmented control — one shared pill, a hard divider,
+           and only ever one half lit. Sharing the entry-chip look would invite
+           the reading "Network is another kind of index", which is the exact
+           confusion the switch exists to end. */
+        #view-switch .view-chip {
+            opacity: 1;
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.30);
+            font-weight: 600;
+            border-radius: 0;
+            margin: 0;
+        }
+
+        #view-switch .view-chip:first-of-type {
+            border-radius: 12px 0 0 12px;
+        }
+
+        #view-switch .view-chip:last-of-type {
+            border-radius: 0 12px 12px 0;
+            border-left-width: 0;
+        }
+
+        #view-switch .view-chip:hover {
+            background: rgba(255,255,255,0.20);
+        }
+
+        #view-switch .view-chip.view-active,
+        #view-switch .view-chip.view-active:hover {
+            background: #27ae60;
+            border-color: #2ecc71;
+            color: #ffffff;
+        }
+
+        /* The group is a control, so its two halves must not be separated by
+           the chip-group gap the way independent filters are. Written with
+           enough specificity to beat the narrow-screen `#chip-bar .chip-group
+           { gap: 8px }` further down the file, which would otherwise split the
+           pill in two on the one screen where it matters most. */
+        #chip-bar #view-switch.chip-group {
+            gap: 0;
+        }
+
+        /* The label still needs its own air, since the gap is now zero. */
+        /* The canvas-mounted twin of #view-switch. Desktop has room for the
+           real one in the filter bar, so this is a phone-only control and is
+           display:none here; the narrow-screen block turns it on. */
+        .view-float { display: none; }
+
+        #view-switch .chip-group-label {
+            margin-right: 6px;
+        }
+
         #container {
             display: flex;
             flex: 1;
@@ -172,6 +289,43 @@
             background: white;
             position: relative;
         }
+
+        /* ---- axis headings for the ordered arrival ----
+           Below #legend and #fruit-panel in the stack (they are z-index 5) and
+           above the canvas, so a heading never hides a control. The whole
+           overlay and every label in it is pointer-events:none: the reader is
+           aiming at nodes, and an invisible 20px band across the top of the
+           canvas that swallows clicks is exactly the kind of thing nobody
+           finds until they file a bug about the graph being dead. */
+        #axis-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            overflow: hidden;
+            pointer-events: none;
+            display: none;
+        }
+
+        #axis-overlay.axis-visible { display: block; }
+
+        #axis-overlay .axis-label {
+            position: absolute;
+            pointer-events: none;
+            white-space: nowrap;
+            font-size: 11px;
+            line-height: 1.2;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: #61707c;
+            background: rgba(255,255,255,0.86);
+            border: 1px solid #e6eaed;
+            border-radius: 3px;
+            padding: 2px 6px;
+        }
+
+        #axis-overlay .axis-lane { font-weight: 600; color: #48586a; }
+        #axis-overlay .axis-across { transform: translateX(-50%); }
+        #axis-overlay .axis-down { transform: translateY(-50%); }
 
         /* ---- legend ---- */
         #legend {
@@ -190,6 +344,12 @@
             max-height: calc(100% - 120px);
             overflow-y: auto;
             z-index: 5;
+        }
+
+        #legend.legend-index {
+            max-width: 186px;
+            padding: 8px 10px;
+            font-size: 11px;
         }
 
         #legend h4 {
@@ -492,6 +652,13 @@
             white-space: nowrap;
         }
 
+        /* The placeholder state carries no information and costs the graph a
+           whole row. It was already hidden on phones; there is no reason the
+           desktop should pay for it either. A real path brings the bar back. */
+        #breadcrumb.is-empty {
+            display: none;
+        }
+
         #breadcrumb .breadcrumb-item {
             color: #3498db;
             cursor: pointer;
@@ -506,21 +673,20 @@
             color: #95a5a6;
         }
 
-        /* ---- timeline ---- */
+        /* ---- timeline ----
+           Demoted, not weakened. It used to be a fixed 58px bar across the
+           bottom of the window — the loudest instrument on the page, and the
+           one that needs you to already know which node to watch. It is now a
+           group inside #chip-bar, sitting alongside the status and type
+           filters as one more axis you can slice by. Every id, handler and
+           behaviour is unchanged. */
         #timeline-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 58px;
-            background: #2c3e50;
-            color: #ecf0f1;
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 0 20px;
-            z-index: 400;
-            box-shadow: 0 -2px 8px rgba(0,0,0,0.15);
+            gap: 10px;
+            flex: 1 1 340px;
+            min-width: 260px;
+            color: #ecf0f1;
         }
 
         #timeline-bar.disabled {
@@ -530,14 +696,16 @@
 
         #timeline {
             flex: 1;
-            min-width: 120px;
+            min-width: 110px;
             accent-color: #27ae60;
             cursor: pointer;
         }
 
         #timeline-play {
             background: #27ae60;
-            min-width: 74px;
+            min-width: 58px;
+            padding: 5px 10px;
+            font-size: 12px;
         }
 
         #timeline-play:hover {
@@ -545,9 +713,19 @@
         }
 
         #timeline-readout {
-            font-size: 13px;
-            min-width: 240px;
-            line-height: 1.35;
+            font-size: 12px;
+            min-width: 140px;
+            max-width: 220px;
+            line-height: 1.2;
+            overflow: hidden;
+        }
+
+        #timeline-date,
+        #timeline-phase {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         #timeline-date {
@@ -590,7 +768,7 @@
 
         #toast {
             position: fixed;
-            bottom: 76px;
+            bottom: 28px;
             left: 50%;
             transform: translateX(-50%) translateY(12px);
             background: #2c3e50;
@@ -1034,12 +1212,15 @@
              - the legend becomes a "Legend" overlay toggle;
              - the breadcrumb hides while it holds only placeholder text;
              - the details panel becomes a bottom sheet with its own scroll;
-             - the timeline bar compacts from 58px to 46px but stays put.
+             - the timeline and the index entry points ride inside the same
+               "Filters" disclosure as the chips, so neither costs a pixel of
+               the chrome budget.
            ===================================================================== */
         @media (max-width: 768px) {
             body {
-                /* keeps the graph clear of the compacted timeline bar */
-                padding-bottom: 46px;
+                /* The timeline is no longer a fixed bottom bar, so nothing
+                   below the graph needs clearing. */
+                padding-bottom: 0;
                 height: 100vh;
                 height: 100dvh;
             }
@@ -1096,12 +1277,23 @@
                 padding: 0 6px;
             }
 
+            /* Back on one line with the graph selector: a second full-width
+               row here would cost ~46px of a 160px chrome budget. Search is
+               still the widest thing in the header. */
             #search {
                 flex: 1 1 auto;
                 width: auto;
                 min-width: 0;
                 min-height: 40px;
+                padding: 0 10px;
                 font-size: 16px; /* >=16px stops iOS zoom-on-focus */
+                box-shadow: none;
+            }
+
+            /* The readout is a desktop nicety; on a phone the graph needs the
+               pixels more than the reader needs the count. */
+            #search-status {
+                display: none;
             }
 
             /* ---- disclosure toolbar ---- */
@@ -1168,6 +1360,47 @@
 
             #chip-bar.mobile-open {
                 display: flex;
+            }
+
+            /* Anchored to the chrome's own measured bottom (the same custom
+               property the disclosures use) so it tracks the header instead of
+               guessing at it. Sits over the canvas, which on a phone is empty
+               in this corner in every one of the four graphs.
+               `mode-hidden` still wins: dissolution and isomorphism draw their
+               own layouts and have no index to switch to. */
+            .view-float {
+                position: fixed;
+                top: calc(var(--mobile-chrome-bottom, 132px) + 10px);
+                left: 10px;
+                z-index: 315;
+                display: flex;
+                gap: 0;
+                border-radius: 999px;
+                overflow: hidden;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.28);
+            }
+
+            .view-float.mode-hidden { display: none; }
+
+            .view-float-chip {
+                /* 40px tall so it is a real touch target, and opaque so the
+                   graph never shows through and makes the label unreadable. */
+                min-height: 40px;
+                padding: 0 14px;
+                border: 1px solid #b9c2c8;
+                background: #ffffff;
+                color: #2c3e50;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+
+            .view-float-chip + .view-float-chip { border-left: none; }
+
+            .view-float-chip.view-active {
+                background: #2c3e50;
+                border-color: #2c3e50;
+                color: #ffffff;
             }
 
             #chip-bar .chip-group {
@@ -1290,7 +1523,7 @@
                 position: fixed;
                 left: 0;
                 right: 0;
-                bottom: 46px;
+                bottom: 0;
                 top: auto;
                 width: auto;
                 height: 62vh;
@@ -1348,11 +1581,11 @@
                 min-height: 44px;
             }
 
-            /* ---- timeline: compacted, still a headline control ---- */
+            /* ---- timeline: one row inside the Filters disclosure ---- */
             #timeline-bar {
-                height: 46px;
+                flex: 1 1 auto;
+                min-width: 0;
                 gap: 8px;
-                padding: 0 10px;
             }
 
             #timeline-label {
@@ -1394,7 +1627,7 @@
             }
 
             #toast {
-                bottom: 60px;
+                bottom: 24px;
                 max-width: 88vw;
             }
 
@@ -1449,6 +1682,14 @@
     <div id="header">
         <h1><span id="graph-title">Evidence Graph</span> <span id="live-badge" class="status-badge">LIVE</span></h1>
         <div id="controls">
+            <!-- Looking something up is what an index is FOR, so search leads:
+                 its own line above every other control on desktop, still the
+                 widest thing in the header on a phone. It matches labels, ids
+                 AND description text. -->
+            <input type="text" id="search" autocomplete="off" spellcheck="false"
+                   aria-label="Search the index"
+                   placeholder="Search the index — a label, an id, or any word in a description">
+            <span id="search-status"></span>
             <span class="control-label">Graph</span>
             <select id="graph-select" onchange="selectGraph(this.value)">
                 <option value="evidence">Evidence</option>
@@ -1456,7 +1697,6 @@
                 <option value="isomorphism">Isomorphism</option>
                 <option value="threads">Threads</option>
             </select>
-            <input type="text" id="search" placeholder="Search claims, descriptions, ids...">
             <!-- display:contents above 768px, so these stay flex items of #controls
                  exactly as before; below it the wrapper becomes the overflow menu. -->
             <span id="header-secondary">
@@ -1471,6 +1711,11 @@
                     <span class="control-label">Model</span>
                     <select id="model-select" onchange="selectDissolutionModel(this.value)"></select>
                 </span>
+                <!-- `Explore` used to live here. It was a one-way excursion out
+                     of the index and back, which is not what the graph is: the
+                     force-directed reading is a VIEW, so it moved into the
+                     view switch in #chip-bar. toggleExplore()/setExploreMode()
+                     still work and still mean the same thing. -->
                 <button id="btn-show-all" onclick="filterNodes('all')">Show All</button>
                 <button id="btn-reset" onclick="resetView()">Reset View</button>
                 <button id="btn-reload" onclick="reloadData()">Refresh Data</button>
@@ -1492,7 +1737,72 @@
         </div>
     </div>
 
+    <!-- The same view switch, on the canvas, for phones only.
+         #view-switch lives in #chip-bar, which is display:none on a phone until
+         the reader taps "Filters". That made the switch unreachable in practice:
+         nothing about a disclosure labelled Filters suggests it contains the
+         control for HOW the graph is drawn, and the owner reported exactly that
+         -- "on my phone I don't see index option to change view". Measured: zero
+         pixels of it on arrival; it only appears at 59x40 after the tap.
+         Putting it on the canvas rather than in #mobile-toolbar is deliberate:
+         that row already carries Filters / More / Legend, and "Filters" grows to
+         "Filters (12 of 18)", so a fourth control there wraps the row and costs
+         ~46px of a 160px chrome budget that is already at 125px. Floating it
+         costs zero chrome, which is why assertion 12 is unaffected.
+         Kept as a second control rather than moved, because moving the node
+         between containers at a breakpoint is the kind of thing this file has
+         already been bitten by; updateViewSwitch() drives both from one place,
+         so they cannot disagree. -->
+    <div class="view-float mode-hidden" id="view-float">
+        <button type="button" class="view-float-chip view-active" id="view-float-network"
+                aria-pressed="true" title="Force-directed: physics on, nothing pinned"
+                onclick="setViewMode('network')">Network</button>
+        <button type="button" class="view-float-chip" id="view-float-index"
+                aria-pressed="false" title="Ordered grid: type across, date down"
+                onclick="setViewMode('index')">Index</button>
+    </div>
+
     <div id="chip-bar">
+        <!-- The view switch. Two co-equal readings of the same nodes and the
+             same edges — not a filter, not an entry point, and not a graph:
+             #graph-select picks WHICH data, this picks HOW it is drawn.
+
+             It rides in #chip-bar rather than in the header because that is the
+             one place that is free on a phone: the chip bar is already the
+             Filters disclosure below 768px, so the switch costs zero chrome
+             budget and inherits the 40x40 tap target the mobile .chip rule
+             gives every chip. Above 768px the chip bar is always on screen, so
+             the switch is permanently visible there. -->
+        <div class="chip-group" id="view-switch">
+            <span class="chip-group-label">View</span>
+            <button type="button" class="chip view-chip view-active" id="view-network"
+                    aria-pressed="true" title="Force-directed: physics on, nothing pinned"
+                    onclick="setViewMode('network')">Network</button>
+            <button type="button" class="chip view-chip" id="view-index"
+                    aria-pressed="false" title="Ordered grid: type across, date down"
+                    onclick="setViewMode('index')">Index</button>
+        </div>
+        <!-- Front matter: an index's contents page. Each of these SETS the
+             graph's state rather than navigating away. The last three are
+             computed from _data/threads.json and from the corrects / retires /
+             supersedes edges; buildEntryPoints() hides any that have nothing
+             behind them, so a missing threads.json degrades to four entry
+             points rather than to a broken row. -->
+        <div class="chip-group" id="entry-points">
+            <span class="chip-group-label">Index</span>
+            <button type="button" class="chip entry-chip entry-active" id="entry-claims"
+                    onclick="applyEntryPoint('claims')">by claim</button>
+            <button type="button" class="chip entry-chip" id="entry-questions"
+                    onclick="applyEntryPoint('questions')">by question</button>
+            <button type="button" class="chip entry-chip" id="entry-open"
+                    onclick="applyEntryPoint('open')">what's open</button>
+            <button type="button" class="chip entry-chip" id="entry-changed"
+                    onclick="applyEntryPoint('changed')">what changed</button>
+            <button type="button" class="chip entry-chip" id="entry-blocked"
+                    onclick="applyEntryPoint('blocked')">what's blocked</button>
+            <button type="button" class="chip entry-chip" id="entry-everything"
+                    onclick="applyEntryPoint('everything')">everything</button>
+        </div>
         <div class="chip-group" id="status-chips">
             <span class="chip-group-label">Status</span>
         </div>
@@ -1508,6 +1818,17 @@
         <div class="chip-group mode-hidden" id="basin-chips">
             <span class="chip-group-label">Basin</span>
         </div>
+        <!-- The scrubber, demoted to one axis among the filters. Same ids,
+             same handlers, same behaviour — a different altitude. -->
+        <div id="timeline-bar">
+            <span id="timeline-label">Timeline</span>
+            <button id="timeline-play" onclick="toggleTimelinePlay()">Play</button>
+            <input type="range" id="timeline" min="0" max="0" step="1" value="0" oninput="onTimelineInput(this.value)">
+            <div id="timeline-readout">
+                <span id="timeline-date">--</span>
+                <span id="timeline-phase">no dated entities</span>
+            </div>
+        </div>
     </div>
 
     <div id="breadcrumb" class="is-empty">
@@ -1516,6 +1837,13 @@
 
     <div id="container">
         <div id="graph">
+            <!-- Axis headings for the ordered arrival. An HTML overlay rather
+                 than canvas text so the headings stay the same size at every
+                 zoom instead of shrinking into the illegibility they exist to
+                 explain. pointer-events:none throughout — nothing here may
+                 intercept a click meant for a node. Empty and display:none in
+                 dissolution and isomorphism, which have their own layouts. -->
+            <div id="axis-overlay" aria-hidden="true"></div>
             <div id="legend"></div>
             <!-- Threads mode only: the report's ranked low-hanging fruit. An
                  absolutely-positioned overlay inside #graph, so no other mode's
@@ -1529,16 +1857,6 @@
                     onclick="closeDetailsPanel()">&times;</button>
             <h2 id="detail-title">Select a node</h2>
             <div id="detail-content"></div>
-        </div>
-    </div>
-
-    <div id="timeline-bar">
-        <span id="timeline-label">Timeline</span>
-        <button id="timeline-play" onclick="toggleTimelinePlay()">Play</button>
-        <input type="range" id="timeline" min="0" max="0" step="1" value="0" oninput="onTimelineInput(this.value)">
-        <div id="timeline-readout">
-            <span id="timeline-date">--</span>
-            <span id="timeline-phase">no dated entities</span>
         </div>
     </div>
 
@@ -1739,6 +2057,243 @@
         // Isomorphism side layout: acoustic left, transformer right.
         const SIDE_X = { acoustic: -700, shared: 0, transformer: 700 };
 
+        // =====================================================================
+        // ORDERED ARRIVAL — the index grid.
+        //
+        // A force-directed cloud is exhaustive and nothing else: no order to
+        // navigate by, no way to scan it, and a different picture every load.
+        // The arrival layout replaces it with a grid that means something:
+        //
+        //     x = entity type      one lane per type, claims first
+        //     y = assertion date   ascending downward, undated last
+        //
+        // so findings run in date order down their lane, the hypotheses of the
+        // same week sit level with them, and their colour (= status) is the
+        // disposition. Within one (type, date) cell nodes wrap into a small
+        // block, sorted by id, so the arrangement is a pure function of the
+        // data — the same bytes in, the same pixels out, every load.
+        //
+        // Positions are pinned with `fixed`, exactly the mechanism
+        // applySideLayout() already uses for isomorphism. Deliberately NOT a
+        // layoutOverride: `layoutOverride` must stay null for the evidence
+        // family, both because the dissolution override is the thing that has
+        // leaked before and because the network-rebuild signature is derived
+        // from it. See the comment above `layoutOverride = null`.
+        // =====================================================================
+        const ORDERED_LANES = [
+            'hypothesis', 'finding', 'question', 'concept',
+            'run', 'model', 'null-model',
+            'doc', 'artefact', 'prior-work', 'blocker'
+        ];
+        // What "by claim" means: the four types that carry an assertion.
+        const ORDERED_CLAIM_TYPES = ['hypothesis', 'finding', 'question', 'concept'];
+        // ---------------------------------------------------------------------
+        // GRID PITCH — DERIVED FROM THE LABEL, NOT CHOSEN.
+        //
+        // DO NOT TIDY THESE BACK INTO ROUND NUMBERS. The first version of this
+        // grid used 220 / 128 / 110 / 70, picked because they looked like
+        // sensible spacing in the editor. They are arbitrary world units with
+        // no relation to how big a label actually is, and they came out ~1.8x
+        // more spread out than the labels needed: fit-to-extent then had to
+        // zoom to 0.353 to contain the result, and every node label rendered at
+        // 4.94px on a 1600x950 desktop. An index nobody can read is not an
+        // index. That is the bug these expressions prevent, and it is invisible
+        // in the source — it only shows up as mush on the screen.
+        //
+        // So the pitch is stated as a multiple of ORDERED_FONT, because the
+        // ONLY thing that decides whether the arrival is legible is the RATIO
+        // between the cell pitch and the text drawn in it. The absolute size is
+        // a free gauge with no effect at all: double every number below and
+        // fit() simply halves the zoom, landing on exactly the same picture.
+        // Which is why hand-picked constants cannot be "about right" — they can
+        // only be in the right ratio or the wrong one.
+        //
+        // If the labels need to change, change ORDERED_LABEL_EMS,
+        // ORDERED_LABEL_LINES or ORDERED_NODE_EMS and let the pitch follow —
+        // then re-measure. The measurement that matters is
+        //     node font size * network.getScale()
+        // read at 1600x950 with the claims-only arrival showing. It must stay
+        // at or above ORDERED_TARGET_LABEL_PX. docs/graph/tests/smoke_test.mjs
+        // pins determinism, not legibility; legibility is on you.
+        // ---------------------------------------------------------------------
+        const ORDERED_TARGET_LABEL_PX = 11;  // the number the pitch is solving for
+        const ORDERED_FONT = 14;             // world units, claim labels
+        const ORDERED_FONT_SMALL = 12;       // world units, everything else
+        // A label wraps at ORDERED_LABEL_EMS ems (~12 characters of Arial at
+        // this size) and is clipped after ORDERED_LABEL_LINES of them, which is
+        // where ORDERED_LABEL_CHARS comes from. Wrapping rather than running on
+        // is what lets sixteen columns fit across 1600px at all: the same 20
+        // characters on one line are ~155 world units wide, and sixteen of
+        // those do not fit at any zoom that leaves the text readable.
+        const ORDERED_LABEL_EMS = 6.5;
+        const ORDERED_LABEL_LINES = 2;
+        const ORDERED_LABEL_CHARS = 20;   // full text stays in the tooltip/panel
+        // Node radius ceiling. visual_config's sizes (up to 26) are drawn for a
+        // physics cloud, where a node has a neighbourhood of empty canvas
+        // around it; in the index a node shares its cell with its own label,
+        // and a 52-unit diamond above a 35-unit caption is what forced the row
+        // pitch — and therefore the zoom — to be twice what the text needed.
+        const ORDERED_NODE_EMS = 0.6;
+        const ORDERED_LABEL_WIDTH = Math.round(ORDERED_FONT * ORDERED_LABEL_EMS);
+        const ORDERED_LABEL_HEIGHT = Math.round(ORDERED_FONT * 1.25 * ORDERED_LABEL_LINES);
+        const ORDERED_NODE_MAX = Math.round(ORDERED_FONT * ORDERED_NODE_EMS);
+        const ORDERED_NODE_MIN = Math.round(ORDERED_FONT * 0.36);
+        // The reference size the vocabulary is compressed against, so the
+        // relative order of the shapes (hypothesis biggest, artefact smallest)
+        // survives the compression instead of everything clamping to one size.
+        const ORDERED_NODE_REF = 24;
+        // A column holds one wrapped label plus a hair of air; a row holds the
+        // node's full height plus the caption underneath it.
+        const ORDERED_COL = ORDERED_LABEL_WIDTH + Math.round(ORDERED_FONT * 0.6);
+        const ORDERED_ROW = ORDERED_LABEL_HEIGHT + 2 * ORDERED_NODE_MAX + Math.round(ORDERED_FONT * 0.35);
+        // Air at a lane/band boundary: a third of a cell. Stated as a fraction
+        // of the pitch it separates, for the same reason as everything else
+        // here — a boundary has to read as wider than the gutter inside a lane,
+        // and "a third of a cell" stays true if the cell ever changes size.
+        const ORDERED_LANE_GAP = Math.round(ORDERED_COL / 3);
+        const ORDERED_DATE_GAP = Math.round(ORDERED_ROW / 3);
+        const ORDERED_MAX_LANE_COLS = 8;  // a lane never grows wider than this
+        const ORDERED_CELL_ROWS = 3;      // target rows before a cell widens
+        // vis sizes these shapes to fit their label, so an unconstrained one
+        // inflates past 200 layout units and swallows its neighbours' cells.
+        // Everything else draws its label underneath and stays node-sized.
+        const LABEL_INSIDE_SHAPES = ['box', 'circle', 'database', 'ellipse', 'text'];
+        // A circle is sized to max(labelWidth, labelHeight) + margin, so it is
+        // the one shape whose caption cannot be traded for height: whatever you
+        // do to the wrap width, a full-length label produces a ~70-unit disc,
+        // which is wider than the row pitch the other nine lanes are packed at.
+        // Inside-label shapes therefore get their own, much shorter clip — the
+        // full text is one hover or one tap away, and the alternative is a
+        // question lane that overlaps the two rows either side of it.
+        const ORDERED_INSIDE_LABEL_CHARS = 10;
+        const ORDERED_INSIDE_LABEL_WIDTH = Math.round(ORDERED_FONT * 3.2);
+
+        // ---------------------------------------------------------------------
+        // NARROW SCREENS: A DIFFERENT GRID, ON PURPOSE.
+        //
+        // The arithmetic is not close. A comfortably readable label is ~11px
+        // and an average claim label is ~28 characters, so ~154px wide; a
+        // 393x830 phone leaves a 393x705 canvas, which holds about 2 columns of
+        // 27 rows = ~54 labelled nodes. The index has 93. No orientation, no
+        // pitch and no amount of effort fixes that — a fully labelled phone
+        // index at full extent is arithmetically impossible.
+        //
+        // So the narrow arrival does not pretend. It draws NO node captions at
+        // all: it is a shape-and-colour map with the axis headings naming the
+        // lanes and the bands, and the text arrives through search, the entry
+        // chips, and tapping a node.
+        //
+        // And it does not draw them at any zoom, which is worth stating because
+        // "hide them, bring them back when the reader pinches in" is the
+        // obvious fix and it does not work. A caption and the cell it sits in
+        // are both in world units, so zooming scales them together: if the
+        // caption is four times the cell's width at fit, it is four times the
+        // cell's width at every other zoom too. It is a ratio, not a size, and
+        // no camera move touches it.
+        //
+        // With no caption to clear, a cell only has to hold the node, so the
+        // pitch collapses to a small multiple of the node radius — and the
+        // nodes get BIGGER rather than smaller, because they are no longer
+        // competing with text for the cell. At the desktop pitch these same 93
+        // nodes render as 8px targets, which is under any thumb-sized minimum.
+        //
+        // The grid is also TRANSPOSED here — type down the page, date across —
+        // because the landscape ordering is ~2.3:1 and a phone canvas is 1:1.8,
+        // which is how a deterministic, correctly ordered index still managed
+        // to fill 19.6% of the screen and leave the rest white.
+        //
+        // DETERMINISM. This is the one thing in the arrival that is not a pure
+        // function of the data. Assertion 15's claim weakens from "a pure
+        // function of the data" to "a pure function of the data AND the
+        // viewport class". It is a CLASS, not a measurement: isMobileLayout()
+        // is a matchMedia boolean over one breakpoint, so every width below
+        // 768px produces byte-identical coordinates and so does every width
+        // above it. Nothing here may ever become a continuous function of the
+        // viewport — that would put a resize inside the layout and make two
+        // loads of the same data disagree.
+        // ---------------------------------------------------------------------
+        const ORDERED_NARROW_NODE_MAX = Math.round(ORDERED_FONT * 1.1);
+        // The lane pitch is the wider of the two because the grid is
+        // transposed: lanes run DOWN a canvas that is 1.8x taller than it is
+        // wide, so that is the axis with room to spend.
+        const ORDERED_NARROW_BAND_PITCH = Math.round(ORDERED_NARROW_NODE_MAX * 2.9);
+        const ORDERED_NARROW_LANE_PITCH = Math.round(ORDERED_NARROW_NODE_MAX * 4.0);
+        const ORDERED_NARROW_LANE_GAP = Math.round(ORDERED_NARROW_LANE_PITCH * 0.40);
+        const ORDERED_NARROW_DATE_GAP = Math.round(ORDERED_NARROW_BAND_PITCH * 0.40);
+        // box / circle / ellipse are sized BY their label, so with no label
+        // they collapse to a 10-unit dot. A fixed label width — of nothing —
+        // is what keeps them the size of the shapes around them.
+        const ORDERED_NARROW_INSIDE_WIDTH = 2 * ORDERED_NARROW_NODE_MAX - 10;
+
+        // ---------------------------------------------------------------------
+        // ARROW WEIGHT ON THE NARROW INDEX.
+        //
+        // An arrowhead in vis is sized by the EDGE, never by the node it points
+        // at. end-points.js draws the closed path (0,0) (-1,0.3) (-0.9,0)
+        // (-1,-0.3) scaled by
+        //
+        //     length = 15 * arrows.to.scaleFactor + 3 * edge.width
+        //
+        // so its ink is 0.27 * length^2 — it grows as the SQUARE of a number
+        // the edge style alone controls, while the node beside it is capped by
+        // the layout at ORDERED_NARROW_NODE_MAX. Nothing in the grid can push
+        // back on that, which is how the two ended up the same size.
+        //
+        // MEASURED, at 393x830, on the widths this data actually carries — note
+        // that these are NOT the 1..4 in RELATIONSHIP_STYLES, because
+        // edgeWidth() prefers rel.weight and the evidence relationships run
+        // 3..8 with a median of 6:
+        //
+        //     median arrow length   33.0 units   (15*1 + 3*6)
+        //     median arrowhead ink  294 u^2
+        //     median node ink       616 u^2      (disc of r = median size 14)
+        //     ratio                 47.8%
+        //
+        // Half a node each, 126 of them. That is not a connector, that is a
+        // second class of object on the canvas.
+        //
+        // And the 7% arrival opacity does not save it — checked rather than
+        // assumed. vis's drawArrowHead() takes its fill from the same
+        // getColor() the line strokes with, which returns
+        // overrideOpacity(values.color, values.opacity); the head really does
+        // fade to 0.07 with its line. It still reads as solid because a FILLED
+        // 33-unit triangle at 7% covers ~40x the area of a 6-unit line at 7%.
+        // Opacity was never the lever. Size is.
+        //
+        // So the edges get the compression the nodes already got.
+        // nodeDisplaySize() squeezes visual_config's vocabulary by
+        // ceiling/ORDERED_NODE_REF so the RATIOS between the shapes survive the
+        // squeeze; the edge vocabulary is squeezed by the same factor, applied
+        // to the width and the arrow scaleFactor TOGETHER so that `length`
+        // above scales linearly and the head shrinks with its line instead of
+        // outliving it.
+        //
+        //     scale 15/24 = 0.625 -> median length 20.6, ink 115 u^2, ratio 18.6%
+        //
+        // Linear and unclamped on purpose. A floor would flatten the bottom of
+        // the vocabulary, which is precisely the relative weight this has to
+        // preserve: a `refutes` edge must still read heavier than a `cites`
+        // one. The lightest width in the vocabulary (1) still lands at 0.625
+        // units, which vis draws.
+        //
+        // Narrow index only. The desktop index keeps visual_config's widths,
+        // because assertion 14 reads width / color.color / dashes straight off
+        // the DataSet at 1600x1000 to prove the threads gate style has not
+        // leaked into evidence — rescaling them there would make that assertion
+        // measure two unrelated things at once. Network view keeps them too:
+        // its nodes are drawn at visual_config's own sizes, so the arrows are
+        // already in proportion to them.
+        //
+        // Re-measure the way the numbers above were measured: read
+        // network.body.edges[id].edgeType.getArrowData(...).length for every
+        // edge, and network.body.nodes[id].options.size for every node, on a
+        // 393x830 context with the narrow index showing.
+        const NARROW_EDGE_SCALE = ORDERED_NARROW_NODE_MAX / ORDERED_NODE_REF;
+        // The head-to-node ink budget the scale above is solving for, kept next
+        // to it so the next person can check the arithmetic without re-deriving
+        // vis's arrow geometry: 0.27*length^2 <= NARROW_ARROW_INK_BUDGET*pi*r^2.
+        const NARROW_ARROW_INK_BUDGET = 0.25;
+
         // Severity gradient. "not-supported" sits immediately after "refuted":
         // "refuted" means the evidence contradicts the claim, "not-supported"
         // means the evidence simply failed to back it (a null result), and
@@ -1885,6 +2440,106 @@
         let activeRegisters = {};          // register -> bool
         let activeBasins = {};             // terminal basin -> bool
         let basinColours = {};             // basin -> hex, rebuilt per model
+
+        // ---- ordered arrival / view state -----------------------------------
+        // True when this graph HAS an ordered index available: applyOrderedLayout()
+        // has computed and stored a grid position for every node. False for
+        // dissolution (hierarchical) and isomorphism (side-pinned), which keep
+        // the layouts they already had and where the view switch is therefore
+        // inert. Note "available", not "showing" — indexViewActive() is the
+        // question "is the grid on screen right now".
+        let orderedLayoutActive = false;
+        // Shape of the live ordered layout (lanes, bands, extent), for the
+        // legend. null while another render mode supplies its own layout.
+        let orderedLayout = null;
+
+        // =====================================================================
+        // THE VIEW SWITCH — two co-equal readings of one graph.
+        //
+        //   NETWORK  force-directed. Physics running, nothing pinned, full
+        //            captions, edges at their own strength, every type in play.
+        //            This is the graph as it was before the index existed, and
+        //            it is what a first-time reader arrives in.
+        //   INDEX    the ordered grid. Type across, date down, every node
+        //            pinned to an integer coordinate, edges quiet, axes named.
+        //
+        // Same nodes, same edges, same DataSets, same vis.Network. Only the
+        // layout, the typography and the default scope differ — which is
+        // exactly why this is a switch over one render and NOT a second render
+        // mode: nothing here touches `layoutOverride`, so the hierarchical
+        // layout leak that loadAndInitialize() guards against is not reachable
+        // from the switch at all. Read the comment above `layoutOverride =
+        // null` before changing that.
+        //
+        // Built ON TOP OF the pre-existing explore flag rather than beside it.
+        // Two independent booleans both meaning "physics is running" is how a
+        // viewer ends up drawing the index's clipped captions over an unpinned
+        // cloud; there is exactly one, and `exploreMode === true` IS the
+        // network view.
+        // =====================================================================
+        const VIEW_NETWORK = 'network';
+        const VIEW_INDEX = 'index';
+        // THE OWNER'S CALL, written down once. The graph they already had is
+        // the graph the page opens on; the index is a view of it, not a
+        // replacement for it. One edit here flips the default for a first-time
+        // visitor and nothing else in this file has an opinion.
+        const DEFAULT_VIEW = VIEW_NETWORK;
+        const VIEW_STORAGE_KEY = 'lucier-graph-view';
+
+        // A remembered choice beats the default. Anything else — storage
+        // disabled, private mode, a value some older build wrote — falls back
+        // to the default instead of throwing: localStorage.getItem can THROW in
+        // a locked-down browser rather than merely returning null, so this is
+        // guarded and not just null-checked. A viewer that white-screens
+        // because cookies are off is a worse bug than a forgotten preference.
+        function readStoredView() {
+            try {
+                const raw = window.localStorage.getItem(VIEW_STORAGE_KEY);
+                if (raw === VIEW_NETWORK || raw === VIEW_INDEX) return raw;
+            } catch (e) { /* storage unavailable: the default stands */ }
+            return DEFAULT_VIEW;
+        }
+
+        function storeView(view) {
+            try { window.localStorage.setItem(VIEW_STORAGE_KEY, view); } catch (e) { /* ditto */ }
+        }
+
+        // The reader's standing preference, which is not the same thing as what
+        // is on screen: on a graph with no index (isomorphism, dissolution) the
+        // preference is remembered but cannot be honoured, and switching back
+        // to evidence must land where the reader left off rather than on the
+        // default.
+        let preferredView = readStoredView();
+
+        // Which reading is on screen. true = NETWORK (every node released, the
+        // solver has its degrees of freedom back); false = INDEX (every node
+        // pinned, so the solver has nothing to integrate and the picture cannot
+        // wobble). Still called exploreMode because Explore is what it grew out
+        // of and setExploreMode()/toggleExplore() still drive it.
+        let exploreMode = false;
+        // ---- edge emphasis ---------------------------------------------------
+        // The node the reader is currently making the subject — hovered, or
+        // selected. Drives which relationships are drawn at full strength; see
+        // applyEdgeEmphasis().
+        let edgeFocusNodeId = null;
+        // Last emphasis state written to the DataSet, so a mouse crossing the
+        // canvas does not rewrite 131 edges per frame.
+        let edgeEmphasisSignature = null;
+        // Which edge weight the DataSet is currently carrying (see
+        // NARROW_EDGE_SCALE), so a resize that does not cross the breakpoint —
+        // which on a phone is every scroll-driven toolbar resize — costs
+        // nothing.
+        let edgeWeightSignature = null;
+
+        // ---- front matter ---------------------------------------------------
+        // threads.json read for the entry points. Deliberately a separate
+        // global from `threadsReport`: threads mode owns that one and the
+        // evidence graph must leave it null, so the front matter cannot be
+        // mistaken for a threads-mode overlay that failed to clear.
+        let indexOverlay = null;
+        let indexOverlayTried = false;
+        let entryPointIds = {};            // entry key -> {nodeId: true} or null
+        let activeEntryPoint = 'claims';
 
         // ---- threads state -------------------------------------------------
         let threadsReport = null;          // parsed threads.json, or null
@@ -2269,6 +2924,990 @@
                 });
             });
             return true;
+        }
+
+        // =====================================================================
+        // Ordered arrival layout. See the ORDERED_* block above for why.
+        //
+        // Every decision here is a total order over data that is already on
+        // the node record — lane order from ORDERED_LANES, band order from the
+        // parsed date, position inside a cell from the id. Nothing consults a
+        // random seed, the viewport, the clock or the previous render, which is
+        // what makes two consecutive loads produce identical coordinates.
+        //
+        // Returns true when it pinned something.
+        // =====================================================================
+        function orderedDateKey(node) {
+            const t = node ? node.asserted : null;
+            return (t === null || t === undefined || !isFinite(t)) ? '' : String(t);
+        }
+
+        function orderedLanesFor(nodes) {
+            const lanes = ORDERED_LANES.filter(function (type) {
+                return nodes.some(function (n) { return (n.entityType || '') === type; });
+            });
+            // A type the vocabulary has never seen still gets a lane of its
+            // own rather than being dropped into someone else's: appended in
+            // sorted order, so it is deterministic too.
+            const extra = [];
+            nodes.forEach(function (n) {
+                const type = n.entityType || 'unknown';
+                if (lanes.indexOf(type) === -1 && extra.indexOf(type) === -1) extra.push(type);
+            });
+            extra.sort();
+            return lanes.concat(extra);
+        }
+
+        function orderedDateBands(nodes) {
+            const keys = [];
+            nodes.forEach(function (n) {
+                const key = orderedDateKey(n);
+                if (keys.indexOf(key) === -1) keys.push(key);
+            });
+            // Undated last: "we never wrote down when" belongs after the record.
+            keys.sort(function (a, b) {
+                if (a === b) return 0;
+                if (a === '') return 1;
+                if (b === '') return -1;
+                return Number(a) - Number(b);
+            });
+            return keys;
+        }
+
+        // The two shapes of the grid. `transposed` is the narrow-screen class —
+        // see the ORDERED_NARROW_* comment for why a phone gets a different one
+        // and what that costs assertion 15's purity claim. Reading the class
+        // through one function keeps the "discrete class, never a measurement"
+        // rule in one place instead of scattered across the layout.
+        function orderedGridMetrics() {
+            if (isMobileLayout()) {
+                return {
+                    transposed: true,
+                    lanePitch: ORDERED_NARROW_LANE_PITCH,
+                    bandPitch: ORDERED_NARROW_BAND_PITCH,
+                    laneGap: ORDERED_NARROW_LANE_GAP,
+                    bandGap: ORDERED_NARROW_DATE_GAP
+                };
+            }
+            return {
+                transposed: false,
+                lanePitch: ORDERED_COL,
+                bandPitch: ORDERED_ROW,
+                laneGap: ORDERED_LANE_GAP,
+                bandGap: ORDERED_DATE_GAP
+            };
+        }
+
+        function applyOrderedLayout(nodes) {
+            if (!nodes || !nodes.length) return false;
+
+            const lanes = orderedLanesFor(nodes);
+            const bands = orderedDateBands(nodes);
+            if (!lanes.length || !bands.length) return false;
+
+            const grid = orderedGridMetrics();
+
+            // Bucket into (lane, band) cells, each sorted by id.
+            const cells = {};
+            nodes.forEach(function (node) {
+                const lane = lanes.indexOf(node.entityType || 'unknown');
+                const band = bands.indexOf(orderedDateKey(node));
+                const key = lane + '|' + band;
+                if (!cells[key]) cells[key] = [];
+                cells[key].push(node);
+            });
+            Object.keys(cells).forEach(function (key) {
+                cells[key].sort(function (a, b) {
+                    return a.id < b.id ? -1 : (a.id > b.id ? 1 : 0);
+                });
+            });
+
+            // A lane is as wide as its busiest cell needs to stay ~4 rows tall,
+            // capped so no single lane can run away with the canvas.
+            const laneCols = lanes.map(function (type, lane) {
+                let max = 0;
+                bands.forEach(function (b, band) {
+                    const cell = cells[lane + '|' + band];
+                    if (cell) max = Math.max(max, cell.length);
+                });
+                return clamp(Math.ceil(max / ORDERED_CELL_ROWS), 1, ORDERED_MAX_LANE_COLS);
+            });
+
+            // A band is as tall as the tallest cell in it, so bands never overlap.
+            const bandRows = bands.map(function (b, band) {
+                let max = 1;
+                lanes.forEach(function (type, lane) {
+                    const cell = cells[lane + '|' + band];
+                    if (cell) max = Math.max(max, Math.ceil(cell.length / laneCols[lane]));
+                });
+                return max;
+            });
+
+            // Everything below is computed on the two grid AXES — `lane` runs
+            // along one, `band` along the other — and only mapped onto x/y at
+            // the very end. That is what makes the transposed narrow layout one
+            // extra line instead of a second copy of the arithmetic.
+            const laneAt = [];
+            let laneSpan = 0;
+            lanes.forEach(function (type, lane) {
+                laneAt.push(laneSpan);
+                laneSpan += laneCols[lane] * grid.lanePitch + grid.laneGap;
+            });
+            laneSpan = Math.max(0, laneSpan - grid.laneGap);
+
+            const bandAt = [];
+            let bandSpan = 0;
+            bands.forEach(function (b, band) {
+                bandAt.push(bandSpan);
+                bandSpan += bandRows[band] * grid.bandPitch + grid.bandGap;
+            });
+            bandSpan = Math.max(0, bandSpan - grid.bandGap);
+
+            // Centred on the origin: vis has nothing left to shift.
+            Object.keys(cells).forEach(function (key) {
+                const parts = key.split('|');
+                const lane = Number(parts[0]);
+                const band = Number(parts[1]);
+                const cols = laneCols[lane];
+                cells[key].forEach(function (node, i) {
+                    const along = laneAt[lane] + (i % cols) * grid.lanePitch - laneSpan / 2;
+                    const down = bandAt[band] + Math.floor(i / cols) * grid.bandPitch - bandSpan / 2;
+                    node.x = Math.round(grid.transposed ? down : along);
+                    node.y = Math.round(grid.transposed ? along : down);
+                    node.fixed = { x: true, y: true };
+                });
+            });
+
+            // Where the axis headings hang: the centre of each lane and each
+            // band, in world coordinates, plus which screen axis each one runs
+            // along. Computed here rather than in the overlay because this is
+            // the only place that knows the grid's arithmetic, and an overlay
+            // that re-derives it is an overlay that drifts out of step with it.
+            const laneCentres = lanes.map(function (type, lane) {
+                return Math.round(laneAt[lane] + ((laneCols[lane] - 1) / 2) * grid.lanePitch - laneSpan / 2);
+            });
+            // A band heading anchors to where the band BEGINS, not to its
+            // middle. The middle of a band is occupied — that is where the
+            // nodes and their captions are — whereas the run-up to it is the
+            // band gap, which is empty by construction. Same reason a ruler
+            // puts its number at the tick and not between two of them.
+            const bandAnchors = bands.map(function (b, band) {
+                return Math.round(bandAt[band] - grid.bandPitch * 0.36 - bandSpan / 2);
+            });
+
+            orderedLayout = {
+                lanes: lanes,
+                laneCols: laneCols,
+                bands: bands,
+                bandRows: bandRows,
+                transposed: grid.transposed,
+                laneAxis: grid.transposed ? 'y' : 'x',
+                bandAxis: grid.transposed ? 'x' : 'y',
+                laneCentres: laneCentres,
+                bandAnchors: bandAnchors,
+                width: grid.transposed ? bandSpan : laneSpan,
+                height: grid.transposed ? laneSpan : bandSpan
+            };
+            return true;
+        }
+
+        // In the ordered arrival the label is a scanning aid, so it is clipped
+        // and wrapped to a fixed column width. The untruncated text is still on
+        // the node record, in the tooltip and in the details panel — nothing is
+        // lost, it is only not shouted. Explore mode restores the full label.
+        //
+        // On a narrow screen the arrival draws no caption at all, at any zoom;
+        // see the ORDERED_NARROW_* comment for why that is arithmetic and not
+        // defeatism. The full text is still on the node record, in the tooltip,
+        // and in the details panel a tap opens.
+        function orderedNarrowLayout() {
+            return orderedLayoutActive && !!orderedLayout && orderedLayout.transposed === true;
+        }
+
+        // A leading "Q: " is type boilerplate, and the shape already says
+        // "question" — so inside a circle, where the clip is ORDERED_INSIDE_LABEL_CHARS
+        // characters wide, those three are 30% of the budget spent restating what
+        // the reader can see. Dropping them is worth more than it looks: it takes
+        // the question lane from two pairs of byte-identical drawn labels
+        // ("Q: Is the…" twice, "Q: What do…" twice) down to one, because the
+        // characters recovered are the first ones that actually differ.
+        const LABEL_TYPE_PREFIX = /^Q:\s*/;
+
+        // The narrow index's "no caption" label is a SPACE, not the empty
+        // string, and that is not a style choice.
+        //
+        // vis's Label.setOptions() only marks the label dirty when
+        // isValidLabel() passes, and isValidLabel is
+        // `typeof v === 'string' && v !== ''`. Assigning '' therefore does not
+        // re-measure anything — it sets options.label to undefined so nothing
+        // is DRAWN, while the cached text metrics from whatever the label used
+        // to be survive untouched. For every shape that is sized by its own
+        // label box that is a stale size, not a hidden caption: switching from
+        // Network to the narrow index left the twelve question circles at
+        // radius 234 instead of 15, measured, because their unwrapped
+        // network-view captions were still what vis thought their labels were.
+        // The same bug fires on a desktop window dragged narrow while the index
+        // is showing.
+        //
+        // A single space is a valid label, so it re-measures. It draws nothing,
+        // and nodeWidthConstraint() below is what actually sets the box.
+        const ORDERED_NARROW_BLANK_LABEL = ' ';
+
+        function nodeDisplayLabel(node) {
+            if (!orderedLayoutActive || exploreMode) return node.label;
+            if (orderedNarrowLayout()) return ORDERED_NARROW_BLANK_LABEL;
+            const inside = LABEL_INSIDE_SHAPES.indexOf(node.shape) !== -1;
+            const text = inside ? node.label.replace(LABEL_TYPE_PREFIX, '') : node.label;
+            return truncate(text, inside ? ORDERED_INSIDE_LABEL_CHARS : ORDERED_LABEL_CHARS);
+        }
+
+        // Every shape gets a wrap width in the index, not just the ones that
+        // draw their label inside. Without one a caption runs on for ~185 world
+        // units, which is wider than two columns: the labels collide with their
+        // neighbours' and fit() has to zoom out far enough to contain the
+        // overhang, which is the same 4.94px bug from the other direction.
+        function nodeWidthConstraint(node) {
+            if (!orderedLayoutActive || exploreMode) return false;
+            const inside = LABEL_INSIDE_SHAPES.indexOf(node.shape) !== -1;
+            if (orderedNarrowLayout()) {
+                // Nothing to wrap here — this pins the label BOX of the shapes
+                // that are sized by it, so an unlabelled circle does not arrive
+                // as a 10-unit speck beside a 30-unit diamond.
+                return inside
+                    ? { minimum: ORDERED_NARROW_INSIDE_WIDTH, maximum: ORDERED_NARROW_INSIDE_WIDTH }
+                    : false;
+            }
+            return inside
+                ? { maximum: ORDERED_INSIDE_LABEL_WIDTH }
+                : { maximum: ORDERED_LABEL_WIDTH };
+        }
+
+        // The index's node sizes are a compression of visual_config's, not a
+        // replacement: the ratios between the shapes are preserved, the
+        // absolute heights are brought down to something a cell can hold above
+        // its own caption. On the narrow index there is no caption to hold, so
+        // the ceiling goes UP — the node is the only thing in the cell, and it
+        // is also the tap target. Outside the ordered arrival nothing changes.
+        function nodeDisplaySize(node) {
+            if (!orderedLayoutActive || exploreMode) return node.size;
+            const ceiling = orderedNarrowLayout() ? ORDERED_NARROW_NODE_MAX : ORDERED_NODE_MAX;
+            const floor = Math.max(ORDERED_NODE_MIN, Math.round(ceiling * 0.6));
+            const raw = Number(node.size);
+            if (!isFinite(raw) || raw <= 0) return ceiling;
+            return clamp(Math.round(raw * ceiling / ORDERED_NODE_REF), floor, ceiling);
+        }
+
+        // Guarded like nodeDisplayLabel/nodeWidthConstraint/nodeDisplaySize, and
+        // for the same reason: these sizes and this colour are chosen to make the
+        // ordered grid's pitch work. Dissolution and isomorphism draw their own
+        // layouts and never asked for index typography — without the guard they
+        // silently inherited it, because unlike its three siblings this one
+        // returned the ordered values unconditionally.
+        function nodeDisplayFont(node) {
+            if (!orderedLayoutActive || exploreMode) return node.font;
+            const size = (node.nodeType === 'claim') ? ORDERED_FONT : ORDERED_FONT_SMALL;
+            return { size: size, color: '#2c3e50' };
+        }
+
+        // =====================================================================
+        // QUIET EDGES — an index's edges are not its content.
+        //
+        // The ordered grid separates related nodes on purpose: a finding and
+        // the hypothesis it supports are in different lanes by definition, and
+        // often in different date bands too. Ordering the graph therefore made
+        // every edge long. Measured on arrival: 131 edges, mean length 997
+        // world units, 130,552 units of edge ink against 47,525 for the same
+        // data under physics — 2.75x more line on the page, sweeping across
+        // every lane boundary the grid was drawn to establish. The reader's
+        // first look at the index was mostly other people's arrows.
+        //
+        // So on arrival the edges recede to ORDERED_EDGE_QUIET_OPACITY, and
+        // they come back the moment a relationship is what the reader is
+        // actually asking about:
+        //
+        //   hover / select a node   -> that node's own edges, at full strength,
+        //                              which is the question "what is this
+        //                              connected to?" answered in place
+        //   an active search        -> all of them; a search is a claim about
+        //                              the whole graph, not one node
+        //   Explore                 -> all of them; explore IS the structure
+        //   threads mode            -> all of them; the gate edges are the
+        //                              entire point of that mode, and assertion
+        //                              14 checks they are drawn
+        //
+        // ONLY `color.opacity` is written. Not `hidden` — a hidden edge changes
+        // what vis's fit() and its physics see. Not `width`, not `color.color`,
+        // not `dashes` — assertion 14 reads exactly those three off the DataSet
+        // to prove the threads gate style has not leaked into evidence, and a
+        // readability change has no business touching them. And nothing here
+        // goes near a coordinate: quieting the edges cannot move a node.
+        // =====================================================================
+        const ORDERED_EDGE_QUIET_OPACITY = 0.07;
+
+        function edgesShouldRecede() {
+            return indexViewActive() &&
+                renderMode !== 'threads' && !searchTerm;
+        }
+
+        function applyEdgeEmphasis() {
+            if (!edgesDataSet || !allEdges || !allEdges.length) return;
+            const recede = edgesShouldRecede();
+            const focus = recede ? edgeFocusNodeId : null;
+            const signature = recede ? ('quiet:' + (focus || '')) : 'loud';
+            if (signature === edgeEmphasisSignature) return;
+            edgeEmphasisSignature = signature;
+
+            edgesDataSet.update(allEdges.map(function (edge) {
+                const loud = !recede ||
+                    (focus !== null && (edge.from === focus || edge.to === focus));
+                // Rebuilt from the edge's own colour record every time, so the
+                // base colour is never read back out of a previously dimmed row.
+                const base = (edge.color && typeof edge.color === 'object')
+                    ? edge.color
+                    : (typeof edge.color === 'string' ? { color: edge.color } : {});
+                // "Loud" restores the edge's OWN opacity rather than forcing 1:
+                // the dissolution transitions are drawn at 0.85 on purpose, and
+                // a restore that hard-codes full strength repaints another
+                // mode's edges brighter than that mode ever asked for.
+                const full = (base.opacity === undefined) ? 1 : base.opacity;
+                return {
+                    id: edge.id,
+                    color: Object.assign({}, base, {
+                        opacity: loud ? full : ORDERED_EDGE_QUIET_OPACITY
+                    }),
+                    // The edge LABEL has to go too. It is drawn on a white
+                    // halo at full strength regardless of the edge's opacity,
+                    // so quieting only the line leaves 131 stencilled words
+                    // ("supports", "corrects", "qualifies") lying across the
+                    // index — which is most of the clutter the reader was
+                    // complaining about, still there.
+                    font: loud ? (edge.font || { size: 10 }) : { size: 0 }
+                };
+            }));
+        }
+
+        function setEdgeFocus(nodeId) {
+            const next = nodeId || null;
+            if (next === edgeFocusNodeId) return;
+            edgeFocusNodeId = next;
+            applyEdgeEmphasis();
+        }
+
+        // =====================================================================
+        // EDGE WEIGHT — see the NARROW_EDGE_SCALE comment for the measurements.
+        //
+        // Deliberately separate from applyEdgeEmphasis(). Emphasis writes
+        // color.opacity and font and nothing else, on purpose, because
+        // assertion 14 reads width / color.color / dashes off the DataSet to
+        // prove the threads gate style has not leaked into evidence. This
+        // writes width and arrows and nothing else. Merging them would put a
+        // per-hover rewrite in charge of the numbers that assertion reads.
+        //
+        // Nothing here goes near a coordinate. Edge width has no input into
+        // vis's fit() or its layout, so on every breakpoint the nodes are
+        // exactly where they were.
+        // =====================================================================
+        function narrowEdgeScale() {
+            // Gated on the VIEWPORT, not on the view. Scoping this to the
+            // ordered index left the complaint that prompted it — "the arrows
+            // are too thick relative to the elements (on phone)" — standing in
+            // the view a phone now opens on. Measured at 393x830, median
+            // arrowhead against median node area:
+            //
+            //     index view    16.1%   (scaled)
+            //     network view  27.2%   (unscaled, and it is the default)
+            //
+            // so the reader most likely to hit it was the one still getting it.
+            // The scale is derived from the index's node ceiling, but network
+            // view's nodes on a phone land within a unit of that ceiling, so it
+            // is the right factor for both.
+            //
+            // matchMedia is read directly rather than through isMobileLayout():
+            // that helper closes over a `const` declared ~2000 lines below, and
+            // this runs during the first render.
+            const narrow = typeof window.matchMedia === 'function' &&
+                window.matchMedia('(max-width: 768px)').matches;
+            return narrow ? NARROW_EDGE_SCALE : 1;
+        }
+
+        // vis's `arrows` is a string ('to', '', 'to;from') in the form
+        // normalizeArrows() produces, and scaleFactor only exists in the object
+        // form — so the string is PARSED rather than replaced. An edge with no
+        // head (analogous-to, breaks-down-at, both drawn headless on purpose)
+        // must not grow one here, which is what a blanket `{to: {...}}` would
+        // do to fourteen of them.
+        function arrowsAtScale(raw, scale) {
+            if (raw && typeof raw === 'object') return raw;  // already explicit; leave it alone
+            const ends = String(raw === undefined || raw === null ? 'to' : raw)
+                .split(';')
+                .map(function (s) { return s.trim(); })
+                .filter(Boolean);
+            const spec = {};
+            ['to', 'from', 'middle'].forEach(function (end) {
+                spec[end] = { enabled: ends.indexOf(end) !== -1, scaleFactor: scale };
+            });
+            return spec;
+        }
+
+        function applyEdgeWeight() {
+            if (!edgesDataSet || !allEdges || !allEdges.length) return;
+            const scale = narrowEdgeScale();
+            const signature = String(scale);
+            if (signature === edgeWeightSignature) return;
+            edgeWeightSignature = signature;
+            const narrow = scale !== 1;
+            edgesDataSet.update(allEdges.map(function (edge) {
+                return {
+                    id: edge.id,
+                    // Rebuilt from the edge's own record every time, never read
+                    // back out of a previously scaled row — otherwise crossing
+                    // the breakpoint twice would compound the scale.
+                    width: edge.width * scale,
+                    // On the way back to full weight the original string form
+                    // is restored rather than an object with scaleFactor 1, so
+                    // a wide DataSet is byte-identical to one that never
+                    // visited the narrow breakpoint.
+                    arrows: narrow ? arrowsAtScale(edge.arrows, scale) : edge.arrows
+                };
+            }));
+        }
+
+        // The head-to-node ink ratio, printed where the next person to touch
+        // NARROW_EDGE_SCALE will see it without building a harness first — the
+        // same idea as reportOrderedLegibility(), for the same reason. vis's
+        // own arrow geometry is asked rather than re-derived, so this cannot
+        // drift away from what is drawn.
+        function reportNarrowArrowWeight() {
+            if (!network || !edgesDataSet || narrowEdgeScale() === 1) return;
+            const median = function (values) {
+                if (!values.length) return 0;
+                const s = values.slice().sort(function (a, b) { return a - b; });
+                const m = s.length >> 1;
+                return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+            };
+            let ctx;
+            try {
+                ctx = document.querySelector('#graph canvas').getContext('2d');
+            } catch (e) { return; }
+            const lengths = [];
+            Object.keys(network.body.edges).forEach(function (id) {
+                const edge = network.body.edges[id];
+                if (!edge || !edge.edgeType) return;
+                const values = edge.getFormattingValues();
+                if (values.hidden || !values.toArrow) return;
+                try {
+                    const data = edge.edgeType.getArrowData(
+                        ctx, 'to', edge.edgeType.getViaNode(), false, false, values);
+                    if (data && isFinite(data.length)) lengths.push(data.length);
+                } catch (e) { /* an edge vis cannot place has no head to measure */ }
+            });
+            const sizes = [];
+            Object.keys(network.body.nodes).forEach(function (id) {
+                const node = network.body.nodes[id];
+                if (!node || !node.options || node.options.hidden) return;
+                const size = Number(node.options.size);
+                if (isFinite(size) && size > 0) sizes.push(size);
+            });
+            if (!lengths.length || !sizes.length) return;
+            // 0.27 * length^2 is the area of vis's arrow polygon; pi * r^2 is
+            // the node as a disc of its drawn radius.
+            const head = 0.27 * Math.pow(median(lengths), 2);
+            const node = Math.PI * Math.pow(median(sizes), 2);
+            console.log('Narrow index arrows: scale ' + NARROW_EDGE_SCALE.toFixed(3) +
+                ', median head ' + median(lengths).toFixed(1) + ' units = ' + head.toFixed(0) +
+                'u^2 against a median node of ' + node.toFixed(0) + 'u^2 — ' +
+                (head / node * 100).toFixed(1) + '% (budget <= ' +
+                (NARROW_ARROW_INK_BUDGET * 100).toFixed(0) + '%)');
+        }
+
+        // The one number the grid pitch is solving for, printed where the next
+        // person to touch ORDERED_COL will see it without having to build a
+        // harness first. Effective label size is font size * zoom, and nothing
+        // else; if this prints below ORDERED_TARGET_LABEL_PX on a desktop then
+        // the constants are wrong for this data, not the reader's eyesight.
+        function reportOrderedLegibility() {
+            if (!network || !orderedLayout) return;
+            const scale = network.getScale();
+            const px = ORDERED_FONT * scale;
+            console.log('Ordered index: ' +
+                (orderedLayout.transposed ? 'narrow (transposed, captions off)' : 'wide') +
+                ', fit scale ' + scale.toFixed(3) +
+                ', effective label ' + px.toFixed(2) + 'px' +
+                (orderedLayout.transposed
+                    ? ' — not drawn; see the ORDERED_NARROW_* comment'
+                    : ' (target >= ' + ORDERED_TARGET_LABEL_PX + 'px)'));
+        }
+
+        // Searching is how a reader reads one entry on a phone, and a search
+        // that cuts 93 nodes down to three and leaves the camera at full extent
+        // has handed them three 18px dots to find by eye. So on the narrow
+        // index — and only there — a search re-frames on what survived it. On a
+        // desktop the captions are legible where they already are, and moving
+        // the camera out from under someone who can see the answer is worse
+        // than leaving it alone.
+        function frameNarrowSearch() {
+            if (!orderedNarrowLayout() || !network || !nodesDataSet) return;
+            const alive = nodesDataSet.get().filter(function (n) { return n.hidden !== true; });
+            if (!alive.length) return;   // nothing matched: keep the last view
+            network.fit({ nodes: alive.map(function (n) { return n.id; }), animation: false });
+        }
+
+        // =====================================================================
+        // DRIVING THE VIEW SWITCH. See the VIEW_NETWORK/VIEW_INDEX block above
+        // for what the two views are and why there is only one flag.
+        //
+        // Entering NETWORK: every node is released — `fixed: false` and no
+        // coordinate written — and the solver takes over. Entering INDEX: the
+        // grid is RECOMPUTED from the data and the resulting integers are
+        // written back, so the ordered arrangement returns exactly, the same
+        // integers and not merely the same shape.
+        //
+        // `physics.enabled` itself is never switched off in either direction.
+        // With every node fixed the solver has nothing to integrate, which is
+        // what "physics off in the index" means in practice, and it is what
+        // keeps the network's own options honest for assertion 15's round trip.
+        // =====================================================================
+        function indexViewActive() {
+            return orderedLayoutActive && !exploreMode;
+        }
+
+        function currentView() {
+            return exploreMode ? VIEW_NETWORK : VIEW_INDEX;
+        }
+
+        // There is something to switch between only where an index exists.
+        // Isomorphism pins its own columns and dissolution renders
+        // hierarchically; both leave orderedLayoutActive false, and the switch
+        // goes inert there exactly as the Explore button already did.
+        function viewSwitchAvailable() {
+            return orderedLayoutActive && !!network && !!nodesDataSet;
+        }
+
+        function updateViewSwitch() {
+            const view = currentView();
+            // Both switches, from one place. #view-switch is the desktop
+            // control in the filter bar; #view-float is its phone-only twin on
+            // the canvas, which exists because #chip-bar is display:none until
+            // the reader taps "Filters". Driving them from a single loop is the
+            // point -- two controls for one piece of state is only safe while
+            // nothing can update one and forget the other.
+            ['view-switch', 'view-float'].forEach(function (id) {
+                const group = document.getElementById(id);
+                if (group) group.classList.toggle('mode-hidden', !orderedLayoutActive);
+            });
+            [[VIEW_NETWORK, 'view-network'], [VIEW_INDEX, 'view-index'],
+             [VIEW_NETWORK, 'view-float-network'], [VIEW_INDEX, 'view-float-index']
+            ].forEach(function (pair) {
+                const el = document.getElementById(pair[1]);
+                if (!el) return;
+                const on = orderedLayoutActive && pair[0] === view;
+                el.classList.toggle('view-active', on);
+                el.setAttribute('aria-pressed', on ? 'true' : 'false');
+            });
+            // The header button this superseded. Gone from the markup, but a
+            // fork that still has it keeps a working control rather than a dead
+            // one that lies about which view is showing.
+            const btn = document.getElementById('btn-explore');
+            if (btn) {
+                btn.textContent = exploreMode ? 'Back to the index' : 'Explore';
+                btn.setAttribute('aria-pressed', exploreMode ? 'true' : 'false');
+                btn.classList.toggle('mode-hidden', !orderedLayoutActive);
+            }
+        }
+
+        // Called under its old name by applyModeVisibility() and
+        // loadAndInitialize(), which have done so since before there was a
+        // switch. Kept rather than renamed at every call site, because the one
+        // thing this function has always meant — "make the control agree with
+        // the state" — has not changed.
+        function updateExploreButton() {
+            updateViewSwitch();
+        }
+
+        // options.remember === false   do not write the preference (used when
+        //                              the switch is being restored, not chosen)
+        // options.scope    === 'keep'  leave the chip row alone
+        function setViewMode(view, options) {
+            const want = (view === VIEW_NETWORK) ? VIEW_NETWORK : VIEW_INDEX;
+            const opts = options || {};
+
+            // The preference is the READER'S, so it is recorded even when the
+            // graph on screen cannot honour it: asking for Network while
+            // isomorphism is showing and then switching to evidence must land
+            // in Network, not back on the default.
+            if (opts.remember !== false) {
+                preferredView = want;
+                storeView(want);
+            }
+            if (!viewSwitchAvailable() || want === currentView()) {
+                updateViewSwitch();
+                return;
+            }
+            exploreMode = (want === VIEW_NETWORK);
+
+            // INDEX is entered from the DATA, never from whatever is on screen.
+            // applyOrderedLayout() is a pure function of the nodes and the
+            // viewport class, so recomputing it here costs nothing and closes
+            // the one hole a stored layout leaves: a window that crossed the
+            // 768px breakpoint while Network was showing would otherwise hand
+            // the reader the other breakpoint's grid, because
+            // reflowOrderedLayoutForBreakpoint() deliberately does nothing
+            // while the grid is not being drawn.
+            if (!exploreMode) applyOrderedLayout(allNodes);
+
+            nodesDataSet.update(allNodes.map(function (node) {
+                const record = {
+                    id: node.id,
+                    label: nodeDisplayLabel(node),
+                    widthConstraint: nodeWidthConstraint(node),
+                    size: nodeDisplaySize(node),
+                    font: nodeDisplayFont(node)
+                };
+                if (exploreMode) {
+                    // Released, and given no coordinate at all. Writing the
+                    // grid position back unpinned would not be the network view
+                    // the reader had before the index existed — it would be a
+                    // force-directed run seeded from a grid, which converges
+                    // somewhere else.
+                    record.fixed = false;
+                } else {
+                    if (node.x !== undefined) record.x = node.x;
+                    if (node.y !== undefined) record.y = node.y;
+                    record.fixed = (node.fixed === undefined) ? false : node.fixed;
+                }
+                return record;
+            }));
+
+            // Each view arrives on its own default scope — the same one a fresh
+            // load in that view would give: NETWORK is the whole graph (175
+            // nodes on evidence), INDEX is the 93 claims. Switching view is a
+            // statement about which READING you want, so it re-states that
+            // reading's scope rather than carrying the other one's filter
+            // across. A reader who lands in Network still holding the
+            // claims-only chip row is looking at the index's node set drawn as
+            // a cloud, which is neither view.
+            if (opts.scope !== 'keep') {
+                focusedNodeIds = null;
+                applyDefaultTypeSelection();
+                syncChipClasses();
+            }
+
+            network.setOptions({ physics: { enabled: true } });
+            // Network view is where the structure IS the subject, so the edges
+            // come all the way back up and back to full weight; the index
+            // quiets them and, on a phone, compresses them again.
+            applyEdgeWeight();
+            // Repaints labels, sizes, fonts, hidden flags, the legend and the
+            // edge emphasis in one pass, from the flag that has just changed.
+            applyVisualState();
+
+            if (exploreMode) {
+                try { network.startSimulation(); } catch (e) { /* older vis builds */ }
+
+                // FRAME IT. Releasing the pins lets the solver expand the graph
+                // far past the index's extent while the camera is still on the
+                // index's zoom and pan. Measured share of nodes left on canvas
+                // after switching Index -> Network without this:
+                //
+                //     desktop 1600x950   100% on arrival ->  9.7%, 8.6% at +6s
+                //     phone   393x830    100% on arrival -> 13.1%, 11.4% at +6s
+                //
+                // It never recovers, because the framing on a fresh load comes
+                // from initNetwork's stabilization handler and startSimulation()
+                // on an already-built network does not re-run it. An explicit
+                // fit() puts it back to 100%, so this is a missing call and not
+                // a layout fault.
+                //
+                // Fitted twice deliberately: once now, so the switch is never
+                // off-screen even for a frame, and once when the solver settles,
+                // because the extent it settles to is not the extent it starts
+                // from. The guard matters — the reader can be back in the index
+                // long before 60 iterations finish.
+                network.fit();
+                network.once('stabilizationIterationsDone', function () {
+                    if (exploreMode && network) network.fit({ animation: true });
+                });
+                try { network.stabilize(60); } catch (e) { /* older vis builds */ }
+
+                showToast('Network view: physics on. Drag nodes; Index restores the ordered grid.');
+            } else {
+                try { network.stopSimulation(); } catch (e) { /* older vis builds */ }
+                // REDRAW BEFORE FITTING. vis sizes a node when it DRAWS it —
+                // node.width/height are set in resize(ctx) — and fit() reads
+                // those cached sizes. Rewriting 175 labels and immediately
+                // asking for a fit therefore measures the extent of the OTHER
+                // view's captions: full-length and unwrapped, ~185 world units
+                // each instead of ORDERED_LABEL_WIDTH's 91. Measured: fit scale
+                // 0.457 instead of 0.873, every caption at 6.39px. That is the
+                // 4.94px illegible-index bug from the ORDERED_COL comment
+                // arriving by a completely different route, and assertion 16 is
+                // what caught it.
+                //
+                // A setTimeout alone does NOT fix it, which is worth stating
+                // because it is the obvious fix: the index has just pinned
+                // every node and stopped the simulation, so there is no render
+                // loop left to produce the draw the deferred fit is waiting
+                // for. redraw() is synchronous and unconditional, so it is the
+                // thing that actually re-measures. The timeout stays anyway, to
+                // let the disclosure/legend reflow this switch may have caused
+                // land before fitOrderedLayout() reads the legend's width.
+                setTimeout(function () {
+                    if (!indexViewActive() || !network) return;   // switched back meanwhile
+                    network.redraw();
+                    fitOrderedLayout();
+                    updateAxisOverlay();
+                    reportOrderedLegibility();
+                    reportNarrowArrowWeight();
+                }, 60);
+                showToast('Index view: type across, date down');
+            }
+            updateViewSwitch();
+            updateAxisOverlay();
+            updateSearchStatus();
+        }
+
+        // Explore WAS the network view all along; it just could not be arrived
+        // in and could not be remembered. Both names are kept working because
+        // they are the documented way in for anything outside this file.
+        function setExploreMode(on) {
+            setViewMode(on ? VIEW_NETWORK : VIEW_INDEX);
+        }
+
+        function toggleExplore(force) {
+            setExploreMode(force === undefined ? !exploreMode : !!force);
+        }
+
+        // #legend is an overlay pinned to the top-left corner of the canvas, and
+        // fit() knows nothing about it — so the leftmost lane (hypotheses, the
+        // thing a reader most wants first) lands underneath it. Now that the
+        // captions are meant to be READ that is not a cosmetic problem: it
+        // hides a twelfth of the index behind a key.
+        //
+        // So the shift is measured rather than guessed. The old version moved
+        // the camera by half the legend's width, which was not enough to clear
+        // it; moving by all of it overran the right-hand edge and clipped the
+        // last concept column instead. What actually works is: ask for enough
+        // to clear the legend, take what the canvas has left on the other side,
+        // and shift by the smaller of the two.
+        //
+        // This moves the VIEW, never a node: getPositions() is untouched and
+        // the arrival stays byte-identical, which is what assertion 15's
+        // zero-tolerance round trip is checking.
+        function fitOrderedLayout() {
+            if (!network) return;
+            network.fit({ animation: false });
+            if (isMobileLayout()) return;   // the legend is a closed disclosure there
+            const legend = document.getElementById('legend');
+            const graph = document.getElementById('graph');
+            if (!legend || !graph || !nodesDataSet) return;
+            if (getComputedStyle(legend).display === 'none') return;
+            const legendRect = legend.getBoundingClientRect();
+            const graphRect = graph.getBoundingClientRect();
+            const overlay = legendRect.width;
+            const canvas = graphRect.width;
+            if (!overlay || !canvas || overlay > canvas * 0.45) return;
+            const scale = network.getScale();
+            if (!isFinite(scale) || scale <= 0) return;
+
+            // Where the drawn index actually sits, in canvas px. The caption is
+            // as much "the index" as the node above it, so the extent is padded
+            // by half a wrapped label on each side.
+            const hidden = {};
+            nodesDataSet.get().forEach(function (n) { if (n.hidden === true) hidden[n.id] = true; });
+            const positions = network.getPositions();
+            let left = Infinity, right = -Infinity;
+            Object.keys(positions).forEach(function (id) {
+                if (hidden[id]) return;
+                const x = network.canvasToDOM(positions[id]).x;
+                if (x < left) left = x;
+                if (x > right) right = x;
+            });
+            if (!isFinite(left)) return;
+            const pad = (ORDERED_LABEL_WIDTH / 2) * scale;
+            left -= pad;
+            right += pad;
+
+            const want = (legendRect.right - graphRect.left) + 10 - left;
+            const room = canvas - 8 - right;
+            const shift = Math.max(0, Math.min(want, room));
+            if (shift < 1) return;
+            const centre = network.getViewPosition();
+            network.moveTo({
+                position: { x: centre.x - shift / scale, y: centre.y },
+                scale: scale,
+                animation: false
+            });
+        }
+
+        // =====================================================================
+        // AXIS HEADINGS.
+        //
+        // The grid means "type across, date down", and until now nothing on
+        // screen said so: the reader got an arrangement with no key to it, and
+        // at fit scale not one node label was legible enough to infer it from.
+        //
+        // Drawn as HTML positioned over the canvas rather than as canvas text,
+        // for one reason: canvas text is in world units and scales with the
+        // graph, so at the zoom where the headings would be most useful — all
+        // the way out, looking at the whole index — they would be the least
+        // readable thing on the page. In screen space they are 11px at every
+        // zoom, which is the whole point.
+        //
+        // Only lanes and bands that currently have a VISIBLE node are labelled.
+        // Naming all ten lanes over a claims-only arrival would be a heading
+        // that describes the data rather than the picture, and would put five
+        // type names over empty canvas.
+        // =====================================================================
+        let axisOverlayItems = [];   // {el, axis: 'x'|'y', world}
+        let axisOverlayKey = null;   // which lanes/bands the DOM was built for
+        let axisOverlayView = null;  // last camera the labels were placed against
+
+        function axisBandText(band) {
+            if (band === '') return 'undated';
+            const t = Number(band);
+            return isFinite(t) ? formatDate(t) : String(band);
+        }
+
+        function updateAxisOverlay() {
+            const overlay = document.getElementById('axis-overlay');
+            if (!overlay) return;
+            const show = !!(indexViewActive() && orderedLayout && network);
+            overlay.classList.toggle('axis-visible', show);
+            if (!show) {
+                if (axisOverlayItems.length) overlay.innerHTML = '';
+                axisOverlayItems = [];
+                axisOverlayKey = null;
+                axisOverlayView = null;
+                return;
+            }
+
+            const hidden = {};
+            (nodesDataSet ? nodesDataSet.get() : []).forEach(function (n) {
+                if (n.hidden === true) hidden[n.id] = true;
+            });
+            const laneLive = {}, bandLive = {};
+            allNodes.forEach(function (node) {
+                if (hidden[node.id]) return;
+                const lane = orderedLayout.lanes.indexOf(node.entityType || 'unknown');
+                const band = orderedLayout.bands.indexOf(orderedDateKey(node));
+                if (lane !== -1) laneLive[lane] = true;
+                if (band !== -1) bandLive[band] = true;
+            });
+
+            const key = orderedLayout.laneAxis + ':' +
+                Object.keys(laneLive).join(',') + '/' + Object.keys(bandLive).join(',');
+            if (key !== axisOverlayKey) {
+                axisOverlayKey = key;
+                axisOverlayView = null;
+                overlay.innerHTML = '';
+                axisOverlayItems = [];
+                const add = function (text, cls, axis, world) {
+                    const el = document.createElement('span');
+                    el.className = 'axis-label ' + cls +
+                        (axis === 'x' ? ' axis-across' : ' axis-down');
+                    el.textContent = text;
+                    overlay.appendChild(el);
+                    // Measured once, here: the text never changes, and reading
+                    // offsetWidth inside the draw loop would force a layout on
+                    // every frame of a pan.
+                    axisOverlayItems.push({
+                        el: el, axis: axis, world: world,
+                        halfW: el.offsetWidth / 2, halfH: el.offsetHeight / 2
+                    });
+                };
+                orderedLayout.lanes.forEach(function (type, i) {
+                    if (!laneLive[i]) return;
+                    add(type, 'axis-lane', orderedLayout.laneAxis, orderedLayout.laneCentres[i]);
+                });
+                orderedLayout.bands.forEach(function (band, i) {
+                    if (!bandLive[i]) return;
+                    add(axisBandText(band), 'axis-band', orderedLayout.bandAxis, orderedLayout.bandAnchors[i]);
+                });
+            }
+            positionAxisOverlay(true);
+        }
+
+        // Re-placed on every redraw, which is what makes the headings track a
+        // pan as well as a zoom. The camera signature short-circuit is not an
+        // optimisation nicety: vis fires afterDrawing continuously while the
+        // canvas is being dragged, and writing seventeen inline styles per
+        // frame is visible as jitter on the labels themselves.
+        function positionAxisOverlay(force) {
+            if (!network || !axisOverlayItems.length) return;
+            const graph = document.getElementById('graph');
+            if (!graph) return;
+            const scale = network.getScale();
+            const centre = network.getViewPosition();
+            const rect = graph.getBoundingClientRect();
+            const signature = scale + '|' + centre.x + '|' + centre.y + '|' +
+                Math.round(rect.width) + 'x' + Math.round(rect.height);
+            if (!force && signature === axisOverlayView) return;
+            axisOverlayView = signature;
+
+            // Band labels sit against the left edge, which on a desktop is
+            // where #legend lives — so they start just clear of it. On a phone
+            // the legend is a closed disclosure and there is nothing to clear.
+            const legend = document.getElementById('legend');
+            let inset = 6;
+            if (legend && getComputedStyle(legend).display !== 'none') {
+                const lr = legend.getBoundingClientRect();
+                if (lr.width) inset = Math.round(lr.right - rect.left) + 8;
+            }
+
+            // The two axes get two strips and must not land in each other's:
+            // the first date band anchors ABOVE the grid, which is exactly
+            // where the lane headings live, and without this the band chip
+            // paints over the lane name and you get "HESIS".
+            const TOP_STRIP = 30;
+
+            // A heading whose lane has scrolled off the canvas is a heading
+            // pointing at nothing, so it goes away entirely. One that is merely
+            // clipped — half a chip hanging off the left edge, which is what
+            // the first date band does at fit scale — is nudged back into view
+            // instead: a partly readable "26-03-0" is worse than either.
+            const EDGE_SLACK = 26;
+            // Axis-tick decimation. The items arrive in world order along their
+            // own axis, so one running "where the last one ended" per axis is
+            // enough: a heading that would land on top of the one before it is
+            // dropped rather than drawn, which is how a chart handles a crowded
+            // axis. Without this the narrow index shows "2026-" with the next
+            // band's chip sitting on the rest of it.
+            const lastEnd = { x: -Infinity, y: -Infinity };
+            axisOverlayItems.forEach(function (item) {
+                const dom = network.canvasToDOM(
+                    item.axis === 'x' ? { x: item.world, y: 0 } : { x: 0, y: item.world });
+                const el = item.el;
+                let at, half, lo, hi;
+                if (item.axis === 'x') {
+                    at = dom.x; half = item.halfW;
+                    lo = inset + half; hi = Math.max(lo, rect.width - 6 - half);
+                    if (at < inset - EDGE_SLACK || at > rect.width + EDGE_SLACK) {
+                        el.style.display = 'none';
+                        return;
+                    }
+                } else {
+                    at = dom.y; half = item.halfH;
+                    lo = TOP_STRIP + half; hi = Math.max(lo, rect.height - 6 - half);
+                    if (at < -EDGE_SLACK || at > rect.height + EDGE_SLACK) {
+                        el.style.display = 'none';
+                        return;
+                    }
+                }
+                const placed = clamp(at, lo, hi);
+                if (placed - half < lastEnd[item.axis] + 4) {
+                    el.style.display = 'none';
+                    return;
+                }
+                lastEnd[item.axis] = placed + half;
+                el.style.display = '';
+                if (item.axis === 'x') {
+                    el.style.left = Math.round(placed) + 'px';
+                    el.style.top = '6px';
+                } else {
+                    el.style.top = Math.round(placed) + 'px';
+                    el.style.left = inset + 'px';
+                }
+            });
         }
 
         // =====================================================================
@@ -2895,6 +4534,7 @@
 
         function toggleReadinessChip(key) {
             activeReadiness[key] = activeReadiness[key] === false;
+            releaseEntryPoint();
             focusedNodeIds = null;
             syncReadinessChipClasses();
             applyVisualState();
@@ -2961,6 +4601,8 @@
                     }).join(', ')) + '.</div>';
             }
             html += '<div class="legend-note">No timeline here: readiness is a statement about now.</div></div>';
+
+            html += orderedLayoutLegendHtml();
 
             // Things the graph does not know about at all. They have no node to
             // colour, so the legend is the only place they can appear.
@@ -3230,6 +4872,15 @@
             // and readiness is a statement about the tree as it is right now.
             toggle('timeline-bar', dissolution || threads);
             toggle('colour-mode-controls', dissolution || threads);
+            // Dissolution is not an index of claims: it has no types, no dates
+            // and no threads report to point at.
+            toggle('entry-points', dissolution);
+            // The switch is hidden, not merely disabled, wherever there is no
+            // index to switch to — dissolution renders hierarchically and
+            // isomorphism pins its own columns, so on those two "Network" and
+            // "Index" would both be lies. updateViewSwitch() reads
+            // orderedLayoutActive for exactly that.
+            updateViewSwitch();
             // Switching graphs swaps which chip groups are live, so the
             // "Filters (n of m)" count has to be recomputed, and any open
             // disclosure closed before its contents change underneath it.
@@ -3457,10 +5108,11 @@
 
                 nodeUpdates.push({
                     id: node.id,
-                    label: node.label,
+                    label: nodeDisplayLabel(node),
+                    widthConstraint: nodeWidthConstraint(node),
                     title: nodeTooltip(node),
                     shape: node.shape,
-                    size: node.size,
+                    size: nodeDisplaySize(node),
                     hidden: hidden,
                     opacity: retiredNow ? RETIRED_OPACITY : (dimmed ? 0.5 : 1),
                     borderWidth: retiredNow ? 3 : 2,
@@ -3471,7 +5123,7 @@
                         highlight: { background: shade(colour, 0.12), border: shade(border, -0.3) },
                         hover: { background: shade(colour, 0.08), border: shade(border, -0.3) }
                     },
-                    font: { size: node.nodeType === 'claim' ? 14 : 12, color: '#2c3e50' }
+                    font: nodeDisplayFont(node)
                 });
             });
 
@@ -3484,7 +5136,18 @@
             });
             edgesDataSet.update(edgeUpdates);
 
+            // After the hidden flags, never before: whether an edge is quiet is
+            // a separate question from whether it is drawn at all, and merging
+            // the two updates would make a chip change silently reset the
+            // emphasis the reader's hover had asked for.
+            applyEdgeEmphasis();
+
+            let shown = 0;
+            Object.keys(visible).forEach(function (id) { if (visible[id]) shown += 1; });
+            updateSearchStatus(shown);
+
             renderLegend();
+            updateAxisOverlay();
         }
 
         function setColourMode(mode) {
@@ -3559,6 +5222,12 @@
             thtml += '<button class="chip" id="chip-type-none" onclick="setAllTypeChips(false)">none</button>';
             typeBar.innerHTML = thtml;
 
+            // The arrival state of the type row: claims only on the evidence
+            // graph, everything elsewhere. Done here rather than in
+            // loadAndInitialize() so any later rebuild of the chips
+            // re-establishes it instead of silently widening the view.
+            applyDefaultTypeSelection();
+            syncChipClasses();
             updateFilterToggleLabel();
         }
 
@@ -3576,6 +5245,7 @@
 
         function toggleStatusChip(status) {
             activeStatuses[status] = activeStatuses[status] === false;
+            releaseEntryPoint();
             focusedNodeIds = null;
             syncChipClasses();
             applyVisualState();
@@ -3583,6 +5253,7 @@
 
         function toggleTypeChip(type) {
             activeTypes[type] = activeTypes[type] === false;
+            releaseEntryPoint();
             focusedNodeIds = null;
             syncChipClasses();
             applyVisualState();
@@ -3600,6 +5271,251 @@
             focusedNodeIds = null;
             syncChipClasses();
             applyVisualState();
+        }
+
+        // =====================================================================
+        // Front matter: entry points.
+        //
+        // An index has a contents page. Each of these sets the graph's whole
+        // state — type chips, status chips, focus set, timeline cursor — so the
+        // reader lands on a question instead of on a filter. None of them
+        // navigate away; all of them are undone by "everything", "Show All" or
+        // "Reset View".
+        //
+        // "what's open" and "what's blocked" come out of _data/threads.json;
+        // "what changed" comes out of the corrects / retires / supersedes edges
+        // the graph already carries. Any entry point with nothing behind it is
+        // hidden rather than left to disappoint.
+        // =====================================================================
+        const ENTRY_SET_KEYS = ['open', 'changed', 'blocked'];
+
+        // Read once per page. A missing or unreadable overlay is not an error:
+        // it costs two entry points and nothing else, so warn and carry on.
+        async function loadIndexOverlay() {
+            if (indexOverlayTried) return indexOverlay;
+            indexOverlayTried = true;
+            try {
+                const response = await fetch('_data/threads.json');
+                if (!response.ok) throw new Error(response.status + ' ' + response.statusText);
+                const payload = await response.json();
+                if (!payload || typeof payload !== 'object') throw new Error('not a JSON object');
+                indexOverlay = payload;
+            } catch (error) {
+                console.warn('Front matter: no usable _data/threads.json (' + error.message +
+                    ') — hiding the entry points that depend on it.');
+                indexOverlay = null;
+            }
+            return indexOverlay;
+        }
+
+        function setEntryChipVisible(id, visible) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('mode-hidden', !visible);
+        }
+
+        // A manual narrowing supersedes the entry point that produced it: the
+        // focus set the entry point installed is dropped by the chip handlers,
+        // so the label must not keep claiming it is still in force.
+        // Every entry point is released by a manual filter or a search, not just
+        // the three that pin an id set. `by claim` and `by question` set the type
+        // row, so toggling a type chip is exactly the gesture that makes them no
+        // longer true — leaving the chip lit and the status line still claiming
+        // "the claims" describes a view that is no longer on screen. `everything`
+        // is the neutral state and has nothing to release.
+        function releaseEntryPoint() {
+            if (activeEntryPoint === 'everything') return;
+            activeEntryPoint = 'everything';
+            syncEntryChipClasses();
+        }
+
+        function syncEntryChipClasses() {
+            const ids = ['entry-claims', 'entry-questions', 'entry-open',
+                         'entry-changed', 'entry-blocked', 'entry-everything'];
+            ids.forEach(function (id) {
+                const el = document.getElementById(id);
+                if (el) el.classList.toggle('entry-active', id === 'entry-' + activeEntryPoint);
+            });
+        }
+
+        function buildEntryPoints() {
+            entryPointIds = {};
+
+            // "what changed": both ends of every edge that revises the record.
+            const changed = {};
+            allEdges.forEach(function (edge) {
+                if (['corrects', 'retires', 'supersedes'].indexOf(edge.relType) === -1) return;
+                if (nodeIndex[edge.from]) changed[edge.from] = true;
+                if (nodeIndex[edge.to]) changed[edge.to] = true;
+            });
+            entryPointIds.changed = Object.keys(changed).length ? changed : null;
+
+            const report = indexOverlay || {};
+
+            const open = {};
+            asArray(report.open_threads).forEach(function (thread) {
+                if (thread && thread.claim && nodeIndex[thread.claim]) open[thread.claim] = true;
+            });
+            entryPointIds.open = Object.keys(open).length ? open : null;
+
+            // "what's blocked": the gated claims AND the blockers gating them,
+            // so the fan-out is visible rather than implied.
+            const blocked = {};
+            asArray(report.blockers).forEach(function (blocker) {
+                if (!blocker || !blocker.key) return;
+                const own = blockerNodeId(blocker, nodeIndex);
+                if (nodeIndex[own]) blocked[own] = true;
+                asArray(blocker.gates).forEach(function (gate) {
+                    if (gate && gate.claim && nodeIndex[gate.claim]) blocked[gate.claim] = true;
+                });
+            });
+            allEdges.forEach(function (edge) {
+                if (GATE_EDGE_TYPES.indexOf(edge.relType) === -1) return;
+                if (nodeIndex[edge.from]) blocked[edge.from] = true;
+                if (nodeIndex[edge.to]) blocked[edge.to] = true;
+            });
+            entryPointIds.blocked = Object.keys(blocked).length ? blocked : null;
+
+            const hasQuestions = allNodes.some(function (n) { return n.entityType === 'question'; });
+            setEntryChipVisible('entry-questions', hasQuestions);
+            setEntryChipVisible('entry-open', !!entryPointIds.open);
+            setEntryChipVisible('entry-changed', !!entryPointIds.changed);
+            setEntryChipVisible('entry-blocked', !!entryPointIds.blocked);
+            syncEntryChipClasses();
+        }
+
+        function claimTypesAvailable() {
+            return ORDERED_CLAIM_TYPES.filter(function (t) {
+                return activeTypes[t] !== undefined;
+            });
+        }
+
+        // The INDEX shows claims only: 93 assertions read better as an index
+        // than 175 nodes do, and runs, models, documents and artefacts are one
+        // chip (or one entry point) away. Applied to the evidence graph itself;
+        // isomorphism and threads open on everything they have.
+        //
+        // The claims-only default belongs to the INDEX and not to the graph.
+        // Network view is the force-directed reading the owner already had, and
+        // that had all 175 nodes in it: narrowing it to 93 would hand them back
+        // a graph with the runs, models, documents and artefacts silently
+        // missing and no filter lit to say so. exploreMode is read rather than
+        // preferredView because what matters here is which view is actually
+        // being built, not which one the reader would prefer on a graph that
+        // has one.
+        function indexDefaultsToClaims() {
+            return !exploreMode && renderMode === 'evidence' &&
+                currentGraphKey === 'evidence' && claimTypesAvailable().length > 0;
+        }
+
+        function applyClaimsOnlyTypes() {
+            Object.keys(activeTypes).forEach(function (type) {
+                activeTypes[type] = ORDERED_CLAIM_TYPES.indexOf(type) !== -1;
+            });
+        }
+
+        function applyDefaultTypeSelection() {
+            if (indexDefaultsToClaims()) {
+                applyClaimsOnlyTypes();
+                activeEntryPoint = 'claims';
+            } else {
+                Object.keys(activeTypes).forEach(function (type) { activeTypes[type] = true; });
+                activeEntryPoint = 'everything';
+            }
+            syncEntryChipClasses();
+        }
+
+        function applyEntryPoint(key) {
+            if (!activeTypes || !Object.keys(activeTypes).length) return;
+            // Checked before anything is mutated. This used to bail out further
+            // down, after the search box, the timeline cursor, the status row and
+            // the readiness row had all been reset — but before syncChipClasses()
+            // and applyVisualState() ran, so the model had moved and the chips and
+            // canvas had not. Refusing early is the only way to refuse cleanly.
+            if (ENTRY_SET_KEYS.indexOf(key) !== -1 && !entryPointIds[key]) {
+                showToast('Nothing recorded for that entry point');
+                return;
+            }
+
+            focusedNodeIds = null;
+            searchTerm = '';
+            const searchEl = document.getElementById('search');
+            if (searchEl) searchEl.value = '';
+            stopTimelinePlay();
+
+            // An entry point is a statement about now, so it always opens at
+            // the present end of the timeline.
+            timelineValue = timelineDays;
+            const slider = document.getElementById('timeline');
+            if (slider) slider.value = String(timelineValue);
+            updateTimelineReadout();
+
+            Object.keys(activeStatuses).forEach(function (s) { activeStatuses[s] = true; });
+            Object.keys(activeReadiness).forEach(function (k) { activeReadiness[k] = true; });
+
+            if (key === 'questions') {
+                Object.keys(activeTypes).forEach(function (t) { activeTypes[t] = (t === 'question'); });
+            } else if (ENTRY_SET_KEYS.indexOf(key) !== -1) {
+                const set = entryPointIds[key];
+                // The id set decides membership here, not the type row.
+                Object.keys(activeTypes).forEach(function (t) { activeTypes[t] = true; });
+                focusedNodeIds = Object.assign({}, set);
+            } else if (key === 'everything') {
+                Object.keys(activeTypes).forEach(function (t) { activeTypes[t] = true; });
+            } else {
+                key = 'claims';
+                if (claimTypesAvailable().length) {
+                    applyClaimsOnlyTypes();
+                } else {
+                    Object.keys(activeTypes).forEach(function (t) { activeTypes[t] = true; });
+                }
+            }
+
+            activeEntryPoint = key;
+            syncChipClasses();
+            syncReadinessChipClasses();
+            syncEntryChipClasses();
+            applyVisualState();
+            // The index is framed by fitOrderedLayout(), which also shifts the
+            // camera clear of the legend; the network view has no grid to clear
+            // it from and takes vis's own fit.
+            if (indexViewActive()) fitOrderedLayout();
+            else if (network) network.fit({ animation: true });
+        }
+
+        // The count under the search box: an index says how big it is and how
+        // much of it you are currently looking at.
+        const ENTRY_LABELS = {
+            claims: 'the claims',
+            questions: 'the open questions',
+            open: 'open threads',
+            changed: 'claims the record has revised',
+            blocked: 'blocked claims and their blockers',
+            everything: 'everything'
+        };
+
+        function updateSearchStatus(visibleCount) {
+            const el = document.getElementById('search-status');
+            if (!el) return;
+            const total = allNodes.length;
+            const shown = (visibleCount === undefined)
+                ? (nodesDataSet ? nodesDataSet.get().filter(function (n) { return n.hidden !== true; }).length : 0)
+                : visibleCount;
+            let text;
+            if (searchTerm) {
+                text = shown + ' of ' + total + ' match “' + searchTerm + '” — label, id or description';
+            } else {
+                text = shown + ' of ' + total + ' nodes — ' +
+                    (ENTRY_LABELS[activeEntryPoint] || 'everything');
+            }
+            // Which of the two readings is on screen, said in words, because
+            // the switch is one tap away inside a closed Filters disclosure on
+            // a phone and the picture alone does not name itself.
+            if (orderedLayoutActive) {
+                text += exploreMode
+                    ? ' · network view: physics on'
+                    : ' · index view: type across, date down';
+            }
+            el.textContent = text;
         }
 
         // Legacy-compatible filter entry point: filterNodes('all') or a type name.
@@ -3621,9 +5537,12 @@
                     setAllStatusChips(true);
                 }
                 Object.keys(activeTypes).forEach(function (t) { activeTypes[t] = true; });
+                activeEntryPoint = 'everything';
             } else {
                 Object.keys(activeTypes).forEach(function (t) { activeTypes[t] = (t === type); });
+                activeEntryPoint = (type === 'question') ? 'questions' : 'everything';
             }
+            syncEntryChipClasses();
             syncChipClasses();
             applyVisualState();
             if (network) network.fit({ animation: true });
@@ -3726,10 +5645,43 @@
             }
         }
 
+        // The ordered grid has two shapes and the breakpoint picks between them
+        // (see the ORDERED_NARROW_* comment), so crossing the breakpoint has to
+        // re-lay it out — otherwise a phone rotated into landscape keeps the
+        // transposed grid it was loaded with, and a desktop window dragged
+        // narrow keeps the wide one. Same function, same data: the result is
+        // byte-identical to a fresh load at that width, which is the whole of
+        // what "a pure function of the data and the viewport class" promises.
+        function reflowOrderedLayoutForBreakpoint() {
+            if (!indexViewActive() || !orderedLayout) return;
+            if (!network || !nodesDataSet || !allNodes.length) return;
+            if (orderedLayout.transposed === isMobileLayout()) return;
+            if (!applyOrderedLayout(allNodes)) return;
+            nodesDataSet.update(allNodes.map(function (node) {
+                return {
+                    id: node.id,
+                    x: node.x,
+                    y: node.y,
+                    fixed: node.fixed,
+                    label: nodeDisplayLabel(node),
+                    widthConstraint: nodeWidthConstraint(node),
+                    size: nodeDisplaySize(node)
+                };
+            }));
+            fitOrderedLayout();
+            updateAxisOverlay();
+        }
+
         window.addEventListener('resize', function () {
             // The ranked list lives in its own panel above 768px and inside the
             // legend disclosure below it, so a width change has to re-render.
             if (renderMode === 'threads') renderLegend();
+            reflowOrderedLayoutForBreakpoint();
+            // Arrow weight is a function of the breakpoint too (see
+            // NARROW_EDGE_SCALE). Its own signature makes every resize that
+            // does not cross 768px free, so this is safe on a stream of them.
+            applyEdgeWeight();
+            positionAxisOverlay(true);
             if (!isMobileLayout()) {
                 closeAllDisclosures();
                 return;
@@ -3865,7 +5817,52 @@
                 '; border:2px solid ' + esc(statusColour('refuted')) + '; opacity:0.6"></span>' +
                 '<span>retired as of the cursor (rim keeps its status colour)</span></div></div>';
 
+            html += orderedLayoutLegendHtml();
+
             legend.innerHTML = html;
+            // In the ordered index the legend is an overlay competing with
+            // content it can hide, so it gives back some width. That is what
+            // leaves fitOrderedLayout() enough room to shift the grid clear of
+            // it without running the last lane off the right-hand edge — the
+            // two are a pair, and widening one without the other puts the
+            // hypothesis lane back underneath the key.
+            legend.classList.toggle('legend-index', indexViewActive());
+        }
+
+        // How to read whichever view is showing. Deliberately legend-note markup
+        // and deliberately last: the status/shape/edge legend rows above are what
+        // the smoke test keys its gradient assertions on, and nothing here adds
+        // a .legend-row to that sequence.
+        function orderedLayoutLegendHtml() {
+            if (!orderedLayoutActive || !orderedLayout) return '';
+            // In Network view the axes below describe a grid that is not on the
+            // screen. A legend that explains the other view is worse than no
+            // legend: it tells the reader to look for lanes in a cloud.
+            if (exploreMode) {
+                return '<div class="legend-section"><h4>Network view</h4>' +
+                    '<div class="legend-note">Force-directed: position is what the solver ' +
+                    'settled on, not a statement about the data. Drag anything; it stays ' +
+                    'where you put it until physics is disturbed again.</div>' +
+                    '<div class="legend-note">Switch to <b>Index</b> for the same nodes ' +
+                    'ordered by type and assertion date — computed from the data, identical ' +
+                    'on every load.</div></div>';
+            }
+            const lanes = orderedLayout.lanes.join(' · ');
+            const dated = orderedLayout.bands.filter(function (b) { return b !== ''; });
+            let html = '<div class="legend-section"><h4>Arrangement</h4>' +
+                '<div class="legend-note"><b>Across:</b> entity type — ' + esc(lanes) + '.</div>' +
+                '<div class="legend-note"><b>Down:</b> the date the claim was asserted' +
+                (dated.length
+                    ? ', ' + esc(formatDate(Number(dated[0]))) + ' at the top through ' +
+                      esc(formatDate(Number(dated[dated.length - 1]))) + ' at the bottom'
+                    : '') +
+                (orderedLayout.bands.indexOf('') === -1 ? '' : '; undated last') + '.</div>' +
+                '<div class="legend-note">The layout is computed from the data, not settled by ' +
+                'physics: identical on every load, and nothing moves under you. ' +
+                (exploreMode
+                    ? 'You are in <b>Network</b> view; <b>Index</b> restores this grid exactly.'
+                    : 'Switch to <b>Network</b> to release it into physics.') + '</div></div>';
+            return html;
         }
 
         // =====================================================================
@@ -4066,7 +6063,7 @@
         // Overlays that live inside #graph and would otherwise be swallowed:
         // constructing a vis.Network clears its container, and some builds
         // clear it again on destroy(). Both are held aside and put back.
-        const GRAPH_OVERLAY_IDS = ['legend', 'fruit-panel'];
+        const GRAPH_OVERLAY_IDS = ['axis-overlay', 'legend', 'fruit-panel'];
 
         function detachGraphOverlays() {
             return GRAPH_OVERLAY_IDS.map(function (id) {
@@ -4134,6 +6131,30 @@
                 if (params.nodes.length > 0) {
                     focusOnNode(params.nodes[0]);
                 }
+            });
+
+            // ---- what makes a relationship the subject --------------------
+            // Hover is the desktop gesture, selection is the touch one; both
+            // mean "this node, and what it is attached to". blurNode falls back
+            // to whatever is still selected rather than to nothing, so moving
+            // the mouse off a node you have clicked does not throw away the
+            // emphasis you asked for.
+            network.on('hoverNode', function (params) { setEdgeFocus(params.node); });
+            network.on('blurNode', function () {
+                let selected = [];
+                try { selected = network.getSelectedNodes() || []; } catch (e) { /* older vis builds */ }
+                setEdgeFocus(selected.length ? selected[0] : null);
+            });
+            network.on('selectNode', function (params) {
+                setEdgeFocus((params.nodes && params.nodes[0]) || null);
+            });
+            network.on('deselectNode', function () { setEdgeFocus(null); });
+
+            // The headings are in screen space, so they have to be re-placed
+            // whenever the camera moves — which includes panning, not just
+            // zooming, so this rides the draw loop rather than the zoom event.
+            network.on('afterDrawing', function () {
+                positionAxisOverlay(false);
             });
 
             network.on('oncontext', function (params) {
@@ -4416,12 +6437,37 @@
                 setAllStatusChips(true);
                 setAllTypeChips(true);
             }
+            // "Reset view" resets the view the reader is IN. It deliberately
+            // does not change which view that is.
+            //
+            // This used to read `if (exploreMode) setExploreMode(false);` under
+            // a comment claiming the arrival state "is the ordered index" —
+            // true when the index was the only view, false from the moment
+            // DEFAULT_VIEW became VIEW_NETWORK. Because setExploreMode routes
+            // through setViewMode with `remember` defaulting to true, one click
+            // moved a Network reader to the Index and PERSISTED it:
+            //
+            //     fresh arrival        view=network  stored=null
+            //     click "Reset View"   view=index    stored="index"
+            //     new page             view=index                  <- forever
+            //
+            // The reader never chose the index. That is exactly the over-reach
+            // this branch was asked to undo, coming back through a control
+            // labelled "Reset".
+            if (renderMode !== 'dissolution') {
+                applyDefaultTypeSelection();
+                syncChipClasses();
+            }
             stopTimelinePlay();
             setTimelineValue(timelineDays);
             navigationHistory = [];
             updateBreadcrumb();
             applyVisualState();
-            if (network) network.fit({ animation: true });
+            // The index is framed by fitOrderedLayout(), which also shifts the
+            // camera clear of the legend; the network view has no grid to clear
+            // it from and takes vis's own fit.
+            if (indexViewActive()) fitOrderedLayout();
+            else if (network) network.fit({ animation: true });
         }
 
         function updateBreadcrumb() {
@@ -4723,6 +6769,10 @@
             const loading = document.getElementById('loading');
             loading.classList.remove('hidden');
             loading.textContent = 'Reloading evidence graph...';
+            // "Refresh Data" has to refresh the front matter too, or a
+            // regenerated threads.json would not reach the entry points until
+            // the page itself was reloaded.
+            indexOverlayTried = false;
             try {
                 await loadAndInitialize();
                 showToast('Data reloaded');
@@ -4736,6 +6786,27 @@
             const graph = GRAPHS[currentGraphKey] || GRAPHS[DEFAULT_GRAPH_KEY];
             const payload = await loadEntities();
             await loadVisualConfig();
+            // Read once, for the front matter only. Never assigned to
+            // threadsReport — that global belongs to threads mode.
+            await loadIndexOverlay();
+
+            // Every graph arrives in its own arrival state; nothing about the
+            // previous one survives the switch. exploreMode is cleared here and
+            // re-derived from `preferredView` further down, once we know
+            // whether this graph has an index for the switch to point at — a
+            // graph with none (dissolution, isomorphism) must not inherit the
+            // previous one's view, only the previous one's preference.
+            exploreMode = false;
+            orderedLayoutActive = false;
+            orderedLayout = null;
+            // Emphasis and weight are per-render: the signatures guard against
+            // rewriting edges that have not changed, so they have to be
+            // forgotten whenever the DataSet underneath them is replaced, or
+            // the first applyVisualState() of the new graph would decide it had
+            // already done the work.
+            edgeFocusNodeId = null;
+            edgeEmphasisSignature = null;
+            edgeWeightSignature = null;
 
             const select = document.getElementById('graph-select');
             if (select && select.value !== currentGraphKey) select.value = currentGraphKey;
@@ -4816,11 +6887,23 @@
                 buildAdjacency();
 
                 // Isomorphism claims carry a `side`; pin acoustic left and
-                // transformer right when they do.
-                applySideLayout(allNodes);
+                // transformer right when they do. A graph that pins sides
+                // keeps that layout — the ordered grid is for the graphs that
+                // would otherwise arrive as a physics cloud.
+                const sided = applySideLayout(allNodes);
+                orderedLayoutActive = sided ? false : applyOrderedLayout(allNodes);
+                // Which of the two readings arrives. The preference is consulted
+                // HERE and nowhere else in the load path, so a graph with no
+                // index simply leaves this false and the switch inert, rather
+                // than needing a special case of its own. Note that the grid was
+                // computed either way, on the line above: the network view does
+                // not draw it, but it must exist on the node records for the
+                // switch to be able to restore it exactly.
+                exploreMode = orderedLayoutActive && preferredView === VIEW_NETWORK;
 
                 buildChips();
                 if (renderMode === 'threads') buildReadinessChips();
+                buildEntryPoints();
             }
 
             applyModeVisibility();
@@ -4840,18 +6923,30 @@
             const visNodes = allNodes.map(function (node) {
                 const record = {
                     id: node.id,
-                    label: node.label,
+                    label: nodeDisplayLabel(node),
+                    widthConstraint: nodeWidthConstraint(node),
                     title: nodeTooltip(node),
                     shape: node.shape,
-                    size: node.size,
+                    size: nodeDisplaySize(node),
                     borderWidth: 2,
-                    font: { size: node.nodeType === 'claim' ? 14 : 12, color: '#2c3e50' },
+                    font: nodeDisplayFont(node),
                     color: { background: nodeDisplayColour(node, false) }
                 };
                 if (node.level !== undefined) record.level = node.level;
-                if (node.x !== undefined) record.x = node.x;
-                if (node.y !== undefined) record.y = node.y;
-                if (node.fixed !== undefined) record.fixed = node.fixed;
+                if (exploreMode) {
+                    // NETWORK arrives with NO coordinate at all — not with the
+                    // grid's coordinates released. Handing vis a starting
+                    // position is handing it a different force-directed
+                    // arrival, and the whole point of this view is that it is
+                    // the graph the reader already had. `fixed: false` is
+                    // stated rather than omitted so a rebuild cannot inherit a
+                    // pin from the DataSet it replaced.
+                    record.fixed = false;
+                } else {
+                    if (node.x !== undefined) record.x = node.x;
+                    if (node.y !== undefined) record.y = node.y;
+                    if (node.fixed !== undefined) record.fixed = node.fixed;
+                }
                 return record;
             });
 
@@ -4885,7 +6980,12 @@
                 network.setData({ nodes: nodesDataSet, edges: edgesDataSet });
             }
 
+            // Before applyVisualState(), so the first paint already carries the
+            // right edge weight rather than a frame of full-weight arrows on a
+            // phone. Reads exploreMode, which is settled above.
+            applyEdgeWeight();
             applyVisualState();
+            updateViewSwitch();
 
             // Layered layouts settle instantly; fit once the DOM has painted.
             if (renderMode === 'dissolution' && network) {
@@ -4894,6 +6994,28 @@
                     const el = document.getElementById('loading');
                     if (el) el.classList.add('hidden');
                 }, 60);
+            }
+
+            // The INDEX arrival is settled the instant it is drawn: every node
+            // is pinned, so there is nothing to stabilise and nothing to wait
+            // for. Frame it (after initNetwork's own 100ms physics kick, which
+            // with pinned nodes is a no-op) and drop the overlay rather than
+            // leaving the reader on a progress bar for a layout that is already
+            // finished.
+            //
+            // The NETWORK arrival is the opposite and takes the path it always
+            // took: vis stabilises, reports progress, and initNetwork's
+            // `stabilizationIterationsDone` listener drops the overlay. Fitting
+            // it here would frame a layout that has not happened yet.
+            if (indexViewActive() && network) {
+                setTimeout(function () {
+                    fitOrderedLayout();
+                    updateAxisOverlay();
+                    reportOrderedLegibility();
+                    reportNarrowArrowWeight();
+                    const el = document.getElementById('loading');
+                    if (el) el.classList.add('hidden');
+                }, 180);
             }
 
             if (renderMode === 'dissolution') {
@@ -4932,11 +7054,17 @@
             }
         });
 
-        // Search: matches labels, descriptions and ids.
+        // Search: matches labels, ids AND description text (see
+        // nodeMatchesSearch, which also reaches into paths, scripts, sides,
+        // roles, dissolution tokens and the threads report's own wording).
         document.getElementById('search').addEventListener('input', function (e) {
             searchTerm = e.target.value.trim().toLowerCase();
+            // Searching is a lookup over the whole index, so it supersedes any
+            // entry point that had narrowed it.
+            releaseEntryPoint();
             focusedNodeIds = null;
             applyVisualState();
+            frameNarrowSearch();
         });
 
         // Keyboard: space toggles playback unless typing.

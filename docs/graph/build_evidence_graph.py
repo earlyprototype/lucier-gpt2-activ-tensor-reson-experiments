@@ -51,6 +51,14 @@ REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
 DATA_DIR = os.path.join(HERE, "_data")
 
 
+
+# A markdown table cell escapes a literal pipe as `\|`. Both patterns are
+# compiled once here rather than inline, so the split and the unescape can never
+# drift apart into disagreeing about what an escape looks like.
+_TABLE_CELL_SPLIT = re.compile(r"(?<!\\)\|")
+_TABLE_CELL_ESCAPE = re.compile(r"\\\|")
+
+
 def load_sibling(name: str):
     """Import a module sitting next to this one, by path.
 
@@ -153,7 +161,20 @@ def parse_table(block: str):
             if rows:
                 break          # table finished
             continue
-        cells = [c.strip() for c in line.strip("|").split("|")]
+        # Split on unescaped pipes only, then unescape. A markdown table cell
+        # writes a literal pipe as `\|`, and splitting on every `|` cuts the row
+        # in two at that point: the rest of the cell becomes extra columns, and
+        # everything past the header's width is discarded by the truncation
+        # below. Silently.
+        #
+        # H-pos0 is the first claim in the record to need one -- its test is
+        # "seeded at `<\|endoftext\|>`" -- and it lost its Test instruction, its
+        # Falsifiers and its Rationale from the graph while reading correctly in
+        # FINDINGS.md. That is precisely the record/graph divergence the drift
+        # check exists to catch, arriving through the parser rather than through
+        # the record, where nothing was watching for it.
+        cells = [_TABLE_CELL_ESCAPE.sub("|", c.strip())
+                 for c in _TABLE_CELL_SPLIT.split(line.strip("|"))]
         if header is None:
             header = cells
             continue

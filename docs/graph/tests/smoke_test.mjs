@@ -3,7 +3,7 @@
  * Headless browser smoke + interaction test for docs/graph/viewer.html.
  *
  * Serves docs/graph on a free port, drives the viewer with Playwright's
- * bundled Chromium, and asserts fourteen things:
+ * bundled Chromium, and asserts eighteen things:
  *
  *   1. viewer.html loads with ZERO pageerror and ZERO console-error events
  *   2. a <canvas> exists and vis-network has actually rendered nodes
@@ -24,11 +24,51 @@
  *      leaks: after threads -> dissolution -> evidence the hub nodes are gone,
  *      status colours are back, gate edges are undashed and evidence is still
  *      clickable
+ *  15. the evidence graph's INDEX view is a deterministic ordered index: two
+ *      independent loads in separate browser contexts, each asked for the
+ *      index through the switch, put every node on the same coordinates,
+ *      nothing drifts once it is drawn (physics is off in the only sense the
+ *      reader can perceive — every node pinned, zero displacement over a
+ *      settle window), and a round trip out to another graph and back restores
+ *      those coordinates EXACTLY, not approximately
+ *  16. that ordered index is LEGIBLE, not merely ordered: captions render at
+ *      or above ORDERED_TARGET_LABEL_PX once the grid is fitted, the lane and
+ *      date-band axes are actually named, and those headings do not swallow
+ *      clicks meant for the graph underneath them
+ *  17. the NETWORK/INDEX view switch is real, reversible and remembered: a
+ *      first-time visitor arrives in Network with physics running, nothing
+ *      pinned and every type in play; Index pins all of it; both round trips
+ *      are exact in both directions; and the choice survives a fresh load
+ *  18. the switch leaves the reader looking at the graph, and "Reset View"
+ *      neither changes which view they are in nor stores one for them --
+ *      17 checks the state the switch reaches, not the camera it leaves
+ *      behind, and both of those shipped green underneath it
  *
  * Assertions 1-11, 13 and 14 run at 1600x1000. Assertion 12 opens a second,
  * phone-sized context (393x830, isMobile + hasTouch) so the narrow-screen
  * layout is pinned without disturbing the desktop measurements the others
- * depend on.
+ * depend on. Assertion 15 opens two further desktop contexts, because "the
+ * same every load" is only testable across genuinely separate loads,
+ * assertion 16 opens one more at 1600x1000 (caption size is a function of the
+ * fitted zoom, so it has to be read on a window whose size is known), and
+ * assertion 17 opens one more still, because a first-time visitor is by
+ * definition a context with empty localStorage.
+ *
+ * THE DEFAULT VIEW MOVED. viewer.html's DEFAULT_VIEW is VIEW_NETWORK: the
+ * evidence graph opens force-directed, and the ordered index is one tap away
+ * rather than the thing that arrives. Assertions 15 and 16 were written when
+ * the index was the arrival, so they now ASK for it first -- through the same
+ * chip a reader clicks, not by poking the flag, so a switch that stopped
+ * working would take them down with it. Neither budget moved: both are still
+ * tolerance-zero, and both still measure the index and nothing else.
+ *
+ * Assertion 13 and assertion 15 are deliberately complementary, and both are
+ * load-bearing. 13 pins the mode flags on the way back from another graph
+ * (hierarchical off, physics option on, override cleared) and tolerates
+ * generous positional drift, because it was written against a stochastic
+ * force-directed arrival. 15 pins the thing 13 cannot see: that the arrival is
+ * a pure function of the data, to the integer. Weakening 15 to "approximately
+ * the same" would silently re-admit the physics cloud 13 already tolerates.
  *
  * Run:  node docs/graph/tests/smoke_test.mjs
  * Exit: 0 = all pass, 1 = at least one failure.
@@ -159,7 +199,36 @@ function startServer(rootDir) {
 // --- reporting -------------------------------------------------------------
 // Every assertion must run: a suite that silently stops short is a failure, not
 // a pass. Bump this when adding one.
-const TOTAL_ASSERTIONS = 14;
+const TOTAL_ASSERTIONS = 18;
+
+// --- ordered arrival budget (assertion 15) ---------------------------------
+// The index property is "the same bytes in, the same pixels out". These are
+// exact-match budgets on purpose: one unit of tolerance is one unit of physics,
+// and the whole point of the ordered arrival is that there is none. The settle
+// window is the interval over which an unpinned solver would visibly move
+// things (the force-directed arrival this replaced was still travelling
+// hundreds of units at t=3s).
+const ORDERED_SETTLE_WINDOW_MS = 2500;
+const ORDERED_MAX_DRIFT_UNITS = 0;   // total |dx|+|dy| across every node
+const ORDERED_MAX_RELOAD_DELTA = 0;  // nodes allowed to differ between loads
+
+// --- legibility budget (assertion 16) --------------------------------------
+// Assertion 15 pins that the arrival is ordered and deterministic. It says
+// nothing about whether a reader can READ it, and those are genuinely
+// independent: reverting the grid pitch to the round numbers it started with
+// re-creates the original 4.94px-label bug -- an unreadable index -- and 15
+// still passes, because every node is still exactly where it deterministically
+// ought to be. That gap was measured, not theorised.
+//
+// So this is the budget that stops the readability work silently rotting. The
+// number is the same one viewer.html solves its pitch for
+// (ORDERED_TARGET_LABEL_PX), read the same way: node font size * getScale(),
+// with the claims-only arrival showing. Measured at LEGIBILITY_VIEWPORT
+// because label size is height-bound -- a narrower window legitimately yields
+// less, which is a known and documented limitation, not a regression.
+const LEGIBILITY_VIEWPORT = { width: 1600, height: 1000 };
+const MIN_EFFECTIVE_LABEL_PX = 11;
+const MIN_AXIS_HEADINGS = 2;   // at least one lane and one band named
 
 // --- mobile budget (assertion 12) ------------------------------------------
 // A real device (Nothing Phone 2a) showed the header + chip rows eating 66% of
@@ -185,6 +254,8 @@ const consoleErrors = [];// {phase, text}
 const badResponses = []; // {phase, status, url}
 const allResponses = [];
 let phase = 'boot';
+// Filled in by main() once the CDN mirror has been populated on disk.
+let mirror = {};
 
 function snapshotErrors() {
     return { pe: pageErrors.length, ce: consoleErrors.length, bad: badResponses.length };
@@ -291,6 +362,84 @@ async function canvasInk(page) {
     });
 }
 
+// Attach the three collectors every page needs, together, so a page cannot be
+// half-instrumented.
+//
+// This exists because a page WAS half-instrumented. Assertion 18 opens its own
+// contexts to check framing and Reset View; the reset pages were given a
+// pageerror listener, or none at all, and never a response listener. Since 18
+// ends in `cleanSince(snap18)`, that meant a thrown error or a 404 raised
+// during exactly the checks 18 was added for would have gone unrecorded and
+// left it green -- the same "assertion that cannot fail" shape 15, 16 and 18
+// were each written to close, reappearing inside one of them.
+//
+// Every listener reads the module-level `phase` when it FIRES, not when it is
+// attached, so attributions follow whatever phase is current.
+function instrumentPage(page) {
+    page.on('pageerror', (e) => {
+        pageErrors.push({ phase, text: (e && e.stack) || String(e) });
+    });
+    page.on('console', (msg) => {
+        if (msg.type() === 'error') consoleErrors.push({ phase, text: msg.text() });
+    });
+    page.on('response', (res) => {
+        const rec = { phase, status: res.status(), url: res.url() };
+        allResponses.push(rec);
+        if (rec.status >= 400) badResponses.push(rec);
+    });
+    return page;
+}
+
+// Serve the two CDN scripts from the local mirror. Paired with instrumentPage
+// above: a page that routes but is not instrumented is the bug this fixes.
+async function mirrorCdn(page) {
+    await page.route('**/*', async (route) => {
+        const url = route.request().url();
+        for (const asset of CDN_ASSETS) {
+            if (url === asset.url || url.startsWith(asset.url.split('?')[0])) {
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'text/javascript; charset=utf-8',
+                    body: mirror[asset.url]
+                });
+                return;
+            }
+        }
+        await route.continue();
+    });
+    return page;
+}
+
+// One call that cannot produce a partially-wired page.
+async function newInstrumentedPage(ctx) {
+    const page = await ctx.newPage();
+    instrumentPage(page);
+    await mirrorCdn(page);
+    return page;
+}
+
+// The evidence graph opens in NETWORK view (viewer.html's DEFAULT_VIEW).
+// Anything that wants to measure the ORDERED INDEX has to ask for it first --
+// and asks the way a reader does, by clicking the switch in #chip-bar, so that
+// a switch which silently stopped working takes the index assertions down with
+// it instead of leaving them measuring a physics cloud and calling it a grid.
+// Returns what it did, so the assertion can report "no #view-index" rather than
+// timing out somewhere further along.
+async function enterIndexView(page) {
+    const outcome = await page.evaluate(() => {
+        const el = document.getElementById('view-index');
+        if (!el) return 'no #view-index in the DOM';
+        const group = document.getElementById('view-switch');
+        if (group && group.classList.contains('mode-hidden')) return 'switch hidden';
+        if (el.classList.contains('view-active')) return 'already in index view';
+        el.click();
+        return 'clicked';
+    });
+    await sleep(900);
+    await settle(page);
+    return outcome;
+}
+
 async function typeSearch(page, term) {
     await page.fill('#search', '');
     await page.fill('#search', term);
@@ -327,7 +476,9 @@ async function main() {
     console.log(`  vis-network + marked served from local mirror ${MIRROR_DIR} ` +
         `(the page still requests the CDN URLs; interception keeps the run hermetic)\n`);
 
-    const mirror = Object.fromEntries(
+    // Assigned, not declared: `mirror` is bound at module scope so the page
+    // helpers defined above main() can serve from the same map.
+    mirror = Object.fromEntries(
         CDN_ASSETS.map(a => [a.url, fs.readFileSync(path.join(MIRROR_DIR, a.file), 'utf8')])
     );
 
@@ -1299,6 +1450,835 @@ async function main() {
                 `${evDetail.pill === null ? 'MISSING' : '"' + evDetail.pill + '"'}\n` +
                 (describeSince(snap14).join('\n') || 'no errors'));
         }
+
+        // ---------------------------------------------------------------- 15
+        // The evidence graph's INDEX view is a deterministic ordered index.
+        //
+        // The index is no longer what arrives -- viewer.html's DEFAULT_VIEW is
+        // VIEW_NETWORK, on the owner's instruction -- so this asks for it
+        // first, by clicking #view-index the way a reader does. That is the
+        // only change: the property being measured, and the zero tolerance it
+        // is measured to, are exactly as they were. Asking through the DOM
+        // rather than through setViewMode() is deliberate; a switch that
+        // stopped being wired up would fail here rather than quietly leaving
+        // this assertion measuring a physics cloud and calling it a grid.
+        //
+        // This is the single property the ordered index rests on, and
+        // it is the one thing none of assertions 1-14 can see. Assertion 13
+        // checks the mode FLAGS after a round trip and tolerates half the
+        // distinct-x count drifting away, because it was written when the
+        // arrival was a physics cloud. If the ordered layout silently stopped
+        // being applied — a stale `fixed`, an early return in
+        // applyOrderedLayout(), a solver left running — 13 would still pass
+        // while the front door went back to being a different picture every
+        // load. So 15 measures the property directly, in three parts:
+        //
+        //   a. TWO LOADS, TWO CONTEXTS, IDENTICAL COORDINATES. Separate browser
+        //      contexts, so nothing is shared: no cache, no storage, no
+        //      surviving vis instance. Every node must land on exactly the same
+        //      integer pair. Comparing within one page would prove nothing —
+        //      it is the second *load* that has to agree.
+        //
+        //   b. NOTHING MOVES ONCE IT IS DRAWN. "Physics off" is asserted as the
+        //      reader experiences it rather than as an options flag, because
+        //      the viewer deliberately leaves physics.enabled true (assertion
+        //      13 requires it) and instead pins every node. Both halves are
+        //      checked: every node carries fixed.x && fixed.y, AND total
+        //      displacement over a settle window is zero. Either alone is
+        //      forgeable — a pinned node whose coordinates are recomputed on a
+        //      timer would pass the first, and a solver that happens to be at
+        //      rest on this data would pass the second.
+        //
+        //   c. THE ROUND TRIP RESTORES IT EXACTLY. Out to dissolution — the
+        //      hierarchical override that has leaked before — and back. Not
+        //      "roughly the same shape": the same integers. This is the
+        //      layout-leak bug's second incarnation, and an ordered layout that
+        //      comes back 3 units off is an ordered layout that is being
+        //      recomputed from something other than the data.
+        // ------------------------------------------------------------------
+        phase = 'ordered-arrival';
+        const snap15 = snapshotErrors();
+
+        // Read every node's coordinates as integers, plus what the layout says
+        // about itself. Rounding is the caller's problem nowhere: vis stores
+        // these as floats and the ordered layout writes Math.round()ed ints, so
+        // an exact comparison is legitimate here and would not be if physics
+        // had ever touched them.
+        const readOrdered = (p) => p.evaluate(() => {
+            const pos = network.getPositions();
+            const ids = Object.keys(pos).sort();
+            const items = nodesDataSet.get();
+            const pinned = items.filter(n => n.fixed && n.fixed.x === true && n.fixed.y === true).length;
+            return {
+                graphKey: typeof currentGraphKey !== 'undefined' ? currentGraphKey : null,
+                orderedLayoutActive: typeof orderedLayoutActive !== 'undefined'
+                    ? !!orderedLayoutActive : null,
+                exploreMode: typeof exploreMode !== 'undefined' ? !!exploreMode : null,
+                overrideCleared: typeof layoutOverride === 'undefined' || layoutOverride === null,
+                hierarchical: !!(network.layoutEngine && network.layoutEngine.options &&
+                    network.layoutEngine.options.hierarchical &&
+                    network.layoutEngine.options.hierarchical.enabled),
+                physicsOption: !!network.physics.options.enabled,
+                nodeCount: ids.length,
+                totalNodes: items.length,
+                pinnedNodes: pinned,
+                distinctX: new Set(ids.map(id => Math.round(pos[id].x))).size,
+                coords: ids.map(id => `${id}:${Math.round(pos[id].x)},${Math.round(pos[id].y)}`)
+            };
+        });
+
+        // Total displacement between two coordinate readings, plus the worst
+        // offenders by name — a count alone does not tell you whether one node
+        // slipped or the whole grid re-flowed.
+        const displacement = (a, b) => {
+            const parse = (rows) => {
+                const m = new Map();
+                rows.forEach(r => {
+                    const i = r.lastIndexOf(':');
+                    const [x, y] = r.slice(i + 1).split(',').map(Number);
+                    m.set(r.slice(0, i), [x, y]);
+                });
+                return m;
+            };
+            const ma = parse(a), mb = parse(b);
+            let total = 0;
+            const movers = [];
+            const missing = [];
+            for (const [id, pa] of ma) {
+                const pb = mb.get(id);
+                if (!pb) { missing.push(id); continue; }
+                const d = Math.abs(pa[0] - pb[0]) + Math.abs(pa[1] - pb[1]);
+                if (d) { total += d; movers.push({ id, from: pa, to: pb, d }); }
+            }
+            for (const id of mb.keys()) if (!ma.has(id)) missing.push(id);
+            movers.sort((x, y) => y.d - x.d);
+            return {
+                total, movedCount: movers.length, missingCount: missing.length,
+                worst: movers.slice(0, 4).map(m =>
+                    `${m.id} (${m.from[0]},${m.from[1]})->(${m.to[0]},${m.to[1]}) d=${m.d}`),
+                missing: missing.slice(0, 4)
+            };
+        };
+
+        let arrivalA = null, arrivalB = null, afterDrift = null, afterTrip = null;
+        let driftDelta = null, reloadDelta = null, tripDelta = null;
+        const orderedNotes = [];
+        const enterNotes = [];
+
+        for (const which of ['A', 'B']) {
+            const oCtx = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
+            try {
+                const oPage = await oCtx.newPage();
+                await oPage.route('**/*', async (route) => {
+                    const url = route.request().url();
+                    for (const asset of CDN_ASSETS) {
+                        if (url === asset.url || url.startsWith(asset.url.split('?')[0])) {
+                            await route.fulfill({
+                                status: 200,
+                                contentType: 'text/javascript; charset=utf-8',
+                                body: mirror[asset.url]
+                            });
+                            return;
+                        }
+                    }
+                    await route.continue();
+                });
+                oPage.on('pageerror', (err) => {
+                    pageErrors.push({ phase, text: (err && err.stack) || String(err) });
+                });
+                oPage.on('console', (msg) => {
+                    if (msg.type() === 'error') consoleErrors.push({ phase, text: msg.text() });
+                });
+                oPage.on('response', (res) => {
+                    const rec = { phase, status: res.status(), url: res.url() };
+                    allResponses.push(rec);
+                    if (rec.status >= 400) badResponses.push(rec);
+                });
+
+                await oPage.goto(`${base}/viewer.html`, { waitUntil: 'domcontentloaded' });
+                await waitLoaded(oPage);
+                // A fresh context has empty localStorage, so both loads open in
+                // Network. Ask for the index through the switch. Recorded per
+                // context because "the same every load" has to mean the same
+                // gesture every load too.
+                enterNotes.push(`${which}: ${await enterIndexView(oPage)}`);
+
+                if (which === 'A') {
+                    arrivalA = await readOrdered(oPage);
+                    // (b) nothing moves. Deliberately NOT preceded by another
+                    // settle() call: this window starts the moment the arrival
+                    // is declared done, which is exactly when a reader is
+                    // looking at it.
+                    await sleep(ORDERED_SETTLE_WINDOW_MS);
+                    afterDrift = await readOrdered(oPage);
+                    driftDelta = displacement(arrivalA.coords, afterDrift.coords);
+
+                    // (c) out through the hierarchical override and back.
+                    await oPage.selectOption('#graph-select', 'dissolution');
+                    await waitLoaded(oPage);
+                    await sleep(1200);
+                    const viaDiss = await readOrdered(oPage);
+                    orderedNotes.push(
+                        `detour dissolution: hierarchical=${viaDiss.hierarchical} ` +
+                        `physicsOption=${viaDiss.physicsOption} ordered=${viaDiss.orderedLayoutActive}`);
+                    await oPage.selectOption('#graph-select', 'evidence');
+                    await waitLoaded(oPage);
+                    await sleep(1500);
+                    // Deliberately NOT re-clicking the switch here. The reader
+                    // chose Index before the detour, and the graph they left in
+                    // Index is the graph they must come back to; a viewer that
+                    // needs the switch pressed again after every graph change
+                    // has a preference it does not honour.
+                    afterTrip = await readOrdered(oPage);
+                    tripDelta = displacement(arrivalA.coords, afterTrip.coords);
+                } else {
+                    arrivalB = await readOrdered(oPage);
+                    reloadDelta = displacement(arrivalA.coords, arrivalB.coords);
+                }
+            } finally {
+                await oCtx.close().catch(() => {});
+            }
+        }
+        phase = 'ordered-arrival';
+
+        const shapeOk = !!arrivalA && arrivalA.graphKey === 'evidence' &&
+            arrivalA.orderedLayoutActive === true && arrivalA.exploreMode === false &&
+            arrivalA.overrideCleared && !arrivalA.hierarchical &&
+            // Every node pinned — not "most", and not merely the visible ones:
+            // an unpinned hidden node is a node that will have moved by the
+            // time a type chip reveals it.
+            arrivalA.pinnedNodes === arrivalA.totalNodes && arrivalA.totalNodes > 0 &&
+            // An ordered grid has lanes. One distinct x is a stack, and one per
+            // node is a cloud; the arrival is neither.
+            arrivalA.distinctX > 1 && arrivalA.distinctX < arrivalA.nodeCount;
+
+        const determinismOk = !!reloadDelta &&
+            reloadDelta.missingCount === 0 &&
+            reloadDelta.movedCount <= ORDERED_MAX_RELOAD_DELTA &&
+            reloadDelta.total <= ORDERED_MAX_RELOAD_DELTA;
+        const stillOk = !!driftDelta && driftDelta.total <= ORDERED_MAX_DRIFT_UNITS;
+        const tripOk = !!afterTrip && !!tripDelta &&
+            tripDelta.missingCount === 0 && tripDelta.total <= ORDERED_MAX_DRIFT_UNITS &&
+            !afterTrip.hierarchical && afterTrip.physicsOption &&
+            afterTrip.overrideCleared && afterTrip.orderedLayoutActive === true &&
+            afterTrip.pinnedNodes === afterTrip.totalNodes;
+
+        const ok15 = shapeOk && determinismOk && stillOk && tripOk && cleanSince(snap15);
+        record(15,
+            'the evidence graph\'s Index view is a deterministic ordered index ' +
+            '(identical coordinates across two loads, nothing moving on arrival, ' +
+            'restored exactly after a round trip)',
+            ok15,
+            (arrivalA
+                ? `arrival: graph=${arrivalA.graphKey} ordered=${arrivalA.orderedLayoutActive} ` +
+                  `explore=${arrivalA.exploreMode} override=${arrivalA.overrideCleared ? 'null' : 'SET'} ` +
+                  `hierarchical=${arrivalA.hierarchical} ` +
+                  `pinned=${arrivalA.pinnedNodes}/${arrivalA.totalNodes} ` +
+                  `placed=${arrivalA.nodeCount} distinctX=${arrivalA.distinctX}` +
+                  `${shapeOk ? '' : ' <-- NOT AN ORDERED ARRIVAL'}\n`
+                : 'arrival: NOT MEASURED\n') +
+            (driftDelta
+                ? `physics off on arrival: over ${ORDERED_SETTLE_WINDOW_MS}ms ` +
+                  `${driftDelta.movedCount} nodes moved, total drift ${driftDelta.total} units ` +
+                  `(budget ${ORDERED_MAX_DRIFT_UNITS})${stillOk ? '' : ' <-- STILL SETTLING'}` +
+                  `${driftDelta.worst.length ? '\n  ' + driftDelta.worst.join('\n  ') : ''}\n`
+                : 'physics off on arrival: NOT MEASURED\n') +
+            (reloadDelta
+                ? `second load in a fresh context: ${arrivalB.nodeCount} nodes placed, ` +
+                  `${reloadDelta.movedCount} differ, ${reloadDelta.missingCount} missing, ` +
+                  `total delta ${reloadDelta.total} units (budget ${ORDERED_MAX_RELOAD_DELTA})` +
+                  `${determinismOk ? '' : ' <-- NOT DETERMINISTIC'}` +
+                  `${reloadDelta.worst.length ? '\n  ' + reloadDelta.worst.join('\n  ') : ''}` +
+                  `${reloadDelta.missing.length ? '\n  missing: ' + reloadDelta.missing.join(', ') : ''}\n`
+                : 'second load: NOT MEASURED\n') +
+            `entered the index by clicking the switch: ${enterNotes.join('; ') || 'NOT ATTEMPTED'}\n` +
+            orderedNotes.map(n => n + '\n').join('') +
+            (tripDelta
+                ? `back from dissolution: ${tripDelta.movedCount} nodes differ, ` +
+                  `total delta ${tripDelta.total} units, ` +
+                  `hierarchical=${afterTrip.hierarchical} physicsOption=${afterTrip.physicsOption} ` +
+                  `override=${afterTrip.overrideCleared ? 'null' : 'SET'} ` +
+                  `ordered=${afterTrip.orderedLayoutActive} ` +
+                  `pinned=${afterTrip.pinnedNodes}/${afterTrip.totalNodes}` +
+                  `${tripOk ? '' : ' <-- ORDERED LAYOUT LEAKED OR LOST'}` +
+                  `${tripDelta.worst.length ? '\n  ' + tripDelta.worst.join('\n  ') : ''}\n`
+                : 'round trip: NOT MEASURED\n') +
+            (describeSince(snap15).join('\n') || 'no errors'));
+
+        // ------------------------------------------------------------------
+        // 16. The ordered index is legible, not merely ordered.
+        //
+        // An index is exhaustive, ordered, fast to scan and points elsewhere.
+        // Assertion 15 covers ordered. This covers the scanning: captions big
+        // enough to read, and axis headings naming what the lanes and bands
+        // are -- because a grid whose axes are anonymous is a pretty pattern,
+        // not an index.
+        //
+        // Both halves are load-bearing and neither implies the other. The
+        // pitch constants in viewer.html are derived from label metrics; put
+        // the original round numbers back and the whole grid inflates ~1.8x,
+        // fit() zooms out to contain it, captions land at ~5px -- and 15 still
+        // passes, every node still exactly where it belongs. Symmetrically the
+        // headings are an HTML overlay that could be dropped without moving a
+        // single node.
+        // ------------------------------------------------------------------
+        phase = 'legibility';
+        const snap16 = snapshotErrors();
+
+        let legibility = null;
+        let legibilityEntry = 'not attempted';
+        {
+            const lCtx = await browser.newContext({ viewport: LEGIBILITY_VIEWPORT });
+            try {
+                const lPage = await lCtx.newPage();
+                lPage.on('pageerror', (e) => pageErrors.push({ phase, text: String(e) }));
+                lPage.on('console', (msg) => {
+                    if (msg.type() === 'error') consoleErrors.push({ phase, text: msg.text() });
+                });
+                lPage.on('response', (res) => {
+                    const rec = { phase, status: res.status(), url: res.url() };
+                    allResponses.push(rec);
+                    if (rec.status >= 400) badResponses.push(rec);
+                });
+                await lPage.route('**/*', async (route) => {
+                    const url = route.request().url();
+                    for (const asset of CDN_ASSETS) {
+                        if (url === asset.url || url.startsWith(asset.url.split('?')[0])) {
+                            await route.fulfill({
+                                status: 200,
+                                contentType: 'text/javascript; charset=utf-8',
+                                body: mirror[asset.url]
+                            });
+                            return;
+                        }
+                    }
+                    await route.continue();
+                });
+                await lPage.goto(`${base}/viewer.html`, { waitUntil: 'domcontentloaded' });
+                await waitLoaded(lPage);
+                // Same reason as assertion 15: this measures the INDEX, and the
+                // index is no longer what arrives.
+                legibilityEntry = await enterIndexView(lPage);
+                await sleep(1200);
+
+                legibility = await lPage.evaluate(() => {
+                    const scale = network.getScale();
+                    // The font the index actually draws claims at. Read from the
+                    // viewer's own constant rather than re-derived here, so the
+                    // test cannot drift away from the thing it is policing.
+                    const font = (typeof ORDERED_FONT === 'number') ? ORDERED_FONT : 14;
+                    const drawn = network.body.data.nodes.get()
+                        .filter(n => n.hidden !== true)
+                        .map(n => (n.label || '').trim())
+                        .filter(Boolean);
+                    const overlay = document.getElementById('axis-overlay');
+                    const labels = overlay
+                        ? Array.from(overlay.querySelectorAll('.axis-label'))
+                            .filter(el => el.offsetWidth > 0 && (el.textContent || '').trim())
+                        : [];
+                    // A heading that swallows a click is worse than no heading:
+                    // it makes a node under it unreachable.
+                    let clickThrough = true;
+                    for (const el of labels) {
+                        const r = el.getBoundingClientRect();
+                        const hit = document.elementFromPoint(
+                            Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2));
+                        if (hit && hit.tagName !== 'CANVAS') { clickThrough = false; break; }
+                    }
+                    return {
+                        // `typeof`, not `window.orderedLayout`: the viewer
+                        // declares it as a top-level `let`, which creates a
+                        // declarative binding rather than a property of window.
+                        // Reading it through window yields undefined always, so
+                        // the transposed check silently answered "false" even on
+                        // a phone where the layout really is transposed -- an
+                        // assertion that cannot fail. Measured, not guessed.
+                        transposed: (typeof orderedLayout !== 'undefined' && orderedLayout)
+                            ? !!orderedLayout.transposed
+                            : null,
+                        scale: +scale.toFixed(3),
+                        font,
+                        effectivePx: +(font * scale).toFixed(2),
+                        drawnLabels: drawn.length,
+                        laneHeadings: labels.filter(el => el.classList.contains('axis-lane')).length,
+                        bandHeadings: labels.filter(el => el.classList.contains('axis-band')).length,
+                        headings: labels.length,
+                        clickThrough
+                    };
+                });
+            } finally {
+                await lCtx.close().catch(() => {});
+            }
+        }
+
+        const ok16 = !!legibility &&
+            // A transposed (narrow) arrival draws no captions by design, so the
+            // caption budget would be meaningless. This viewport is a desktop.
+            legibility.transposed === false &&
+            legibility.effectivePx >= MIN_EFFECTIVE_LABEL_PX &&
+            legibility.drawnLabels > 0 &&
+            legibility.laneHeadings >= 1 && legibility.bandHeadings >= 1 &&
+            legibility.headings >= MIN_AXIS_HEADINGS &&
+            legibility.clickThrough &&
+            cleanSince(snap16);
+        record(16,
+            'the ordered index is legible: captions at or above the target size ' +
+            'and named axes that do not swallow clicks',
+            ok16,
+            `entered the index by clicking the switch: ${legibilityEntry}\n` +
+            (legibility
+                ? `at ${LEGIBILITY_VIEWPORT.width}x${LEGIBILITY_VIEWPORT.height}: ` +
+                  `fit scale ${legibility.scale}, font ${legibility.font} -> ` +
+                  `effective label ${legibility.effectivePx}px ` +
+                  `(budget >= ${MIN_EFFECTIVE_LABEL_PX})` +
+                  `${legibility.effectivePx >= MIN_EFFECTIVE_LABEL_PX ? '' : ' <-- TOO SMALL TO READ'}` +
+                  // Early warning, on a PASS. Caption size is font x the zoom
+                  // that fits the grid, so it shrinks every time a claim is
+                  // added to the record -- registering the 94th cost 0.72px.
+                  // Without this line the first person to add a claim sees a
+                  // viewer assertion go red for an edit to FINDINGS.md and has
+                  // no way to connect the two.
+                  `${legibility.effectivePx >= MIN_EFFECTIVE_LABEL_PX &&
+                     legibility.effectivePx - MIN_EFFECTIVE_LABEL_PX < 1
+                        ? `\n  NOTE: only ${(legibility.effectivePx - MIN_EFFECTIVE_LABEL_PX).toFixed(2)}px above the floor. ` +
+                          `Captions shrink as the record grows (~0.7px per claim), so the next claim ` +
+                          `registered in docs/FINDINGS.md is likely to fail this assertion. That would ` +
+                          `be the grid outgrowing the viewport, not a viewer regression -- the fix is to ` +
+                          `stop fitting the whole grid, not to lower the floor.`
+                        : ''}\n` +
+                  `captions drawn: ${legibility.drawnLabels}` +
+                  `${legibility.drawnLabels ? '' : ' <-- NONE DRAWN'}` +
+                  `${legibility.transposed ? ' <-- TRANSPOSED, expected the wide index' : ''}\n` +
+                  `axis headings: ${legibility.laneHeadings} lane + ` +
+                  `${legibility.bandHeadings} band = ${legibility.headings}` +
+                  `${legibility.headings >= MIN_AXIS_HEADINGS &&
+                     legibility.laneHeadings >= 1 && legibility.bandHeadings >= 1
+                        ? '' : ' <-- AXES UNNAMED'}, ` +
+                  `click-through ${legibility.clickThrough}` +
+                  `${legibility.clickThrough ? '' : ' <-- HEADINGS EAT CLICKS'}`
+                : 'NOT MEASURED') +
+            '\n' + (describeSince(snap16).join('\n') || 'no errors'));
+
+        // ---------------------------------------------------------------- 17
+        // The view switch: two co-equal readings, reversibly.
+        //
+        // The index replaced the graph instead of joining it. It is now one of
+        // two views, and NETWORK -- force-directed, physics running, nothing
+        // pinned, every type in play -- is what a first-time visitor gets.
+        // That makes three separate things breakable, and none of 1-16 can see
+        // any of them:
+        //
+        //   a. THE DEFAULT. A context with empty localStorage must land in
+        //      Network, and "Network" has to mean it: physics option on, ZERO
+        //      pinned nodes, and the full type set. Not the 93-claim index
+        //      default drawn as a cloud -- that is the index's node set wearing
+        //      the graph's layout, which is neither view, and it is exactly
+        //      what happens if the claims-only default is left keyed to the
+        //      graph instead of to the view.
+        //
+        //   b. BOTH ROUND TRIPS, BOTH DIRECTIONS. This file has been bitten
+        //      twice by a return path that half-worked (see the comment above
+        //      `layoutOverride = null`), so each direction is measured on its
+        //      own terms rather than assumed from the other:
+        //        index -> network -> index  restores the SAME INTEGERS. Zero
+        //          tolerance, for the same reason assertion 15 has none: one
+        //          unit of drift is one unit of physics.
+        //        network -> index -> network leaves physics GENUINELY RUNNING.
+        //          Not "the option is true" -- the option is true in the index
+        //          too, by design. Nodes have to actually move, which is the
+        //          only reading a stale `fixed` cannot forge.
+        //
+        //   c. THE PREFERENCE PERSISTS. Checked by reloading the page, in both
+        //      directions, because a preference that is only remembered in a
+        //      JS variable is not remembered at all. Both reloads matter: one
+        //      that only ever stores 'index' would also pass a viewer that had
+        //      simply gone back to opening on the index.
+        //
+        // Assertions 15 and 16 lean on this: both now enter the index by
+        // clicking #view-index, so a broken switch fails three assertions
+        // rather than silently redefining what two of them measure.
+        // ------------------------------------------------------------------
+        phase = 'view-switch';
+        const snap17 = snapshotErrors();
+
+        // Everything the switch can get wrong, read off the live network.
+        // `unpinnedNodes` counts `fixed === false` specifically rather than
+        // "not pinned": vis leaves `fixed` undefined on a node nobody ever
+        // pinned, and undefined is how a node that was never released looks.
+        const readView = (p) => p.evaluate(() => {
+            const pos = network.getPositions();
+            const ids = Object.keys(pos).sort();
+            const items = nodesDataSet.get();
+            const types = (typeof activeTypes !== 'undefined' && activeTypes) ? activeTypes : {};
+            const typeKeys = Object.keys(types);
+            const group = document.getElementById('view-switch');
+            // Key read from the page, not hardcoded here, for the same reason
+            // assertion 16 reads ORDERED_FONT off the viewer: a rename in
+            // viewer.html would otherwise leave 17 and 18 reading a key nobody
+            // writes, seeing `stored === null` forever, and passing.
+            let stored;
+            const storageKey = (typeof VIEW_STORAGE_KEY === 'string')
+                ? VIEW_STORAGE_KEY : 'lucier-graph-view';
+            try { stored = window.localStorage.getItem(storageKey); }
+            catch (e) { stored = 'THREW'; }
+            return {
+                view: (typeof currentView === 'function') ? currentView() : null,
+                explore: (typeof exploreMode !== 'undefined') ? !!exploreMode : null,
+                stored,
+                ordered: (typeof orderedLayoutActive !== 'undefined') ? !!orderedLayoutActive : null,
+                overrideCleared: typeof layoutOverride === 'undefined' || layoutOverride === null,
+                hierarchical: !!(network.layoutEngine && network.layoutEngine.options &&
+                    network.layoutEngine.options.hierarchical &&
+                    network.layoutEngine.options.hierarchical.enabled),
+                physicsOption: !!network.physics.options.enabled,
+                totalNodes: items.length,
+                pinnedNodes: items.filter(n => n.fixed && n.fixed.x === true && n.fixed.y === true).length,
+                unpinnedNodes: items.filter(n => n.fixed === false).length,
+                visibleNodes: items.filter(n => n.hidden !== true).length,
+                typesOn: typeKeys.filter(k => types[k] !== false).length,
+                typesTotal: typeKeys.length,
+                switchShown: !!(group && !group.classList.contains('mode-hidden')),
+                lit: ['view-network', 'view-index']
+                    .filter(id => {
+                        const el = document.getElementById(id);
+                        return el && el.classList.contains('view-active');
+                    }).join(',') || 'none',
+                distinctX: new Set(ids.map(id => Math.round(pos[id].x))).size,
+                coords: ids.map(id => `${id}:${Math.round(pos[id].x)},${Math.round(pos[id].y)}`)
+            };
+        });
+
+        const clickView = async (p, id) => {
+            const outcome = await p.evaluate((which) => {
+                const el = document.getElementById(which);
+                if (!el) return `no #${which}`;
+                const group = document.getElementById('view-switch');
+                if (group && group.classList.contains('mode-hidden')) return 'switch hidden';
+                const rect = el.getBoundingClientRect();
+                if (rect.width < 40 || rect.height < 40) {
+                    // Not fatal on a desktop -- the 40x40 floor is the mobile
+                    // rule -- but worth carrying into the report.
+                    el.click();
+                    return `clicked (${Math.round(rect.width)}x${Math.round(rect.height)})`;
+                }
+                el.click();
+                return 'clicked';
+            }, id);
+            await sleep(900);
+            return outcome;
+        };
+
+        let vArrival = null, vIndex1 = null, vNetwork1 = null, vIndex2 = null;
+        let vMoved = null, vReloadIndex = null, vReloadNetwork = null;
+        let indexTripDelta = null;
+        const viewNotes = [];
+
+        {
+            const vCtx = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
+            try {
+                const vPage = await vCtx.newPage();
+                vPage.on('pageerror', (e) => pageErrors.push({ phase, text: (e && e.stack) || String(e) }));
+                vPage.on('console', (msg) => {
+                    if (msg.type() === 'error') consoleErrors.push({ phase, text: msg.text() });
+                });
+                vPage.on('response', (res) => {
+                    const rec = { phase, status: res.status(), url: res.url() };
+                    allResponses.push(rec);
+                    if (rec.status >= 400) badResponses.push(rec);
+                });
+                await vPage.route('**/*', async (route) => {
+                    const url = route.request().url();
+                    for (const asset of CDN_ASSETS) {
+                        if (url === asset.url || url.startsWith(asset.url.split('?')[0])) {
+                            await route.fulfill({
+                                status: 200,
+                                contentType: 'text/javascript; charset=utf-8',
+                                body: mirror[asset.url]
+                            });
+                            return;
+                        }
+                    }
+                    await route.continue();
+                });
+
+                // (a) first-time visitor: nothing stored, nothing remembered.
+                await vPage.goto(`${base}/viewer.html`, { waitUntil: 'domcontentloaded' });
+                await waitLoaded(vPage);
+                await sleep(1200);
+                vArrival = await readView(vPage);
+
+                // -> index
+                viewNotes.push(`click #view-index: ${await clickView(vPage, 'view-index')}`);
+                await settle(vPage);
+                vIndex1 = await readView(vPage);
+
+                // -> network. Sampled immediately and again a beat later: the
+                // question is whether the solver is integrating, and the only
+                // honest answer is that the nodes are somewhere else now.
+                viewNotes.push(`click #view-network: ${await clickView(vPage, 'view-network')}`);
+                const beforeMove = await readView(vPage);
+                await sleep(1400);
+                vNetwork1 = await readView(vPage);
+                vMoved = displacement(beforeMove.coords, vNetwork1.coords);
+
+                // -> index again. Same integers, or the return path is
+                // recomputing the grid from something other than the data.
+                viewNotes.push(`click #view-index: ${await clickView(vPage, 'view-index')}`);
+                await settle(vPage);
+                vIndex2 = await readView(vPage);
+                indexTripDelta = displacement(vIndex1.coords, vIndex2.coords);
+
+                // (c) the preference survives a real load, both ways round.
+                await vPage.reload({ waitUntil: 'domcontentloaded' });
+                await waitLoaded(vPage);
+                await sleep(1200);
+                vReloadIndex = await readView(vPage);
+
+                viewNotes.push(`click #view-network: ${await clickView(vPage, 'view-network')}`);
+                await vPage.reload({ waitUntil: 'domcontentloaded' });
+                await waitLoaded(vPage);
+                await sleep(1200);
+                vReloadNetwork = await readView(vPage);
+            } finally {
+                await vCtx.close().catch(() => {});
+            }
+        }
+        phase = 'view-switch';
+
+        const defaultOk = !!vArrival &&
+            vArrival.view === 'network' && vArrival.explore === true &&
+            vArrival.ordered === true && vArrival.switchShown === true &&
+            vArrival.lit === 'view-network' &&
+            vArrival.physicsOption === true && !vArrival.hierarchical &&
+            vArrival.overrideCleared &&
+            vArrival.pinnedNodes === 0 &&
+            vArrival.unpinnedNodes === vArrival.totalNodes &&
+            // The full default node set, not the index's 93 claims.
+            vArrival.visibleNodes === vArrival.totalNodes &&
+            vArrival.typesOn === vArrival.typesTotal && vArrival.typesTotal > 0;
+
+        const indexOk = !!vIndex1 &&
+            vIndex1.view === 'index' && vIndex1.lit === 'view-index' &&
+            vIndex1.pinnedNodes === vIndex1.totalNodes && vIndex1.totalNodes > 0 &&
+            vIndex1.distinctX > 1 && vIndex1.distinctX < vIndex1.totalNodes &&
+            vIndex1.visibleNodes < vIndex1.totalNodes;
+
+        const backToNetworkOk = !!vNetwork1 && !!vMoved &&
+            vNetwork1.view === 'network' && vNetwork1.lit === 'view-network' &&
+            vNetwork1.physicsOption === true &&
+            vNetwork1.pinnedNodes === 0 &&
+            vNetwork1.unpinnedNodes === vNetwork1.totalNodes &&
+            vNetwork1.visibleNodes === vNetwork1.totalNodes &&
+            vNetwork1.typesOn === vNetwork1.typesTotal &&
+            // Physics genuinely running, not merely enabled.
+            vMoved.total > 0;
+
+        const indexTripOk = !!indexTripDelta &&
+            indexTripDelta.missingCount === 0 &&
+            indexTripDelta.movedCount <= ORDERED_MAX_RELOAD_DELTA &&
+            indexTripDelta.total <= ORDERED_MAX_RELOAD_DELTA &&
+            !!vIndex2 && vIndex2.pinnedNodes === vIndex2.totalNodes;
+
+        const persistOk = !!vReloadIndex && !!vReloadNetwork &&
+            vReloadIndex.view === 'index' && vReloadIndex.stored === 'index' &&
+            vReloadIndex.pinnedNodes === vReloadIndex.totalNodes &&
+            vReloadNetwork.view === 'network' && vReloadNetwork.stored === 'network' &&
+            vReloadNetwork.pinnedNodes === 0;
+
+        const ok17 = defaultOk && indexOk && backToNetworkOk && indexTripOk &&
+            persistOk && cleanSince(snap17);
+        record(17,
+            'the NETWORK/INDEX view switch is co-equal, reversible and remembered ' +
+            '(Network is the default and really unpinned, both round trips are exact, ' +
+            'the choice survives a reload)',
+            ok17,
+            (vArrival
+                ? `first visit (empty storage): view=${vArrival.view} lit=${vArrival.lit} ` +
+                  `stored=${vArrival.stored === null ? 'nothing' : vArrival.stored} ` +
+                  `switchShown=${vArrival.switchShown} ` +
+                  `pinned=${vArrival.pinnedNodes}/${vArrival.totalNodes} ` +
+                  `released=${vArrival.unpinnedNodes}/${vArrival.totalNodes} ` +
+                  `visible=${vArrival.visibleNodes}/${vArrival.totalNodes} ` +
+                  `types=${vArrival.typesOn}/${vArrival.typesTotal} ` +
+                  `physicsOption=${vArrival.physicsOption} distinctX=${vArrival.distinctX}` +
+                  `${defaultOk ? '' : ' <-- NOT THE NETWORK VIEW'}\n`
+                : 'first visit: NOT MEASURED\n') +
+            (vIndex1
+                ? `-> index: view=${vIndex1.view} lit=${vIndex1.lit} ` +
+                  `pinned=${vIndex1.pinnedNodes}/${vIndex1.totalNodes} ` +
+                  `visible=${vIndex1.visibleNodes}/${vIndex1.totalNodes} ` +
+                  `distinctX=${vIndex1.distinctX}` +
+                  `${indexOk ? '' : ' <-- NOT THE INDEX'}\n`
+                : '-> index: NOT MEASURED\n') +
+            (vNetwork1
+                ? `-> network: view=${vNetwork1.view} lit=${vNetwork1.lit} ` +
+                  `pinned=${vNetwork1.pinnedNodes}/${vNetwork1.totalNodes} ` +
+                  `released=${vNetwork1.unpinnedNodes}/${vNetwork1.totalNodes} ` +
+                  `visible=${vNetwork1.visibleNodes}/${vNetwork1.totalNodes} ` +
+                  `types=${vNetwork1.typesOn}/${vNetwork1.typesTotal} ` +
+                  `physicsOption=${vNetwork1.physicsOption}, ` +
+                  `solver moved ${vMoved ? vMoved.movedCount : '?'} nodes ` +
+                  `${vMoved ? vMoved.total : '?'} units in 1400ms` +
+                  `${backToNetworkOk ? '' : ' <-- PHYSICS NOT ACTUALLY RUNNING'}\n`
+                : '-> network: NOT MEASURED\n') +
+            (indexTripDelta
+                ? `index -> network -> index: ${indexTripDelta.movedCount} nodes differ, ` +
+                  `total delta ${indexTripDelta.total} units (budget ${ORDERED_MAX_RELOAD_DELTA}), ` +
+                  `pinned=${vIndex2.pinnedNodes}/${vIndex2.totalNodes}` +
+                  `${indexTripOk ? '' : ' <-- ROUND TRIP NOT EXACT'}` +
+                  `${indexTripDelta.worst.length ? '\n  ' + indexTripDelta.worst.join('\n  ') : ''}\n`
+                : 'index round trip: NOT MEASURED\n') +
+            (vReloadIndex && vReloadNetwork
+                ? `after reload with 'index' remembered: view=${vReloadIndex.view} ` +
+                  `stored=${vReloadIndex.stored} pinned=${vReloadIndex.pinnedNodes}/${vReloadIndex.totalNodes}\n` +
+                  `after reload with 'network' remembered: view=${vReloadNetwork.view} ` +
+                  `stored=${vReloadNetwork.stored} pinned=${vReloadNetwork.pinnedNodes}/${vReloadNetwork.totalNodes}` +
+                  `${persistOk ? '' : ' <-- PREFERENCE NOT PERSISTED'}\n`
+                : 'persistence: NOT MEASURED\n') +
+            viewNotes.map(n => n + '\n').join('') +
+            (describeSince(snap17).join('\n') || 'no errors'));
+
+        // ---------------------------------------------------------------- 18
+        // What the reader is actually LOOKING AT after using the switch.
+        //
+        // Assertion 17 proves the switch reaches the right state. It says
+        // nothing about the camera, and nothing about the controls around it —
+        // so both of these shipped with 17 green:
+        //
+        //   a. FRAMING. Index -> Network releases the pins and the solver
+        //      expands the graph well past the index's extent, but the camera
+        //      stayed on the index's zoom and pan. Measured before the fix:
+        //      9.7% of nodes still on canvas at 1600x950, 13.1% at 393x830,
+        //      and still 8.6% / 11.4% six seconds later — it never recovered.
+        //      Every flag assertion 17 reads was correct the whole time.
+        //
+        //   b. RESET VIEW MUST NOT CHOOSE A VIEW. resetView() used to force the
+        //      index and persist the choice, so one click moved a Network
+        //      reader into the index permanently. It compounds with (a): when
+        //      the graph flies off-screen, "Reset View" is the obvious
+        //      recovery, so the natural sequence ended with the reader stuck in
+        //      the view they never picked.
+        //
+        // The budget is deliberately loose. This failure is an order of
+        // magnitude, not a few percent, and a tight threshold here would only
+        // make the assertion flap on solver noise.
+        phase = 'view-framing';
+        const snap18 = snapshotErrors();
+        const MIN_ONSCREEN_PCT = 60;
+
+        let fArrival = null, fAfterSwitch = null, fReset = null, fResetReload = null;
+        const frameNotes = [];
+
+        {
+            const fCtx = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
+            try {
+                const fPage = await newInstrumentedPage(fCtx);
+
+                // Share of drawn nodes whose canvas point lies inside the
+                // container. Read through canvasToDOM so it is the camera being
+                // measured, not the layout — a correct layout framed wrongly is
+                // exactly the bug.
+                const onScreen = (p) => p.evaluate(() => {
+                    const c = network.body.container;
+                    const ids = Object.keys(network.getPositions());
+                    let inside = 0;
+                    ids.forEach((id) => {
+                        const pt = network.canvasToDOM(network.getPositions([id])[id]);
+                        if (pt.x >= 0 && pt.x <= c.clientWidth &&
+                            pt.y >= 0 && pt.y <= c.clientHeight) inside++;
+                    });
+                    return {
+                        total: ids.length,
+                        inside,
+                        pct: ids.length ? +(100 * inside / ids.length).toFixed(1) : 0
+                    };
+                });
+
+                await fPage.goto(`${base}/viewer.html`, { waitUntil: 'domcontentloaded' });
+                await waitLoaded(fPage);
+                await sleep(1400);
+                fArrival = await onScreen(fPage);
+
+                // (a) out to the index and back, by clicking, then let the
+                // released solver run well past the settle the fix fits on.
+                frameNotes.push(`click #view-index: ${await clickView(fPage, 'view-index')}`);
+                await settle(fPage);
+                frameNotes.push(`click #view-network: ${await clickView(fPage, 'view-network')}`);
+                await sleep(5000);
+                fAfterSwitch = await onScreen(fPage);
+
+                // (b) Reset View, from Network, must leave the view alone AND
+                // leave the stored preference alone.
+                //
+                // Checked on a page that has NOT touched the switch, which is
+                // how the bug presented: a first-time visitor, nothing stored,
+                // one click on Reset, and they are in the index for good. Doing
+                // it on the page above would prove less — that page clicked its
+                // way to Network, so a stored 'network' there is correct and
+                // the assertion could not tell "reset wrote it" from "the click
+                // wrote it".
+                const rCtx = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
+                try {
+                    const rPage = await newInstrumentedPage(rCtx);
+                    await rPage.goto(`${base}/viewer.html`, { waitUntil: 'domcontentloaded' });
+                    await waitLoaded(rPage);
+                    await sleep(1200);
+                    const rBefore = await readView(rPage);
+                    frameNotes.push(`before Reset: view=${rBefore.view} ` +
+                        `stored=${rBefore.stored === null ? 'nothing' : rBefore.stored}`);
+
+                    await rPage.evaluate(() => { resetView(); });
+                    await sleep(1600);
+                    fReset = await readView(rPage);
+
+                    // Same context, fresh page: if Reset persisted a choice,
+                    // this is where it shows up. Reading it from the OTHER
+                    // context would only report what the switch clicks stored.
+                    const rPage2 = await newInstrumentedPage(rCtx);
+                    await rPage2.goto(`${base}/viewer.html`, { waitUntil: 'domcontentloaded' });
+                    await waitLoaded(rPage2);
+                    await sleep(1200);
+                    fResetReload = await readView(rPage2);
+                } finally {
+                    await rCtx.close().catch(() => {});
+                }
+            } catch (e) {
+                frameNotes.push(`framing probe failed: ${(e && e.message) || e}`);
+            } finally {
+                await fCtx.close().catch(() => {});
+            }
+        }
+
+        const framingOk = !!fArrival && !!fAfterSwitch &&
+            fArrival.pct >= MIN_ONSCREEN_PCT && fAfterSwitch.pct >= MIN_ONSCREEN_PCT;
+        // Reset must be a no-op on WHICH view, and must not write a preference
+        // the reader never expressed.
+        const resetOk = !!fReset && !!fResetReload &&
+            fReset.view === 'network' && fReset.stored === null &&
+            fResetReload.view === 'network' && fResetReload.stored === null;
+
+        record(18,
+            'using the switch leaves the graph on screen, and "Reset View" ' +
+            'neither changes which view the reader is in nor remembers one for them',
+            framingOk && resetOk && cleanSince(snap18),
+            (fArrival && fAfterSwitch
+                ? `nodes on canvas: arrival ${fArrival.inside}/${fArrival.total} (${fArrival.pct}%), ` +
+                  `after index -> network ${fAfterSwitch.inside}/${fAfterSwitch.total} ` +
+                  `(${fAfterSwitch.pct}%, budget >= ${MIN_ONSCREEN_PCT}%)` +
+                  `${framingOk ? '' : ' <-- SWITCHED TO AN OFF-SCREEN GRAPH'}\n`
+                : 'framing: NOT MEASURED\n') +
+            (fReset
+                ? `after Reset View from Network: view=${fReset.view} ` +
+                  `stored=${fReset.stored === null ? 'nothing' : fReset.stored}` +
+                  `${fReset.view === 'network' && fReset.stored === null ? '' : ' <-- RESET CHANGED THE VIEW'}\n`
+                : 'reset: NOT MEASURED\n') +
+            (fResetReload
+                ? `reload afterwards: view=${fResetReload.view} ` +
+                  `stored=${fResetReload.stored === null ? 'nothing' : fResetReload.stored}` +
+                  `${fResetReload.view === 'network' ? '' : ' <-- RESET WAS PERSISTED'}\n`
+                : 'reload after reset: NOT MEASURED\n') +
+            frameNotes.map(n => n + '\n').join('') +
+            (describeSince(snap18).join('\n') || 'no errors'));
 
     } catch (err) {
         console.error('\n\x1b[31mHARNESS ERROR\x1b[0m:', err && err.stack || err);
