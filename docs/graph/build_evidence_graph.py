@@ -87,6 +87,7 @@ D_SERIES_CLOSE = "2026-07-10"  # FINDINGS.md provenance; JOURNEY_MAP Phase 5
 D_PERMUTATION = "2026-07-11"   # RESULTS_SUMMARY.md section 6; permutation_report.md
 D_ACT_II_5 = "2026-07-19"      # FINDINGS.md scope note; confidence_report.md
 D_POST_CLOSE = "2026-07-23"    # JOURNEY_MAP.md header; bell_anatomy.md correction
+D_POS0 = "2026-07-28"          # FINDINGS.md H-pos0 row; GPT2_DEEP_DIVE.md section 2.5
 D_SUPERVISORY = "2026-03-20"   # JOURNEY_MAP Phase 4 heading
 D_EXPLORATORY = "2026-03-01"   # month anchor: FINDINGS "Original exploratory work: 2026-03"
 
@@ -500,6 +501,7 @@ HYP_ID = {
     "H-glitch": "h-glitch",
     "H-flip": "h-flip",
     "H-supp": "h-supp",
+    "H-pos0": "h-pos0",
 }
 
 # status is read off the bolded lead of each disposition cell in
@@ -547,6 +549,12 @@ HYP_META = {
     "H-glitch":      dict(status="supported", phase="phase-5", asserted=D_ACT_II_5, retired=None),
     "H-flip":        dict(status="corrected", phase="phase-5", asserted=D_ACT_II_5, retired=None),
     "H-supp":        dict(status="refuted",   phase="phase-5", asserted=D_ACT_II_5, retired=D_ACT_II_5),
+    # H-pos0 is the first hypothesis on the record derived from the architecture
+    # rather than from a run, so it carries no evidence edges: the causal-mask
+    # argument is deductive, and the sequence-length-1 test that would make it
+    # empirical has not been run (and needs an engine change first). "untested"
+    # is the same status H4 carries for the same reason.
+    "H-pos0":        dict(status="untested",  phase="phase-5", asserted=D_POS0, retired=None),
 }
 
 HYP_EVIDENCE = {
@@ -563,6 +571,7 @@ HYP_EVIDENCE = {
     "H-glitch": ["run-11-glitch-alignment"],
     "H-flip": ["run-12-flip-axis-eigenvalue"],
     "H-supp": ["run-15-suppression-test"],
+    "H-pos0": [],
 }
 
 
