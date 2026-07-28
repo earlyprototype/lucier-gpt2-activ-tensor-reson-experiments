@@ -32,6 +32,43 @@ defaults that reproduce the historical single-window path bit-for-bit:
 - `inject_hook_name` (default None) and `renorm` (`"seed_j"` default, or
   `"natural_i"`): the injection-site and rescale-target controls developed for
   the Stage 2 layer-window experiments (EXP_010c).
+- `prepend_bos` (default None): whether TransformerLens prepends the BOS token
+  when it tokenises a string prompt. None defers to the model's own
+  `cfg.default_prepend_bos` — `True` for GPT-2 by the library's global default,
+  explicitly `False` for GPT-NeoX/Pythia — which is what every run in the
+  record used. `True`/`False` overrides it. `run_atr_loop` takes it too, and in
+  both the parameter is threaded to *every* forward pass in the loop, not just
+  the seed pass. Added for issue #75.
+
+## The BOS, and the two ways to control the input sequence
+
+Until #75 the engine handed a bare string to `run_with_cache` at all four of
+its call sites, so whether a BOS token was prepended was decided by the model
+config, invisibly, at a call site that could not see it. Nobody chose it. The
+engine simply could not express "run GPT-2 without a BOS", which is what the
+H-pos0 single-position test (a sequence whose one token *is* the BOS) and the
+caveat-17 tokenisation control both need.
+
+There are now two ways to say what the model actually sees, and they are not
+interchangeable:
+
+- **`prepend_bos=True|False`** — an override on the tokenisation of a string
+  prompt. Convenient, and the right tool for a BOS-free arm of an existing
+  prompt set, because it leaves the prompts themselves alone.
+- **a token-ID `prompt`** — pass a `[pos]` or `[1, pos]` integer tensor instead
+  of a string and TransformerLens takes it verbatim, without a tokeniser in the
+  path at all. This is the exact-sequence route: it states the sequence rather
+  than asking the tokeniser to produce it. For a single-token run the
+  difference is load-bearing — `prepend_bos=False` still leaves the string
+  `<|endoftext|>` to be tokenised into exactly `[50256]` and nothing else,
+  while `torch.tensor([[50256]])` removes the question. No new parameter was
+  needed for this: the engine has always passed `prompt` straight through and
+  never tokenised it itself.
+
+Combining the two raises `ValueError`. TransformerLens applies `prepend_bos`
+inside `to_tokens`, which a token-ID tensor never reaches, so the flag would be
+silently ignored — and a run whose entire point is the absence of a BOS must
+not be able to lie about it.
 
 ## The vendoring contract
 
