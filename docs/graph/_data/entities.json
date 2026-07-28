@@ -157,7 +157,7 @@
       "label": "Discovery 16: Cross-model differences are intrinsic dynamics, not apparatus",
       "type": "finding",
       "status": "supported",
-      "description": "Cross-model differences are intrinsic dynamics, not apparatus. Recorded from Diagnostics (2026-07); evidence: cos_sim_mean verdicts are tensor-level; normalisation inert up to LayerNorm's epsilon term.",
+      "description": "Cross-model differences are intrinsic dynamics, not apparatus. Recorded from Diagnostics (2026-07); evidence: cos_sim_mean verdicts are tensor-level; normalisation inert up to LayerNorm's epsilon term. Amended 2026-07-28: the inertness half is withdrawn pending re-derivation — LayerNorm ignores a global rescale but the residual path around it does not, so the block is not invariant (FINDINGS caveat 7; experiments/preln_rescale_check.py). The tensor-level half is unaffected, and §1.1's separate ruling that the rescale preserves the mix — and so is not the Pythia-410m fragmentation source — still stands.",
       "phase": "phase-5",
       "asserted": "2026-07-10",
       "retired": null,

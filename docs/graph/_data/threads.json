@@ -53,10 +53,10 @@
   "counts": {
     "answered_but_unrecorded": 2,
     "answered_on_disk_unrecorded": 1,
-    "blockers": 8,
+    "blockers": 9,
     "shared_blockers": 2,
-    "open_threads": 22,
-    "low_hanging_fruit": 22,
+    "open_threads": 23,
+    "low_hanging_fruit": 23,
     "frontier": 16,
     "thin_concepts": 3,
     "silent_claims": 33,
@@ -702,6 +702,56 @@
       }
     },
     {
+      "key": "phrase-re-derivation-layernorm-ignores",
+      "label": "re-derivation — LayerNorm ignores a global rescale but the residual path around it does not",
+      "kind": "unresolvable-phrase",
+      "issues": [],
+      "artefact_phrases": [
+        "re-derivation — LayerNorm ignores a global rescale but the residual path around it does not"
+      ],
+      "gates": [
+        {
+          "claim": "disc-16-differences-intrinsic",
+          "label": "Discovery 16: Cross-model differences are intrinsic dynamics, not apparatus",
+          "type": "finding",
+          "status": "supported",
+          "doc_ref": "docs/JOURNEY_MAP.md#2-key-discoveries-chronological",
+          "quotes": [
+            "Amended 2026-07-28: the inertness half is withdrawn pending re-derivation — LayerNorm ignores a global rescale but the residual path around it does not, so the block is not invariant (FINDINGS caveat 7;"
+          ]
+        }
+      ],
+      "gate_count": 1,
+      "still_holds": null,
+      "resolution_evidence_kind": null,
+      "resolution": {
+        "holds": null,
+        "resolution_evidence": [
+          {
+            "file": null,
+            "line": null,
+            "kind": "verdict",
+            "text": "the blocker is a phrase with no filename this tool can responsibly look for; not checked"
+          }
+        ],
+        "checked": [
+          "re_derivation_layernorm.py",
+          "re_derivation_layernorm.json",
+          "re_derivation_layernorm.pt",
+          "re_derivation_layernorm.md",
+          "re_derivation.py",
+          "re_derivation.json",
+          "re_derivation.pt",
+          "re_derivation.md"
+        ],
+        "found": [],
+        "issue_prose": [],
+        "evidence": null,
+        "contrary_prose": [],
+        "guessed_only": []
+      }
+    },
+    {
       "key": "phrase-re-gate",
       "label": "re-gate",
       "kind": "unresolvable-phrase",
@@ -1111,6 +1161,89 @@
       "verdict": "newly-unblocked",
       "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's",
       "rank_tier": 1
+    },
+    {
+      "claim": "disc-16-differences-intrinsic",
+      "label": "Discovery 16: Cross-model differences are intrinsic dynamics, not apparatus",
+      "type": "finding",
+      "status": "supported",
+      "asserted": "2026-07-10",
+      "doc_ref": "docs/JOURNEY_MAP.md#2-key-discoveries-chronological",
+      "description": "Cross-model differences are intrinsic dynamics, not apparatus. Recorded from Diagnostics (2026-07); evidence: cos_sim_mean verdicts are tensor-level; normalisation inert up to LayerNorm's epsilon term. Amended 2026-07-28: the inertness half is withdrawn pending re-derivation — LayerNorm ignores a global rescale but the residual path around it does not, so the block is not invariant (FINDINGS caveat 7; experiments/preln_rescale_check.py). The tensor-level half is unaffected, and §1.1's separate ruling that the rescale preserves the mix — and so is not the Pythia-410m fragmentation source — still stands.",
+      "pending_language": [
+        "pending"
+      ],
+      "blockers": [
+        {
+          "key": "phrase-re-derivation-layernorm-ignores",
+          "label": "re-derivation — LayerNorm ignores a global rescale but the residual path around it does not",
+          "still_holds": null
+        }
+      ],
+      "runs": [
+        "run-cos-sim-diagnostic"
+      ],
+      "evidence": [
+        {
+          "run": "run-cos-sim-diagnostic",
+          "run_label": "Tensor convergence diagnostic",
+          "graph_says": "reads runs 1–2",
+          "date": "2026-07-10",
+          "script": "experiments/cos_sim_diagnostic.ipynb",
+          "script_exists": true,
+          "script_state": {
+            "kind": "notebook",
+            "readable": true,
+            "cells_total": 7,
+            "code_cells": 5,
+            "cells_with_outputs": 5,
+            "executed": true,
+            "verdict_quotes": [],
+            "banner": "# Diagnostic: cos_sim_mean Convergence Across Models Extracts `cos_sim_mean` data from existing notebook cell outputs (no model loading required). Tests whether Pythia-410m's token fragmentation is a **readout artefact** (dynamics converge but vocabulary can't name the attractor) or **genuine non-convergence** (dynamics are chaotic). See `docs/SCALING_ARTEFACT_ANALYSIS.md` for context.",
+            "saves": [],
+            "loads": []
+          },
+          "output_dir": null,
+          "output_dir_exists": null,
+          "output_dir_files": [],
+          "declared_inputs": [],
+          "missing_inputs": [],
+          "saved_artefacts": [],
+          "missing_local_modules": [],
+          "graph_artefacts": []
+        },
+        {
+          "run": null,
+          "run_label": "(named in the record, no run node)",
+          "graph_says": null,
+          "date": null,
+          "script": "experiments/preln_rescale_check.py",
+          "script_exists": true,
+          "script_state": {
+            "kind": "script",
+            "readable": true,
+            "cells_total": null,
+            "code_cells": null,
+            "cells_with_outputs": null,
+            "executed": null,
+            "verdict_quotes": [],
+            "banner": null,
+            "saves": [],
+            "loads": []
+          },
+          "output_dir": null,
+          "output_dir_exists": null,
+          "output_dir_files": [],
+          "declared_inputs": [],
+          "missing_inputs": [],
+          "saved_artefacts": [],
+          "missing_local_modules": [],
+          "graph_artefacts": []
+        }
+      ],
+      "verdict": "answerable-from-disk",
+      "reason": "experiments/preln_rescale_check.py exists, every input it declares is present in the tree, and it has not been executed",
+      "rank_tier": 2
     },
     {
       "claim": "q-tmix-llm",
@@ -2189,6 +2322,22 @@
     {
       "rank_tier": 2,
       "tier_name": "answerable-from-disk",
+      "claim": "disc-16-differences-intrinsic",
+      "label": "Discovery 16: Cross-model differences are intrinsic dynamics, not apparatus",
+      "status": "supported",
+      "reason": "experiments/preln_rescale_check.py exists, every input it declares is present in the tree, and it has not been executed",
+      "quoted_result": null,
+      "doc_ref": "docs/JOURNEY_MAP.md#2-key-discoveries-chronological",
+      "cheap": true,
+      "scripts": [
+        "experiments/cos_sim_diagnostic.ipynb",
+        "experiments/preln_rescale_check.py"
+      ],
+      "rank": 7
+    },
+    {
+      "rank_tier": 2,
+      "tier_name": "answerable-from-disk",
       "claim": "q-tmix-llm",
       "label": "Q: What is T_mix_LLM for each basin?",
       "status": "open",
@@ -2197,7 +2346,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
       "cheap": true,
       "scripts": [],
-      "rank": 7
+      "rank": 8
     },
     {
       "rank_tier": 3,
@@ -2210,7 +2359,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#4-adjacent-science--mathematics",
       "cheap": false,
       "scripts": [],
-      "rank": 8
+      "rank": 9
     },
     {
       "rank_tier": 3,
@@ -2226,7 +2375,7 @@
         "experiments/gpt2_small/01_attractor_dominance.ipynb",
         "experiments/gpt2_small/gated_resweep.py"
       ],
-      "rank": 9
+      "rank": 10
     },
     {
       "rank_tier": 3,
@@ -2239,7 +2388,7 @@
       "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions",
       "cheap": false,
       "scripts": [],
-      "rank": 10
+      "rank": 11
     },
     {
       "rank_tier": 3,
@@ -2255,7 +2404,7 @@
         "experiments/gpt2_small/00_reproducibility_gate.ipynb",
         "experiments/gpt2_small/04_readout_confidence.py"
       ],
-      "rank": 11
+      "rank": 12
     },
     {
       "rank_tier": 3,
@@ -2268,7 +2417,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
       "cheap": false,
       "scripts": [],
-      "rank": 12
+      "rank": 13
     },
     {
       "rank_tier": 3,
@@ -2281,7 +2430,7 @@
       "doc_ref": "docs/FINDINGS.md#caveats",
       "cheap": false,
       "scripts": [],
-      "rank": 13
+      "rank": 14
     },
     {
       "rank_tier": 3,
@@ -2294,7 +2443,7 @@
       "doc_ref": "docs/FINDINGS.md#caveats",
       "cheap": false,
       "scripts": [],
-      "rank": 14
+      "rank": 15
     },
     {
       "rank_tier": 3,
@@ -2307,7 +2456,7 @@
       "doc_ref": "docs/FINDINGS.md#caveats",
       "cheap": false,
       "scripts": [],
-      "rank": 15
+      "rank": 16
     },
     {
       "rank_tier": 3,
@@ -2320,7 +2469,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
       "cheap": false,
       "scripts": [],
-      "rank": 16
+      "rank": 17
     },
     {
       "rank_tier": 3,
@@ -2333,7 +2482,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
       "cheap": false,
       "scripts": [],
-      "rank": 17
+      "rank": 18
     },
     {
       "rank_tier": 4,
@@ -2349,7 +2498,7 @@
         "experiments/gpt2_small/05_jlens_pilot.py",
         "experiments/gpt2_small/10_jlens_phase.py"
       ],
-      "rank": 18
+      "rank": 19
     },
     {
       "rank_tier": 4,
@@ -2362,7 +2511,7 @@
       "doc_ref": "docs/FINDINGS.md#f11-j-lens-pilot-the-prolet-insidedivine-outside-prediction-did-not-hold-the-boundary-that-appeared-is-language-vs-noise",
       "cheap": false,
       "scripts": [],
-      "rank": 19
+      "rank": 20
     },
     {
       "rank_tier": 5,
@@ -2375,7 +2524,7 @@
       "doc_ref": "docs/FINDINGS.md#f8-the-prolet-basin-is-a-coherent-cluster-of-related-tokens-not-a-single-token-permutation-tested",
       "cheap": false,
       "scripts": [],
-      "rank": 20
+      "rank": 21
     },
     {
       "rank_tier": 5,
@@ -2388,7 +2537,7 @@
       "doc_ref": "docs/FINDINGS.md#f11-j-lens-pilot-the-prolet-insidedivine-outside-prediction-did-not-hold-the-boundary-that-appeared-is-language-vs-noise",
       "cheap": false,
       "scripts": [],
-      "rank": 21
+      "rank": 22
     },
     {
       "rank_tier": 5,
@@ -2404,7 +2553,7 @@
         "experiments/gpt2_small/01_attractor_dominance.ipynb",
         "experiments/gpt2_small/gated_resweep.py"
       ],
-      "rank": 22
+      "rank": 23
     }
   ],
   "frontier": [

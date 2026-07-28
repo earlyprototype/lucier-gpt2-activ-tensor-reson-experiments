@@ -78,7 +78,7 @@ The ordering below is mechanical. It is printed here so that it can be argued wi
 5. **still-blocked** &mdash; The named blocker still holds on disk. Cost: unblock first.
 6. **cannot-determine** &mdash; The graph names no run, script or artefact for this thread, so no honest disk verdict is available. Cost: unknown, and that is the finding.
 
-Tiers 1 to 3 are the fruit proper &mdash; 7 of 22 open threads. The rest are ranked in the same list so that the cut line is visible.
+Tiers 1 to 3 are the fruit proper &mdash; 8 of 23 open threads. The rest are ranked in the same list so that the cut line is visible.
 
 | # | Cheap? | Tier | Claim | Evidence, in brief |
 |---:|:---:|:---|:---|:---|
@@ -88,22 +88,23 @@ Tiers 1 to 3 are the fruit proper &mdash; 7 of 22 open threads. The rest are ran
 | 4 | yes | newly-unblocked | `q-flip-axis-generality` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the... |
 | 5 | yes | newly-unblocked | `q-lag2-regate-33` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the... |
 | 6 | yes | newly-unblocked | `q-prompt-library` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the... |
-| 7 | yes | answerable-from-disk | `q-tmix-llm` | the record itself says the inputs are already committed ("JOURNEY_MAP section 7: "What is T_mix_LLM for each basin? \| Measurable from existing data \| Compute from .pt"."), and 13 .pt... |
-| 8 | no | needs-compute | `concept-fractal-dimension` | the record states the work has not been done ("Relevance to ATR: Potential metric for basin characterisation (untested).") and names no script for it, so answering it requires a fresh run |
-| 9 | no | needs-compute | `f1-five-attractor-basins` | the record states the work has not been done ("…gate, all at iteration 120, which is the gate's earliest possible firing point rather than a measured settling time: the true iteration... |
-| 10 | no | needs-compute | `h-pos0` | the record states the work has not been done ("Disposition: Registered, untested (2026-07-28): under the causal mask, attention at position 0 attends only to position 0 (its softmax row... |
-| 11 | no | needs-compute | `h0-determinism` | the record states the work has not been done ("Independent re-implementation still not attempted.") and names no script for it, so answering it requires a fresh run (prerequisite in the... |
-| 12 | no | needs-compute | `q-fractal-dimension` | the record states the work has not been done ("The weakest item on the open list, recorded at that strength: speculative, and gated on a metric nobody has computed yet.") and names no... |
-| 13 | no | needs-compute | `q-gate-cadence` | the record states the work has not been done ("true settling times between 100 and 120 are unresolved." FINDINGS section 6 files it as the series' one remaining declared debt - "One item... |
-| 14 | no | needs-compute | `q-hook-window-depth` | the record states the work has not been done ("Alternative windows (including a Pythia-410m depth control, layers 0-11 vs 0-23) are designed but not run." JOURNEY_MAP section 7 carries... |
-| 15 | no | needs-compute | `q-independent-reimplementation` | the record states the work has not been done ("H0's disposition ends on the gap: "Independent re-implementation still not attempted." Caveat 1 makes the same point its heading -... |
-| 16 | no | needs-compute | `q-slonski-macro-group` | the record states the work has not been done ("JOURNEY_MAP section 7: "Are all basins in one Slonski macro-group? \| Untested;") and names no script for it, so answering it requires a... |
-| 17 | no | needs-compute | `q-why-gpt2-small` | the record states the work has not been done ("JOURNEY_MAP section 7 files this one at a status of its own: "The open question of the series", next step "New experimental stage".") and... |
-| 18 | no | still-blocked | `h-j1` | the record calls this blocked on issue #8; an issue number names no file, so the working tree cannot say whether it has been resolved and this report does not guess |
-| 19 | no | still-blocked | `q-jlens-full-build` | the record calls this blocked on issue #8; an issue number names no file, so the working tree cannot say whether it has been resolved and this report does not guess |
-| 20 | no | cannot-determine | `concept-coherence` | nothing in the graph or the tree ties this thread to a script, run or artefact |
-| 21 | no | cannot-determine | `concept-jspace-workspace` | nothing in the graph or the tree ties this thread to a script, run or artefact |
-| 22 | no | cannot-determine | `f2-divine-readout-stable` | the pending language here (pending) is tied to no script, run or artefact this tool can find, so no disk verdict is available |
+| 7 | yes | answerable-from-disk | `disc-16-differences-intrinsic` | experiments/preln_rescale_check.py exists, every input it declares is present in the tree, and it has not been executed |
+| 8 | yes | answerable-from-disk | `q-tmix-llm` | the record itself says the inputs are already committed ("JOURNEY_MAP section 7: "What is T_mix_LLM for each basin? \| Measurable from existing data \| Compute from .pt"."), and 13 .pt... |
+| 9 | no | needs-compute | `concept-fractal-dimension` | the record states the work has not been done ("Relevance to ATR: Potential metric for basin characterisation (untested).") and names no script for it, so answering it requires a fresh run |
+| 10 | no | needs-compute | `f1-five-attractor-basins` | the record states the work has not been done ("…gate, all at iteration 120, which is the gate's earliest possible firing point rather than a measured settling time: the true iteration... |
+| 11 | no | needs-compute | `h-pos0` | the record states the work has not been done ("Disposition: Registered, untested (2026-07-28): under the causal mask, attention at position 0 attends only to position 0 (its softmax row... |
+| 12 | no | needs-compute | `h0-determinism` | the record states the work has not been done ("Independent re-implementation still not attempted.") and names no script for it, so answering it requires a fresh run (prerequisite in the... |
+| 13 | no | needs-compute | `q-fractal-dimension` | the record states the work has not been done ("The weakest item on the open list, recorded at that strength: speculative, and gated on a metric nobody has computed yet.") and names no... |
+| 14 | no | needs-compute | `q-gate-cadence` | the record states the work has not been done ("true settling times between 100 and 120 are unresolved." FINDINGS section 6 files it as the series' one remaining declared debt - "One item... |
+| 15 | no | needs-compute | `q-hook-window-depth` | the record states the work has not been done ("Alternative windows (including a Pythia-410m depth control, layers 0-11 vs 0-23) are designed but not run." JOURNEY_MAP section 7 carries... |
+| 16 | no | needs-compute | `q-independent-reimplementation` | the record states the work has not been done ("H0's disposition ends on the gap: "Independent re-implementation still not attempted." Caveat 1 makes the same point its heading -... |
+| 17 | no | needs-compute | `q-slonski-macro-group` | the record states the work has not been done ("JOURNEY_MAP section 7: "Are all basins in one Slonski macro-group? \| Untested;") and names no script for it, so answering it requires a... |
+| 18 | no | needs-compute | `q-why-gpt2-small` | the record states the work has not been done ("JOURNEY_MAP section 7 files this one at a status of its own: "The open question of the series", next step "New experimental stage".") and... |
+| 19 | no | still-blocked | `h-j1` | the record calls this blocked on issue #8; an issue number names no file, so the working tree cannot say whether it has been resolved and this report does not guess |
+| 20 | no | still-blocked | `q-jlens-full-build` | the record calls this blocked on issue #8; an issue number names no file, so the working tree cannot say whether it has been resolved and this report does not guess |
+| 21 | no | cannot-determine | `concept-coherence` | nothing in the graph or the tree ties this thread to a script, run or artefact |
+| 22 | no | cannot-determine | `concept-jspace-workspace` | nothing in the graph or the tree ties this thread to a script, run or artefact |
+| 23 | no | cannot-determine | `f2-divine-readout-stable` | the pending language here (pending) is tied to no script, run or artefact this tool can find, so no disk verdict is available |
 
 The cheap ones in full:
 
@@ -156,7 +157,14 @@ The cheap ones in full:
 - Record: `docs/FINDINGS.md#caveats`
 - Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's
 
-**7. Q: What is T_mix_LLM for each basin?**
+**7. Discovery 16: Cross-model differences are intrinsic dynamics, not apparatus**
+
+- Tier: *answerable-from-disk*
+- Record: `docs/JOURNEY_MAP.md#2-key-discoveries-chronological`
+- Script(s): `experiments/cos_sim_diagnostic.ipynb`, `experiments/preln_rescale_check.py`
+- Evidence: experiments/preln_rescale_check.py exists, every input it declares is present in the tree, and it has not been executed
+
+**8. Q: What is T_mix_LLM for each basin?**
 
 - Tier: *answerable-from-disk*
 - Record: `docs/JOURNEY_MAP.md#7-open-questions`
@@ -264,6 +272,15 @@ The record uses blocking language, but the thing being waited on is not named as
 
 *Filenames tried:* `artefact.py`, `artefact.json`, `artefact.pt`, `artefact.md`
 
+#### re-derivation — LayerNorm ignores a global rescale but the residual path around it does not &mdash; gates 1 claim; the working tree cannot settle it
+
+- **`disc-16-differences-intrinsic`** (finding, supported) &mdash; docs/JOURNEY_MAP.md#2-key-discoveries-chronological
+  > Amended 2026-07-28: the inertness half is withdrawn pending re-derivation — LayerNorm ignores a global rescale but the residual path around it does not, so the block is not invariant (FINDINGS caveat 7;
+
+*Disk check:* the blocker is a phrase with no filename this tool can responsibly look for; not checked
+
+*Filenames tried:* `re_derivation_layernorm.py`, `re_derivation_layernorm.json`, `re_derivation_layernorm.pt`, `re_derivation_layernorm.md`, `re_derivation.py`, `re_derivation.json`, `re_derivation.pt`, `re_derivation.md`
+
 #### re-gate &mdash; gates 1 claim; the working tree cannot settle it
 
 - **`f2-divine-readout-stable`** (finding, corrected) &mdash; docs/FINDINGS.md#f2-the-divine-basin-is-readout-stable-over-a-never-settling-tensor
@@ -287,6 +304,7 @@ A thread is open here if its description carries pending-work language, or it is
 | `q-flip-axis-generality` | open | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's |
 | `q-lag2-regate-33` | open | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's |
 | `q-prompt-library` | open | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's |
+| `disc-16-differences-intrinsic` | supported | **answerable-from-disk** | experiments/preln_rescale_check.py exists, every input it declares is present in the tree, and it has not been executed |
 | `q-tmix-llm` | open | **answerable-from-disk** | the record itself says the inputs are already committed ("JOURNEY_MAP section 7: "What is T_mix_LLM for each basin? \| Measurable from existing data \| Compute from .pt"."), and 13 .pt artefact(s) exist under experiments/; no script is named for the computation, so this rests on the record's word plus the presence of the data |
 | `concept-fractal-dimension` | untested | **needs-compute** | the record states the work has not been done ("Relevance to ATR: Potential metric for basin characterisation (untested).") and names no script for it, so answering it requires a fresh run |
 | `f1-five-attractor-basins` | qualified | **needs-compute** | the record states the work has not been done ("…gate, all at iteration 120, which is the gate's earliest possible firing point rather than a measured settling time: the true iteration lies somewhere between 100 and 120 and finer cadence was never run (caveat 5).") and names no script for it, so answering it requires a fresh run |
@@ -304,7 +322,7 @@ A thread is open here if its description carries pending-work language, or it is
 | `concept-jspace-workspace` | open | **cannot-determine** | nothing in the graph or the tree ties this thread to a script, run or artefact |
 | `f2-divine-readout-stable` | corrected | **cannot-determine** | the pending language here (pending) is tied to no script, run or artefact this tool can find, so no disk verdict is available |
 
-Totals: 10 needs-compute, 5 newly-unblocked, 3 cannot-determine, 2 still-blocked, 1 answered-on-disk, 1 answerable-from-disk.
+Totals: 10 needs-compute, 5 newly-unblocked, 3 cannot-determine, 2 answerable-from-disk, 2 still-blocked, 1 answered-on-disk.
 
 Pending-work language was matched literally against claim descriptions. The phrases that fired, claim by claim:
 
@@ -314,6 +332,7 @@ Pending-work language was matched literally against claim descriptions. The phra
 - `q-flip-axis-generality`: *blocked on*, *issue #9*, *pending*, *untested*
 - `q-lag2-regate-33`: *blocked on*, *issue #9*
 - `q-prompt-library`: *issue #9*, *pending*
+- `disc-16-differences-intrinsic`: *pending*
 - `q-tmix-llm`: *is open*
 - `concept-fractal-dimension`: *untested*
 - `f1-five-attractor-basins`: *finer cadence*, *never run*
