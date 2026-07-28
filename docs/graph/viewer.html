@@ -3166,8 +3166,35 @@
         // units, which is wider than two columns: the labels collide with their
         // neighbours' and fit() has to zoom out far enough to contain the
         // overhang, which is the same 4.94px bug from the other direction.
+        // How wide a label-inside shape may grow in the NETWORK view. Not a
+        // style choice -- without it those shapes have no upper bound at all.
+        //
+        // vis draws the label INSIDE box / circle / ellipse / database / text
+        // and sizes the node to contain it, while every other shape draws its
+        // caption underneath and stays node-sized. Unconstrained, a question
+        // whose title is a sentence becomes a disc wide enough to swallow its
+        // neighbours. Measured on a phone, before this cap:
+        //
+        //     circle   median 410, max 487      hexagon 32
+        //     box      median 216, max 298      square  36
+        //     ellipse  median 213, max 271      star    24
+        //
+        // -- questions rendering about thirteen times the size of a concept,
+        // which is what "giant circles" looks like on the published site. At
+        // 130 the same nodes measure 120 (max 143): still the largest shapes on
+        // the canvas, because they are the ones carrying text, but in
+        // proportion to everything else and with the label still wrapped and
+        // readable rather than clipped.
+        const NETWORK_INSIDE_LABEL_WIDTH = 130;
+
         function nodeWidthConstraint(node) {
-            if (!orderedLayoutActive || exploreMode) return false;
+            if (!orderedLayoutActive || exploreMode) {
+                // The network view still needs the cap. This used to return
+                // `false` here, which is what let the discs grow without limit.
+                return LABEL_INSIDE_SHAPES.indexOf(node.shape) !== -1
+                    ? { maximum: NETWORK_INSIDE_LABEL_WIDTH }
+                    : false;
+            }
             const inside = LABEL_INSIDE_SHAPES.indexOf(node.shape) !== -1;
             if (orderedNarrowLayout()) {
                 // Nothing to wrap here — this pins the label BOX of the shapes
