@@ -106,7 +106,7 @@ def per_coordinate_disagreement(tensor):
 
     Under relative rounding every coordinate carries |du_k| / |u_k| ~ eps
     regardless of its size, so the disagreement being CONCENTRATED proves
-    nothing on its own: relative rounding of a state whose energy is 91% in ten
+    nothing on its own: relative rounding of a state whose energy is ~68% in ten
     coordinates is concentrated too. What separates rounding from structure is
     whether the relative disagreement is flat at a few eps across coordinates.
 
@@ -117,12 +117,20 @@ def per_coordinate_disagreement(tensor):
     worst-relative coordinates sit below typical magnitude and what share of the
     angle they carry. Those last two matter because a coordinate near zero has a
     huge relative error for a negligible absolute one.
+
+    Also returns how the disagreement is spread over coordinates -- the largest
+    single coordinate's share, and the inverse participation ratio 1 / sum(p^2)
+    as an effective count of participating coordinates. Those two are the
+    grounds for refusing to read `d` per component, so they are computed here
+    rather than asserted; see the note in RESULTS.md on how far they can be
+    trusted, which is not very.
     """
     t = tensor.to(torch.float64)
     unit = t / t.norm(dim=1, keepdim=True)
     seq_len = unit.shape[0]
 
     relative, magnitude, contribution = [], [], []
+    energy = torch.zeros(unit.shape[1], dtype=torch.float64)
     for i in range(seq_len):
         for j in range(i + 1, seq_len):
             scale = torch.maximum(unit[i].abs(), unit[j].abs())
@@ -131,11 +139,13 @@ def per_coordinate_disagreement(tensor):
             relative.append(gap[keep] / scale[keep] / FLOAT32_EPS)
             magnitude.append(scale[keep])
             contribution.append(gap[keep] ** 2)
+            energy += gap ** 2
 
     rel = torch.cat(relative)
     mag = torch.cat(magnitude)
     con = torch.cat(contribution)
     tail = rel > 100
+    share = energy / energy.sum()
     return {
         "median": rel.quantile(0.5).item(),
         "p90": rel.quantile(0.9).item(),
@@ -147,6 +157,8 @@ def per_coordinate_disagreement(tensor):
         "tail_angle_share": (
             con[tail].sum().item() / con.sum().item() if tail.any() else 0.0
         ),
+        "top_coordinate_share": share.max().item(),
+        "participation_ratio": (1.0 / (share ** 2).sum()).item(),
     }
 
 
@@ -289,15 +301,21 @@ def main():
     header4 = (
         f"{'run':<26}{'median':>9}{'p90':>9}{'p99':>9}"
         f"{'>100 eps':>10}{'their |u|':>11}{'their angle':>13}"
+        f"{'top coord':>11}{'part. ratio':>13}"
     )
     print(header4)
     print("-" * len(header4))
+    spread = []
+    d_model = 0
     for name, tensor, _ in load_runs():
         m = per_coordinate_disagreement(tensor)
+        d_model = tensor.shape[1]
+        spread.append((name, m["top_coordinate_share"], m["participation_ratio"]))
         print(
             f"{name:<26}{m['median']:>9.2f}{m['p90']:>9.2f}{m['p99']:>9.2f}"
             f"{m['tail_fraction'] * 100:>9.2f}%{m['tail_magnitude_ratio']:>11.4f}"
             f"{m['tail_angle_share'] * 100:>12.2f}%"
+            f"{m['top_coordinate_share'] * 100:>10.1f}%{m['participation_ratio']:>13.1f}"
         )
 
     print(
@@ -310,6 +328,22 @@ def main():
         "that scale, and nothing here should be read as proving it."
     )
 
+    # The last two columns are why `d` is not read per component. State their
+    # range, and the reason not to lean on it -- two runs at the SAME state
+    # disagree by 7x, so this measures the shape of one run's rounding residual.
+    shares = [s for _, s, _ in spread]
+    ratios = [p for _, _, p in spread]
+    print(
+        f"\ntop coord ranges {min(shares) * 100:.0f}-{max(shares) * 100:.0f}%, "
+        f"participation ratio {min(ratios):.0f}-{max(ratios):.0f} of {d_model}. So the\n"
+        "disagreement is not spread evenly and d cannot be read per component.\n"
+        "\nBut these two are not stable quantities:\n"
+        "Syntactic and Divine_Syntactic settle to the same direction (1 - cos = 1e-10)\n"
+        "and still return different values, so what they describe is the shape of an\n"
+        "individual run's rounding residual, not a property of the settled state.\n"
+        "That instability is itself consistent with the residual being arithmetic."
+    )
+
     # SECONDARY: sensitivity sweep. See noise_floor's docstring for what this is
     # and, more importantly, what it is not.
     print()
@@ -319,11 +353,11 @@ def main():
     print("rounding. Shown for the slope: k x4 moves the deviation ~15x, so the")
     print("reading above survives the error scale being off by a factor of a few.")
     print()
-    header4 = f"{'run':<26}{'observed':>13}" + "".join(
+    header5 = f"{'run':<26}{'observed':>13}" + "".join(
         f"{'k=' + str(k):>13}" for k in ULP_LEVELS
     )
-    print(header4)
-    print("-" * len(header4))
+    print(header5)
+    print("-" * len(header5))
     for name, tensor, _ in load_runs():
         observed = 1.0 - engine_position_similarity(
             tensor.to(torch.float32).to(torch.float64)

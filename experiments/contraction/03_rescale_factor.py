@@ -11,7 +11,7 @@ change and no forward pass is needed.
 
 What is missing is that two experiment scripts discarded those fields at save
 time -- `05_divine_motion.py:118` reimplements the snapshot and keeps 7 of the
-engine's 20 fields; `sink_geometry/02_masking_control.py:86-88` keeps only the
+engine's 19 fields; `sink_geometry/02_masking_control.py:86-88` keeps only the
 per-position mean. This script therefore reconstructs c from what those slimmed
 archives did retain, which works because of the order of operations in the loop
 (atr_engine.py:211-216):
@@ -152,10 +152,10 @@ def trajectory(pairs):
             else:
                 cells.append(f"c_{v[0]}={v[1]:.4f}" + ("*" if v[0] == 1 else ""))
         print("    " + "  ".join(cells))
-        settled = [v for n, v in values if n >= 100]
+        settled = [v for n, v in values if n >= 101]
         if settled:
             print(
-                f"    from c_100 on: min {min(settled):.4f}  max {max(settled):.4f}  "
+                f"    from c_101 on: min {min(settled):.4f}  max {max(settled):.4f}  "
                 f"spread {max(settled) - min(settled):.1e}"
             )
     print()
