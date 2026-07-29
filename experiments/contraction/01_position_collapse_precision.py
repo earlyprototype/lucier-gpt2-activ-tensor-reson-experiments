@@ -81,18 +81,17 @@ def measure(name, tensor, iteration):
     }
 
 
-def component_disagreement(deviation):
-    """Per-component relative disagreement implied by 1 - position_similarity.
+def rms_residual_scale(deviation):
+    """RMS angular-residual scale: d = sqrt(1 - position_similarity).
 
-    This is the model-free way to ask how exact the collapse is, and it is the
-    number to quote. If two vectors are the same up to independent per-component
-    relative error of size d, the angle between them is about d*sqrt(2), so
-    1 - cos = theta^2 / 2 = d^2. Inverting, d = sqrt(1 - position_similarity).
-
-    Expressed in units of float32 epsilon, d answers the question directly:
-    d ~ 1 means the positions agree to the precision a float32 number carries,
-    which is as equal as two float32-computed vectors can be. No noise model,
-    no distributional assumption, no simulation.
+    An order-of-magnitude summary of how far apart the positions are, and
+    nothing more. The geometry behind it is exact -- 1 - cos = theta^2 / 2, so
+    d is the angle up to a factor of sqrt(2) -- but reading d as a PER-COMPONENT
+    relative error is not: that step needs the disagreement to be spread evenly
+    and independently across coordinates, and for these tensors it is not (one
+    coordinate carries 4-55% of it). So d is reported as a scale, in units of
+    float32 epsilon for legibility, and the per-coordinate question is answered
+    by `per_coordinate_disagreement` instead.
     """
     return math.sqrt(max(deviation, 0.0))
 
@@ -100,7 +99,7 @@ def component_disagreement(deviation):
 def per_coordinate_disagreement(tensor):
     """Coordinate-by-coordinate relative disagreement, assuming nothing.
 
-    `component_disagreement` above summarises the angle into one number, but
+    `rms_residual_scale` above summarises the angle into one number, but
     turning that into a per-component statement assumes the disagreement is
     spread evenly over coordinates -- which it is not. Raised in review, and
     correct. This measures it per coordinate instead.
@@ -154,8 +153,8 @@ def per_coordinate_disagreement(tensor):
 def noise_floor(tensor, levels=ULP_LEVELS, seed=0):
     """Secondary cross-check: a synthetic sensitivity sweep, NOT a ULP baseline.
 
-    Read `component_disagreement` above first -- that is the primary result and
-    it needs none of this.
+    Read `per_coordinate_disagreement` above first -- that is the primary
+    evidence, and it needs none of this.
 
     This perturbs an exactly collapsed tensor by relative Gaussian noise of size
     k * FLOAT32_EPS and reports the deviation that produces. Being relative, it
@@ -258,17 +257,17 @@ def main():
             "measurement rather than a storage artefact."
         )
 
-    # PRIMARY: how far apart are the positions, per component, model-free?
+    # First cut: the scale of the residual. An RMS summary, not per-coordinate.
     print()
-    print("How exact is the collapse? Per-component relative disagreement implied")
-    print("by the measurement, with no noise model: d = sqrt(1 - position_similarity).")
+    print("Scale of the residual: d = sqrt(1 - position_similarity), an RMS")
+    print("angular summary. NOT a per-coordinate figure -- see the next table.")
     print()
     header3 = f"{'run':<26}{'1 - sim':>12}{'d':>12}{'d / eps32':>12}"
     print(header3)
     print("-" * len(header3))
     within = 0
     for r in rows:
-        d = component_disagreement(r["deviation"])
+        d = rms_residual_scale(r["deviation"])
         if d <= 2 * FLOAT32_EPS:
             within += 1
         print(f"{r['name']:<26}{r['deviation']:>12.2e}{d:>12.2e}{d / FLOAT32_EPS:>12.2f}")

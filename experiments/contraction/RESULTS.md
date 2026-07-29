@@ -1,8 +1,9 @@
 # How fast does the state settle, and is the position collapse exact?
 
-**Short answer: the positions agree to about two units of float32 precision per number — the scale
-arithmetic noise operates at, which leaves no room for a large structured disagreement, though it
-cannot rule out a small one hiding below that scale. The settling speed does not track model size;
+**Short answer: coordinate by coordinate, the positions agree to about two units of float32 precision
+— the scale arithmetic noise operates at, which leaves no room for a large structured disagreement,
+though it cannot rule out a small one hiding below that scale. The settling speed does not track model
+size;
 inside each family, the two sizes disagree about which direction it goes. And the loop's per-step
 shrink factor, which a hypothesis on file assumes is 1 at rest, is measurably not.**
 
@@ -145,15 +146,16 @@ float32 epsilon is **1.19e−07**. Every column above sits within a small factor
 tensor is rank-1 to the same tolerance: σ₂/σ₁ ≈ 10⁻⁷ means the second singular direction carries
 nothing float32 can represent.
 
-### Is any of that residual real? Read it per component.
+### Is any of that residual real? First the scale, then the coordinates.
 
 Stopping at "it sits at the precision floor" is true but evasive — it leaves the impression of an open
-empirical question. The sharper question is how far apart the positions actually are, and there is a
-direct way to ask it that needs no model at all.
+empirical question. The sharper question is how far apart the positions actually are.
 
-If two vectors are the same up to independent per-component relative error *d*, the angle between
-them is about *d*√2, so 1 − cos = θ²/2 = *d*². Inverting: **d = √(1 − position_similarity)**. In units
-of float32 epsilon, that says how many units-in-the-last-place apart the positions are, per number:
+The first cut is a *scale*: **d = √(1 − position_similarity)**. The geometry is exact — 1 − cos = θ²/2,
+so *d* is the angle up to a factor of √2 — and expressing it in units of float32 epsilon makes it
+legible. **It is an RMS summary and nothing more.** Reading *d* as a *per-component* relative error
+would need the disagreement spread evenly and independently across coordinates, and it is not (see
+below). Treat this table as an order of magnitude, not a per-number statement:
 
 | Run | 1 − similarity | *d* | ***d* / ε₃₂** |
 |---|---|---|---|
@@ -222,9 +224,9 @@ over-claimed and the "one ULP" phrasing it produced was wrong**, for two reasons
 - A single rounding is the wrong comparison anyway. The archived state is the output of a twelve-layer
   forward pass, so its accumulated error is worth several roundings, not one.
 
-Neither objection touches the per-component reading above, which is why that is now the primary
-result. The sweep is kept only for its *slope*: a factor of 4 in *k* moves the deviation ~15×, so the
-conclusion survives the assumed error scale being wrong by a factor of a few.
+Neither objection touches the per-coordinate measurement above, which is why that is now the primary
+evidence. The sweep is kept only for its *slope*: a factor of 4 in *k* moves the deviation ~15×, so
+the conclusion survives the assumed error scale being wrong by a factor of a few.
 
 | Run | Observed | k = 1 | k = 4 | k = 16 | k = 64 |
 |---|---|---|---|---|---|
