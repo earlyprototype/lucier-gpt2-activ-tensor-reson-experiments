@@ -97,6 +97,60 @@ def component_disagreement(deviation):
     return math.sqrt(max(deviation, 0.0))
 
 
+def per_coordinate_disagreement(tensor):
+    """Coordinate-by-coordinate relative disagreement, assuming nothing.
+
+    `component_disagreement` above summarises the angle into one number, but
+    turning that into a per-component statement assumes the disagreement is
+    spread evenly over coordinates -- which it is not. Raised in review, and
+    correct. This measures it per coordinate instead.
+
+    Under relative rounding every coordinate carries |du_k| / |u_k| ~ eps
+    regardless of its size, so the disagreement being CONCENTRATED proves
+    nothing on its own: relative rounding of a state whose energy is 91% in ten
+    coordinates is concentrated too. What separates rounding from structure is
+    whether the relative disagreement is flat at a few eps across coordinates.
+
+    Scale is divided out first -- H-pos0 allows each position its own scalar
+    (see M5), so what is at issue is the direction, not the length.
+
+    Returns quantiles of |du_k| / |u_k| in units of eps, plus how far the
+    worst-relative coordinates sit below typical magnitude and what share of the
+    angle they carry. Those last two matter because a coordinate near zero has a
+    huge relative error for a negligible absolute one.
+    """
+    t = tensor.to(torch.float64)
+    unit = t / t.norm(dim=1, keepdim=True)
+    seq_len = unit.shape[0]
+
+    relative, magnitude, contribution = [], [], []
+    for i in range(seq_len):
+        for j in range(i + 1, seq_len):
+            scale = torch.maximum(unit[i].abs(), unit[j].abs())
+            keep = scale > 0
+            gap = (unit[i] - unit[j]).abs()
+            relative.append(gap[keep] / scale[keep] / FLOAT32_EPS)
+            magnitude.append(scale[keep])
+            contribution.append(gap[keep] ** 2)
+
+    rel = torch.cat(relative)
+    mag = torch.cat(magnitude)
+    con = torch.cat(contribution)
+    tail = rel > 100
+    return {
+        "median": rel.quantile(0.5).item(),
+        "p90": rel.quantile(0.9).item(),
+        "p99": rel.quantile(0.99).item(),
+        "tail_fraction": tail.float().mean().item(),
+        "tail_magnitude_ratio": (
+            mag[tail].median().item() / mag.median().item() if tail.any() else float("nan")
+        ),
+        "tail_angle_share": (
+            con[tail].sum().item() / con.sum().item() if tail.any() else 0.0
+        ),
+    }
+
+
 def noise_floor(tensor, levels=ULP_LEVELS, seed=0):
     """Secondary cross-check: a synthetic sensitivity sweep, NOT a ULP baseline.
 
@@ -221,12 +275,40 @@ def main():
 
     print()
     print(f"float32 epsilon                          : {FLOAT32_EPS:.3e}")
-    print(f"runs agreeing to within 2 eps per component: {within}/{len(rows)}")
+    print(f"runs with d within 2 eps                 : {within}/{len(rows)}")
     print(
-        "\nd near 1 eps means the positions agree to the precision a float32 number\n"
-        "carries -- as equal as two float32-computed vectors can be, and nothing\n"
-        "is left over to be a structured disagreement. This is a direct reading of\n"
-        "the measurement, not a fit or a simulation."
+        "\nd is an RMS summary: turning it into a per-coordinate statement assumes\n"
+        "the disagreement is spread evenly, and it is not. The next table drops\n"
+        "that assumption."
+    )
+
+    # Per coordinate, assuming nothing about how the disagreement is spread.
+    print()
+    print("Per coordinate: relative disagreement |du_k| / |u_k| in units of eps,")
+    print("scale divided out (each position may keep its own scalar -- see M5).")
+    print()
+    header4 = (
+        f"{'run':<26}{'median':>9}{'p90':>9}{'p99':>9}"
+        f"{'>100 eps':>10}{'their |u|':>11}{'their angle':>13}"
+    )
+    print(header4)
+    print("-" * len(header4))
+    for name, tensor, _ in load_runs():
+        m = per_coordinate_disagreement(tensor)
+        print(
+            f"{name:<26}{m['median']:>9.2f}{m['p90']:>9.2f}{m['p99']:>9.2f}"
+            f"{m['tail_fraction'] * 100:>9.2f}%{m['tail_magnitude_ratio']:>11.4f}"
+            f"{m['tail_angle_share'] * 100:>12.2f}%"
+        )
+
+    print(
+        "\nThe typical coordinate agrees to about 2 eps. The heavy p99 is confined to\n"
+        "coordinates far below typical magnitude ('their |u|', as a fraction of the\n"
+        "median) which together carry ~1% of the angle: a small-denominator artefact,\n"
+        "not a finding. Where the angle actually lives, agreement is at the few-eps\n"
+        "level -- the scale float32 arithmetic operates at.\n"
+        "\nThis bounds the residual; it does not prove the absence of structure below\n"
+        "that scale, and nothing here should be read as proving it."
     )
 
     # SECONDARY: sensitivity sweep. See noise_floor's docstring for what this is

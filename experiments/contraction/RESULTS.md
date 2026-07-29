@@ -1,9 +1,10 @@
 # How fast does the state settle, and is the position collapse exact?
 
-**Short answer: the collapse is exact — the positions agree to about one unit of float32 precision per
-number, which is as equal as two float32-computed vectors can be. The settling speed does not track
-model size; inside each family, the two sizes disagree about which direction it goes. And the loop's
-per-step shrink factor, which a hypothesis on file assumes is 1 at rest, is measurably not.**
+**Short answer: the positions agree to about two units of float32 precision per number — the scale
+arithmetic noise operates at, which leaves no room for a large structured disagreement, though it
+cannot rule out a small one hiding below that scale. The settling speed does not track model size;
+inside each family, the two sizes disagree about which direction it goes. And the loop's per-step
+shrink factor, which a hypothesis on file assumes is 1 at rest, is measurably not.**
 
 **Run:** 2026-07-28, analysis only — no forward passes, no model loaded.
 **Status:** executed; scripts in this directory, all inputs already in the repository.
@@ -29,13 +30,17 @@ The tensors were saved in float32, a format that can only distinguish numbers to
 10⁷, and the angle between positions comes out at about 2×10⁻⁷ radians — float32's own resolution. So
 the raw figures alone cannot separate "exactly parallel" from "parallel to one part in 10 million".
 
-**But that is not where this stops, and an earlier version of this file wrongly left it there.**
-Asking how much of the leftover is real: an exactly-collapsed tensor, carrying nothing but *one unit
-in the last place* of float32 per number — the smallest error the format can hold — reproduces the
-measured figures in seven of the eight runs. There is nothing left over to be a real disagreement
-between positions. **The collapse is exact as far as the question can be asked**, and it stays exact
-over 1000 iterations rather than drifting. For H-pos0's purposes it is settled. A higher-precision run
-would confirm it, not decide it.
+**But that is not where this stops.** Going coordinate by coordinate, the typical coordinate of one
+position agrees with the same coordinate of another to about **two units of float32 precision** — the
+scale at which float32 arithmetic operates. Where the remaining disagreement actually lives, it is at
+that scale and no larger. It also stays there over 1000 iterations rather than drifting.
+
+**What that supports, and what it does not.** It says the leftover is the size of arithmetic noise, so
+there is no room for a *large* structured disagreement between positions — enough for H-pos0's premise
+to be usable. It does **not** prove that nothing structured hides below the arithmetic scale; no
+measurement made in float32 can. A higher-precision run would settle that, and this analysis bounds
+the question rather than closing it. Two earlier drafts of this file overstated exactly this point and
+were corrected in review.
 
 **M2.** How *fast* does the state settle? M2 asked for a decay curve across iterations.
 
@@ -163,15 +168,40 @@ of float32 epsilon, that says how many units-in-the-last-place apart the positio
 
 float32 ε = 1.192e−07.
 
-**Seven of eight runs agree to within about one epsilon per number** — one of them (`Syntactic`) to
-less than one. That is as equal as two float32-computed vectors can be. Nothing is left over to be a
-structured disagreement between positions.
+**But *d* is an RMS summary**, and reading it as "every component agrees to ~1 ε" assumes the
+disagreement is spread evenly across coordinates. It is not — one coordinate carries 4–55% of it, and
+the effective number of participating coordinates is 3–23 out of 768. That assumption was flagged in
+review and it does not hold, so the per-coordinate question has to be asked per coordinate.
 
-**So the verdict on M1 is stronger than "cannot tell".** The collapse is exact to the precision a
-float32 number carries, and it stays there over 1000 iterations rather than growing. For H-pos0's
-purposes that *is* exact. What remains unprovable is only the in-principle gap below one epsilon, and
-nothing downstream can be sensitive to it unless something amplifies it — which 1000 iterations of
-stable running says it does not. A float64 run would confirm, not decide.
+### Per coordinate, assuming nothing
+
+Concentration on its own proves nothing: under *relative* rounding every coordinate carries
+|Δu_k|/|u_k| ~ ε regardless of its size, and this state's energy is 91% in ten coordinates, so
+rounding would look concentrated too. What separates rounding from structure is whether the *relative*
+disagreement is flat at a few ε. Scale is divided out first — H-pos0 lets each position keep its own
+scalar (M5), so the direction is what is at issue.
+
+| Run | median | p90 | p99 | >100 ε | their \|u\| | their share of angle |
+|---|---|---|---|---|---|---|
+| Lucier | 1.90 | 10.03 | 63.67 | 0.45% | 0.026 | 0.35% |
+| Semantic | 1.82 | 9.39 | 71.55 | 0.79% | 0.007 | 0.47% |
+| Syntactic | 1.69 | 9.51 | 182.02 | 1.41% | 0.003 | 1.48% |
+| Nonsense | 1.87 | 9.77 | 90.63 | 0.92% | 0.012 | 0.63% |
+| Imperative | 1.80 | 9.40 | 83.86 | 0.88% | 0.016 | 0.78% |
+| Divine_Syntactic | 1.85 | 10.24 | 190.03 | 1.56% | 0.003 | 1.32% |
+| Control_noise | 3.38 | 15.17 | 209.01 | 1.81% | 0.010 | 0.43% |
+| Control_prolet_Semantic | 1.81 | 9.61 | 77.40 | 0.79% | 0.007 | 0.36% |
+
+**The typical coordinate agrees to about 2 ε.** The heavy p99 looks alarming and is not: those
+coordinates sit at 0.3–2.6% of typical magnitude, where a negligible absolute difference makes a huge
+*relative* one, and together they carry ~1% of the angle. A small-denominator artefact, not a finding.
+Where the angle actually lives, agreement is at the few-ε level.
+
+**So the verdict on M1 is stronger than "cannot tell", and weaker than "proven exact".** The residual
+between positions is the size of float32 arithmetic noise, which leaves no room for a *large*
+structured disagreement — enough for H-pos0's premise to be usable, and it holds steady over 1000
+iterations rather than growing. It does **not** establish that nothing structured hides below the
+arithmetic scale. No float32 measurement can. That needs the higher-precision run.
 
 **The one exception is worth keeping.** `Control_noise` sits at 2.66 ε, against 0.74–1.30 for the
 other seven — a factor of about 2.2 in the natural units, and 9× in the raw deviation, which is the
@@ -479,11 +509,11 @@ M5.
 GPT-2 Small's ragged fit is a latency, not a slow rate, and is not caused by the massive-activation
 effect documented in `sink_geometry`.
 
-**Settled, against an earlier draft of this file.** Whether the position collapse is *exactly* exact.
-Positions agree to 0.74–1.30 float32 epsilon per component in 7 of 8 runs — as equal as two
-float32-computed vectors can be — so there is nothing left to be a structured disagreement. Only the
-in-principle gap below one epsilon survives, and 1000 iterations of stable running says nothing
-amplifies it. H-pos0's premise holds.
+**Bounded, not settled — and two earlier drafts of this file claimed otherwise.** Whether the position
+collapse is *exactly* exact. The typical coordinate agrees to ~2 float32 ε, which is the scale
+arithmetic noise operates at, so no *large* structured disagreement fits in the gap. H-pos0's premise
+is usable on that basis. But a float32 measurement cannot show the absence of structure below float32's
+own noise, and this one does not. The higher-precision run is what would settle it.
 
 **Open, and the one loose thread in that table.** `Control_noise` sits at 2.66 ε per component, alone
 above 2 ε among the eight. It is also the noise control and has by far the largest rescale factor.
