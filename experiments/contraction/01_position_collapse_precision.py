@@ -81,25 +81,43 @@ def measure(name, tensor, iteration):
     }
 
 
+def component_disagreement(deviation):
+    """Per-component relative disagreement implied by 1 - position_similarity.
+
+    This is the model-free way to ask how exact the collapse is, and it is the
+    number to quote. If two vectors are the same up to independent per-component
+    relative error of size d, the angle between them is about d*sqrt(2), so
+    1 - cos = theta^2 / 2 = d^2. Inverting, d = sqrt(1 - position_similarity).
+
+    Expressed in units of float32 epsilon, d answers the question directly:
+    d ~ 1 means the positions agree to the precision a float32 number carries,
+    which is as equal as two float32-computed vectors can be. No noise model,
+    no distributional assumption, no simulation.
+    """
+    return math.sqrt(max(deviation, 0.0))
+
+
 def noise_floor(tensor, levels=ULP_LEVELS, seed=0):
-    """What deviation would an EXACTLY collapsed tensor show anyway?
+    """Secondary cross-check: a synthetic sensitivity sweep, NOT a ULP baseline.
 
-    Saying "the residual sits at float32 epsilon, so we cannot tell exact from
-    1-part-in-1e7" is true but dodges the question that matters: is any of the
-    measured deviation real, or is all of it the price of doing the arithmetic
-    in float32 at all?
+    Read `component_disagreement` above first -- that is the primary result and
+    it needs none of this.
 
-    The wrong null is to build a rank-1 tensor and round it to float32. Because
-    the per-position norms here agree to ~1e-7, every row rounds to nearly the
-    same float32 vector -- some come out bit-identical, deviation exactly 0.
-    That measures storage, and storage is not where the deviation comes from.
+    This perturbs an exactly collapsed tensor by relative Gaussian noise of size
+    k * FLOAT32_EPS and reports the deviation that produces. Being relative, it
+    does scale with each component's magnitude, so it is not tied to numbers
+    near 1. But Gaussian noise of standard deviation eps is NOT float32
+    round-to-nearest, whose relative error is bounded by eps/2 and roughly
+    uniform (standard deviation about eps / (2*sqrt(3)), some 3.5x smaller). Nor
+    is a single rounding the right comparison: the archived state is the output
+    of a twelve-layer forward pass, so its accumulated error is worth several
+    roundings, not one.
 
-    The deviation comes from arithmetic. Each iteration is a forward pass whose
-    matmuls accumulate over 768+ dimensions in float32; even if the true map
-    sends every position to one vector, each position's arithmetic takes a
-    different path and lands a few ULPs away. So the null is an exactly
-    collapsed tensor perturbed per-component at float32 ULP scale, which is what
-    a float32 forward pass leaves behind whatever the underlying dynamics do.
+    So the k column that matches an observation should NOT be read as "the
+    collapse is exact to k ULPs". What the sweep is good for is showing how
+    steeply the deviation moves with the assumed error scale -- a factor of 4 in
+    k moves it by ~15x -- which is why the conclusion survives the constant
+    being uncertain by a factor of a few.
     """
     generator = torch.Generator().manual_seed(seed)
     t64 = tensor.to(torch.float64)
@@ -186,38 +204,51 @@ def main():
             "measurement rather than a storage artefact."
         )
 
-    # How much of the measured deviation is unavoidable float32 arithmetic?
+    # PRIMARY: how far apart are the positions, per component, model-free?
     print()
-    print("Against the float32 noise floor: deviation of an EXACTLY collapsed tensor")
-    print("carrying k ULPs of per-component arithmetic noise.")
+    print("How exact is the collapse? Per-component relative disagreement implied")
+    print("by the measurement, with no noise model: d = sqrt(1 - position_similarity).")
     print()
-    header3 = f"{'run':<26}{'observed':>13}" + "".join(
-        f"{'k=' + str(k):>13}" for k in ULP_LEVELS
-    )
+    header3 = f"{'run':<26}{'1 - sim':>12}{'d':>12}{'d / eps32':>12}"
     print(header3)
     print("-" * len(header3))
-    at_one_ulp = 0
+    within = 0
+    for r in rows:
+        d = component_disagreement(r["deviation"])
+        if d <= 2 * FLOAT32_EPS:
+            within += 1
+        print(f"{r['name']:<26}{r['deviation']:>12.2e}{d:>12.2e}{d / FLOAT32_EPS:>12.2f}")
+
+    print()
+    print(f"float32 epsilon                          : {FLOAT32_EPS:.3e}")
+    print(f"runs agreeing to within 2 eps per component: {within}/{len(rows)}")
+    print(
+        "\nd near 1 eps means the positions agree to the precision a float32 number\n"
+        "carries -- as equal as two float32-computed vectors can be, and nothing\n"
+        "is left over to be a structured disagreement. This is a direct reading of\n"
+        "the measurement, not a fit or a simulation."
+    )
+
+    # SECONDARY: sensitivity sweep. See noise_floor's docstring for what this is
+    # and, more importantly, what it is not.
+    print()
+    print("Secondary, synthetic: deviation of an exactly collapsed tensor carrying")
+    print("relative Gaussian noise of k x eps32. NOT a ULP baseline -- Gaussian(eps)")
+    print("is not round-to-nearest, and the state is a 12-layer pass, not one")
+    print("rounding. Shown for the slope: k x4 moves the deviation ~15x, so the")
+    print("reading above survives the error scale being off by a factor of a few.")
+    print()
+    header4 = f"{'run':<26}{'observed':>13}" + "".join(
+        f"{'k=' + str(k):>13}" for k in ULP_LEVELS
+    )
+    print(header4)
+    print("-" * len(header4))
     for name, tensor, _ in load_runs():
         observed = 1.0 - engine_position_similarity(
             tensor.to(torch.float32).to(torch.float64)
         )[0]
         floors = noise_floor(tensor.to(torch.float32))
-        if observed <= 4 * floors[0]:
-            at_one_ulp += 1
-        print(
-            f"{name:<26}{observed:>13.2e}"
-            + "".join(f"{f:>13.2e}" for f in floors)
-        )
-
-    print()
-    print(f"runs within 4x of the one-ULP floor: {at_one_ulp}/{len(rows)}")
-    print(
-        "\nWhere observed sits on the k=1 column, one unit in the last place of\n"
-        "float32 per component -- the smallest non-zero perturbation the format\n"
-        "can hold -- reproduces the measurement on its own. There is then nothing\n"
-        "left to attribute to a genuine residual, and the collapse is exact as far\n"
-        "as the question can be posed in float32."
-    )
+        print(f"{name:<26}{observed:>13.2e}" + "".join(f"{f:>13.2e}" for f in floors))
 
 
 if __name__ == "__main__":

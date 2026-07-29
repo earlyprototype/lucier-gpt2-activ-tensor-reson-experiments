@@ -120,14 +120,20 @@ def settled_values(pairs):
 
 
 def trajectory(pairs):
-    """c_n across the run.
+    """c across the run.
+
+    Indices matter here and are easy to get wrong. A snapshot recorded at
+    iteration n holds the state AFTER n forward passes and BEFORE the rescale
+    that precedes pass n+1, so the value it yields is c_{n+1}, not c_n. The
+    labels below say so: a snapshot at iteration 0 is reported as c_1.
 
     Only the post-collapse values are exact: before collapse the positions are
     not parallel, so reconstructing ||tensor|| from `last_norm` overestimates or
-    underestimates it. Iteration 0 is shown for context and marked, not used.
+    underestimates it. The first is shown for context and marked, not used.
     """
-    print("Step 3 -- does c_n vary, or settle to a constant?")
-    print("  (iteration 0 is pre-collapse, so its value is an artefact of the")
+    print("Step 3 -- does c vary, or settle to a constant?")
+    print("  (a snapshot at iteration n gives c_{n+1}, labelled accordingly;")
+    print("   c_1 comes from the pre-collapse state, so it is an artefact of the")
     print("   reconstruction and is marked * rather than trusted)")
     print()
     for label, state, snaps in pairs:
@@ -135,7 +141,7 @@ def trajectory(pairs):
         initial = state["initial_norm"]
         print(f"  {label}  (seq_len={seq_len}, initial_norm={initial:.2f})")
         values = [
-            (s["iteration"], initial / (math.sqrt(seq_len) * s["last_norm"]))
+            (s["iteration"] + 1, initial / (math.sqrt(seq_len) * s["last_norm"]))
             for s in snaps
         ]
         shown = values[:4] + [None] + values[-3:]
@@ -144,12 +150,12 @@ def trajectory(pairs):
             if v is None:
                 cells.append("...")
             else:
-                cells.append(f"n={v[0]}:{v[1]:.4f}" + ("*" if v[0] == 0 else ""))
+                cells.append(f"c_{v[0]}={v[1]:.4f}" + ("*" if v[0] == 1 else ""))
         print("    " + "  ".join(cells))
         settled = [v for n, v in values if n >= 100]
         if settled:
             print(
-                f"    from n=100 on: min {min(settled):.4f}  max {max(settled):.4f}  "
+                f"    from c_100 on: min {min(settled):.4f}  max {max(settled):.4f}  "
                 f"spread {max(settled) - min(settled):.1e}"
             )
     print()

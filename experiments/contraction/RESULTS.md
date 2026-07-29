@@ -1,10 +1,9 @@
 # How fast does the state settle, and is the position collapse exact?
 
-**Short answer: the collapse is exact — the leftover disagreement between positions is one unit in
-the last place of the number format, which is what a perfectly collapsed state would show anyway. The
-settling speed does not track model size; inside each family, the two sizes disagree about which
-direction it goes. And the loop's per-step shrink factor, which a hypothesis on file assumes is 1 at
-rest, is measurably not.**
+**Short answer: the collapse is exact — the positions agree to about one unit of float32 precision per
+number, which is as equal as two float32-computed vectors can be. The settling speed does not track
+model size; inside each family, the two sizes disagree about which direction it goes. And the loop's
+per-step shrink factor, which a hypothesis on file assumes is 1 at rest, is measurably not.**
 
 **Run:** 2026-07-28, analysis only — no forward passes, no model loaded.
 **Status:** executed; scripts in this directory, all inputs already in the repository.
@@ -141,23 +140,63 @@ float32 epsilon is **1.19e−07**. Every column above sits within a small factor
 tensor is rank-1 to the same tolerance: σ₂/σ₁ ≈ 10⁻⁷ means the second singular direction carries
 nothing float32 can represent.
 
-### Is any of that residual real? Almost none of it.
+### Is any of that residual real? Read it per component.
 
 Stopping at "it sits at the precision floor" is true but evasive — it leaves the impression of an open
-empirical question. The sharper question is whether *any* of the measured deviation is real, or
-whether all of it is the price of doing the arithmetic in float32 at all.
+empirical question. The sharper question is how far apart the positions actually are, and there is a
+direct way to ask it that needs no model at all.
 
-The wrong way to test this is to build a rank-1 tensor and round it to float32. Because the
-per-position norms here agree to ~10⁻⁷, every row rounds to nearly the same float32 vector — two runs
-come out bit-identical, deviation exactly 0. That measures *storage*, and storage is not where the
-deviation comes from.
+If two vectors are the same up to independent per-component relative error *d*, the angle between
+them is about *d*√2, so 1 − cos = θ²/2 = *d*². Inverting: **d = √(1 − position_similarity)**. In units
+of float32 epsilon, that says how many units-in-the-last-place apart the positions are, per number:
 
-It comes from *arithmetic*. Each iteration is a forward pass whose matmuls accumulate over 768+
-dimensions in float32. Even if the true map sends every position to one vector, each position's
-arithmetic takes a different path and lands a few ULPs away. So the null is an exactly collapsed
-tensor perturbed per component at float32 ULP scale:
+| Run | 1 − similarity | *d* | ***d* / ε₃₂** |
+|---|---|---|---|
+| Lucier | 2.39e−14 | 1.54e−07 | **1.30** |
+| Semantic | 1.60e−14 | 1.26e−07 | **1.06** |
+| Syntactic | 7.88e−15 | 8.88e−08 | **0.74** |
+| Nonsense | 1.79e−14 | 1.34e−07 | **1.12** |
+| Imperative | 1.60e−14 | 1.26e−07 | **1.06** |
+| Divine_Syntactic | 1.20e−14 | 1.10e−07 | **0.92** |
+| Control_noise | 1.01e−13 | 3.17e−07 | **2.66** |
+| Control_prolet_Semantic | 2.13e−14 | 1.46e−07 | **1.22** |
 
-| Run | Observed | k = 1 ULP | k = 4 | k = 16 | k = 64 |
+float32 ε = 1.192e−07.
+
+**Seven of eight runs agree to within about one epsilon per number** — one of them (`Syntactic`) to
+less than one. That is as equal as two float32-computed vectors can be. Nothing is left over to be a
+structured disagreement between positions.
+
+**So the verdict on M1 is stronger than "cannot tell".** The collapse is exact to the precision a
+float32 number carries, and it stays there over 1000 iterations rather than growing. For H-pos0's
+purposes that *is* exact. What remains unprovable is only the in-principle gap below one epsilon, and
+nothing downstream can be sensitive to it unless something amplifies it — which 1000 iterations of
+stable running says it does not. A float64 run would confirm, not decide.
+
+**The one exception is worth keeping.** `Control_noise` sits at 2.66 ε, against 0.74–1.30 for the
+other seven — a factor of about 2.2 in the natural units, and 9× in the raw deviation, which is the
+same fact seen through a square. It is the only run above 2 ε. It is also the noise control, and the
+run with by far the largest rescale factor (10.1× amplification against 3.5×, see M5). Whether those
+are connected is not answerable from one run, but it is the one place here where something might sit
+above the floor.
+
+<details>
+<summary>Secondary cross-check: a synthetic sensitivity sweep, and what it is not</summary>
+
+An earlier revision of this file led with a simulation instead: perturb an exactly-collapsed tensor by
+relative Gaussian noise of *k* × ε and see which *k* column the observation matches. **That was
+over-claimed and the "one ULP" phrasing it produced was wrong**, for two reasons raised in review:
+
+- Gaussian noise of standard deviation ε is not float32 round-to-nearest, whose relative error is
+  bounded by ε/2 and roughly uniform — standard deviation about ε/(2√3), some 3.5× smaller.
+- A single rounding is the wrong comparison anyway. The archived state is the output of a twelve-layer
+  forward pass, so its accumulated error is worth several roundings, not one.
+
+Neither objection touches the per-component reading above, which is why that is now the primary
+result. The sweep is kept only for its *slope*: a factor of 4 in *k* moves the deviation ~15×, so the
+conclusion survives the assumed error scale being wrong by a factor of a few.
+
+| Run | Observed | k = 1 | k = 4 | k = 16 | k = 64 |
 |---|---|---|---|---|---|
 | Lucier | 2.39e−14 | 1.41e−14 | 2.15e−13 | 3.16e−12 | 6.04e−11 |
 | Semantic | 1.60e−14 | 1.44e−14 | 2.14e−13 | 3.12e−12 | 5.28e−11 |
@@ -165,25 +204,15 @@ tensor perturbed per component at float32 ULP scale:
 | Nonsense | 1.79e−14 | 1.39e−14 | 2.20e−13 | 3.09e−12 | 5.12e−11 |
 | Imperative | 1.60e−14 | 1.40e−14 | 2.20e−13 | 3.09e−12 | 5.12e−11 |
 | Divine_Syntactic | 1.20e−14 | 1.23e−14 | 2.36e−13 | 3.28e−12 | 5.32e−11 |
-| Control_noise | **1.01e−13** | 1.12e−14 | 1.85e−13 | 3.08e−12 | 5.13e−11 |
+| Control_noise | 1.01e−13 | 1.12e−14 | 1.85e−13 | 3.08e−12 | 5.13e−11 |
 | Control_prolet_Semantic | 2.13e−14 | 1.47e−14 | 2.14e−13 | 3.12e−12 | 5.28e−11 |
 
-**Seven of eight runs sit on the k = 1 column** — one unit in the last place of float32 per
-component, the smallest non-zero perturbation the format can hold. That alone reproduces the
-measurement. There is nothing left over to attribute to a real residual.
+One thing the sweep *does* settle: the obvious null — build a rank-1 tensor and round it to float32 —
+is useless here. Because the per-position norms agree to ~10⁻⁷, every row rounds to nearly the same
+float32 vector and two runs come out bit-identical at deviation exactly 0. That measures storage, and
+storage is not where the deviation comes from.
 
-**So the honest verdict on M1 is stronger than "cannot tell".** The collapse is exact to within one
-ULP, which is as exact as the question can be posed in float32, and it stays there over 1000
-iterations rather than growing. For H-pos0's purposes that *is* exact. What remains unprovable is
-only the in-principle gap below one ULP, and nothing downstream can be sensitive to it unless
-something amplifies it — which 1000 iterations of stable running says it does not. A float64 run
-would be a nice confirmation, not a precondition.
-
-**The one exception is worth keeping.** `Control_noise` sits at 1.01e−13, about 7× its one-ULP floor
-and between k = 1 and k = 4. It is the only run that does. It is also the noise control, and the run
-with by far the largest rescale factor (10.1× amplification against 3.5×, see M5). Whether those are
-connected is not answerable from one run, but it is the one place in this table where something might
-be above the floor.
+</details>
 
 **Consequence for H-pos0.** H-pos0 allows each position its own scalar *c_n*, so the prediction is a
 tensor whose rows are one shared direction with differing lengths. What the data shows is stronger:
@@ -353,8 +382,9 @@ uses it — it holds to 2–6 × 10⁻⁷. `initial_norm` is recorded directly.
 | Control_noise | 10 | 397.18 | 4017.69 | **0.0989** | 10.12× |
 | Control_prolet_Semantic | 12 | 1392.65 | 5230.65 | **0.2662** | 3.76× |
 
-*c* settles fast and then holds: from iteration 100 to 1000 the spread is 2×10⁻⁴ to 6×10⁻³. It is a
-**stable constant**.
+*c* settles fast and then holds: from *c*₁₀₁ to *c*₁₀₀₁ the spread is 2×10⁻⁴ to 6×10⁻³. It is a
+**stable constant**. (Index convention, easy to get wrong: a snapshot recorded at iteration *n* holds
+the state *after* *n* passes and *before* the rescale that precedes pass *n*+1, so it yields *c*ₙ₊₁.)
 
 ### Why this matters: it contradicts a step in H-pos0
 
@@ -394,7 +424,7 @@ LayerNorm and not at all around the residual path.
 0.266) and the noise control (0.099), and the noise control is also the one that lands elsewhere.
 Whether *c* tracks basin identity is not answerable from three runs and is not claimed here.
 
-### Correction: no engine change is needed, and M5 was never gated
+### Correction: no engine change is needed, and M5 was gated in error
 
 An earlier revision of this file said the transient "still needs the one-line change" to the engine.
 **That is wrong, and so is M5's own premise.** `atr_engine.py` already records everything M5 asks for,
@@ -450,14 +480,14 @@ GPT-2 Small's ragged fit is a latency, not a slow rate, and is not caused by the
 effect documented in `sink_geometry`.
 
 **Settled, against an earlier draft of this file.** Whether the position collapse is *exactly* exact.
-One ULP of float32 per component — the smallest error the format can hold — reproduces the measured
-residual in 7 of 8 runs, so there is nothing left to be a real disagreement. Only the in-principle gap
-below one ULP survives, and 1000 iterations of stable running says nothing amplifies it. H-pos0's
-premise holds.
+Positions agree to 0.74–1.30 float32 epsilon per component in 7 of 8 runs — as equal as two
+float32-computed vectors can be — so there is nothing left to be a structured disagreement. Only the
+in-principle gap below one epsilon survives, and 1000 iterations of stable running says nothing
+amplifies it. H-pos0's premise holds.
 
-**Open, and the one loose thread in that table.** `Control_noise` sits ~7× its one-ULP floor, alone
-among the eight. It is also the noise control and has by far the largest rescale factor. One run; not
-answerable here.
+**Open, and the one loose thread in that table.** `Control_noise` sits at 2.66 ε per component, alone
+above 2 ε among the eight. It is also the noise control and has by far the largest rescale factor.
+One run; not answerable here.
 
 **Not settled.** Whether pythia-410m converges at all given more iterations, or is a genuinely
 different regime. 60 iterations is not enough to tell, and extending it is a new run.
