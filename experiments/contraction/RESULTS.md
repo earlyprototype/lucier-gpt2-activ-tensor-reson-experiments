@@ -1,9 +1,10 @@
 # How fast does the state settle, and is the position collapse exact?
 
-**Short answer: the collapse is exact to the limit of the stored precision, and cannot be pushed
-further without a new run. The settling speed does not track model size — inside each family, the
-two sizes disagree about which direction it goes. And the loop's per-step shrink factor, which a
-hypothesis on file assumes is 1 at rest, is measurably not.**
+**Short answer: the collapse is exact — the leftover disagreement between positions is one unit in
+the last place of the number format, which is what a perfectly collapsed state would show anyway. The
+settling speed does not track model size; inside each family, the two sizes disagree about which
+direction it goes. And the loop's per-step shrink factor, which a hypothesis on file assumes is 1 at
+rest, is measurably not.**
 
 **Run:** 2026-07-28, analysis only — no forward passes, no model loaded.
 **Status:** executed; scripts in this directory, all inputs already in the repository.
@@ -25,13 +26,17 @@ in the project (**H-pos0**) assumes the collapse is *exact*, and 0.9999 would no
 **Answer: it is 1.000000000000 to twelve decimal places, in all eight committed runs.** The largest
 shortfall is one part in 10¹³.
 
-But there is a catch, and it is the real result. The tensors were saved in float32, a format that
-can only distinguish numbers to about one part in 10⁷. The angle between positions comes out at
-about 2×10⁻⁷ radians — which is float32's own resolution. So the measurement has hit the floor of the
-format it was stored in. **The committed data says "exactly parallel, or parallel to one part in
-10 million — cannot tell which."** That is enough for H-pos0's premise to survive, and not enough to
-confirm it. Settling it needs a run recorded at higher precision, which is gated by
-[`docs/ATR_PAUSE.md`](../../docs/ATR_PAUSE.md).
+The tensors were saved in float32, a format that can only distinguish numbers to about one part in
+10⁷, and the angle between positions comes out at about 2×10⁻⁷ radians — float32's own resolution. So
+the raw figures alone cannot separate "exactly parallel" from "parallel to one part in 10 million".
+
+**But that is not where this stops, and an earlier version of this file wrongly left it there.**
+Asking how much of the leftover is real: an exactly-collapsed tensor, carrying nothing but *one unit
+in the last place* of float32 per number — the smallest error the format can hold — reproduces the
+measured figures in seven of the eight runs. There is nothing left over to be a real disagreement
+between positions. **The collapse is exact as far as the question can be asked**, and it stays exact
+over 1000 iterations rather than drifting. For H-pos0's purposes it is settled. A higher-precision run
+would confirm it, not decide it.
 
 **M2.** How *fast* does the state settle? M2 asked for a decay curve across iterations.
 
@@ -135,6 +140,50 @@ physics — which is precisely why M1 needed doing rather than being read off th
 float32 epsilon is **1.19e−07**. Every column above sits within a small factor of it. The converged
 tensor is rank-1 to the same tolerance: σ₂/σ₁ ≈ 10⁻⁷ means the second singular direction carries
 nothing float32 can represent.
+
+### Is any of that residual real? Almost none of it.
+
+Stopping at "it sits at the precision floor" is true but evasive — it leaves the impression of an open
+empirical question. The sharper question is whether *any* of the measured deviation is real, or
+whether all of it is the price of doing the arithmetic in float32 at all.
+
+The wrong way to test this is to build a rank-1 tensor and round it to float32. Because the
+per-position norms here agree to ~10⁻⁷, every row rounds to nearly the same float32 vector — two runs
+come out bit-identical, deviation exactly 0. That measures *storage*, and storage is not where the
+deviation comes from.
+
+It comes from *arithmetic*. Each iteration is a forward pass whose matmuls accumulate over 768+
+dimensions in float32. Even if the true map sends every position to one vector, each position's
+arithmetic takes a different path and lands a few ULPs away. So the null is an exactly collapsed
+tensor perturbed per component at float32 ULP scale:
+
+| Run | Observed | k = 1 ULP | k = 4 | k = 16 | k = 64 |
+|---|---|---|---|---|---|
+| Lucier | 2.39e−14 | 1.41e−14 | 2.15e−13 | 3.16e−12 | 6.04e−11 |
+| Semantic | 1.60e−14 | 1.44e−14 | 2.14e−13 | 3.12e−12 | 5.28e−11 |
+| Syntactic | 7.88e−15 | 1.23e−14 | 2.36e−13 | 3.29e−12 | 5.32e−11 |
+| Nonsense | 1.79e−14 | 1.39e−14 | 2.20e−13 | 3.09e−12 | 5.12e−11 |
+| Imperative | 1.60e−14 | 1.40e−14 | 2.20e−13 | 3.09e−12 | 5.12e−11 |
+| Divine_Syntactic | 1.20e−14 | 1.23e−14 | 2.36e−13 | 3.28e−12 | 5.32e−11 |
+| Control_noise | **1.01e−13** | 1.12e−14 | 1.85e−13 | 3.08e−12 | 5.13e−11 |
+| Control_prolet_Semantic | 2.13e−14 | 1.47e−14 | 2.14e−13 | 3.12e−12 | 5.28e−11 |
+
+**Seven of eight runs sit on the k = 1 column** — one unit in the last place of float32 per
+component, the smallest non-zero perturbation the format can hold. That alone reproduces the
+measurement. There is nothing left over to attribute to a real residual.
+
+**So the honest verdict on M1 is stronger than "cannot tell".** The collapse is exact to within one
+ULP, which is as exact as the question can be posed in float32, and it stays there over 1000
+iterations rather than growing. For H-pos0's purposes that *is* exact. What remains unprovable is
+only the in-principle gap below one ULP, and nothing downstream can be sensitive to it unless
+something amplifies it — which 1000 iterations of stable running says it does not. A float64 run
+would be a nice confirmation, not a precondition.
+
+**The one exception is worth keeping.** `Control_noise` sits at 1.01e−13, about 7× its one-ULP floor
+and between k = 1 and k = 4. It is the only run that does. It is also the noise control, and the run
+with by far the largest rescale factor (10.1× amplification against 3.5×, see M5). Whether those are
+connected is not answerable from one run, but it is the one place in this table where something might
+be above the floor.
 
 **Consequence for H-pos0.** H-pos0 allows each position its own scalar *c_n*, so the prediction is a
 tensor whose rows are one shared direction with differing lengths. What the data shows is stronger:
@@ -345,16 +394,43 @@ LayerNorm and not at all around the residual path.
 0.266) and the noise control (0.099), and the noise control is also the one that lands elsewhere.
 Whether *c* tracks basin identity is not answerable from three runs and is not claimed here.
 
-### What still needs the one-line change
+### Correction: no engine change is needed, and M5 was never gated
 
-- Iterations 1–99, which no snapshot samples — so the *approach* of *c_n* to its settled value is
-  unobserved, and only the settled value is in hand.
+An earlier revision of this file said the transient "still needs the one-line change" to the engine.
+**That is wrong, and so is M5's own premise.** `atr_engine.py` already records everything M5 asks for,
+at every snapshot:
+
+```python
+"tensor":              current_tensor.clone().cpu(),   # line 260
+"tensor_norm":         current_tensor.norm().item(),   # line 265
+"position_similarity": position_similarity,            # line 274
+```
+
+and the iteration-0 snapshot carries the same fields, so `initial_norm` is just
+`snapshots[0]["tensor_norm"]`. *c*ₙ₊₁ = `snapshots[0].tensor_norm / snapshots[n].tensor_norm` — fully
+available from any engine run whose snapshots were saved intact. M5's "currently never recorded" is
+not true of the engine.
+
+**What actually happened is a save-time discard, in two separate scripts, each independently:**
+
+| Script | What it did |
+|---|---|
+| `experiments/gpt2_small/05_divine_motion.py:118` | `make_snapshot()` — *"Slim snapshot with just the fields the analysis needs."* Reimplements the snapshot from scratch and keeps 7 of the engine's 20 fields. Drops `tensor`, `tensor_norm`, `position_similarity`. |
+| `experiments/sink_geometry/02_masking_control.py:86-88` | Calls `run_atr_loop`, receives the full snapshots, keeps `means` and discards the rest before `torch.save`. |
+
+Both decided at save time what would ever be asked of the data. Both were wrong — this analysis
+asked for exactly what they dropped, and neither loss is recoverable without a re-run.
+
+So the residual limits below are limits of **these two archives**, not of the engine or the method:
+
+- Iterations 1–99, which `05_divine_motion.py`'s schedule does not sample — so the *approach* of *c_n*
+  to its settled value is unobserved, and only the settled value is in hand.
 - The pre-collapse regime, where reconstructing ‖x‖ from `last_norm` is not exact. The iteration-0
   values are printed marked with `*` and are not used.
-- Any run whose `seq_len` and `initial_norm` were not archived — which is all of the cross-model ones.
+- The cross-model runs, which archived no per-position data at all.
 
-So M5 should move from `GATED` to **partly delivered**: the settled value is measured, the transient
-still needs a run.
+**M5 should move from `GATED` to done-where-data-exists.** Nothing about it needs a forward pass or an
+engine change; it needs archives that were not slimmed.
 
 ---
 
@@ -364,16 +440,24 @@ still needs a run.
 committed runs, including the worst individual pair, with no outlier position. The float32 discrepancy
 in `Imperative` is accumulation order.
 
-**Settled.** No committed archive can support M2 as worded. The per-position tensor was not saved per
-iteration. Future runs should save it.
+**Settled.** No committed archive can support M2 as worded — but the cause is not the engine. The
+engine records the full per-position tensor, `tensor_norm` and `position_similarity` at every
+snapshot. Two experiment scripts discarded them at save time, independently. See the correction under
+M5.
 
 **Settled.** Contraction speed is not monotone in model size, and the two families order oppositely.
 GPT-2 Small's ragged fit is a latency, not a slow rate, and is not caused by the massive-activation
 effect documented in `sink_geometry`.
 
-**Not settled.** Whether the position collapse is *exactly* exact. The archives are float32 and the
-residual is at float32's floor. This is the one thing M1 was meant to decide and the data cannot
-decide it.
+**Settled, against an earlier draft of this file.** Whether the position collapse is *exactly* exact.
+One ULP of float32 per component — the smallest error the format can hold — reproduces the measured
+residual in 7 of 8 runs, so there is nothing left to be a real disagreement. Only the in-principle gap
+below one ULP survives, and 1000 iterations of stable running says nothing amplifies it. H-pos0's
+premise holds.
+
+**Open, and the one loose thread in that table.** `Control_noise` sits ~7× its one-ULP floor, alone
+among the eight. It is also the noise control and has by far the largest rescale factor. One run; not
+answerable here.
 
 **Not settled.** Whether pythia-410m converges at all given more iterations, or is a genuinely
 different regime. 60 iterations is not enough to tell, and extending it is a new run.
@@ -383,8 +467,9 @@ different regime. 60 iterations is not enough to tell, and extending it is a new
 H-pos0 argument (#75), and because the map is not scale-invariant (#69) the scalar cannot be dropped
 from the fixed-point condition. M5 was filed as gated; its settled value did not need a run.
 
-**Not settled.** How *c_n* reaches that constant. No snapshot samples iterations 1–99, and by
-iteration 100 it has already arrived.
+**Not settled, and avoidably so.** How *c_n* reaches that constant. No snapshot samples iterations
+1–99 in the one archive that retained enough to compute it. The engine would have recorded it; the
+saving script did not.
 
-**Gated.** Both of the above need forward passes and are blocked by
-[`docs/ATR_PAUSE.md`](../../docs/ATR_PAUSE.md).
+**Gated.** Extending pythia-410m, and any float64 confirmation, need forward passes and are blocked by
+[`docs/ATR_PAUSE.md`](../../docs/ATR_PAUSE.md). Nothing else here is.

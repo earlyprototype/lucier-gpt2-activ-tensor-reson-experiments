@@ -1,9 +1,20 @@
 """M5 (#71): the per-iteration rescale factor c_n -- from committed data.
 
 M5 is filed `GATED` `EXPERIMENT` on the grounds that the ratio is "currently
-never recorded" and needs one line added to the loop. It does need that line for
-full per-iteration coverage. But it is *partly recoverable now*, because of the
-order of operations in the loop (atr_engine.py:211-216):
+never recorded". That is not true of the engine: `atr_engine.py` stores
+`tensor_norm` in every snapshot including iteration 0, so
+
+    c_{n+1} = snapshots[0]["tensor_norm"] / snapshots[n]["tensor_norm"]
+
+is available directly from any run whose snapshots were saved intact. No engine
+change and no forward pass is needed.
+
+What is missing is that two experiment scripts discarded those fields at save
+time -- `05_divine_motion.py:118` reimplements the snapshot and keeps 7 of the
+engine's 20 fields; `sink_geometry/02_masking_control.py:86-88` keeps only the
+per-position mean. This script therefore reconstructs c from what those slimmed
+archives did retain, which works because of the order of operations in the loop
+(atr_engine.py:211-216):
 
     for i in 1..max_iter:
         current_norm = ||current_tensor||          # PRE-rescale
@@ -154,9 +165,10 @@ def main():
     check_identity(pairs)
     settled_values(pairs)
     trajectory(pairs)
-    print("What this does NOT cover, and still needs the one-line change:")
-    print("  * iterations 1-99, which no snapshot samples, so the approach of c_n")
-    print("    to its settled value is unobserved")
+    print("What this does NOT cover -- all limits of these archives, not of the")
+    print("engine, which recorded every one of these and had it thrown away:")
+    print("  * iterations 1-99, which 05_divine_motion.py's schedule does not sample,")
+    print("    so the approach of c_n to its settled value is unobserved")
     print("  * any run whose seq_len or initial_norm was not archived")
     print("  * the pre-collapse regime, where the reconstruction is not exact")
 
