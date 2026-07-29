@@ -155,29 +155,46 @@ of magnitude, not a per-number statement:
 
 float32 ε = 1.192e−07.
 
+**The second decimal place in that last column is not supported by the method.** `1 − similarity` is
+computed as the engine computes it, `1.0 - mean(cos)`, with every cos ≈ 1 — so it cancels down to the
+float64 ulp. Restating the identical quantity cancellation-free as mean‖u_i − u_j‖²/2 gives
+consistently larger values: 2.418e−14 against 2.387e−14 for `Lucier` (1.3%), 1.649e−14 against
+1.599e−14 for `Imperative` (3.0%), and 8.379e−15 against 7.883e−15 for `Syntactic` (5.9%). The error
+is worst on the smallest deviation, which is `Syntactic` — the run quoted as the low end of the
+0.74–1.30 band. A 5.9% shift in 1 − similarity is 2.9% in *d*, so no conclusion here moves, but the
+band is really 0.77–1.30 and the figures should be read to one decimal. The engine's formula is
+mirrored deliberately, so this is recorded rather than fixed.
+
 **But *d* is an RMS summary**, and reading it as "every component agrees to ~1 ε" assumes the
 disagreement is spread evenly across coordinates. It is not — one coordinate carries 4–55% of it, and
-the effective number of participating coordinates is 3–23 out of 768. That assumption was flagged in
+the effective number of participating coordinates is 3–157 out of 768. That assumption was flagged in
 review and it does not hold, so the per-coordinate question has to be asked per coordinate.
+
+Both figures are computed by `per_coordinate_disagreement` and printed in the table below, and
+**neither is a stable quantity.** `Syntactic` and `Divine_Syntactic` settle to the same direction
+(1 − cos = 1.2e−10) and return 4.4% / 157 against 19.4% / 23 — a factor of seven apart at the same
+state. What they describe is the shape of an individual run's rounding residual, not a property of
+the settled state, which is why the range is this wide and why nothing downstream leans on it. That
+instability is itself what an arithmetic residual should look like.
 
 ### Per-coordinate measurement
 
 Concentration on its own proves nothing: under *relative* rounding every coordinate carries
-|Δu_k|/|u_k| ~ ε regardless of its size, and this state's energy is 91% in ten coordinates, so
+|Δu_k|/|u_k| ~ ε regardless of its size, and this state's energy is ~68% in ten coordinates, so
 rounding would look concentrated too. What separates rounding from structure is whether the *relative*
 disagreement is flat at a few ε. Scale is divided out first — H-pos0 lets each position keep its own
 scalar (M5), so the direction is what is at issue.
 
-| Run | median | p90 | p99 | >100 ε | their \|u\| | their share of angle |
-|---|---|---|---|---|---|---|
-| Lucier | 1.90 | 10.03 | 63.67 | 0.45% | 0.026 | 0.35% |
-| Semantic | 1.82 | 9.39 | 71.55 | 0.79% | 0.007 | 0.47% |
-| Syntactic | 1.69 | 9.51 | 182.02 | 1.41% | 0.003 | 1.48% |
-| Nonsense | 1.87 | 9.77 | 90.63 | 0.92% | 0.012 | 0.63% |
-| Imperative | 1.80 | 9.40 | 83.86 | 0.88% | 0.016 | 0.78% |
-| Divine_Syntactic | 1.85 | 10.24 | 190.03 | 1.56% | 0.003 | 1.32% |
-| Control_noise | 3.38 | 15.17 | 209.01 | 1.81% | 0.010 | 0.43% |
-| Control_prolet_Semantic | 1.81 | 9.61 | 77.40 | 0.79% | 0.007 | 0.36% |
+| Run | median | p90 | p99 | >100 ε | their \|u\| | their share of angle | top coord | part. ratio |
+|---|---|---|---|---|---|---|---|---|
+| Lucier | 1.90 | 10.03 | 63.67 | 0.45% | 0.026 | 0.35% | 51.2% | 3.8 |
+| Semantic | 1.82 | 9.39 | 71.55 | 0.79% | 0.007 | 0.47% | 35.9% | 7.5 |
+| Syntactic | 1.69 | 9.51 | 182.02 | 1.41% | 0.003 | 1.48% | 4.4% | 156.8 |
+| Nonsense | 1.87 | 9.77 | 90.63 | 0.92% | 0.012 | 0.63% | 42.8% | 5.4 |
+| Imperative | 1.80 | 9.40 | 83.86 | 0.88% | 0.016 | 0.78% | 39.9% | 6.2 |
+| Divine_Syntactic | 1.85 | 10.24 | 190.03 | 1.56% | 0.003 | 1.32% | 19.4% | 23.3 |
+| Control_noise | 3.38 | 15.17 | 209.01 | 1.81% | 0.010 | 0.43% | 40.2% | 5.6 |
+| Control_prolet_Semantic | 1.81 | 9.61 | 77.40 | 0.79% | 0.007 | 0.36% | 54.9% | 3.3 |
 
 **The typical coordinate agrees to about 2 ε.** The p99 column is driven by coordinates at 0.3–2.6%
 of typical magnitude, where a negligible absolute difference produces a large relative one; those
@@ -197,10 +214,13 @@ higher-precision run is required.
 | Per-coordinate median | 3.38 ε | 1.69–1.90 ε |
 | Raw deviation 1 − sim | 1.01e−13 | 7.9e−15 – 2.4e−14 |
 
-Roughly a factor of two on either per-number measure — the 9× in the raw deviation is the same fact
-seen through a square, not a separate finding. It is also the noise control, and the run with by far
-the largest rescale factor (10.1× amplification against 3.5×, see M5). Whether those are connected is
-not answerable from one run, but it is the one place here where something might sit above the floor.
+Roughly a factor of two on either per-number measure. The raw-deviation row looks like a much larger
+gap, but it is the same fact seen through a square: against the geometric mean of the other seven the
+ratio is 6.49×, and (2.66 / 1.045)² = 6.48. It is not a separate finding. The ratio is quoted against
+the geometric mean because it moves between 4.2× and 12.8× depending on which of the seven is used as
+the comparator. It is also the noise control, and the run with by far the largest rescale factor
+(10.1× amplification against 3.5×, see M5). Whether those are connected is not answerable from one
+run, but it is the one place here where something might sit above the floor.
 
 <details>
 <summary>Secondary cross-check: a synthetic sensitivity sweep, and what it is not</summary>
@@ -448,7 +468,7 @@ at every snapshot:
 ```python
 "tensor":              current_tensor.clone().cpu(),   # line 260
 "tensor_norm":         current_tensor.norm().item(),   # line 265
-"position_similarity": position_similarity,            # line 274
+"position_similarity": position_similarity,            # line 277
 ```
 
 The iteration-0 snapshot carries the same fields, so `initial_norm` = `snapshots[0]["tensor_norm"]`
@@ -459,7 +479,7 @@ snapshots were saved intact. M5's "currently never recorded" does not hold for t
 
 | Script | What it did |
 |---|---|
-| `experiments/gpt2_small/05_divine_motion.py:118` | `make_snapshot()` — *"Slim snapshot with just the fields the analysis needs."* Reimplements the snapshot from scratch and keeps 7 of the engine's 20 fields. Drops `tensor`, `tensor_norm`, `position_similarity`. |
+| `experiments/gpt2_small/05_divine_motion.py:118` | `make_snapshot()` — *"Slim snapshot with just the fields the analysis needs."* Reimplements the snapshot from scratch and keeps 7 of the engine's 19 fields. Drops `tensor`, `tensor_norm`, `position_similarity`. |
 | `experiments/sink_geometry/02_masking_control.py:86-88` | Calls `run_atr_loop`, receives the full snapshots, keeps `means` and discards the rest before `torch.save`. |
 
 Both selected fields at save time. The fields this analysis required are among those dropped, and
