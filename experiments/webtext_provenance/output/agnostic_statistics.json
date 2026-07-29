@@ -1,0 +1,534 @@
+{
+ "generated_by": "10_agnostic_statistics.py",
+ "seed": 20260729,
+ "T1_cluster_membership_vs_null": {
+  "corpus_base_rate": 0.011,
+  "documents_in_clusters": 2860,
+  "documents_total": 260000,
+  "groups": {
+   "state_produced": {
+    "n": 155,
+    "observed_in_clusters": 0,
+    "expected_in_clusters": 1.7,
+    "rate": 0.0,
+    "rate_95_ci": [
+     0.0,
+     0.02352
+    ],
+    "rate_ratio_vs_corpus": 0.0,
+    "binomial_p_two_sided": 0.42372513910920845,
+    "significant_at_0.05": false
+   },
+   "all_indicator_flagged": {
+    "n": 578,
+    "observed_in_clusters": 0,
+    "expected_in_clusters": 6.36,
+    "rate": 0.0,
+    "rate_95_ci": [
+     0.0,
+     0.00636
+    ],
+    "rate_ratio_vs_corpus": 0.0,
+    "binomial_p_two_sided": 0.003941272184575159,
+    "significant_at_0.05": true
+   },
+   "tier_A": {
+    "n": 8,
+    "observed_in_clusters": 0,
+    "expected_in_clusters": 0.09,
+    "rate": 0.0,
+    "rate_95_ci": [
+     0.0,
+     0.36942
+    ],
+    "rate_ratio_vs_corpus": 0.0,
+    "binomial_p_two_sided": 0.9999999999999998,
+    "significant_at_0.05": false
+   },
+   "tier_B": {
+    "n": 551,
+    "observed_in_clusters": 0,
+    "expected_in_clusters": 6.06,
+    "rate": 0.0,
+    "rate_95_ci": [
+     0.0,
+     0.00667
+    ],
+    "rate_ratio_vs_corpus": 0.0,
+    "binomial_p_two_sided": 0.0036934755179165077,
+    "significant_at_0.05": true
+   },
+   "tier_C": {
+    "n": 6,
+    "observed_in_clusters": 0,
+    "expected_in_clusters": 0.07,
+    "rate": 0.0,
+    "rate_95_ci": [
+     0.0,
+     0.45926
+    ],
+    "rate_ratio_vs_corpus": 0.0,
+    "binomial_p_two_sided": 1.0,
+    "significant_at_0.05": false
+   },
+   "tier_M": {
+    "n": 18,
+    "observed_in_clusters": 0,
+    "expected_in_clusters": 0.2,
+    "rate": 0.0,
+    "rate_95_ci": [
+     0.0,
+     0.1853
+    ],
+    "rate_ratio_vs_corpus": 0.0,
+    "binomial_p_two_sided": 0.9999999999999997,
+    "significant_at_0.05": false
+   }
+  },
+  "power_state_produced": {
+   "rate_ratio_0.0": 0.0,
+   "rate_ratio_0.25": 0.0,
+   "rate_ratio_0.5": 0.002,
+   "rate_ratio_2.0": 0.265,
+   "rate_ratio_3.0": 0.582,
+   "rate_ratio_5.0": 0.928
+  },
+  "power_note": "A rate ratio of 0 means the group never clusters. With n=155 and a corpus base rate of 0.0110, even total absence of clustering is only detectable with the power shown \u2014 which is why the observed zero cannot support a depletion claim."
+ },
+ "T1b_baseline_control": {
+  "per_tier_vs_corpus_base_rate": {
+   "tier_A": {
+    "n": 8,
+    "observed": 0,
+    "expected": 0.09,
+    "binomial_p_vs_corpus": 0.9999999999999998
+   },
+   "tier_B": {
+    "n": 551,
+    "observed": 0,
+    "expected": 6.06,
+    "binomial_p_vs_corpus": 0.0036934755179165077
+   },
+   "tier_BASE": {
+    "n": 533,
+    "observed": 6,
+    "expected": 5.86,
+    "binomial_p_vs_corpus": 0.8352258624763751
+   },
+   "tier_C": {
+    "n": 6,
+    "observed": 0,
+    "expected": 0.07,
+    "binomial_p_vs_corpus": 1.0
+   },
+   "tier_M": {
+    "n": 18,
+    "observed": 0,
+    "expected": 0.2,
+    "binomial_p_vs_corpus": 0.9999999999999997
+   }
+  },
+  "state_media_vs_baseline_news": {
+   "tier_B": {
+    "clustered": 0,
+    "n": 551
+   },
+   "tier_BASE": {
+    "clustered": 6,
+    "n": 533
+   },
+   "fisher_exact_two_sided": 0.0139
+  },
+  "fragility": {
+   "distinct_clusters_holding_baseline_docs": 1,
+   "largest_cluster_share": "6/6",
+   "fisher_p_dropping_largest_baseline_cluster": 1.0,
+   "verdict": "The entire baseline signal sits in one cluster. Removing it leaves both groups at zero and there is no difference left to test. The comparison is nominally significant and rests on a single six-document author-bio block."
+  }
+ },
+ "T2_rank_residual_permutation": {
+  "targets": {
+   "rt": -0.197,
+   "sputniknews": 0.094,
+   "presstv": -0.105,
+   "globalresearch": -0.474,
+   "telesurtv": -0.575
+  },
+  "observed_mean_z": -0.2516,
+  "n_permutations": 20000,
+  "unrestricted_null": {
+   "mean": -0.0037,
+   "p_two_sided": 0.4943,
+   "p_greater": 0.7767
+  },
+  "rank_stratified_null": {
+   "mean": -0.1536,
+   "p_two_sided": 0.5189,
+   "p_greater": 0.7359
+  },
+  "note": "p_greater is the test that matters for the hypothesis: amplification predicts state domains sit ABOVE the fitted law. n=5 domains, so this test is weak whatever it returns."
+ },
+ "T3_domain_enrichment_scan": {
+  "documents_in_clusters": 2860,
+  "documents_not_in_clusters": 257140,
+  "domains_tested": 68,
+  "min_occurrences_to_test": 20,
+  "n_significant_fdr": 33,
+  "n_enriched": 31,
+  "top_enriched": [
+   {
+    "domain": "domainmarket.com",
+    "in_clusters": 28,
+    "total": 28,
+    "rate": 1.0,
+    "expected_rate": 0.011,
+    "enrichment": 90.91,
+    "p": 1.4420993610649967e-55,
+    "q": 2.4515689138104944e-54,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "ring.com",
+    "in_clusters": 27,
+    "total": 27,
+    "rate": 1.0,
+    "expected_rate": 0.011,
+    "enrichment": 90.91,
+    "p": 1.3109994191500035e-53,
+    "q": 1.4857993417033374e-52,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "accurateappraisals.com",
+    "in_clusters": 27,
+    "total": 27,
+    "rate": 1.0,
+    "expected_rate": 0.011,
+    "enrichment": 90.91,
+    "p": 1.3109994191500035e-53,
+    "q": 1.4857993417033374e-52,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "seo.com",
+    "in_clusters": 27,
+    "total": 28,
+    "rate": 0.9643,
+    "expected_rate": 0.011,
+    "enrichment": 87.66,
+    "p": 3.6318616908711965e-52,
+    "q": 3.528094213989162e-51,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "wikidot.com",
+    "in_clusters": 37,
+    "total": 46,
+    "rate": 0.8043,
+    "expected_rate": 0.011,
+    "enrichment": 73.12,
+    "p": 3.4002504120514054e-64,
+    "q": 7.707234267316519e-63,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "userbenchmark.com",
+    "in_clusters": 27,
+    "total": 35,
+    "rate": 0.7714,
+    "expected_rate": 0.011,
+    "enrichment": 70.13,
+    "p": 2.8332427499549056e-46,
+    "q": 2.4082563374616698e-45,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "govtrack.us",
+    "in_clusters": 60,
+    "total": 91,
+    "rate": 0.6593,
+    "expected_rate": 0.011,
+    "enrichment": 59.94,
+    "p": 4.2942545624423697e-94,
+    "q": 2.9200931024608114e-92,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "congress.gov",
+    "in_clusters": 60,
+    "total": 93,
+    "rate": 0.6452,
+    "expected_rate": 0.011,
+    "enrichment": 58.65,
+    "p": 3.404446154416984e-93,
+    "q": 1.1575116925017746e-91,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "loc.gov",
+    "in_clusters": 12,
+    "total": 25,
+    "rate": 0.48,
+    "expected_rate": 0.011,
+    "enrichment": 43.64,
+    "p": 1.4293613500304883e-17,
+    "q": 8.099714316839434e-17,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "lulu.com",
+    "in_clusters": 10,
+    "total": 25,
+    "rate": 0.4,
+    "expected_rate": 0.011,
+    "enrichment": 36.36,
+    "p": 7.292506307735697e-14,
+    "q": 3.3059361928401827e-13,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "golang.org",
+    "in_clusters": 12,
+    "total": 31,
+    "rate": 0.3871,
+    "expected_rate": 0.011,
+    "enrichment": 35.19,
+    "p": 3.6486781116641205e-16,
+    "q": 1.908539319947386e-15,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "ebay.com",
+    "in_clusters": 15,
+    "total": 44,
+    "rate": 0.3409,
+    "expected_rate": 0.011,
+    "enrichment": 30.99,
+    "p": 7.111667969080919e-19,
+    "q": 4.835934218975025e-18,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "setup.exe",
+    "in_clusters": 6,
+    "total": 22,
+    "rate": 0.2727,
+    "expected_rate": 0.011,
+    "enrichment": 24.79,
+    "p": 1.1361679833316036e-07,
+    "q": 4.828713929159315e-07,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "newegg.com",
+    "in_clusters": 5,
+    "total": 24,
+    "rate": 0.2083,
+    "expected_rate": 0.011,
+    "enrichment": 18.94,
+    "p": 5.748947032787493e-06,
+    "q": 1.9546419911477476e-05,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "playstation.com",
+    "in_clusters": 6,
+    "total": 51,
+    "rate": 0.1176,
+    "expected_rate": 0.011,
+    "enrichment": 10.7,
+    "p": 2.0871324268699817e-05,
+    "q": 6.758333572721845e-05,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "etsy.com",
+    "in_clusters": 9,
+    "total": 77,
+    "rate": 0.1169,
+    "expected_rate": 0.011,
+    "enrichment": 10.63,
+    "p": 1.9383755466734713e-07,
+    "q": 7.753502186693885e-07,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "evike.com",
+    "in_clusters": 4,
+    "total": 35,
+    "rate": 0.1143,
+    "expected_rate": 0.011,
+    "enrichment": 10.39,
+    "p": 0.0005837756008401101,
+    "q": 0.0016540308690469786,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "virtus.pro",
+    "in_clusters": 5,
+    "total": 44,
+    "rate": 0.1136,
+    "expected_rate": 0.011,
+    "enrichment": 10.33,
+    "p": 0.00012235600462827555,
+    "q": 0.00037819128703285175,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "clinicaltrials.gov",
+    "in_clusters": 4,
+    "total": 40,
+    "rate": 0.1,
+    "expected_rate": 0.011,
+    "enrichment": 9.09,
+    "p": 0.0009754252889549771,
+    "q": 0.00255111229418994,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "playstationnetwork.com",
+    "in_clusters": 2,
+    "total": 20,
+    "rate": 0.1,
+    "expected_rate": 0.011,
+    "enrichment": 9.09,
+    "p": 0.020158473646726672,
+    "q": 0.04283675649929418,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "bungie.net",
+    "in_clusters": 2,
+    "total": 22,
+    "rate": 0.0909,
+    "expected_rate": 0.011,
+    "enrichment": 8.26,
+    "p": 0.024156493714332424,
+    "q": 0.0497770173507456,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "advice.disclaimer",
+    "in_clusters": 52,
+    "total": 589,
+    "rate": 0.0883,
+    "expected_rate": 0.011,
+    "enrichment": 8.03,
+    "p": 5.707334004453791e-30,
+    "q": 4.312207914476198e-29,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "discord.gg",
+    "in_clusters": 5,
+    "total": 59,
+    "rate": 0.0847,
+    "expected_rate": 0.011,
+    "enrichment": 7.7,
+    "p": 0.0004921413912796152,
+    "q": 0.0014550267220440796,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "reddit.com",
+    "in_clusters": 32,
+    "total": 382,
+    "rate": 0.0838,
+    "expected_rate": 0.011,
+    "enrichment": 7.62,
+    "p": 2.1053240941789847e-18,
+    "q": 1.3014730764015543e-17,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "breitbart.com",
+    "in_clusters": 6,
+    "total": 98,
+    "rate": 0.0612,
+    "expected_rate": 0.011,
+    "enrichment": 5.57,
+    "p": 0.0007865739607642879,
+    "q": 0.0021394811732788634,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "tumblr.com",
+    "in_clusters": 5,
+    "total": 88,
+    "rate": 0.0568,
+    "expected_rate": 0.011,
+    "enrichment": 5.17,
+    "p": 0.0029636760431066443,
+    "q": 0.0069493093424569585,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "google.com",
+    "in_clusters": 37,
+    "total": 698,
+    "rate": 0.053,
+    "expected_rate": 0.011,
+    "enrichment": 4.82,
+    "p": 1.2915468757539884e-14,
+    "q": 6.273227682233659e-14,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "doi.org",
+    "in_clusters": 6,
+    "total": 115,
+    "rate": 0.0522,
+    "expected_rate": 0.011,
+    "enrichment": 4.74,
+    "p": 0.0017961036469854154,
+    "q": 0.004523520296111417,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "patreon.com",
+    "in_clusters": 5,
+    "total": 115,
+    "rate": 0.0435,
+    "expected_rate": 0.011,
+    "enrichment": 3.95,
+    "p": 0.009117541698636784,
+    "q": 0.019999768887332302,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "amazon.com",
+    "in_clusters": 21,
+    "total": 493,
+    "rate": 0.0426,
+    "expected_rate": 0.011,
+    "enrichment": 3.87,
+    "p": 2.356665360716368e-07,
+    "q": 8.902958029372945e-07,
+    "significant_fdr_0.05": true
+   },
+   {
+    "domain": "youtube.com",
+    "in_clusters": 17,
+    "total": 770,
+    "rate": 0.0221,
+    "expected_rate": 0.011,
+    "enrichment": 2.01,
+    "p": 0.00802368766260538,
+    "q": 0.018187025368572196,
+    "significant_fdr_0.05": true
+   }
+  ],
+  "enriched_matching_an_indicator": [
+   "breitbart.com"
+  ],
+  "note": "Domains are second-level labels from text tokens, so this counts documents that MENTION a domain, not documents FROM it \u2014 the same capture limit the indicator scan has. Benjamini-Hochberg controls the false discovery rate across all domains tested."
+ },
+ "T4_length_permutation": {
+  "n_state_produced": 155,
+  "median_bpe_tokens_state_produced": 463,
+  "median_bpe_tokens_corpus": 552,
+  "null_median_mean": 555.7,
+  "p_two_sided": 0.1359,
+  "note": "Structural check requiring no indicator list."
+ }
+}

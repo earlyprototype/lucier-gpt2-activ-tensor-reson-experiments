@@ -120,6 +120,96 @@ def binom_test_two_sided(k, n, p):
     return min(1.0, total)
 
 
+def fisher_exact_2x2(a, b, c, d):
+    """Two-sided Fisher exact test on [[a, b], [c, d]], by summing every table
+    no more likely than the observed one (the same small-p convention used by
+    binom_test_two_sided).
+
+    Needed because comparing two groups against a shared corpus base rate is
+    not the same as comparing them against each other, and the second is the
+    question when a control group exists.
+    """
+    n1, n2, t = a + b, c + d, a + c
+
+    def lchoose(n, k):
+        if k < 0 or k > n:
+            return -math.inf
+        return math.lgamma(n + 1) - math.lgamma(k + 1) - math.lgamma(n - k + 1)
+
+    def p_tab(x):
+        lp = lchoose(n1, x) + lchoose(n2, t - x) - lchoose(n1 + n2, t)
+        return math.exp(lp) if lp > -math.inf else 0.0
+
+    obs = p_tab(a)
+    total = 0.0
+    for x in range(0, min(n1, t) + 1):
+        if t - x > n2:
+            continue
+        p = p_tab(x)
+        if p <= obs * (1 + 1e-9):
+            total += p
+    return min(1.0, total)
+
+
+def binom_test_auto(k, n, p, exact_max=4000):
+    """Exact two-sided binomial test for small n, normal approximation with a
+    continuity correction beyond it.
+
+    The enrichment scan tests domains whose occurrence counts run into the tens
+    of thousands, where the exact test's outcome-by-outcome sum is far too slow.
+    At those n the approximation is accurate to well past the precision any
+    false-discovery threshold needs; below exact_max the exact test is used.
+    """
+    if n <= exact_max:
+        return binom_test_two_sided(k, n, p)
+    mu = n * p
+    sd = math.sqrt(n * p * (1 - p))
+    if sd == 0:
+        return 1.0
+    z = (abs(k - mu) - 0.5) / sd
+    if z <= 0:
+        return 1.0
+    return math.erfc(z / math.sqrt(2))
+
+
+def benjamini_hochberg(pvals, alpha=0.05):
+    """Return (rejected, qvalues) under Benjamini-Hochberg FDR control.
+
+    Needed because the enrichment scan tests every domain in the corpus at
+    once; without correction a few hundred domains will clear p<0.05 by
+    chance alone and read as discoveries.
+    """
+    n = len(pvals)
+    if n == 0:
+        return [], []
+    order = sorted(range(n), key=lambda i: pvals[i])
+    q = [0.0] * n
+    prev = 1.0
+    for rank, i in enumerate(reversed(order), start=1):
+        idx = n - rank + 1
+        val = min(prev, pvals[i] * n / idx)
+        q[i] = val
+        prev = val
+    return [q[i] <= alpha for i in range(n)], q
+
+
+def permutation_pvalue(observed, null_samples, tail="two"):
+    """p-value from an empirical null, with the standard +1 correction so a
+    p of exactly zero is never reported from a finite number of draws."""
+    m = len(null_samples)
+    if m == 0:
+        return float("nan")
+    if tail == "greater":
+        extreme = sum(1 for v in null_samples if v >= observed)
+    elif tail == "less":
+        extreme = sum(1 for v in null_samples if v <= observed)
+    else:
+        centre = sum(null_samples) / m
+        d = abs(observed - centre)
+        extreme = sum(1 for v in null_samples if abs(v - centre) >= d)
+    return (extreme + 1) / (m + 1)
+
+
 def cohen_kappa(pairs):
     """Cohen's kappa for two raters over a list of (rater_a, rater_b) labels."""
     n = len(pairs)

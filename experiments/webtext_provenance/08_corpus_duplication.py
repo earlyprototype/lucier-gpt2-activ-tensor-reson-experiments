@@ -44,6 +44,7 @@ OUT = HERE / "output"
 SHINGLE_W = 8
 SKETCH_K = 8
 MIN_SHARED = 2
+BIG_BUCKET = 200
 CLUSTER_T = 0.50
 LOW_T = 0.25
 BASE = np.int64(31)
@@ -108,33 +109,45 @@ def main():
             index[v].append(i)
 
     pair_shared = defaultdict(int)
-    big_buckets = 0
+    # Buckets above BIG_BUCKET documents are excluded from pair generation:
+    # each costs O(n^2) comparisons and a value shared by hundreds of documents
+    # is usually site furniture. An earlier version asserted that without
+    # checking, so the excluded set is now RECORDED — every document id, and a
+    # text sample — and inspected in output/oversized_buckets.json. Exclusion
+    # affects only which pairs are *generated*; the documents remain in the
+    # sketch index and can still pair through their other sketch values.
+    big_bucket_records = []
     for v, members in index.items():
         if len(members) < 2:
             continue
-        # A sketch value shared by a very large number of documents is a
-        # boilerplate artefact (navigation furniture, licence text), not a
-        # coordination signal; comparing all of them is quadratic and useless.
-        if len(members) > 200:
-            big_buckets += 1
+        if len(members) > BIG_BUCKET:
+            big_bucket_records.append({"sketch_value": int(v),
+                                       "n_docs": len(members),
+                                       "doc_idx": members})
             continue
         for a in range(len(members)):
             for b in range(a + 1, len(members)):
                 pair_shared[(members[a], members[b])] += 1
+    big_buckets = len(big_bucket_records)
     candidates = [p for p, c in pair_shared.items() if c >= MIN_SHARED]
     print(f"index: {len(index):,} sketch values, {big_buckets:,} oversized buckets skipped, "
           f"{len(candidates):,} candidate pairs ({time.time() - t0:.0f}s)")
 
-    # ---- pass 2: exact Jaccard on candidates only --------------------------
+    # ---- pass 2: exact Jaccard on candidates, plus bucket samples ----------
     needed = sorted({i for p in candidates for i in p})
     need_keys = {keys[i] for i in needed}
-    full = {}
+    bucket_doc_idx = {i for r in big_bucket_records for i in r["doc_idx"]}
+    bucket_sample_idx = {i for r in big_bucket_records for i in r["doc_idx"][:3]}
+    bucket_keys = {keys[i] for i in bucket_sample_idx}
+    full, bucket_text = {}, {}
     for split, doc in iter_corpus(DATA):
         key = (split, doc["id"])
         if key in need_keys:
             h = shingle_hashes(doc["text"].lower())
             if h is not None:
                 full[key] = set(h.tolist())
+        if key in bucket_keys:
+            bucket_text[key] = doc["text"][:400]
     print(f"pass 2: rehashed {len(full):,} candidate documents "
           f"({time.time() - t0:.0f}s)")
 
@@ -237,6 +250,39 @@ def main():
     }
     with open(OUT / "corpus_duplication.json", "w") as f:
         json.dump(result, f, indent=1)
+
+    # ---- the excluded set, written out so it can be judged ----------------
+    bucket_out = []
+    for r in sorted(big_bucket_records, key=lambda r: -r["n_docs"]):
+        docs = [f"{keys[i][0]}:{keys[i][1]}" for i in r["doc_idx"]]
+        hits = sorted({ind for i in r["doc_idx"]
+                       for ind in flagged.get(keys[i], [])})
+        bucket_out.append({
+            "sketch_value": r["sketch_value"],
+            "n_docs": r["n_docs"],
+            "indicator_hits": hits,
+            "state_produced_members": sorted(
+                set(docs) & produced_docs),
+            "samples": [
+                {"doc": f"{keys[i][0]}:{keys[i][1]}",
+                 "head": bucket_text.get(keys[i], "")}
+                for i in r["doc_idx"][:3]
+            ],
+            "documents": docs,
+        })
+    with open(OUT / "oversized_buckets.json", "w") as f:
+        json.dump({
+            "generated_by": "08_corpus_duplication.py",
+            "threshold": BIG_BUCKET,
+            "n_buckets": len(bucket_out),
+            "n_distinct_documents": len(bucket_doc_idx),
+            "note": "Excluded from PAIR GENERATION only. These documents remain "
+                    "in the corpus, in the sketch index, and in every other "
+                    "script; they can still cluster via their other sketch "
+                    "values. Recorded because an earlier version called them "
+                    "boilerplate without inspecting them.",
+            "buckets": bucket_out,
+        }, f, indent=1)
 
     print()
     print(f"pairs >= {LOW_T}: {result['pairs_at_or_above_0.25']:,}   "

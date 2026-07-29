@@ -2,16 +2,18 @@
 
 **A provenance audit of GPT-2's training corpus.** 260,000 documents scanned against
 77 indicators drawn from public attributions; 605 document-indicator pairs classified;
-213 adjudicated by hand; two source-agnostic structural tests run over the whole corpus.
+213 adjudicated by hand; four source-agnostic tests with null models, run over the whole corpus.
 
 > **Verdict in one line.** The hypothesis as posed — that WebText contains *evidence of
 > non-western asymmetric warfare via botfarming* — is **not supported**, and one of its two
 > halves is **refuted**. The corpus contains **155 documents of state-produced material
 > (5.96 per 10,000; exact 95% CI 5.06–6.98)**, arriving through the *overt* broadcast arm,
-> not the covert one. Two structural tests that never consult the indicator list agree:
-> state-linked domains sit **exactly on** the corpus's own rank-frequency law, and **none of
-> the 155 documents appears in any of the 727 near-duplicate clusters** the corpus does
-> contain. WebText ingested state media through ordinary organic sharing.
+> not the covert one. Three source-agnostic tests agree, each with a null model attached:
+> state-media domains sit **on** the corpus's rank-frequency law (permutation p ≈ 0.75
+> against the amplification direction); **no tier shows duplication enrichment**; and an
+> enrichment scan asking the corpus what *is* coordinated inside it — with no names supplied
+> — returns **search-engine-optimisation spam and auto-generated boilerplate**, with nothing
+> from the indicator list. WebText ingested state media through ordinary organic sharing.
 
 > **A correction to an earlier version of this document.** It reported "RT ranked 92nd,
 > ahead of Al Jazeera" as though the rank were itself striking. Fitting the corpus's
@@ -59,7 +61,7 @@ including the parts that refute the premise.
 threats to validity, and how to port the regime to another corpus — is in
 [METHODOLOGY.md](METHODOLOGY.md).*
 
-Nine scripts, run in order. Raw corpus files are gitignored (692 MB); everything needed to
+Ten scripts, run in order. Raw corpus files are gitignored (692 MB); everything needed to
 audit a claim is committed.
 
 | Script | Does |
@@ -73,11 +75,12 @@ audit a claim is committed.
 | `07_statistics.py` | Exact bounds, power, intervals, recall correction, agreement |
 | `08_corpus_duplication.py` | **Source-agnostic:** duplication over all 260k documents |
 | `09_census_anomaly.py` | **Source-agnostic:** rank-frequency outliers over all 1,000 domains |
+| `10_agnostic_statistics.py` | **Source-agnostic:** null models, permutation tests, enrichment scan |
 
 **Scripts `01`–`06` are confirmatory: they can only find what the indicator list already
-names.** That is a real limitation of the design, not a detail — see §7. Scripts `08` and
-`09` were added to answer it, and let the corpus nominate its own anomalies before identity
-is consulted.
+names.** That is a real limitation of the design, not a detail — see §7. Scripts `08`–`10`
+were added to answer it: they let the corpus nominate its own anomalies before identity is
+consulted, and `10` supplies the null models that `08` and `09` originally lacked.
 
 **Corpus.** OpenAI's `gpt-2-output-dataset` release of original WebText: 250,000 + 5,000 +
 5,000 = **260,000 documents, 152.2M byte-pair-encoding tokens, 680 MB of text**. This is
@@ -355,18 +358,42 @@ indicator-touching cluster is six Colin Flaherty columns sharing a verbatim biog
 
 Not one of the 155 state-produced documents is in any of them.
 
-**That last sentence carries far less than an earlier version of this document claimed.**
-It was presented here as the study's load-bearing result. It is not. Cluster membership
-across the corpus runs at 2,860/260,000 = 1.1%, so the *expected* number of state-produced
-documents in clusters was **1.7**. Observing zero happens **18% of the time by chance**
-(exact binomial, p = 0.18). The observation is consistent with the state-produced set being
-duplicated at exactly the corpus base rate, and this test cannot distinguish that from
-genuine depletion.
+**That sentence was presented in an earlier version as the study's load-bearing result. It
+is not a result at all.** Cluster membership across the corpus runs at 2,860/260,000 = 1.1%,
+so the expected count was **1.7 documents**; observing zero is unremarkable (exact binomial
+p = 0.42). Worse, the simulated power is **0.000** — at n = 155 against a 1.1% base rate,
+a group that *never* clustered would essentially never register as significant. The
+observation was uninformative by construction, and I reported it as decisive.
 
-What survives is the weaker and still worthwhile statement: the corpus contains detectable
-duplication, the detector demonstrably finds it, and the state-produced set shows **no
-enrichment** — no sign of the mass templating a content operation would leave. Ruling out
-*depletion* at this sample size is not possible; 155 documents is too few.
+### 5.1b Null models, and the one comparison that survives them
+
+`10_agnostic_statistics.py`. Cluster membership for each tier against the corpus base rate,
+then — the test that actually matters — state media against baseline news directly.
+
+| Group | n | In clusters | Expected | p |
+|---|---|---|---|---|
+| State-produced | 155 | 0 | 1.70 | 0.42 |
+| Tier A (covert) | 8 | 0 | 0.09 | 1.00 |
+| **Tier B (state media)** | 551 | **0** | 6.06 | **0.0037** |
+| **Tier BASE (western news)** | 533 | **6** | 5.86 | **0.84** |
+| Tier C | 6 | 0 | 0.07 | 1.00 |
+| Tier M | 18 | 0 | 0.20 | 1.00 |
+
+Comparing the two tiers against the corpus base rate is the wrong test, because the base
+rate is set by SEO and template pages (§5.3), which are not a fair comparator for news
+prose. The right test is state media against baseline news directly: **Fisher exact
+p = 0.014**, nominally significant, with state-media documents *less* duplicated than
+western-news documents.
+
+**It does not survive inspection.** All six clustered baseline documents sit in **one
+cluster** — six Colin Flaherty columns sharing a verbatim author-bio block. Drop that single
+cluster and the baseline is also zero, the two groups are identical, and **p = 1.0**.
+
+So the honest statement is that neither news group duplicates meaningfully, and the entire
+apparent difference is one author's boilerplate. What is *not* observed anywhere is
+enrichment — no group shows the mass templating a content-flooding operation would leave —
+but the tests have the power to detect only large effects (a 5× enrichment at 93% power, a
+2× at 27%).
 
 ### 5.2 Is anything over-represented relative to the corpus's own law?
 
@@ -401,11 +428,69 @@ own link-sharing law predicts a domain at that rank should be. If RT, Sputnik or
 were being pushed into WebText by inauthentic link-sharing, the mechanism left **no trace in
 the link distribution**.
 
-Stated as strongly as the method allows and no further: rank and links are not independent
-(rank is *assigned by* links), so these residuals are descriptive distances from a fitted
-line, not test statistics with clean null distributions. They are deliberately not converted
-into p-values. A positive residual has many innocent causes — publication volume, absence of
-a paywall, archive depth.
+**Now tested, rather than left descriptive.** An earlier version reported these residuals and
+declined to test them, which left the reader to judge whether −0.20 was surprising.
+`10_agnostic_statistics.py` runs a permutation test — 20,000 draws against two nulls, the
+second stratified by rank because residual spread varies along the curve:
+
+| Null | Observed mean z | p (two-sided) | p (state media *above* the law) |
+|---|---|---|---|
+| Unrestricted | −0.252 | 0.49 | 0.78 |
+| Rank-stratified (±50 ranks) | −0.252 | 0.52 | 0.74 |
+
+The one-sided test is the one the hypothesis predicts — amplification means sitting **above**
+the fitted law — and it returns p ≈ 0.75. State-media domains are indistinguishable from
+ordinary domains at their rank, with a slight, non-significant tilt *below* the line.
+
+The caveat that originally justified refusing the test still limits its strength: rank is
+assigned *by* link count, so a permutation null over ranks is approximate, and five domains
+is a small target set. A weak test that states its weakness is still worth more than a
+refusal to test. A positive residual would in any case have innocent explanations —
+publication volume, absence of a paywall, archive depth.
+
+---
+
+### 5.3 What the corpus's duplicated content actually is
+
+The only test here shaped like discovery rather than confirmation. For every domain
+mentioned in a clustered document, compare its rate inside clusters against outside, with
+Benjamini-Hochberg false-discovery control across all domains tested. No list is consulted
+at any point; the indicator file is opened only after the enriched set is fixed.
+
+68 domains had enough occurrences to test, 33 significant at FDR 0.05, **31 enriched**:
+
+| Domain | In clusters | Total | Enrichment | q |
+|---|---|---|---|---|
+| domainmarket.com | 28 | 28 | 90.9× | 2.4e−54 |
+| ring.com | 27 | 27 | 90.9× | 1.5e−52 |
+| accurateappraisals.com | 27 | 27 | 90.9× | 1.5e−52 |
+| seo.com | 27 | 28 | 87.7× | 3.5e−51 |
+| wikidot.com | 37 | 46 | 73.1× | 7.7e−63 |
+| userbenchmark.com | 27 | 35 | 70.1× | 2.4e−45 |
+| govtrack.us | 60 | 91 | 59.9× | 2.9e−92 |
+| congress.gov | 60 | 93 | 58.7× | 1.2e−91 |
+
+Domain-parking and search-engine-optimisation services, hardware-benchmark pages, wiki
+farms, and auto-generated legislative records. **WebText's duplicated content is machine-
+generated commercial and civic boilerplate.**
+
+**Exactly one enriched domain appears anywhere on the indicator list: `breitbart.com`** — a
+*baseline* comparator, and it is the author-bio cluster from §5.1b. No Tier A, B or C domain
+is enriched among duplicated documents.
+
+This is the result a discovery-shaped method was supposed to produce, and it is the strongest
+evidence in the study for the negative conclusion: when the corpus is asked what is
+coordinated inside it, with nobody's name supplied in advance, it answers *search-engine
+spam* — and nothing on the indicator list comes back.
+
+Its limits: domains are matched from text tokens, so this counts documents that *mention* a
+domain, not documents *from* it — the same capture ceiling §4.4 measures. And the 20-occurrence
+floor means small operations cannot appear.
+
+### 5.4 One structural check with no list at all
+
+State-produced documents are shorter than corpus median (463 versus 552 byte-pair-encoding
+tokens), but not significantly so under a 2,000-draw permutation test (p = 0.14).
 
 ---
 
@@ -420,11 +505,16 @@ documents by a single author.
 
 **Not supported:** the botfarming mechanism. Not because it was tested and failed, but
 because **the released data cannot test it** — Reddit-side vote provenance was never
-published. Two text-visible proxies were run, and both came back negative with the detector
-demonstrably working: state-produced documents appear in **none** of the 727 near-duplicate
-clusters the corpus contains, and every state domain sits **on** the corpus's own
-rank-frequency law rather than above it. A 3-karma threshold is a bar a few genuine upvotes
-clear, and nothing in the link distribution suggests anything more than that was needed.
+published. Three text-visible proxies were run with null models attached. No tier shows
+duplication enrichment; state domains sit on the rank-frequency law rather than above it
+(p ≈ 0.75 against the amplification direction); and the corpus's own duplicated content,
+found without any list, is search-engine spam. A 3-karma threshold is a bar a few genuine
+upvotes clear, and nothing found here suggests more than that was needed.
+
+**What the negative evidence is worth, precisely.** These tests detect *large* effects: a
+5× duplication enrichment at 93% power, 2× at only 27%, and depletion not at all at this
+sample size. They rule out mass templating. They do not rule out a small, careful operation,
+and no test in this study could.
 
 **Supported, and worth stating plainly:** WebText ingested **non-western state media at
 measurable scale through ordinary organic sharing**. 155 documents of state-produced copy
@@ -480,9 +570,12 @@ question, and this study does not address it. It is a corpus audit, not a model 
 8. **The Zipf residuals are not test statistics.** Rank is assigned *by* link count, so
    residuals from a rank-frequency fit have no clean null distribution. They are descriptive
    distances from a fitted line and are deliberately not converted into p-values.
-9. **The duplication sweep skips oversized sketch buckets** (>200 documents sharing a sketch
-   value) as boilerplate artefacts, and 27 documents were too short to sketch. Both are
-   recorded in `output/corpus_duplication.json`.
+9. **The duplication sweep excludes 7 oversized sketch buckets** (>200 documents sharing a
+    sketch value) from pair generation, and 27 documents are too short to sketch. An earlier
+    version called those buckets boilerplate without opening them; they are now written to
+    `output/oversized_buckets.json` and inspected — Google Sheets exports, card-database
+    pages, newsletter furniture, 1,382 documents, **no state-produced document among them**.
+    Exclusion affects which pairs are generated, not which documents exist.
 10. **Duplication figures were non-reproducible in a first version** of `08`, which used
     Python's `hash()` — salted per process, so cluster counts drifted run to run (726, then
     722). Replaced with CRC32; two consecutive runs now agree exactly. Any duplication
@@ -503,6 +596,7 @@ python3 06_headline_stats.py
 python3 07_statistics.py         # exact bounds, power, intervals, recall, agreement
 python3 08_corpus_duplication.py # ~45 s, all 260k documents, needs numpy
 python3 09_census_anomaly.py     # rank-frequency fit over all 1,000 domains
+python3 10_agnostic_statistics.py # null models for 08 and 09; enrichment scan
 pytest ../../tests/test_webtext_provenance_scanlib.py \
        ../../tests/test_webtext_provenance_statlib.py
 ```
@@ -515,7 +609,8 @@ Committed outputs: `output/hits_nonbase.jsonl` (every non-baseline hit with cont
 `classified_hits.json`, `adjudications.json` (213 hand verdicts with quoted evidence),
 `scan_summary.json`, `classification_summary.json`, `domain_census.json`,
 `dup_clusters.json`, `headline_stats.json`, `statistics.json`,
-`corpus_duplication.json`, `census_anomaly.json`.
+`corpus_duplication.json`, `census_anomaly.json`, `agnostic_statistics.json`,
+`oversized_buckets.json`.
 
 ### Glossary
 

@@ -128,6 +128,63 @@ def test_cohen_kappa_matches_sklearn_if_available():
     assert cohen_kappa(pairs) == pytest.approx(cohen_kappa_score(a, b))
 
 
+def test_fisher_exact_known_value():
+    from statlib import fisher_exact_2x2
+    # Fisher's tea-tasting table: p = 0.4857
+    assert fisher_exact_2x2(3, 1, 1, 3) == pytest.approx(0.4857, abs=5e-4)
+    # No association at all
+    assert fisher_exact_2x2(5, 5, 5, 5) == pytest.approx(1.0)
+
+
+@needs_scipy
+def test_fisher_exact_matches_scipy():
+    from statlib import fisher_exact_2x2
+    for tab in [(0, 551, 6, 527), (3, 1, 1, 3), (12, 40, 5, 60), (0, 20, 0, 20)]:
+        got = fisher_exact_2x2(*tab)
+        expect = _sps.fisher_exact([[tab[0], tab[1]], [tab[2], tab[3]]])[1]
+        assert got == pytest.approx(expect, rel=1e-6, abs=1e-12)
+
+
+@needs_scipy
+def test_binom_test_auto_approximation_is_close():
+    """The enrichment scan uses a normal approximation past exact_max; check it
+    tracks the exact value where both are computable."""
+    from statlib import binom_test_auto
+    for k, n, p in [(600, 50_000, 0.011), (120, 10_000, 0.011)]:
+        approx = binom_test_auto(k, n, p, exact_max=0)
+        exact = _sps.binomtest(k, n, p).pvalue
+        assert approx == pytest.approx(exact, rel=0.35, abs=1e-9)
+
+
+def test_binom_test_auto_uses_exact_below_threshold():
+    from statlib import binom_test_auto, binom_test_two_sided
+    assert binom_test_auto(3, 100, 0.05) == binom_test_two_sided(3, 100, 0.05)
+
+
+def test_benjamini_hochberg_controls_and_is_monotone():
+    from statlib import benjamini_hochberg
+    pv = [0.001, 0.008, 0.039, 0.041, 0.9]
+    rej, q = benjamini_hochberg(pv, alpha=0.05)
+    assert rej[0] and rej[1]
+    assert not rej[4]
+    assert all(q[i] <= q[j] for i, j in zip(range(4), range(1, 5)))
+    assert all(qq >= p for qq, p in zip(q, pv))
+
+
+def test_benjamini_hochberg_all_null_rejects_about_none():
+    from statlib import benjamini_hochberg
+    rej, _ = benjamini_hochberg([0.5, 0.6, 0.7, 0.8, 0.9])
+    assert not any(rej)
+
+
+def test_permutation_pvalue_never_zero_and_respects_tails():
+    from statlib import permutation_pvalue
+    null = list(range(100))
+    assert permutation_pvalue(1000, null, "greater") == pytest.approx(1 / 101)
+    assert permutation_pvalue(-1000, null, "less") == pytest.approx(1 / 101)
+    assert permutation_pvalue(50, null, "greater") > 0.4
+
+
 def test_log_binom_pmf_sums_to_one():
     from statlib import log_binom_pmf
     total = sum(math.exp(log_binom_pmf(k, 20, 0.37)) for k in range(21))
