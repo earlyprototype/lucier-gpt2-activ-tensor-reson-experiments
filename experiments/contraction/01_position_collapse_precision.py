@@ -115,18 +115,41 @@ def per_coordinate_disagreement(tensor):
 
     Returns quantiles of |du_k| / |u_k| in units of eps, plus how far the
     worst-relative coordinates sit below typical magnitude and what share of the
-    angle they carry. Those last two matter because a coordinate near zero has a
-    huge relative error for a negligible absolute one.
+    residual ENERGY they carry. Those last two matter because a coordinate near
+    zero has a huge relative error for a negligible absolute one.
 
     Also returns how the disagreement is spread over coordinates -- the largest
-    single coordinate's share, and the inverse participation ratio 1 / sum(p^2)
-    as an effective count of participating coordinates. Those two are the
-    grounds for refusing to read `d` per component, so they are computed here
-    rather than asserted; see the note in RESULTS.md on how far they can be
-    trusted, which is not very.
+    single coordinate's share of that energy, and the inverse participation
+    ratio 1 / sum(p^2) as an effective count of participating coordinates. Those
+    two are the grounds for refusing to read `d` per component, so they are
+    computed here rather than asserted; see the note in RESULTS.md on how far
+    they can be trusted, which is not very.
+
+    Every share here is a share of energy[k] = sum_{i<j} (u_ik - u_jk)^2, i.e.
+    of the SQUARED residual, not of the angle -- the angle goes as its square
+    root. Energy is the right denominator for the question being asked, because
+    1 - position_similarity is itself quadratic in du (it is the mean over pairs
+    of ||du||^2 / 2), so a coordinate carrying 1% of the energy accounts for 1%
+    of the reported deviation. It carries ~10% of the amplitude, which is why
+    these are named for energy and should not be read as fractions of the angle.
     """
     t = tensor.to(torch.float64)
-    unit = t / t.norm(dim=1, keepdim=True)
+    # Loud rather than silent. A zero-norm position makes `unit` NaN, and NaN
+    # fails `scale > 0`, so those coordinates would be dropped from the
+    # quantiles while surfacing as NaN only in the concentration figures --
+    # half the statistics silently computed over a subset. Clamping the norm
+    # instead is worse: it maps a zero row to a zero unit vector, and the
+    # relative disagreement against any real row then reads 1/eps = 8.4e6 eps,
+    # a fabricated number that enters the median as if it were a measurement.
+    norms = t.norm(dim=1)
+    if not bool(torch.isfinite(t).all()) or bool((norms == 0).any()):
+        raise ValueError(
+            "per_coordinate_disagreement needs finite, non-zero-norm positions; "
+            "got a zero-norm or non-finite row. A converged ATR state has "
+            "per-position norms in the hundreds, so this indicates a corrupt "
+            "archive rather than a boundary case."
+        )
+    unit = t / norms.unsqueeze(1)
     seq_len = unit.shape[0]
 
     relative, magnitude, contribution = [], [], []
@@ -145,7 +168,18 @@ def per_coordinate_disagreement(tensor):
     mag = torch.cat(magnitude)
     con = torch.cat(contribution)
     tail = rel > 100
-    share = energy / energy.sum()
+    # Positions that are bit-identical disagree not at all, and the way a
+    # non-existent disagreement is distributed over coordinates has no value.
+    # Report that as undefined rather than dividing by zero and returning a
+    # number-shaped NaN; `main` drops non-finite entries from its range.
+    total = energy.sum().item()
+    if total > 0.0:
+        share = energy / total
+        top_share = share.max().item()
+        participation = (1.0 / (share ** 2).sum()).item()
+    else:
+        top_share = float("nan")
+        participation = float("nan")
     return {
         "median": rel.quantile(0.5).item(),
         "p90": rel.quantile(0.9).item(),
@@ -154,11 +188,11 @@ def per_coordinate_disagreement(tensor):
         "tail_magnitude_ratio": (
             mag[tail].median().item() / mag.median().item() if tail.any() else float("nan")
         ),
-        "tail_angle_share": (
-            con[tail].sum().item() / con.sum().item() if tail.any() else 0.0
+        "tail_energy_share": (
+            con[tail].sum().item() / con.sum().item() if tail.any() and total > 0.0 else 0.0
         ),
-        "top_coordinate_share": share.max().item(),
-        "participation_ratio": (1.0 / (share ** 2).sum()).item(),
+        "top_coordinate_share": top_share,
+        "participation_ratio": participation,
     }
 
 
@@ -300,7 +334,7 @@ def main():
     print()
     header4 = (
         f"{'run':<26}{'median':>9}{'p90':>9}{'p99':>9}"
-        f"{'>100 eps':>10}{'their |u|':>11}{'their angle':>13}"
+        f"{'>100 eps':>10}{'their |u|':>11}{'their energy':>14}"
         f"{'top coord':>11}{'part. ratio':>13}"
     )
     print(header4)
@@ -314,16 +348,17 @@ def main():
         print(
             f"{name:<26}{m['median']:>9.2f}{m['p90']:>9.2f}{m['p99']:>9.2f}"
             f"{m['tail_fraction'] * 100:>9.2f}%{m['tail_magnitude_ratio']:>11.4f}"
-            f"{m['tail_angle_share'] * 100:>12.2f}%"
+            f"{m['tail_energy_share'] * 100:>13.2f}%"
             f"{m['top_coordinate_share'] * 100:>10.1f}%{m['participation_ratio']:>13.1f}"
         )
 
     print(
         "\nThe typical coordinate agrees to about 2 eps. The heavy p99 is confined to\n"
         "coordinates far below typical magnitude ('their |u|', as a fraction of the\n"
-        "median) which together carry ~1% of the angle: a small-denominator artefact,\n"
-        "not a finding. Where the angle actually lives, agreement is at the few-eps\n"
-        "level -- the scale float32 arithmetic operates at.\n"
+        "median) which together carry ~1% of the residual energy -- and so ~1% of the\n"
+        "reported 1 - similarity, which is quadratic in du. A small-denominator\n"
+        "artefact, not a finding. Where the residual actually lives, agreement is at\n"
+        "the few-eps level -- the scale float32 arithmetic operates at.\n"
         "\nThis bounds the residual; it does not prove the absence of structure below\n"
         "that scale, and nothing here should be read as proving it."
     )
@@ -331,18 +366,26 @@ def main():
     # The last two columns are why `d` is not read per component. State their
     # range, and the reason not to lean on it -- two runs at the SAME state
     # disagree by 7x, so this measures the shape of one run's rounding residual.
-    shares = [s for _, s, _ in spread]
-    ratios = [p for _, _, p in spread]
-    print(
-        f"\ntop coord ranges {min(shares) * 100:.0f}-{max(shares) * 100:.0f}%, "
-        f"participation ratio {min(ratios):.0f}-{max(ratios):.0f} of {d_model}. So the\n"
-        "disagreement is not spread evenly and d cannot be read per component.\n"
-        "\nBut these two are not stable quantities:\n"
-        "Syntactic and Divine_Syntactic settle to the same direction (1 - cos = 1e-10)\n"
-        "and still return different values, so what they describe is the shape of an\n"
-        "individual run's rounding residual, not a property of the settled state.\n"
-        "That instability is itself consistent with the residual being arithmetic."
-    )
+    shares = [s for _, s, _ in spread if math.isfinite(s)]
+    ratios = [p for _, _, p in spread if math.isfinite(p)]
+    undefined = [n for n, _, p in spread if not math.isfinite(p)]
+    if undefined:
+        print(
+            f"\nconcentration undefined (no disagreement to distribute): "
+            f"{', '.join(undefined)}"
+        )
+    if shares and ratios:
+        print(
+            f"\ntop coord ranges {min(shares) * 100:.0f}-{max(shares) * 100:.0f}%, "
+            f"participation ratio {min(ratios):.0f}-{max(ratios):.0f} of {d_model}, as\n"
+            "shares of squared residual. So the disagreement is not spread evenly and\n"
+            "d cannot be read per component.\n"
+            "\nBut these two are not stable quantities:\n"
+            "Syntactic and Divine_Syntactic settle to the same direction (1 - cos = 1e-10)\n"
+            "and still return different values, so what they describe is the shape of an\n"
+            "individual run's rounding residual, not a property of the settled state.\n"
+            "That instability is itself consistent with the residual being arithmetic."
+        )
 
     # SECONDARY: sensitivity sweep. See noise_floor's docstring for what this is
     # and, more importantly, what it is not.

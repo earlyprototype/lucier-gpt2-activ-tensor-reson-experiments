@@ -166,7 +166,8 @@ band is really 0.77–1.30 and the figures should be read to one decimal. The en
 mirrored deliberately, so this is recorded rather than fixed.
 
 **But *d* is an RMS summary**, and reading it as "every component agrees to ~1 ε" assumes the
-disagreement is spread evenly across coordinates. It is not — one coordinate carries 4–55% of it, and
+disagreement is spread evenly across coordinates. It is not — one coordinate carries 4–55% of the
+residual energy, and
 the effective number of participating coordinates is 3–157 out of 768. That assumption was flagged in
 review and it does not hold, so the per-coordinate question has to be asked per coordinate.
 
@@ -177,6 +178,12 @@ state. What they describe is the shape of an individual run's rounding residual,
 the settled state, which is why the range is this wide and why nothing downstream leans on it. That
 instability is itself what an arithmetic residual should look like.
 
+**All shares here are shares of squared residual**, i.e. of energy_k = Σ_{i<j} (u_ik − u_jk)², not of
+the angle — the angle goes as its square root. Energy is the right denominator for the question being
+asked, because 1 − similarity is itself quadratic in Δu (the mean over pairs of ‖Δu‖²/2), so a
+coordinate carrying 1% of the energy accounts for 1% of the reported deviation. That same coordinate
+carries ~10% of the *amplitude*, so these percentages should not be read as fractions of the angle.
+
 ### Per-coordinate measurement
 
 Concentration on its own proves nothing: under *relative* rounding every coordinate carries
@@ -185,7 +192,7 @@ rounding would look concentrated too. What separates rounding from structure is 
 disagreement is flat at a few ε. Scale is divided out first — H-pos0 lets each position keep its own
 scalar (M5), so the direction is what is at issue.
 
-| Run | median | p90 | p99 | >100 ε | their \|u\| | their share of angle | top coord | part. ratio |
+| Run | median | p90 | p99 | >100 ε | their \|u\| | their share of energy | top coord | part. ratio |
 |---|---|---|---|---|---|---|---|---|
 | Lucier | 1.90 | 10.03 | 63.67 | 0.45% | 0.026 | 0.35% | 51.2% | 3.8 |
 | Semantic | 1.82 | 9.39 | 71.55 | 0.79% | 0.007 | 0.47% | 35.9% | 7.5 |
@@ -198,8 +205,8 @@ scalar (M5), so the direction is what is at issue.
 
 **The typical coordinate agrees to about 2 ε.** The p99 column is driven by coordinates at 0.3–2.6%
 of typical magnitude, where a negligible absolute difference produces a large relative one; those
-coordinates carry ~1% of the angle. In the coordinates carrying the angle, agreement is at the few-ε
-level.
+coordinates carry ~1% of the residual energy, and so ~1% of the reported 1 − similarity. In the
+coordinates carrying the residual, agreement is at the few-ε level.
 
 **M1 conclusion.** The residual between positions is the size of float32 arithmetic noise. This bounds
 a structured disagreement to below that scale, and it holds steady over 1000 iterations. It does not
