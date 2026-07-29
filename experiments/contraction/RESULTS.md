@@ -1,85 +1,71 @@
 # How fast does the state settle, and is the position collapse exact?
 
-**Short answer: coordinate by coordinate, the positions agree to about two units of float32 precision
-— the scale arithmetic noise operates at, which leaves no room for a large structured disagreement,
-though it cannot rule out a small one hiding below that scale. The settling speed does not track model
-size;
-inside each family, the two sizes disagree about which direction it goes. And the loop's per-step
-shrink factor, which a hypothesis on file assumes is 1 at rest, is measurably not.**
+**Summary:** coordinate by coordinate, positions agree to about two units of float32 precision, the
+scale of float32 arithmetic noise. This bounds any structured disagreement to below that scale and
+does not establish its absence. Settling speed does not track model size: within each family the two
+sizes order oppositely. The loop's per-step rescale factor, which H-pos0 states is 1 at a settled
+state, is measured at 0.27–0.29 in two runs and 0.099 in a third.
 
 **Run:** 2026-07-28, analysis only — no forward passes, no model loaded.
 **Status:** executed; scripts in this directory, all inputs already in the repository.
 **Origin:** issue [#71](https://github.com/earlyprototype/lucier-gpt2-activ-tensor-reson-experiments/issues/71),
-items **M1**, **M2** and — unexpectedly — **M5**, which was filed as gated but turns out to be partly
-measurable from what is already on disk.
+items **M1**, **M2** and **M5**.
 
 ---
 
 ## In plain terms
 
-Two questions were left open.
-
 **M1.** ATR reports that all token positions end up holding the same internal state
-(`position_similarity` → 1.0000). But every published figure is rounded to four decimal places, at
-which 0.99994 and 1.000000 look identical. M1 asked for the unrounded number, because a hypothesis
-in the project (**H-pos0**) assumes the collapse is *exact*, and 0.9999 would not be good enough.
+(`position_similarity` → 1.0000). Published figures are rounded to four decimal places, at which
+0.99994 and 1.000000 are indistinguishable. M1 asked for the unrounded number, because **H-pos0**
+assumes the collapse is exact.
 
-**Answer: it is 1.000000000000 to twelve decimal places, in all eight committed runs.** The largest
+**Unrounded, it is 1.000000000000 to twelve decimal places in all eight committed runs.** The largest
 shortfall is one part in 10¹³.
 
-The tensors were saved in float32, a format that can only distinguish numbers to about one part in
-10⁷, and the angle between positions comes out at about 2×10⁻⁷ radians — float32's own resolution. So
-the raw figures alone cannot separate "exactly parallel" from "parallel to one part in 10 million".
+The tensors were saved in float32, which distinguishes numbers to about one part in 10⁷, and the angle
+between positions is about 2×10⁻⁷ radians. The raw figures alone therefore do not separate "exactly
+parallel" from "parallel to one part in 10 million".
 
-**But that is not where this stops.** Going coordinate by coordinate, the typical coordinate of one
-position agrees with the same coordinate of another to about **two units of float32 precision** — the
-scale at which float32 arithmetic operates. Where the remaining disagreement actually lives, it is at
-that scale and no larger. It also stays there over 1000 iterations rather than drifting.
+Coordinate by coordinate, the typical coordinate of one position agrees with the same coordinate of
+another to about **two units of float32 precision**, and stays there over 1000 iterations. This is the
+scale at which float32 arithmetic operates.
 
-**What that supports, and what it does not.** It says the leftover is the size of arithmetic noise, so
-there is no room for a *large* structured disagreement between positions — enough for H-pos0's premise
-to be usable. It does **not** prove that nothing structured hides below the arithmetic scale; no
-measurement made in float32 can. A higher-precision run would settle that, and this analysis bounds
-the question rather than closing it. Two earlier drafts of this file overstated exactly this point and
-were corrected in review.
+**Scope.** The measurement bounds a structured disagreement between positions to below the arithmetic
+scale. It does not establish that none exists below that scale; a float32 measurement cannot. A
+higher-precision run is required to determine it.
 
-**M2.** How *fast* does the state settle? M2 asked for a decay curve across iterations.
+**M2.** M2 asked for a decay curve across iterations.
 
-**That exact curve cannot be drawn from committed data.** It needs the full state of every position
-at every iteration, and no archive in this repository keeps that — the per-iteration files store the
-*average* across positions, and the files that keep every position store only the final one. This is
-a gap in what was saved, not a gap in what was run.
+**That curve cannot be drawn from committed data.** It requires the full state of every position at
+every iteration. The per-iteration files store the average across positions; the files that store
+every position store only the final iteration. This is a gap in what was saved, not in what was run.
 
-What *can* be measured is how fast the average state stops moving, and that is available for all four
-models. It gives a clear and slightly awkward result:
+What is measurable is the rate at which the average state stops moving, for all four models:
 
-| Model | Settles? | Half-life |
+| Model | Settles within 60 iterations? | Half-life |
 |---|---|---|
-| Pythia-160M | yes, cleanly | ~0.8 iterations |
-| GPT-2 Medium | yes, cleanly | ~1.3 iterations |
-| GPT-2 Small | yes, but only after a delay | flat for ~30 iterations, then 1.9–3.0 |
-| Pythia-410M | no, not within 60 iterations | — |
+| Pythia-160M | yes | ~0.8 iterations |
+| GPT-2 Medium | yes | ~1.3 iterations |
+| GPT-2 Small | after a delay | flat ~30 iterations, then 1.9–3.0 |
+| Pythia-410M | no | — |
 
-**Size does not predict this.** In the GPT-2 family the *larger* model settles faster and more
-cleanly. In the Pythia family the *smaller* one does. Whatever governs settling speed, it is not
-parameter count, and it is not shared across families — which is what the 2×2 was built to detect.
+**Size does not predict this.** In the GPT-2 family the larger model settles faster; in the Pythia
+family the smaller one does.
 
-**A prediction that failed.** GPT-2 Small is the odd one out above, and there was an obvious
-candidate explanation: [`experiments/sink_geometry/RESULTS.md`](../sink_geometry/RESULTS.md) already
-found that a handful of oversized dimensions distort GPT-2 Small's similarity numbers specifically.
-If those dimensions were also behind its ragged settling curve, deleting them should tidy it up.
-**They are not.** Deleting the ten largest, or the fifty largest, barely moves it (goodness-of-fit
-0.55 → 0.67, against 0.95+ for the models that settle cleanly). The two findings are unrelated. The
-actual explanation is the delay: GPT-2 Small barely moves for the first thirty iterations and then
-settles quickly, so no single rate describes it — see below.
+**A tested prediction, which failed.**
+[`experiments/sink_geometry/RESULTS.md`](../sink_geometry/RESULTS.md) found that a handful of
+oversized dimensions distort GPT-2 Small's similarity numbers specifically. GPT-2 Small is also the
+model with the poorest single-rate fit here. Prediction: masking those dimensions straightens the fit.
+**Result: it does not.** Masking the ten or fifty largest moves goodness-of-fit from 0.55 to 0.67,
+against 0.95+ for the models that fit a single rate. The measured cause is the delay: GPT-2 Small is
+flat for the first thirty iterations and then contracts, so no single rate describes the whole run.
 
-**M5, which turned out not to need a run at all.** A third item on the same issue asks for the size of
-the shrink the loop applies at each step. It is filed as blocked, because the number is never written
-down. But it can be worked out from what *is* written down, and the answer is not what the record
-assumes. The loop shrinks the state to **29%** of its size each round in one run, **10%** in another —
-a steady figure, not 100%. A hypothesis on file (H-pos0) says this figure is 1, i.e. that at rest the
-shrink does nothing. It isn't, and because the model is known to be sensitive to the size of what it
-is fed, that difference cannot be waved away. Detail below.
+**M5.** M5 asks for the per-step rescale factor and is filed as gated on the grounds that it is never
+recorded. It is derivable from what is recorded. Measured, the loop rescales the state to **29%** of
+its size per round in one run and **10%** in another, stable across iterations. H-pos0 states this
+figure is 1 at a settled state. Because the map is not scale-invariant over this range (#69), the
+scalar does not drop out of the fixed-point condition.
 
 ---
 
@@ -118,7 +104,7 @@ accumulation order cannot be what produces or hides the answer.
 | Control_noise | 10 | 1.0000000000 | 1.000000000000 | 1.01e−13 | 1.000000000000 |
 | Control_prolet_Semantic | 12 | 1.0000000000 | 1.000000000000 | 2.13e−14 | 1.000000000000 |
 
-Two things worth noting in that table.
+Two features of that table.
 
 **The worst *single pair* is also 1.0, not just the average.** The metric is a mean over all pairs, so
 a mean of 1.0 could in principle hide one dissenting position. It does not — the minimum over every
@@ -126,8 +112,8 @@ off-diagonal pair is 1.0 to twelve places in every run. There is no outlier posi
 particular position 0 is not one.
 
 **`Imperative` reads 0.9999999404 through the engine's float32 path and 1.000000000000 in float64.**
-Same tensor, same formula. That single digit of apparent disagreement is accumulation order, not
-physics — which is precisely why M1 needed doing rather than being read off the existing logs.
+Same tensor, same formula. The difference is float32 accumulation order, not a property of the
+state. Recomputing was therefore necessary; the existing logs alone would not distinguish the two.
 
 ### The precision floor
 
@@ -146,16 +132,15 @@ float32 epsilon is **1.19e−07**. Every column above sits within a small factor
 tensor is rank-1 to the same tolerance: σ₂/σ₁ ≈ 10⁻⁷ means the second singular direction carries
 nothing float32 can represent.
 
-### Is any of that residual real? First the scale, then the coordinates.
+### Size of the residual
 
-Stopping at "it sits at the precision floor" is true but evasive — it leaves the impression of an open
-empirical question. The sharper question is how far apart the positions actually are.
+Two further measurements were taken to characterise the residual.
 
-The first cut is a *scale*: **d = √(1 − position_similarity)**. The geometry is exact — 1 − cos = θ²/2,
-so *d* is the angle up to a factor of √2 — and expressing it in units of float32 epsilon makes it
-legible. **It is an RMS summary and nothing more.** Reading *d* as a *per-component* relative error
-would need the disagreement spread evenly and independently across coordinates, and it is not (see
-below). Treat this table as an order of magnitude, not a per-number statement:
+The first is a scale: **d = √(1 − position_similarity)**. The geometry is exact — 1 − cos = θ²/2, so
+*d* is the angle up to a factor of √2 — and it is expressed in units of float32 epsilon below. **It is
+an RMS summary.** Reading *d* as a per-component relative error requires the disagreement to be spread
+evenly and independently across coordinates, which it is not (measured below). The table is an order
+of magnitude, not a per-number statement:
 
 | Run | 1 − similarity | *d* | ***d* / ε₃₂** |
 |---|---|---|---|
@@ -175,7 +160,7 @@ disagreement is spread evenly across coordinates. It is not — one coordinate c
 the effective number of participating coordinates is 3–23 out of 768. That assumption was flagged in
 review and it does not hold, so the per-coordinate question has to be asked per coordinate.
 
-### Per coordinate, assuming nothing
+### Per-coordinate measurement
 
 Concentration on its own proves nothing: under *relative* rounding every coordinate carries
 |Δu_k|/|u_k| ~ ε regardless of its size, and this state's energy is 91% in ten coordinates, so
@@ -194,19 +179,17 @@ scalar (M5), so the direction is what is at issue.
 | Control_noise | 3.38 | 15.17 | 209.01 | 1.81% | 0.010 | 0.43% |
 | Control_prolet_Semantic | 1.81 | 9.61 | 77.40 | 0.79% | 0.007 | 0.36% |
 
-**The typical coordinate agrees to about 2 ε.** The heavy p99 looks alarming and is not: those
-coordinates sit at 0.3–2.6% of typical magnitude, where a negligible absolute difference makes a huge
-*relative* one, and together they carry ~1% of the angle. A small-denominator artefact, not a finding.
-Where the angle actually lives, agreement is at the few-ε level.
+**The typical coordinate agrees to about 2 ε.** The p99 column is driven by coordinates at 0.3–2.6%
+of typical magnitude, where a negligible absolute difference produces a large relative one; those
+coordinates carry ~1% of the angle. In the coordinates carrying the angle, agreement is at the few-ε
+level.
 
-**So the verdict on M1 is stronger than "cannot tell", and weaker than "proven exact".** The residual
-between positions is the size of float32 arithmetic noise, which leaves no room for a *large*
-structured disagreement — enough for H-pos0's premise to be usable, and it holds steady over 1000
-iterations rather than growing. It does **not** establish that nothing structured hides below the
-arithmetic scale. No float32 measurement can. That needs the higher-precision run.
+**M1 conclusion.** The residual between positions is the size of float32 arithmetic noise. This bounds
+a structured disagreement to below that scale, and it holds steady over 1000 iterations. It does not
+establish that no structure exists below the arithmetic scale; a float32 measurement cannot. A
+higher-precision run is required.
 
-**The one exception is worth keeping, and it is the outlier on both measures.** Keeping them
-straight, since they are not the same quantity:
+**`Control_noise` is the outlier on all three measures**, which are distinct quantities:
 
 | Measure | `Control_noise` | Other seven |
 |---|---|---|
@@ -222,18 +205,18 @@ not answerable from one run, but it is the one place here where something might 
 <details>
 <summary>Secondary cross-check: a synthetic sensitivity sweep, and what it is not</summary>
 
-An earlier revision of this file led with a simulation instead: perturb an exactly-collapsed tensor by
-relative Gaussian noise of *k* × ε and see which *k* column the observation matches. **That was
-over-claimed and the "one ULP" phrasing it produced was wrong**, for two reasons raised in review:
+The sweep perturbs an exactly-collapsed tensor by relative Gaussian noise of *k* × ε and reports the
+resulting deviation. **It is not a float32 round-to-nearest baseline**, for two reasons:
 
-- Gaussian noise of standard deviation ε is not float32 round-to-nearest, whose relative error is
-  bounded by ε/2 and roughly uniform — standard deviation about ε/(2√3), some 3.5× smaller.
-- A single rounding is the wrong comparison anyway. The archived state is the output of a twelve-layer
-  forward pass, so its accumulated error is worth several roundings, not one.
+- Gaussian noise of standard deviation ε is not round-to-nearest, whose relative error is bounded by
+  ε/2 and is roughly uniform — standard deviation about ε/(2√3), some 3.5× smaller.
+- A single rounding is not the applicable comparison: the archived state is the output of a
+  twelve-layer forward pass and carries accumulated error from many roundings.
 
-Neither objection touches the per-coordinate measurement above, which is why that is now the primary
-evidence. The sweep is kept only for its *slope*: a factor of 4 in *k* moves the deviation ~15×, so
-the conclusion survives the assumed error scale being wrong by a factor of a few.
+The *k* column matching an observation therefore does not give a ULP count. The sweep is reported for
+its slope: a factor of 4 in *k* moves the deviation ~15×, which bounds the sensitivity of the
+conclusion to the assumed error scale. The per-coordinate measurement above is the primary evidence
+and does not depend on it.
 
 | Run | Observed | k = 1 | k = 4 | k = 16 | k = 64 |
 |---|---|---|---|---|---|
@@ -246,10 +229,10 @@ the conclusion survives the assumed error scale being wrong by a factor of a few
 | Control_noise | 1.01e−13 | 1.12e−14 | 1.85e−13 | 3.08e−12 | 5.13e−11 |
 | Control_prolet_Semantic | 2.13e−14 | 1.47e−14 | 2.14e−13 | 3.12e−12 | 5.28e−11 |
 
-One thing the sweep *does* settle: the obvious null — build a rank-1 tensor and round it to float32 —
-is useless here. Because the per-position norms agree to ~10⁻⁷, every row rounds to nearly the same
-float32 vector and two runs come out bit-identical at deviation exactly 0. That measures storage, and
-storage is not where the deviation comes from.
+One further null was tested and rejected: constructing a rank-1 tensor and rounding it to float32.
+Because the per-position norms agree to ~10⁻⁷, every row rounds to nearly the same float32 vector and
+two runs come out bit-identical at deviation exactly 0. That measures storage rounding, which is not
+the source of the observed deviation.
 
 </details>
 
@@ -284,7 +267,7 @@ array that would have answered M2.
 measurement below is therefore of a related quantity — how fast the mean state stops moving — and is
 labelled as such throughout.
 
-### Two estimators, because the obvious one is biased
+### Two estimators
 
 Measuring 1 − cos(vₜ, v_T) against the *last recorded state* is what M2 describes, but v_T is not a
 proven fixed point; it is just where recording stopped. That forces the curve to zero at t = T by
@@ -356,7 +339,7 @@ dimensions are not the cause of the ragged fit. The latency above is.
 ### Cross-check on the long runs
 
 The 1000-iteration GPT-2 Small runs, on a non-uniform schedule (0, 100, 250, 500, then every 10 from
-800). **This cross-check turns out to support almost nothing, for a reason worth stating.**
+800). **After the gap-width guard below, this cross-check supports two of six fits.**
 
 | Run | Snaps | Gap used | Dropped | Step-to-step | vs last iterate |
 |---|---|---|---|---|---|
@@ -375,21 +358,18 @@ mostly the gap change, not the dynamics.
 that guard is applied, two of the three runs have no usable step fit at all, and `Control_noise`
 covers only its 10-step tail.
 
-**This corrects an earlier version of this file**, which reported step slopes of −0.035 and −0.009
-here. Those were fitted across mixed gaps and were wrong; the corrected `Control_noise` figure is
-−0.028, three times the biased one. The conclusion these runs were cited for — that GPT-2 Small is
-slow to start — rests on the 61-iteration trajectories, which are uniformly spaced at D = 1 and are
-unaffected. It does not depend on this table, which is as well, because this table now says very
-little.
+Superseded figures: an earlier revision reported step slopes of −0.035 and −0.009 here, fitted across
+mixed gaps. The corrected `Control_noise` figure is −0.028, three times the biased value; the other
+two have no usable step fit. The GPT-2 Small delay finding rests on the 61-iteration trajectories,
+which are uniformly spaced at D = 1 and are unaffected by this correction.
 
-Two errors were made and corrected while preparing this analysis, both in the step estimator:
-regressing against snapshot index rather than recorded iteration (inflating the slope by two orders
-of magnitude), and then fitting across unequal gaps (the bias above). The second was caught in review,
-not by me.
+Two defects in the step estimator were found and corrected during this analysis: regressing against
+snapshot index rather than recorded iteration (inflating the slope by two orders of magnitude), and
+fitting across unequal gaps (the bias above).
 
 ---
 
-## M5 — the rescale factor, which turns out not to need a run
+## M5 — the rescale factor
 
 `experiments/contraction/03_rescale_factor.py`.
 
@@ -425,48 +405,44 @@ uses it — it holds to 2–6 × 10⁻⁷. `initial_norm` is recorded directly.
 **stable constant**. (Index convention, easy to get wrong: a snapshot recorded at iteration *n* holds
 the state *after* *n* passes and *before* the rescale that precedes pass *n*+1, so it yields *c*ₙ₊₁.)
 
-### Why this matters: it contradicts a step in H-pos0
+### Relation to H-pos0
 
 #75 states the H-pos0 argument as:
 
 > At a settled, position-uniform state ‖xⁿ‖ is constant, so ***c_n* = 1**, and the shared vector must
 > satisfy ***x\* = F₀(x\*)***
 
-The first clause is right — ‖xⁿ‖ *is* constant at settlement. **The inference from it is not.** The
-rescale target is the *initial* norm, and the settled norm is 3.5–10× that, so *c* settles to a
-constant that is emphatically **not 1**: 0.288, 0.099, 0.266 in the three committed runs. "Constant"
-and "equal to 1" are different claims and only the first is true.
+‖xⁿ‖ is constant at settlement, as stated. The measured *c* at settlement is not 1: the rescale
+target is the *initial* norm and the settled norm is 3.5–10× that, giving *c* = 0.288, 0.099, 0.266 in
+the three committed runs.
 
-The consequence is that the fixed-point condition is not *x\** = *F₀*(*x\**) but
+The fixed-point condition is therefore not *x\** = *F₀*(*x\**) but
 
 > *x\** = *c* · *x\** + *g₀*(LN(*x\**))   with *c* ≈ 0.29 measured
 
-**This is load-bearing rather than pedantic, because of #69.** If the map were scale-invariant the
-scalar would wash out and the clean form would be recoverable. #69 established it is not: cos(*F*(*c*·*x*),
-*F*(*x*)) is 0.936 at *c* = 2 and 0.505 at *c* = 10. The measured amplification is 3.5–10×, which is
-squarely inside the range where #69 says the map is *not* invariant. The scalar cannot be dropped.
+**The scalar does not drop out**, because the map is not scale-invariant over this range. #69 measured
+cos(*F*(*c*·*x*), *F*(*x*)) at 0.936 for *c* = 2 and 0.505 for *c* = 10; the measured amplification here
+is 3.5–10×.
 
-**What survives.** H-pos0's structure is unaffected: position 0's trajectory is still autonomous up
-to one scalar, and the *n* = 1 run still implements that same rescaled map, so the experiment is
-still the right experiment. What needs rewording is the intermediate claim and the clean fixed-point
-form.
+**Unaffected:** H-pos0's structure. Position 0's trajectory remains autonomous up to one scalar, and
+an *n* = 1 run implements the same rescaled map. The intermediate claim and the fixed-point form
+require rewording.
 
-**What may sharpen.** #75 predicts the *n* = 1 run converges to the same terminal basin, treating the
-differing *c* as a trajectory-level difference only. But if the fixed point depends on *c*, and *c* is
-a stable constant fixed by the seed's initial norm — which differs between an *n* = 1 run and the
-sweep — then **the terminal states have a reason to differ too**, not just the routes. That is a
-sharper and more falsifiable prediction than the one on file. It is offered as a consequence worth
-checking, not a result: it assumes LN(*c*·*x*) ≈ LN(*x*), which #69 says holds only to ~10⁻⁵ at the
-LayerNorm and not at all around the residual path.
+**Consequence for Control A, untested.** #75 predicts the *n* = 1 run converges to the same terminal
+basin, treating a differing *c* as a trajectory-level difference. If the fixed point depends on *c*,
+and *c* is fixed by the seed's initial norm — which differs between an *n* = 1 run and the sweep — the
+terminal states would also differ. This follows only under LN(*c*·*x*) ≈ LN(*x*), which #69 reports as
+holding to ~10⁻⁵ at the LayerNorm and not around the residual path. Stated as a consequence to test,
+not a result.
 
-**Three runs, one model, one family of prompts.** *c* differs between the two content prompts (0.288,
-0.266) and the noise control (0.099), and the noise control is also the one that lands elsewhere.
-Whether *c* tracks basin identity is not answerable from three runs and is not claimed here.
+**Coverage:** three runs, one model, one prompt family. *c* differs between the two content prompts
+(0.288, 0.266) and the noise control (0.099); the noise control also converges elsewhere. Whether *c*
+tracks basin identity is not determinable from three runs.
 
-### Correction: no engine change is needed, and M5 was gated in error
+### Correction: no engine change required; M5 gated in error
 
-An earlier revision of this file said the transient "still needs the one-line change" to the engine.
-**That is wrong, and so is M5's own premise.** `atr_engine.py` already records everything M5 asks for,
+An earlier revision of this file stated the transient "still needs the one-line change" to the engine.
+That statement is incorrect, as is M5's premise. `atr_engine.py` records all of the fields M5 requires,
 at every snapshot:
 
 ```python
@@ -475,22 +451,21 @@ at every snapshot:
 "position_similarity": position_similarity,            # line 274
 ```
 
-and the iteration-0 snapshot carries the same fields, so `initial_norm` is just
-`snapshots[0]["tensor_norm"]`. *c*ₙ₊₁ = `snapshots[0].tensor_norm / snapshots[n].tensor_norm` — fully
-available from any engine run whose snapshots were saved intact. M5's "currently never recorded" is
-not true of the engine.
+The iteration-0 snapshot carries the same fields, so `initial_norm` = `snapshots[0]["tensor_norm"]`
+and *c*ₙ₊₁ = `snapshots[0].tensor_norm / snapshots[n].tensor_norm`, available from any engine run whose
+snapshots were saved intact. M5's "currently never recorded" does not hold for the engine.
 
-**What actually happened is a save-time discard, in two separate scripts, each independently:**
+**The loss occurred at save time, in two scripts independently:**
 
 | Script | What it did |
 |---|---|
 | `experiments/gpt2_small/05_divine_motion.py:118` | `make_snapshot()` — *"Slim snapshot with just the fields the analysis needs."* Reimplements the snapshot from scratch and keeps 7 of the engine's 20 fields. Drops `tensor`, `tensor_norm`, `position_similarity`. |
 | `experiments/sink_geometry/02_masking_control.py:86-88` | Calls `run_atr_loop`, receives the full snapshots, keeps `means` and discards the rest before `torch.save`. |
 
-Both decided at save time what would ever be asked of the data. Both were wrong — this analysis
-asked for exactly what they dropped, and neither loss is recoverable without a re-run.
+Both selected fields at save time. The fields this analysis required are among those dropped, and
+neither loss is recoverable without re-running.
 
-So the residual limits below are limits of **these two archives**, not of the engine or the method:
+The residual limits below are therefore limits of **these two archives**, not of the engine or method:
 
 - Iterations 1–99, which `05_divine_motion.py`'s schedule does not sample — so the *approach* of *c_n*
   to its settled value is unobserved, and only the settled value is in hand.
@@ -498,48 +473,45 @@ So the residual limits below are limits of **these two archives**, not of the en
   values are printed marked with `*` and are not used.
 - The cross-model runs, which archived no per-position data at all.
 
-**M5 should move from `GATED` to done-where-data-exists.** Nothing about it needs a forward pass or an
-engine change; it needs archives that were not slimmed.
+**M5 status:** not gated. It requires neither a forward pass nor an engine change, only archives
+retaining the engine's snapshot fields.
 
 ---
 
 ## What this does and does not settle
 
-**Settled.** `position_similarity` at convergence is 1.0 to twelve decimal places in all eight
+**Determined.** `position_similarity` at convergence is 1.0 to twelve decimal places in all eight
 committed runs, including the worst individual pair, with no outlier position. The float32 discrepancy
 in `Imperative` is accumulation order.
 
-**Settled.** No committed archive can support M2 as worded — but the cause is not the engine. The
-engine records the full per-position tensor, `tensor_norm` and `position_similarity` at every
-snapshot. Two experiment scripts discarded them at save time, independently. See the correction under
-M5.
+**Determined.** No committed archive supports M2 as worded. The cause is not the engine: the engine
+records the full per-position tensor, `tensor_norm` and `position_similarity` at every snapshot, and
+two experiment scripts discarded them at save time. See the M5 section.
 
-**Settled.** Contraction speed is not monotone in model size, and the two families order oppositely.
-GPT-2 Small's ragged fit is a latency, not a slow rate, and is not caused by the massive-activation
-effect documented in `sink_geometry`.
+**Determined.** Contraction speed is not monotone in model size, and the two families order
+oppositely. GPT-2 Small's poor single-rate fit is a latency rather than a slow rate, and is not caused
+by the massive-activation effect documented in `sink_geometry`.
 
-**Bounded, not settled — and two earlier drafts of this file claimed otherwise.** Whether the position
-collapse is *exactly* exact. The typical coordinate agrees to ~2 float32 ε, which is the scale
-arithmetic noise operates at, so no *large* structured disagreement fits in the gap. H-pos0's premise
-is usable on that basis. But a float32 measurement cannot show the absence of structure below float32's
-own noise, and this one does not. The higher-precision run is what would settle it.
+**Determined.** The rescale factor *c* settles to a stable constant that is not 1: 0.288, 0.099, 0.266
+across three committed runs. H-pos0 (#75) states this figure is 1 at a settled state. Because the map
+is not scale-invariant over the measured range (#69), the scalar does not drop out of the fixed-point
+condition. M5 required neither a forward pass nor an engine change.
 
-**Open, and the one loose thread.** `Control_noise` is the outlier on both measures, and they are
-different measures: RMS scale *d* = 2.66 ε against 0.74–1.30 for the other seven, and a per-coordinate
-median of 3.38 ε against 1.7–1.9. Roughly a factor of 2 either way. It is also the noise control and
-has by far the largest rescale factor. One run; not answerable here.
+**Bounded, not determined.** Whether the position collapse is exactly exact. The typical coordinate
+agrees to ~2 float32 ε, the scale of arithmetic noise, which bounds a structured disagreement to below
+that scale. A float32 measurement cannot establish the absence of structure below float32's own noise.
+A higher-precision run is required.
 
-**Not settled.** Whether pythia-410m converges at all given more iterations, or is a genuinely
-different regime. 60 iterations is not enough to tell, and extending it is a new run.
+**Open.** `Control_noise` is the outlier on all three measures: RMS scale *d* = 2.66 ε against
+0.74–1.30 for the other seven, per-coordinate median 3.38 ε against 1.69–1.90, raw deviation 1.01e−13
+against 7.9e−15–2.4e−14. Roughly a factor of two on each per-number measure. It is also the noise
+control and the run with the largest rescale factor. One run; not determinable here.
 
-**Settled, and not previously known.** The rescale factor *c* settles to a stable constant that is
-**not 1** — 0.288, 0.099, 0.266 across three committed runs. This contradicts a stated step in the
-H-pos0 argument (#75), and because the map is not scale-invariant (#69) the scalar cannot be dropped
-from the fixed-point condition. M5 was filed as gated; its settled value did not need a run.
+**Open.** Whether pythia-410m converges given more iterations, or is a different regime. 60 iterations
+is insufficient; extending it requires a new run.
 
-**Not settled, and avoidably so.** How *c_n* reaches that constant. No snapshot samples iterations
-1–99 in the one archive that retained enough to compute it. The engine would have recorded it; the
-saving script did not.
+**Open.** How *c_n* reaches its constant. No snapshot samples iterations 1–99 in the one archive
+retaining enough to compute it. The engine records the quantity; the saving script did not retain it.
 
-**Gated.** Extending pythia-410m, and any float64 confirmation, need forward passes and are blocked by
-[`docs/ATR_PAUSE.md`](../../docs/ATR_PAUSE.md). Nothing else here is.
+**Gated.** Extending pythia-410m and any float64 confirmation require forward passes and are blocked
+by [`docs/ATR_PAUSE.md`](../../docs/ATR_PAUSE.md). No other item here is.

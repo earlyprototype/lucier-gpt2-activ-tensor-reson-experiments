@@ -101,8 +101,8 @@ def per_coordinate_disagreement(tensor):
 
     `rms_residual_scale` above summarises the angle into one number, but
     turning that into a per-component statement assumes the disagreement is
-    spread evenly over coordinates -- which it is not. Raised in review, and
-    correct. This measures it per coordinate instead.
+    spread evenly over coordinates, which it is not. This measures the
+    disagreement per coordinate instead.
 
     Under relative rounding every coordinate carries |du_k| / |u_k| ~ eps
     regardless of its size, so the disagreement being CONCENTRATED proves
