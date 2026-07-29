@@ -1,0 +1,318 @@
+{
+ "generated_by": "07_statistics.py",
+ "S1_zero_count_upper_bounds": {
+  "observed_hits": 0,
+  "documents_scanned": 260000,
+  "upper_bound_95_per_document": 1.1521980827433609e-05,
+  "upper_bound_99_per_document": 1.7712036163075595e-05,
+  "upper_bound_95_per_10k_documents": 0.115,
+  "implied_corpus_ceiling_95": 92.2,
+  "implied_corpus_ceiling_99": 141.7,
+  "covert_domains_at_zero": [
+   "irn-lfp-awdnews",
+   "irn-lfp-britishleft",
+   "irn-lfp-iuvmpress",
+   "irn-lfp-libertyfrontpress",
+   "irn-lfp-realprogressivefront",
+   "irn-lfp-whatsupic",
+   "rus-intel-geopolitica",
+   "rus-intel-inforos",
+   "rus-intel-journal-neo",
+   "rus-intel-katehon",
+   "rus-intel-newsfront",
+   "rus-intel-southfront",
+   "rus-ira-black4black",
+   "rus-ira-blackmattersus",
+   "rus-ira-blacktolive",
+   "rus-ira-donotshoot",
+   "rus-ira-media-politexpert",
+   "rus-ira-media-riafan"
+  ],
+  "n_covert_domains_at_zero": 18,
+  "reading": "For any single indicator observed zero times, the prevalence is below 0.115 per 10,000 documents at 95% confidence. Extrapolated to the ~8M-document corpus under the assumption that the sample is a random draw from it, that ceilings each absent covert asset at ~92 documents corpus-wide \u2014 against ~8 million documents total."
+ },
+ "S2_detection_power": {
+  "prevalence_detectable_at_power": {
+   "50%": {
+    "per_document": 2.6659471408230218e-06,
+    "per_10k_documents": 0.027,
+    "equivalent_corpus_documents": 21.3
+   },
+   "80%": {
+    "per_document": 6.190126658145445e-06,
+    "per_10k_documents": 0.062,
+    "equivalent_corpus_documents": 49.5
+   },
+   "95%": {
+    "per_document": 1.1521980827433609e-05,
+    "per_10k_documents": 0.115,
+    "equivalent_corpus_documents": 92.2
+   },
+   "99%": {
+    "per_document": 1.7712036163075595e-05,
+    "per_10k_documents": 0.177,
+    "equivalent_corpus_documents": 141.7
+   }
+  },
+  "reading": "A covert asset contributing as few as ~50 documents corpus-wide would have produced at least one hit in this sample with 80% probability. The null is therefore informative about assets of that size and larger, and uninformative about a handful of documents hiding in 8 million."
+ },
+ "S3_observed_rate_intervals": {
+  "state_produced": {
+   "k": 155,
+   "n": 260000,
+   "point_per_10k": 5.962,
+   "exact_95_ci_per_10k": [
+    5.06,
+    6.977
+   ],
+   "wilson_95_ci_per_10k": [
+    5.094,
+    6.976
+   ],
+   "implied_corpus_documents_95_ci": [
+    4048,
+    5582
+   ]
+  },
+  "per_actor": {
+   "Russia / Sputnik": {
+    "k": 74,
+    "point_per_10k": 2.846,
+    "exact_95_ci_per_10k": [
+     2.235,
+     3.573
+    ]
+   },
+   "China / Xinhua": {
+    "k": 42,
+    "point_per_10k": 1.615,
+    "exact_95_ci_per_10k": [
+     1.164,
+     2.183
+    ]
+   },
+   "Iran / Press TV": {
+    "k": 16,
+    "point_per_10k": 0.615,
+    "exact_95_ci_per_10k": [
+     0.352,
+     0.999
+    ]
+   },
+   "Russia / RT (state-funded international broadcaster)": {
+    "k": 9,
+    "point_per_10k": 0.346,
+    "exact_95_ci_per_10k": [
+     0.158,
+     0.657
+    ]
+   },
+   "China / China Daily (state-run)": {
+    "k": 8,
+    "point_per_10k": 0.308,
+    "exact_95_ci_per_10k": [
+     0.133,
+     0.606
+    ]
+   },
+   "Russia / SVR-directed front (per U.S. Treasury)": {
+    "k": 4,
+    "point_per_10k": 0.154,
+    "exact_95_ci_per_10k": [
+     0.042,
+     0.394
+    ]
+   },
+   "China / China Central Television (CCTV)": {
+    "k": 2,
+    "point_per_10k": 0.077,
+    "exact_95_ci_per_10k": [
+     0.009,
+     0.278
+    ]
+   }
+  }
+ },
+ "S4_scanner_recall_and_correction": {
+  "rows": [
+   {
+    "label": "rt",
+    "tier": "B",
+    "census_links": 38575,
+    "expected_docs_under_uniform_survival": 222.9,
+    "observed_produced_docs": 9,
+    "estimated_recall": 0.04,
+    "recall_95_ci": [
+     0.018,
+     0.077
+    ],
+    "binomial_p_two_sided": 1.0514849767810175e-81,
+    "label_collision": "assumed rt.com at this volume; minor collision possible (e.g. rt.de is also RT)"
+   },
+   {
+    "label": "people",
+    "tier": "B",
+    "census_links": 12774,
+    "expected_docs_under_uniform_survival": 73.8,
+    "observed_produced_docs": 0,
+    "estimated_recall": 0.0,
+    "recall_95_ci": [
+     0.0,
+     0.05
+    ],
+    "binomial_p_two_sided": 2.2763621798991438e-32,
+    "label_collision": "almost certainly people.com (People magazine), not people.com.cn \u2014 excluded from totals"
+   },
+   {
+    "label": "sputniknews",
+    "tier": "B",
+    "census_links": 12611,
+    "expected_docs_under_uniform_survival": 72.9,
+    "observed_produced_docs": 74,
+    "estimated_recall": 1.015,
+    "recall_95_ci": [
+     0.797,
+     1.274
+    ],
+    "binomial_p_two_sided": 0.8605210981068449,
+    "label_collision": null
+   },
+   {
+    "label": "presstv",
+    "tier": "B",
+    "census_links": 7122,
+    "expected_docs_under_uniform_survival": 41.1,
+    "observed_produced_docs": 16,
+    "estimated_recall": 0.389,
+    "recall_95_ci": [
+     0.223,
+     0.632
+    ],
+    "binomial_p_two_sided": 1.5295437730686145e-05,
+    "label_collision": null
+   },
+   {
+    "label": "globalresearch",
+    "tier": "C",
+    "census_links": 6424,
+    "expected_docs_under_uniform_survival": 37.1,
+    "observed_produced_docs": 0,
+    "estimated_recall": 0.0,
+    "recall_95_ci": [
+     0.0,
+     0.099
+    ],
+    "binomial_p_two_sided": 1.585338046268596e-16,
+    "label_collision": null
+   },
+   {
+    "label": "telesurtv",
+    "tier": "B",
+    "census_links": 5137,
+    "expected_docs_under_uniform_survival": 29.7,
+    "observed_produced_docs": 0,
+    "estimated_recall": 0.0,
+    "recall_95_ci": [
+     0.0,
+     0.124
+    ],
+    "binomial_p_two_sided": 2.589623590286894e-13,
+    "label_collision": null
+   }
+  ],
+  "pooled_excluding_collisions": {
+   "observed": 90,
+   "expected": 180.8,
+   "estimated_recall": 0.498,
+   "recall_95_ci": [
+    0.4,
+    0.612
+   ]
+  },
+  "recall_corrected_state_produced": {
+   "observed_k": 155,
+   "correction_factor": 2.01,
+   "corrected_docs_in_sample": 311.4,
+   "corrected_per_10k": 11.976,
+   "corrected_corpus_documents": 9581
+  },
+  "caveats": [
+   "The expectation rests on uniform survival from link to sampled document, which is an assumption, not a measurement: the census counts links (~21.8M over the top 1000) while the corpus holds ~8M deduplicated documents, and survival plausibly varies by domain (paywalls, robots.txt, dead links, dedup).",
+   "Recall is estimated from four to six domains, so the pooled figure is dominated by the largest of them.",
+   "The corrected figure is an order-of-magnitude estimate, not a measurement. The observed count remains the defensible floor."
+  ]
+ },
+ "S5_classifier_agreement": {
+  "n_adjudicated_pairs": 213,
+  "raw_agreement": 0.441,
+  "cohen_kappa": 0.348,
+  "abstention_rate": 0.446,
+  "decided_only": {
+   "n": 118,
+   "raw_agreement": 0.797,
+   "cohen_kappa": 0.721,
+   "note": "pairs where the heuristic committed to a verdict"
+  },
+  "top_disagreements": [
+   {
+    "heuristic": "ambiguous",
+    "human": "mention",
+    "n": 38
+   },
+   {
+    "heuristic": "ambiguous",
+    "human": "false_positive",
+    "n": 17
+   },
+   {
+    "heuristic": "ambiguous",
+    "human": "origin",
+    "n": 17
+   },
+   {
+    "heuristic": "mention",
+    "human": "citation_amplification",
+    "n": 13
+   },
+   {
+    "heuristic": "ambiguous",
+    "human": "citation_amplification",
+    "n": 10
+   },
+   {
+    "heuristic": "ambiguous",
+    "human": "wire_carriage",
+    "n": 9
+   },
+   {
+    "heuristic": "ambiguous",
+    "human": "laundered_origin",
+    "n": 4
+   },
+   {
+    "heuristic": "origin",
+    "human": "mention",
+    "n": 3
+   }
+  ],
+  "IN_SAMPLE_CAVEAT": "The heuristics were REVISED after reading these documents \u2014 wire-dateline, photo-credit and repost-credit patterns were added once adjudication revealed them. This agreement is therefore an in-sample fit, an optimistic bound on out-of-sample accuracy, and NOT a validation. It is reported to show how far the rules had to be corrected, not to certify them."
+ },
+ "S6_family_wise_bound": {
+  "family_size": 18,
+  "per_test_alpha_bonferroni": 0.002777777777777778,
+  "family_wise_upper_bound_per_document": 2.2638605402303114e-05,
+  "family_wise_upper_bound_per_10k": 0.226,
+  "implied_corpus_ceiling_per_asset": 181.1,
+  "reading": "Holding the family-wise error rate at 5% across all 18 covert domains simultaneously, each is still bounded below 0.226 per 10,000 documents \u2014 about 181 documents corpus-wide. The correction weakens the per-asset bound by roughly a factor of 2.0, which does not change the conclusion."
+ },
+ "S7_scope_of_inference": {
+  "census_is_a_population_not_a_sample": "domains.txt reports counts over the WHOLE corpus. Confidence intervals and significance tests do not apply to it: RT ranking 92nd is a fact about the corpus, not an estimate with sampling error. Section 4 uses the census only as a fixed expectation against which to measure the scanner, which is a different use.",
+  "mechanism_remains_untestable": "No statistic here speaks to inauthentic amplification. Vote provenance was never released; no amount of analysis of the documents recovers it. The bounds above constrain CONTENT prevalence only.",
+  "near_duplicate_null_bound": {
+   "pairs_compared": 166753,
+   "observed_at_or_above_0.25": 0,
+   "upper_bound_95_on_pair_rate": 1.7964926354641086e-05,
+   "note": "Pairs are not independent (they share documents), so this bound is indicative rather than exact. Reported because a bounded null beats an unbounded one."
+  }
+ }
+}

@@ -1,0 +1,3591 @@
+{
+ "generated_by": "08_corpus_duplication.py",
+ "scope": "ALL documents in the sample, no indicator pre-filter",
+ "documents_scanned": 260000,
+ "documents_too_short_to_sketch": 27,
+ "shingle_words": 8,
+ "sketch_k": 8,
+ "min_shared_sketch_values": 2,
+ "oversized_buckets_skipped": 7,
+ "candidate_pairs": 60445,
+ "pairs_at_or_above_0.25": 30897,
+ "pairs_at_or_above_0.50": 13102,
+ "clusters": 727,
+ "documents_in_clusters": 2860,
+ "clusters_containing_an_indicator_hit": 1,
+ "state_produced_documents": 155,
+ "state_produced_documents_in_clusters": [],
+ "n_state_produced_in_clusters": 0,
+ "cluster_list_truncated_to": 200,
+ "top_pairs": [
+  {
+   "a": "train:1344",
+   "b": "train:24557",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:1344",
+   "b": "train:48954",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:1344",
+   "b": "train:163165",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:1344",
+   "b": "train:192418",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:24557",
+   "b": "train:48954",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:24557",
+   "b": "train:163165",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:24557",
+   "b": "train:192418",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:48954",
+   "b": "train:163165",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:48954",
+   "b": "train:192418",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:163165",
+   "b": "train:192418",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:6260",
+   "b": "train:174347",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:83521",
+   "b": "train:156650",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:12070",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:24490",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:27357",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:40654",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:46913",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:57912",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:60121",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:82201",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:103829",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:112861",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:115185",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:116553",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:130781",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:139474",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:140657",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:173204",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:176818",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:192035",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:193362",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:201517",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:11846",
+   "b": "train:234088",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:24490",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:27357",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:40654",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:46913",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:57912",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:60121",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:82201",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:103829",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:112861",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:115185",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:116553",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:130781",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:139474",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:140657",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:173204",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:176818",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:192035",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:193362",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:201517",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:12070",
+   "b": "train:234088",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:23138",
+   "b": "train:26269",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:23138",
+   "b": "train:28030",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:23138",
+   "b": "train:31040",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:23138",
+   "b": "train:67685",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:23138",
+   "b": "train:83701",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:23138",
+   "b": "train:89116",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  },
+  {
+   "a": "train:23138",
+   "b": "train:115262",
+   "jaccard": 1.0,
+   "indicators_a": [],
+   "indicators_b": []
+  }
+ ],
+ "cluster_list": [
+  {
+   "size": 50,
+   "members": [
+    "train:617",
+    "train:1543",
+    "train:5673",
+    "train:10038",
+    "train:10664",
+    "train:13171",
+    "train:30707",
+    "train:32503",
+    "train:32653",
+    "train:34549",
+    "train:37651",
+    "train:41489",
+    "train:56012",
+    "train:57416",
+    "train:66251",
+    "train:75582",
+    "train:77871",
+    "train:86492",
+    "train:87437",
+    "train:88565",
+    "train:89555",
+    "train:92160",
+    "train:93701",
+    "train:95549",
+    "train:117711",
+    "train:119832",
+    "train:124236",
+    "train:130686",
+    "train:131023",
+    "train:131979",
+    "train:141462",
+    "train:147717",
+    "train:150185",
+    "train:151748",
+    "train:154272",
+    "train:170913",
+    "train:177690",
+    "train:180859",
+    "train:182675",
+    "train:183072",
+    "train:183225",
+    "train:195768",
+    "train:199835",
+    "train:211152",
+    "train:225510",
+    "train:225840",
+    "train:235584",
+    "train:235896",
+    "train:249556",
+    "valid:253121"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 47,
+   "members": [
+    "train:2413",
+    "train:17998",
+    "train:21428",
+    "train:27510",
+    "train:34999",
+    "train:35274",
+    "train:37964",
+    "train:38936",
+    "train:41295",
+    "train:46183",
+    "train:47959",
+    "train:53959",
+    "train:54242",
+    "train:54985",
+    "train:57843",
+    "train:59855",
+    "train:89499",
+    "train:98010",
+    "train:99200",
+    "train:103494",
+    "train:105024",
+    "train:112749",
+    "train:115650",
+    "train:119088",
+    "train:121554",
+    "train:122035",
+    "train:123091",
+    "train:131415",
+    "train:134297",
+    "train:135059",
+    "train:140246",
+    "train:149876",
+    "train:163662",
+    "train:181229",
+    "train:189350",
+    "train:190418",
+    "train:193221",
+    "train:212020",
+    "train:227325",
+    "train:231031",
+    "train:231583",
+    "train:240161",
+    "train:240178",
+    "train:243067",
+    "valid:251930",
+    "test:255316",
+    "test:258062"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 42,
+   "members": [
+    "train:8185",
+    "train:11884",
+    "train:21691",
+    "train:21759",
+    "train:36452",
+    "train:39713",
+    "train:43812",
+    "train:43972",
+    "train:44989",
+    "train:45289",
+    "train:51077",
+    "train:63905",
+    "train:67655",
+    "train:78739",
+    "train:82214",
+    "train:87869",
+    "train:93074",
+    "train:100278",
+    "train:102202",
+    "train:107344",
+    "train:108014",
+    "train:110939",
+    "train:123089",
+    "train:127473",
+    "train:133934",
+    "train:141022",
+    "train:146641",
+    "train:147105",
+    "train:152419",
+    "train:158005",
+    "train:158964",
+    "train:184710",
+    "train:186708",
+    "train:190085",
+    "train:192270",
+    "train:202718",
+    "train:211701",
+    "train:221172",
+    "train:223850",
+    "train:242883",
+    "train:246677",
+    "test:256057"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 40,
+   "members": [
+    "train:11846",
+    "train:12070",
+    "train:23138",
+    "train:24490",
+    "train:26269",
+    "train:27357",
+    "train:28030",
+    "train:31040",
+    "train:40654",
+    "train:46913",
+    "train:57912",
+    "train:60121",
+    "train:63998",
+    "train:67685",
+    "train:82201",
+    "train:83701",
+    "train:88373",
+    "train:89116",
+    "train:103829",
+    "train:112861",
+    "train:115185",
+    "train:115262",
+    "train:116553",
+    "train:117054",
+    "train:130781",
+    "train:139474",
+    "train:140657",
+    "train:155403",
+    "train:159438",
+    "train:170454",
+    "train:173204",
+    "train:176818",
+    "train:192035",
+    "train:192788",
+    "train:193362",
+    "train:193870",
+    "train:197495",
+    "train:201517",
+    "train:234088",
+    "test:256133"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 38,
+   "members": [
+    "train:13237",
+    "train:16623",
+    "train:33990",
+    "train:35818",
+    "train:56992",
+    "train:64146",
+    "train:64741",
+    "train:69968",
+    "train:74223",
+    "train:76402",
+    "train:77658",
+    "train:82580",
+    "train:93553",
+    "train:94990",
+    "train:105150",
+    "train:106104",
+    "train:121912",
+    "train:128281",
+    "train:155777",
+    "train:160721",
+    "train:167728",
+    "train:170746",
+    "train:177887",
+    "train:181032",
+    "train:181744",
+    "train:184485",
+    "train:185511",
+    "train:204621",
+    "train:206453",
+    "train:209521",
+    "train:212627",
+    "train:216122",
+    "train:227150",
+    "train:241048",
+    "train:244563",
+    "train:246333",
+    "train:246765",
+    "test:259427"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 37,
+   "members": [
+    "train:1537",
+    "train:14164",
+    "train:15986",
+    "train:30551",
+    "train:30641",
+    "train:31235",
+    "train:33188",
+    "train:44960",
+    "train:57777",
+    "train:58853",
+    "train:61762",
+    "train:86361",
+    "train:88805",
+    "train:89160",
+    "train:94002",
+    "train:98523",
+    "train:109458",
+    "train:117899",
+    "train:122988",
+    "train:165878",
+    "train:169120",
+    "train:195439",
+    "train:206779",
+    "train:207660",
+    "train:209475",
+    "train:223273",
+    "train:224976",
+    "train:229912",
+    "train:240925",
+    "train:241395",
+    "train:243758",
+    "train:245348",
+    "train:246205",
+    "train:249999",
+    "valid:250900",
+    "valid:252096",
+    "test:256032"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 37,
+   "members": [
+    "train:15750",
+    "train:16907",
+    "train:24662",
+    "train:25274",
+    "train:25661",
+    "train:28477",
+    "train:35810",
+    "train:48101",
+    "train:48260",
+    "train:49906",
+    "train:52187",
+    "train:54379",
+    "train:54454",
+    "train:64119",
+    "train:125393",
+    "train:133416",
+    "train:139327",
+    "train:141555",
+    "train:146497",
+    "train:153332",
+    "train:156217",
+    "train:160115",
+    "train:163488",
+    "train:165586",
+    "train:182671",
+    "train:185919",
+    "train:186970",
+    "train:192553",
+    "train:205357",
+    "train:209656",
+    "train:234695",
+    "train:235275",
+    "train:236478",
+    "train:238831",
+    "valid:250955",
+    "valid:251446",
+    "test:259247"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 32,
+   "members": [
+    "train:27699",
+    "train:45884",
+    "train:47495",
+    "train:49192",
+    "train:51956",
+    "train:54109",
+    "train:58047",
+    "train:64143",
+    "train:68224",
+    "train:72395",
+    "train:75447",
+    "train:81614",
+    "train:84045",
+    "train:89191",
+    "train:105211",
+    "train:109277",
+    "train:112048",
+    "train:116872",
+    "train:135706",
+    "train:151479",
+    "train:166170",
+    "train:172640",
+    "train:173443",
+    "train:176673",
+    "train:192617",
+    "train:193343",
+    "train:196525",
+    "train:198738",
+    "train:215905",
+    "train:241748",
+    "train:245872",
+    "valid:253019"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 32,
+   "members": [
+    "train:5097",
+    "train:5696",
+    "train:30057",
+    "train:30571",
+    "train:31015",
+    "train:33390",
+    "train:35537",
+    "train:38204",
+    "train:38604",
+    "train:59850",
+    "train:77149",
+    "train:87084",
+    "train:88915",
+    "train:90693",
+    "train:93914",
+    "train:104703",
+    "train:124529",
+    "train:131705",
+    "train:144829",
+    "train:151170",
+    "train:169716",
+    "train:181595",
+    "train:188472",
+    "train:189340",
+    "train:198864",
+    "train:199910",
+    "train:202005",
+    "train:218425",
+    "train:220747",
+    "train:223796",
+    "train:237335",
+    "train:240241"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 30,
+   "members": [
+    "train:5882",
+    "train:21753",
+    "train:25059",
+    "train:33961",
+    "train:40659",
+    "train:55434",
+    "train:64622",
+    "train:65009",
+    "train:66734",
+    "train:72836",
+    "train:77553",
+    "train:81431",
+    "train:93706",
+    "train:103994",
+    "train:128634",
+    "train:135517",
+    "train:152212",
+    "train:154870",
+    "train:156976",
+    "train:157624",
+    "train:158252",
+    "train:165921",
+    "train:168253",
+    "train:168287",
+    "train:168745",
+    "train:183932",
+    "train:198404",
+    "train:198989",
+    "train:237649",
+    "train:241810"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 30,
+   "members": [
+    "train:2882",
+    "train:33999",
+    "train:34793",
+    "train:45023",
+    "train:46285",
+    "train:61477",
+    "train:73946",
+    "train:77850",
+    "train:84046",
+    "train:85042",
+    "train:90731",
+    "train:93507",
+    "train:107503",
+    "train:111518",
+    "train:111991",
+    "train:126516",
+    "train:126958",
+    "train:131295",
+    "train:135676",
+    "train:158839",
+    "train:165237",
+    "train:174930",
+    "train:177715",
+    "train:181446",
+    "train:186226",
+    "train:198382",
+    "train:207257",
+    "train:208631",
+    "train:248174",
+    "test:257379"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 28,
+   "members": [
+    "train:160",
+    "train:11531",
+    "train:31211",
+    "train:39914",
+    "train:52091",
+    "train:62243",
+    "train:63077",
+    "train:68292",
+    "train:78170",
+    "train:78545",
+    "train:95462",
+    "train:100531",
+    "train:109725",
+    "train:111505",
+    "train:113277",
+    "train:124083",
+    "train:126335",
+    "train:126495",
+    "train:149722",
+    "train:152565",
+    "train:160785",
+    "train:161839",
+    "train:202192",
+    "train:207034",
+    "train:208855",
+    "train:219404",
+    "train:230421",
+    "test:256023"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 27,
+   "members": [
+    "train:6120",
+    "train:7954",
+    "train:30075",
+    "train:34651",
+    "train:44699",
+    "train:72068",
+    "train:79315",
+    "train:83723",
+    "train:92157",
+    "train:106409",
+    "train:128994",
+    "train:130765",
+    "train:137642",
+    "train:140037",
+    "train:170741",
+    "train:173994",
+    "train:189744",
+    "train:206699",
+    "train:209739",
+    "train:218339",
+    "train:220381",
+    "train:225540",
+    "train:226134",
+    "train:241670",
+    "train:244081",
+    "train:249570",
+    "test:256996"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 27,
+   "members": [
+    "train:6020",
+    "train:21796",
+    "train:26921",
+    "train:38477",
+    "train:45376",
+    "train:50167",
+    "train:50966",
+    "train:51885",
+    "train:55774",
+    "train:60554",
+    "train:78626",
+    "train:85757",
+    "train:87626",
+    "train:88780",
+    "train:103756",
+    "train:110616",
+    "train:113374",
+    "train:153135",
+    "train:153489",
+    "train:161112",
+    "train:161243",
+    "train:170396",
+    "train:184464",
+    "train:188476",
+    "train:205160",
+    "train:223347",
+    "train:249813"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 26,
+   "members": [
+    "train:15456",
+    "train:33009",
+    "train:56988",
+    "train:62529",
+    "train:80358",
+    "train:88440",
+    "train:92548",
+    "train:95776",
+    "train:99853",
+    "train:107868",
+    "train:121689",
+    "train:133501",
+    "train:133959",
+    "train:142292",
+    "train:143998",
+    "train:147453",
+    "train:164598",
+    "train:173927",
+    "train:194625",
+    "train:197837",
+    "train:198812",
+    "train:206391",
+    "train:208257",
+    "train:221864",
+    "train:224109",
+    "test:257293"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 25,
+   "members": [
+    "train:12242",
+    "train:12757",
+    "train:15742",
+    "train:21675",
+    "train:23155",
+    "train:48264",
+    "train:51045",
+    "train:63786",
+    "train:70476",
+    "train:72756",
+    "train:81890",
+    "train:90645",
+    "train:93862",
+    "train:110283",
+    "train:128553",
+    "train:160193",
+    "train:173471",
+    "train:187156",
+    "train:190101",
+    "train:207422",
+    "train:208424",
+    "train:225228",
+    "train:226224",
+    "train:230583",
+    "train:235561"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 24,
+   "members": [
+    "train:16895",
+    "train:18048",
+    "train:27830",
+    "train:33675",
+    "train:42423",
+    "train:50654",
+    "train:64085",
+    "train:74543",
+    "train:81272",
+    "train:85904",
+    "train:94636",
+    "train:100003",
+    "train:102221",
+    "train:108775",
+    "train:131812",
+    "train:132988",
+    "train:151783",
+    "train:168569",
+    "train:174340",
+    "train:197251",
+    "train:207614",
+    "train:243055",
+    "train:243344",
+    "valid:253946"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 24,
+   "members": [
+    "train:2490",
+    "train:17486",
+    "train:18804",
+    "train:39217",
+    "train:42157",
+    "train:51418",
+    "train:56683",
+    "train:70098",
+    "train:95056",
+    "train:96973",
+    "train:97145",
+    "train:103219",
+    "train:110074",
+    "train:137512",
+    "train:145111",
+    "train:148070",
+    "train:154596",
+    "train:162496",
+    "train:180087",
+    "train:214766",
+    "train:222861",
+    "train:233247",
+    "valid:254161",
+    "test:257266"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 23,
+   "members": [
+    "train:1204",
+    "train:15243",
+    "train:33907",
+    "train:46628",
+    "train:60959",
+    "train:62424",
+    "train:62877",
+    "train:85732",
+    "train:87670",
+    "train:92990",
+    "train:119618",
+    "train:122044",
+    "train:178790",
+    "train:183245",
+    "train:185751",
+    "train:186472",
+    "train:212538",
+    "train:221433",
+    "train:231105",
+    "train:235593",
+    "train:240904",
+    "train:244787",
+    "test:257475"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 21,
+   "members": [
+    "train:1228",
+    "train:9720",
+    "train:9944",
+    "train:43998",
+    "train:59419",
+    "train:86321",
+    "train:90011",
+    "train:122079",
+    "train:136001",
+    "train:158449",
+    "train:169248",
+    "train:175653",
+    "train:179709",
+    "train:188920",
+    "train:193201",
+    "train:208488",
+    "train:219874",
+    "train:224399",
+    "train:230171",
+    "train:240301",
+    "train:248662"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 21,
+   "members": [
+    "train:9981",
+    "train:11483",
+    "train:35621",
+    "train:37551",
+    "train:88563",
+    "train:91929",
+    "train:97111",
+    "train:114333",
+    "train:148401",
+    "train:149779",
+    "train:187747",
+    "train:194967",
+    "train:205274",
+    "train:215347",
+    "train:226472",
+    "train:226899",
+    "train:232514",
+    "train:236684",
+    "train:238307",
+    "train:244033",
+    "train:246407"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 19,
+   "members": [
+    "train:6713",
+    "train:14791",
+    "train:43562",
+    "train:68783",
+    "train:104111",
+    "train:109388",
+    "train:121289",
+    "train:123743",
+    "train:128062",
+    "train:152805",
+    "train:190298",
+    "train:196581",
+    "train:207623",
+    "train:212415",
+    "train:226548",
+    "train:229705",
+    "train:240296",
+    "train:240573",
+    "test:259889"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 18,
+   "members": [
+    "train:10707",
+    "train:19533",
+    "train:26799",
+    "train:41643",
+    "train:63394",
+    "train:77318",
+    "train:101424",
+    "train:109993",
+    "train:117210",
+    "train:124291",
+    "train:136424",
+    "train:147752",
+    "train:196384",
+    "train:197288",
+    "train:240645",
+    "train:244497",
+    "valid:251025",
+    "test:257045"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 17,
+   "members": [
+    "train:696",
+    "train:29775",
+    "train:36456",
+    "train:55199",
+    "train:63312",
+    "train:72345",
+    "train:103315",
+    "train:119602",
+    "train:129178",
+    "train:151265",
+    "train:172632",
+    "train:178016",
+    "train:202471",
+    "train:202902",
+    "train:215842",
+    "train:222784",
+    "valid:254727"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 17,
+   "members": [
+    "train:6090",
+    "train:13116",
+    "train:21220",
+    "train:36134",
+    "train:39163",
+    "train:46907",
+    "train:66110",
+    "train:87032",
+    "train:93854",
+    "train:122797",
+    "train:123301",
+    "train:134610",
+    "train:145826",
+    "train:201128",
+    "train:203005",
+    "train:210054",
+    "train:228054"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 17,
+   "members": [
+    "train:8956",
+    "train:10691",
+    "train:19855",
+    "train:31078",
+    "train:48385",
+    "train:53498",
+    "train:124119",
+    "train:132168",
+    "train:157517",
+    "train:179318",
+    "train:193043",
+    "train:224695",
+    "train:240393",
+    "train:247320",
+    "valid:250398",
+    "valid:252182",
+    "test:257801"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 16,
+   "members": [
+    "train:30341",
+    "train:42891",
+    "train:44054",
+    "train:61881",
+    "train:72706",
+    "train:73426",
+    "train:99243",
+    "train:104723",
+    "train:123511",
+    "train:127964",
+    "train:150450",
+    "train:163201",
+    "train:214744",
+    "train:222506",
+    "train:227526",
+    "train:233399"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 16,
+   "members": [
+    "train:6080",
+    "train:10915",
+    "train:19213",
+    "train:36974",
+    "train:39428",
+    "train:90888",
+    "train:120128",
+    "train:120551",
+    "train:131419",
+    "train:150536",
+    "train:183074",
+    "train:195614",
+    "train:203025",
+    "train:206638",
+    "train:237247",
+    "valid:251515"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 15,
+   "members": [
+    "train:5331",
+    "train:6110",
+    "train:59413",
+    "train:80034",
+    "train:110574",
+    "train:116530",
+    "train:148669",
+    "train:168909",
+    "train:190859",
+    "train:205034",
+    "train:208646",
+    "train:210157",
+    "train:217767",
+    "train:228376",
+    "test:255317"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 15,
+   "members": [
+    "train:32935",
+    "train:41207",
+    "train:48880",
+    "train:66661",
+    "train:73974",
+    "train:95904",
+    "train:115674",
+    "train:118766",
+    "train:151272",
+    "train:158200",
+    "train:206488",
+    "train:206914",
+    "train:232084",
+    "train:239826",
+    "train:249748"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 14,
+   "members": [
+    "train:28591",
+    "train:63003",
+    "train:80331",
+    "train:96114",
+    "train:98571",
+    "train:102201",
+    "train:143429",
+    "train:163576",
+    "train:164368",
+    "train:168776",
+    "train:174416",
+    "train:185014",
+    "train:207249",
+    "train:243291"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 12,
+   "members": [
+    "train:30889",
+    "train:58628",
+    "train:59081",
+    "train:60629",
+    "train:65933",
+    "train:83647",
+    "train:139145",
+    "train:143662",
+    "train:188468",
+    "train:188981",
+    "train:205225",
+    "test:256833"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 12,
+   "members": [
+    "train:44768",
+    "train:51777",
+    "train:79269",
+    "train:83872",
+    "train:112569",
+    "train:114927",
+    "train:154037",
+    "train:181717",
+    "train:190064",
+    "train:196314",
+    "train:214572",
+    "train:248283"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 12,
+   "members": [
+    "train:37502",
+    "train:46686",
+    "train:55755",
+    "train:70789",
+    "train:72891",
+    "train:82994",
+    "train:115939",
+    "train:140167",
+    "train:179581",
+    "train:215168",
+    "train:217945",
+    "train:246395"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 12,
+   "members": [
+    "train:4280",
+    "train:8432",
+    "train:35214",
+    "train:40267",
+    "train:89082",
+    "train:109582",
+    "train:120945",
+    "train:125632",
+    "train:184618",
+    "train:235016",
+    "train:241827",
+    "train:241855"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 12,
+   "members": [
+    "train:20461",
+    "train:59642",
+    "train:64947",
+    "train:117075",
+    "train:145564",
+    "train:147562",
+    "train:163801",
+    "train:198708",
+    "train:204366",
+    "train:243289",
+    "train:249485",
+    "test:255634"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 12,
+   "members": [
+    "train:6822",
+    "train:24721",
+    "train:39921",
+    "train:46637",
+    "train:53893",
+    "train:65362",
+    "train:111886",
+    "train:132764",
+    "train:170056",
+    "train:199861",
+    "train:200456",
+    "train:229551"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 12,
+   "members": [
+    "train:27186",
+    "train:42562",
+    "train:82672",
+    "train:95666",
+    "train:129163",
+    "train:140640",
+    "train:143049",
+    "train:177304",
+    "train:213263",
+    "train:226742",
+    "train:232899",
+    "train:238695"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 11,
+   "members": [
+    "train:27823",
+    "train:35040",
+    "train:100976",
+    "train:126221",
+    "train:138099",
+    "train:164152",
+    "train:165376",
+    "train:183768",
+    "train:187838",
+    "train:216633",
+    "test:256689"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 11,
+   "members": [
+    "train:28574",
+    "train:36866",
+    "train:60417",
+    "train:65439",
+    "train:89245",
+    "train:101714",
+    "train:110550",
+    "train:114732",
+    "train:212851",
+    "train:233617",
+    "train:249617"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 10,
+   "members": [
+    "train:12751",
+    "train:20576",
+    "train:45385",
+    "train:76518",
+    "train:121142",
+    "train:194287",
+    "train:206617",
+    "train:221578",
+    "train:227612",
+    "train:245032"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 10,
+   "members": [
+    "train:3993",
+    "train:21780",
+    "train:36745",
+    "train:118930",
+    "train:143827",
+    "train:150757",
+    "train:172550",
+    "train:222563",
+    "train:228739",
+    "train:234318"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 10,
+   "members": [
+    "train:4366",
+    "train:21415",
+    "train:50104",
+    "train:73252",
+    "train:109267",
+    "train:155058",
+    "train:159699",
+    "train:176053",
+    "train:199070",
+    "train:211684"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 10,
+   "members": [
+    "train:10121",
+    "train:17084",
+    "train:39492",
+    "train:47818",
+    "train:61560",
+    "train:88322",
+    "train:145087",
+    "train:206395",
+    "train:215097",
+    "train:239403"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 9,
+   "members": [
+    "train:40667",
+    "train:53193",
+    "train:84934",
+    "train:88680",
+    "train:96630",
+    "train:112036",
+    "train:177053",
+    "train:192968",
+    "train:243871"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 9,
+   "members": [
+    "train:17783",
+    "train:51773",
+    "train:94255",
+    "train:96652",
+    "train:110782",
+    "train:115970",
+    "train:121973",
+    "train:154777",
+    "train:207068"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 9,
+   "members": [
+    "train:26133",
+    "train:44359",
+    "train:62608",
+    "train:82953",
+    "train:113196",
+    "train:114302",
+    "train:141633",
+    "train:213104",
+    "train:249027"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 9,
+   "members": [
+    "train:8182",
+    "train:14865",
+    "train:74957",
+    "train:90278",
+    "train:139435",
+    "train:175111",
+    "train:211782",
+    "train:219644",
+    "train:235966"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 9,
+   "members": [
+    "train:15291",
+    "train:18127",
+    "train:75180",
+    "train:86868",
+    "train:97232",
+    "train:155647",
+    "train:157931",
+    "train:185051",
+    "train:193111"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 8,
+   "members": [
+    "train:29712",
+    "train:51049",
+    "train:70533",
+    "train:95867",
+    "train:126614",
+    "train:142797",
+    "train:166904",
+    "train:200449"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 8,
+   "members": [
+    "train:80757",
+    "train:111532",
+    "train:120384",
+    "train:120839",
+    "train:125812",
+    "train:188725",
+    "train:200022",
+    "train:207076"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 8,
+   "members": [
+    "train:40401",
+    "train:63897",
+    "train:90112",
+    "train:115908",
+    "train:160169",
+    "train:200220",
+    "train:240566",
+    "test:259182"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 8,
+   "members": [
+    "train:37632",
+    "train:44574",
+    "train:48228",
+    "train:58561",
+    "train:73265",
+    "train:83013",
+    "train:136515",
+    "train:151730"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 8,
+   "members": [
+    "train:19076",
+    "train:23513",
+    "train:46368",
+    "train:72624",
+    "train:93339",
+    "train:117849",
+    "train:144458",
+    "train:232314"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 8,
+   "members": [
+    "train:99646",
+    "train:155306",
+    "train:179237",
+    "train:182893",
+    "train:207365",
+    "train:232906",
+    "train:236842",
+    "valid:253134"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 8,
+   "members": [
+    "train:3776",
+    "train:9139",
+    "train:86421",
+    "train:94788",
+    "train:101900",
+    "train:128321",
+    "train:232485",
+    "test:257785"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 8,
+   "members": [
+    "train:13827",
+    "train:34014",
+    "train:47654",
+    "train:71263",
+    "train:136637",
+    "train:186857",
+    "test:258367",
+    "test:258441"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 8,
+   "members": [
+    "train:94415",
+    "train:158228",
+    "train:164919",
+    "train:195753",
+    "train:215891",
+    "train:219823",
+    "train:230839",
+    "train:245863"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 8,
+   "members": [
+    "train:36353",
+    "train:39789",
+    "train:44511",
+    "train:74374",
+    "train:107042",
+    "train:130348",
+    "train:181847",
+    "train:215556"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 8,
+   "members": [
+    "train:33098",
+    "train:39755",
+    "train:83237",
+    "train:89659",
+    "train:118838",
+    "train:146818",
+    "train:167910",
+    "train:235624"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 8,
+   "members": [
+    "train:377",
+    "train:7285",
+    "train:44011",
+    "train:118936",
+    "train:145725",
+    "train:182103",
+    "train:195666",
+    "train:249163"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 8,
+   "members": [
+    "train:1124",
+    "train:11566",
+    "train:41559",
+    "train:111293",
+    "train:128481",
+    "train:139919",
+    "train:205612",
+    "train:208224"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 8,
+   "members": [
+    "train:26270",
+    "train:29000",
+    "train:87410",
+    "train:111874",
+    "train:147007",
+    "train:169004",
+    "train:191858",
+    "train:220347"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 8,
+   "members": [
+    "train:4174",
+    "train:28006",
+    "train:72937",
+    "train:144658",
+    "train:144959",
+    "train:209690",
+    "train:229336",
+    "train:239922"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 7,
+   "members": [
+    "train:13912",
+    "train:33871",
+    "train:37315",
+    "train:65495",
+    "train:80609",
+    "train:92762",
+    "train:143697"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 7,
+   "members": [
+    "train:86966",
+    "train:110483",
+    "train:143534",
+    "train:152428",
+    "train:192541",
+    "train:206628",
+    "train:208398"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 7,
+   "members": [
+    "train:3941",
+    "train:47680",
+    "train:76529",
+    "train:100171",
+    "train:176714",
+    "train:200146",
+    "test:259189"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 7,
+   "members": [
+    "train:13660",
+    "train:32898",
+    "train:33349",
+    "train:108393",
+    "train:203080",
+    "train:211186",
+    "train:218839"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 7,
+   "members": [
+    "train:16705",
+    "train:75378",
+    "train:82693",
+    "train:97761",
+    "train:100615",
+    "train:103781",
+    "train:231305"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 7,
+   "members": [
+    "train:13456",
+    "train:39409",
+    "train:53579",
+    "train:70078",
+    "train:124831",
+    "train:134917",
+    "train:140588"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 7,
+   "members": [
+    "train:11678",
+    "train:80177",
+    "train:96317",
+    "train:145701",
+    "train:148710",
+    "train:150452",
+    "train:183077"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 7,
+   "members": [
+    "train:41325",
+    "train:86825",
+    "train:97311",
+    "train:122820",
+    "train:180407",
+    "train:238981",
+    "valid:254228"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 7,
+   "members": [
+    "train:2795",
+    "train:13850",
+    "train:88439",
+    "train:102510",
+    "train:178406",
+    "train:222011",
+    "train:243065"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 7,
+   "members": [
+    "train:31671",
+    "train:43220",
+    "train:45989",
+    "train:48914",
+    "train:75948",
+    "train:147183",
+    "train:183830"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 7,
+   "members": [
+    "train:9819",
+    "train:36718",
+    "train:65678",
+    "train:132138",
+    "train:221124",
+    "train:223955",
+    "train:244480"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 6,
+   "members": [
+    "train:2862",
+    "train:30614",
+    "train:34448",
+    "train:84145",
+    "train:150700",
+    "train:202640"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 6,
+   "members": [
+    "train:10436",
+    "train:19053",
+    "train:91613",
+    "train:129144",
+    "train:206930",
+    "train:243313"
+   ],
+   "indicator_hits": [
+    "base-breitbart"
+   ],
+   "any_indicator": true
+  },
+  {
+   "size": 6,
+   "members": [
+    "train:48900",
+    "train:106998",
+    "train:146038",
+    "train:147294",
+    "train:228487",
+    "train:249800"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 6,
+   "members": [
+    "train:11914",
+    "train:68754",
+    "train:142003",
+    "train:227524",
+    "train:228884",
+    "train:244116"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 6,
+   "members": [
+    "train:22504",
+    "train:44805",
+    "train:56132",
+    "train:149280",
+    "train:163180",
+    "train:184376"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 6,
+   "members": [
+    "train:24730",
+    "train:29343",
+    "train:58775",
+    "train:116167",
+    "train:160847",
+    "train:197471"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 6,
+   "members": [
+    "train:110370",
+    "train:111736",
+    "train:128251",
+    "train:211691",
+    "train:216878",
+    "train:224394"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 6,
+   "members": [
+    "train:73814",
+    "train:127797",
+    "train:182690",
+    "train:200079",
+    "train:235439",
+    "test:257805"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 6,
+   "members": [
+    "train:52412",
+    "train:109299",
+    "train:114490",
+    "train:146975",
+    "train:170718",
+    "train:244841"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 6,
+   "members": [
+    "train:7739",
+    "train:45388",
+    "train:145434",
+    "train:166772",
+    "train:198595",
+    "train:232208"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 6,
+   "members": [
+    "train:22368",
+    "train:72146",
+    "train:98126",
+    "train:146869",
+    "train:205959",
+    "train:233442"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 6,
+   "members": [
+    "train:24821",
+    "train:51555",
+    "train:136447",
+    "train:170810",
+    "train:232335",
+    "train:247787"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 6,
+   "members": [
+    "train:41992",
+    "train:103271",
+    "train:139330",
+    "train:194569",
+    "train:211257",
+    "test:257621"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:1344",
+    "train:24557",
+    "train:48954",
+    "train:163165",
+    "train:192418"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:27920",
+    "train:105911",
+    "train:118744",
+    "train:190767",
+    "train:236353"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:52382",
+    "train:135406",
+    "train:145252",
+    "train:157872",
+    "train:246119"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:615",
+    "train:112269",
+    "train:162971",
+    "train:202459",
+    "train:239269"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:73697",
+    "train:104542",
+    "train:149104",
+    "train:164419",
+    "train:221214"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:12168",
+    "train:27301",
+    "train:31314",
+    "train:120732",
+    "train:172999"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:165895",
+    "train:172476",
+    "train:187932",
+    "train:223308",
+    "train:244189"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:95726",
+    "train:137167",
+    "train:184574",
+    "train:199221",
+    "test:255557"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:18938",
+    "train:56637",
+    "train:110317",
+    "train:213405",
+    "train:248983"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:30787",
+    "train:43983",
+    "train:144540",
+    "train:144974",
+    "train:170424"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:20957",
+    "train:105826",
+    "train:183302",
+    "train:207846",
+    "train:247866"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:24648",
+    "train:73708",
+    "train:79416",
+    "train:136593",
+    "valid:253129"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:37660",
+    "train:115252",
+    "train:166036",
+    "train:185398",
+    "train:229882"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:2933",
+    "train:58545",
+    "train:96465",
+    "train:112092",
+    "train:139020"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:43608",
+    "train:120370",
+    "train:204747",
+    "train:206573",
+    "train:230660"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:158182",
+    "train:207983",
+    "train:226814",
+    "train:228544",
+    "train:241092"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:40043",
+    "train:80216",
+    "train:148302",
+    "train:201574",
+    "train:222110"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:820",
+    "train:126841",
+    "train:174091",
+    "train:174462",
+    "valid:254151"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:23939",
+    "train:27968",
+    "train:35069",
+    "train:40126",
+    "train:196169"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:95836",
+    "train:181294",
+    "train:200513",
+    "train:208492",
+    "train:233292"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:146754",
+    "train:175091",
+    "train:197409",
+    "train:206118",
+    "train:217265"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:37774",
+    "train:106907",
+    "train:134200",
+    "train:168998",
+    "train:214627"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:97833",
+    "train:128482",
+    "train:171525",
+    "train:188165",
+    "train:206875"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:61287",
+    "train:79963",
+    "train:94148",
+    "train:141376",
+    "train:205666"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:26224",
+    "train:36701",
+    "train:55415",
+    "train:81900",
+    "train:156059"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:28896",
+    "train:39834",
+    "train:114218",
+    "train:157530",
+    "train:165939"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:80865",
+    "train:102409",
+    "train:201809",
+    "train:206521",
+    "train:230932"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:14589",
+    "train:22375",
+    "train:107266",
+    "train:141620",
+    "train:183629"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:52615",
+    "train:122260",
+    "train:177768",
+    "train:182566",
+    "train:187210"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:26068",
+    "train:69952",
+    "train:97963",
+    "train:132441",
+    "train:132675"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:124414",
+    "train:166434",
+    "train:168985",
+    "train:175955",
+    "train:223277"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:25969",
+    "train:103947",
+    "train:119181",
+    "train:187927",
+    "train:249620"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:12516",
+    "train:153272",
+    "train:200829",
+    "train:202042",
+    "train:218688"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 5,
+   "members": [
+    "train:53225",
+    "train:58349",
+    "train:121717",
+    "train:164672",
+    "train:248165"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:82117",
+    "train:87755",
+    "train:201154",
+    "train:217955"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:36201",
+    "train:52207",
+    "train:52641",
+    "train:240426"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:19993",
+    "train:21106",
+    "train:70523",
+    "train:124846"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:79490",
+    "train:129618",
+    "train:230121",
+    "test:256813"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:39415",
+    "train:60256",
+    "train:84481",
+    "train:239213"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:36510",
+    "train:51334",
+    "train:147340",
+    "train:152162"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:547",
+    "train:63347",
+    "train:86618",
+    "train:127052"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:26818",
+    "train:113999",
+    "train:146954",
+    "train:199131"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:11371",
+    "train:19515",
+    "train:28611",
+    "train:242481"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:69225",
+    "train:148873",
+    "train:172974",
+    "train:197664"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:32730",
+    "train:100662",
+    "train:219569",
+    "valid:253896"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:21128",
+    "train:75844",
+    "train:146665",
+    "train:182353"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:2248",
+    "train:15692",
+    "train:65143",
+    "train:71359"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:75286",
+    "train:122050",
+    "train:122567",
+    "train:181290"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:68283",
+    "train:138371",
+    "train:230330",
+    "valid:250588"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:94932",
+    "train:99956",
+    "train:202632",
+    "test:259783"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:53526",
+    "train:70904",
+    "train:140597",
+    "train:141898"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:55817",
+    "train:73054",
+    "train:123094",
+    "train:179731"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:129292",
+    "train:162015",
+    "train:227907",
+    "train:244244"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:68759",
+    "train:130473",
+    "train:157214",
+    "train:159536"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:3248",
+    "train:131193",
+    "train:205646",
+    "train:231455"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:402",
+    "train:149296",
+    "train:155467",
+    "train:203799"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:31122",
+    "train:36839",
+    "train:110734",
+    "train:114987"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:2594",
+    "train:35232",
+    "train:118386",
+    "train:228716"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:51429",
+    "train:62195",
+    "train:180432",
+    "train:185215"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:58900",
+    "train:106799",
+    "train:155340",
+    "train:162269"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:30765",
+    "train:47691",
+    "train:185131",
+    "train:229620"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:38539",
+    "train:52077",
+    "train:53287",
+    "train:211821"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:114551",
+    "train:125149",
+    "train:212805",
+    "train:245408"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:8622",
+    "train:118827",
+    "train:195270",
+    "train:224341"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:51388",
+    "train:172176",
+    "train:195486",
+    "train:249962"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:7950",
+    "train:204012",
+    "train:204438",
+    "train:207455"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:44408",
+    "train:105904",
+    "train:132235",
+    "train:191854"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:101270",
+    "train:188273",
+    "train:223592",
+    "train:234180"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:34709",
+    "train:93956",
+    "train:162672",
+    "train:248122"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:14319",
+    "train:19151",
+    "train:31385",
+    "train:56614"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:158313",
+    "train:237407",
+    "train:244260",
+    "valid:252759"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:87834",
+    "train:95368",
+    "train:228369",
+    "valid:250654"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:33576",
+    "train:62067",
+    "train:191775",
+    "train:202090"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:648",
+    "train:19913",
+    "train:70548",
+    "train:174866"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:191312",
+    "train:212321",
+    "train:228656",
+    "train:241235"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:7082",
+    "train:186836",
+    "train:237148",
+    "test:255780"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:20282",
+    "train:105500",
+    "train:144129",
+    "test:259291"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:58946",
+    "train:63368",
+    "train:109331",
+    "train:193134"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:46415",
+    "train:110436",
+    "train:213313",
+    "valid:250362"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:130549",
+    "train:167801",
+    "train:195663",
+    "train:197141"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:156828",
+    "train:209513",
+    "train:245218",
+    "train:249067"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:71849",
+    "train:100649",
+    "train:126648",
+    "train:193284"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 4,
+   "members": [
+    "train:12119",
+    "train:61064",
+    "train:179529",
+    "valid:254618"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:19092",
+    "train:29181",
+    "train:139652"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:45069",
+    "train:188957",
+    "train:230890"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:65611",
+    "train:175377",
+    "train:184369"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:38071",
+    "train:41237",
+    "train:139437"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:192872",
+    "train:209434",
+    "train:248050"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:81941",
+    "train:215929",
+    "train:217801"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:24541",
+    "train:140878",
+    "train:206877"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:23522",
+    "train:109696",
+    "train:231736"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:104445",
+    "train:163282",
+    "train:195683"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:164778",
+    "train:189068",
+    "valid:253903"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:70949",
+    "train:170543",
+    "train:222753"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:117781",
+    "train:118695",
+    "train:211187"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:40307",
+    "train:223439",
+    "test:259241"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:1378",
+    "train:137759",
+    "train:151509"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:134096",
+    "train:140711",
+    "train:174069"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:95639",
+    "train:108688",
+    "train:189750"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:12734",
+    "train:144002",
+    "train:215354"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:113592",
+    "train:242160",
+    "test:258020"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:59123",
+    "train:59872",
+    "train:124996"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:119917",
+    "train:180048",
+    "train:223795"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:52853",
+    "train:58687",
+    "train:111276"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:23277",
+    "train:115589",
+    "valid:252131"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:75006",
+    "train:90748",
+    "train:215759"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:120636",
+    "train:176690",
+    "train:177183"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:66292",
+    "train:101275",
+    "train:131268"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:118047",
+    "train:139531",
+    "train:162533"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:95313",
+    "train:216608",
+    "train:217040"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:61851",
+    "train:153271",
+    "train:191760"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  },
+  {
+   "size": 3,
+   "members": [
+    "train:28457",
+    "train:131597",
+    "train:159989"
+   ],
+   "indicator_hits": [],
+   "any_indicator": false
+  }
+ ],
+ "runtime_seconds": 65.0
+}

@@ -1,0 +1,339 @@
+{
+ "generated_by": "09_census_anomaly.py",
+ "scope": "ALL 1,000 census domains; outliers selected before identity is consulted",
+ "fit": {
+  "form": "log(links) = a + b*log(rank)",
+  "a": 14.4417,
+  "b": -0.8563,
+  "r_squared": 0.9969,
+  "residual_sigma": 0.0473,
+  "head_truncated_fit": {
+   "a": 14.5368,
+   "b": -0.8718,
+   "residual_sigma": 0.0342,
+   "note": "refit excluding the top 20 ranks"
+  }
+ },
+ "outlier_threshold_z": 2.0,
+ "n_outliers": 2,
+ "n_outliers_head_truncated_fit": 33,
+ "n_outliers_matching_an_indicator": 1,
+ "outliers": [
+  {
+   "rank": 18,
+   "label": "imdb",
+   "links": 183080,
+   "predicted_links": 157421,
+   "residual_z": 3.19,
+   "residual_z_head_truncated_fit": 2.95,
+   "indicators": []
+  },
+  {
+   "rank": 17,
+   "label": "reuters",
+   "links": 183592,
+   "predicted_links": 165317,
+   "residual_z": 2.22,
+   "residual_z_head_truncated_fit": 1.57,
+   "indicators": [
+    {
+     "id": "base-reuters",
+     "tier": "BASE",
+     "actor": "baseline / Reuters"
+    }
+   ]
+  }
+ ],
+ "indicator_domains_in_census": [
+  {
+   "rank": 5,
+   "label": "nytimes",
+   "links": 333160,
+   "predicted_links": 471444,
+   "residual_z": -7.34,
+   "residual_z_head_truncated_fit": -12.21,
+   "indicators": [
+    {
+     "id": "base-nytimes",
+     "tier": "BASE",
+     "actor": "baseline / New York Times"
+    }
+   ]
+  },
+  {
+   "rank": 7,
+   "label": "washingtonpost",
+   "links": 315368,
+   "predicted_links": 353427,
+   "residual_z": -2.41,
+   "residual_z_head_truncated_fit": -5.23,
+   "indicators": [
+    {
+     "id": "base-washingtonpost",
+     "tier": "BASE",
+     "actor": "baseline / Washington Post"
+    }
+   ]
+  },
+  {
+   "rank": 9,
+   "label": "bbc",
+   "links": 311917,
+   "predicted_links": 284995,
+   "residual_z": 1.91,
+   "residual_z_head_truncated_fit": 0.86,
+   "indicators": [
+    {
+     "id": "base-bbc",
+     "tier": "BASE",
+     "actor": "baseline / BBC"
+    },
+    {
+     "id": "base-bbc-com",
+     "tier": "BASE",
+     "actor": "baseline / BBC"
+    }
+   ]
+  },
+  {
+   "rank": 10,
+   "label": "theguardian",
+   "links": 246303,
+   "predicted_links": 260408,
+   "residual_z": -1.18,
+   "residual_z_head_truncated_fit": -3.36,
+   "indicators": [
+    {
+     "id": "base-guardian",
+     "tier": "BASE",
+     "actor": "baseline / The Guardian"
+    }
+   ]
+  },
+  {
+   "rank": 13,
+   "label": "cnn",
+   "links": 199360,
+   "predicted_links": 208010,
+   "residual_z": -0.9,
+   "residual_z_head_truncated_fit": -2.86,
+   "indicators": [
+    {
+     "id": "base-cnn",
+     "tier": "BASE",
+     "actor": "baseline / CNN"
+    }
+   ]
+  },
+  {
+   "rank": 17,
+   "label": "reuters",
+   "links": 183592,
+   "predicted_links": 165317,
+   "residual_z": 2.22,
+   "residual_z_head_truncated_fit": 1.57,
+   "indicators": [
+    {
+     "id": "base-reuters",
+     "tier": "BASE",
+     "actor": "baseline / Reuters"
+    }
+   ]
+  },
+  {
+   "rank": 24,
+   "label": "dailymail",
+   "links": 118676,
+   "predicted_links": 123048,
+   "residual_z": -0.77,
+   "residual_z_head_truncated_fit": -2.4,
+   "indicators": [
+    {
+     "id": "base-dailymail",
+     "tier": "BASE",
+     "actor": "baseline / Daily Mail"
+    }
+   ]
+  },
+  {
+   "rank": 35,
+   "label": "foxnews",
+   "links": 79494,
+   "predicted_links": 89076,
+   "residual_z": -2.41,
+   "residual_z_head_truncated_fit": -4.5,
+   "indicators": [
+    {
+     "id": "base-foxnews",
+     "tier": "BASE",
+     "actor": "baseline / Fox News"
+    }
+   ]
+  },
+  {
+   "rank": 44,
+   "label": "breitbart",
+   "links": 71743,
+   "predicted_links": 73225,
+   "residual_z": -0.43,
+   "residual_z_head_truncated_fit": -1.66,
+   "indicators": [
+    {
+     "id": "base-breitbart",
+     "tier": "BASE",
+     "actor": "baseline / Breitbart"
+    }
+   ]
+  },
+  {
+   "rank": 92,
+   "label": "rt",
+   "links": 38575,
+   "predicted_links": 38936,
+   "residual_z": -0.2,
+   "residual_z_head_truncated_fit": -1.0,
+   "indicators": [
+    {
+     "id": "rus-state-rt",
+     "tier": "B",
+     "actor": "Russia / RT (state-funded international broadcaster)"
+    }
+   ]
+  },
+  {
+   "rank": 112,
+   "label": "aljazeera",
+   "links": 33867,
+   "predicted_links": 32900,
+   "residual_z": 0.61,
+   "residual_z_head_truncated_fit": 0.21,
+   "indicators": [
+    {
+     "id": "base-aljazeera",
+     "tier": "BASE",
+     "actor": "baseline / Al Jazeera (Qatari state-funded; deliberate comparator)"
+    }
+   ]
+  },
+  {
+   "rank": 340,
+   "label": "people",
+   "links": 12774,
+   "predicted_links": 12713,
+   "residual_z": 0.1,
+   "residual_z_head_truncated_fit": 0.01,
+   "indicators": [
+    {
+     "id": "chn-state-peoples-daily",
+     "tier": "B",
+     "actor": "China / People's Daily"
+    },
+    {
+     "id": "chn-state-peoples-daily-cn",
+     "tier": "B",
+     "actor": "China / People's Daily (en.people.cn)"
+    }
+   ]
+  },
+  {
+   "rank": 345,
+   "label": "sputniknews",
+   "links": 12611,
+   "predicted_links": 12555,
+   "residual_z": 0.09,
+   "residual_z_head_truncated_fit": 0.0,
+   "indicators": [
+    {
+     "id": "rus-state-sputniknews",
+     "tier": "B",
+     "actor": "Russia / Sputnik (Rossiya Segodnya)"
+    }
+   ]
+  },
+  {
+   "rank": 665,
+   "label": "presstv",
+   "links": 7122,
+   "predicted_links": 7157,
+   "residual_z": -0.1,
+   "residual_z_head_truncated_fit": 0.03,
+   "indicators": [
+    {
+     "id": "irn-state-presstv-ir",
+     "tier": "B",
+     "actor": "Iran / Press TV (Islamic Republic of Iran Broadcasting)"
+    },
+    {
+     "id": "irn-state-presstv-com",
+     "tier": "B",
+     "actor": "Iran / Press TV"
+    }
+   ]
+  },
+  {
+   "rank": 735,
+   "label": "globalresearch",
+   "links": 6424,
+   "predicted_links": 6569,
+   "residual_z": -0.47,
+   "residual_z_head_truncated_fit": -0.44,
+   "indicators": [
+    {
+     "id": "amp-globalresearch",
+     "tier": "C",
+     "actor": "Amplifier / Global Research (Centre for Research on Globalization, Canada)"
+    }
+   ]
+  },
+  {
+   "rank": 949,
+   "label": "telesurtv",
+   "links": 5137,
+   "predicted_links": 5278,
+   "residual_z": -0.57,
+   "residual_z_head_truncated_fit": -0.46,
+   "indicators": [
+    {
+     "id": "ven-state-telesur",
+     "tier": "B",
+     "actor": "Venezuela / Telesur (state-led regional broadcaster)"
+    }
+   ]
+  }
+ ],
+ "residual_summary": {
+  "non_baseline_indicator_z": {
+   "n": 6,
+   "values": [
+    -0.2,
+    0.1,
+    0.09,
+    -0.1,
+    -0.47,
+    -0.57
+   ],
+   "mean": -0.192
+  },
+  "baseline_indicator_z": {
+   "n": 10,
+   "values": [
+    -7.34,
+    -2.41,
+    1.91,
+    -1.18,
+    -0.9,
+    2.22,
+    -0.77,
+    -2.41,
+    -0.43,
+    0.61
+   ],
+   "mean": -1.07
+  }
+ },
+ "interpretation": [
+  "A positive residual means a domain carries more links than the corpus's own rank-frequency law predicts for its rank. It is a statement about the shape of the link distribution, NOT about vote authenticity.",
+  "Innocent causes of a positive residual are numerous and likely dominant: a domain that publishes far more articles than its neighbours, a paywall-free source that gets linked in preference to paywalled rivals, an aggregator, a site with a long archive.",
+  "Because rank and links are not independent (rank is assigned BY links), residuals from this fit are not test statistics with clean null distributions. The z-scores are descriptive distances from a fitted line, not p-values, and are deliberately not converted into one."
+ ]
+}

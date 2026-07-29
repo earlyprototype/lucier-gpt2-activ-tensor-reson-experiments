@@ -2,14 +2,22 @@
 
 **A provenance audit of GPT-2's training corpus.** 260,000 documents scanned against
 77 indicators drawn from public attributions; 605 document-indicator pairs classified;
-213 adjudicated by hand.
+213 adjudicated by hand; two source-agnostic structural tests run over the whole corpus.
 
 > **Verdict in one line.** The hypothesis as posed — that WebText contains *evidence of
 > non-western asymmetric warfare via botfarming* — is **not supported**, and one of its two
-> halves is **refuted**. What the corpus does contain is **155 documents of state-produced
-> material (5.96 per 10,000)**, arriving overwhelmingly through the *overt* broadcast arm
-> rather than the covert one, and **RT ranked 92nd of all domains in WebText** — ahead of
-> Al Jazeera. The corpus ingested state media. It did not, on this evidence, ingest a bot farm.
+> halves is **refuted**. The corpus contains **155 documents of state-produced material
+> (5.96 per 10,000; exact 95% CI 5.06–6.98)**, arriving through the *overt* broadcast arm,
+> not the covert one. Two structural tests that never consult the indicator list agree:
+> state-linked domains sit **exactly on** the corpus's own rank-frequency law, and **none of
+> the 155 documents appears in any of the 727 near-duplicate clusters** the corpus does
+> contain. WebText ingested state media through ordinary organic sharing.
+
+> **A correction to an earlier version of this document.** It reported "RT ranked 92nd,
+> ahead of Al Jazeera" as though the rank were itself striking. Fitting the corpus's
+> rank-frequency law (§5.2) shows RT sits at **z = −0.20** — within a fifth of a standard
+> deviation of exactly where a domain of its rank is predicted to be. The rank was quoted
+> without a baseline, which let it imply an anomaly that the data does not contain.
 
 ---
 
@@ -51,7 +59,7 @@ including the parts that refute the premise.
 threats to validity, and how to port the regime to another corpus — is in
 [METHODOLOGY.md](METHODOLOGY.md).*
 
-Six scripts, run in order. Raw corpus files are gitignored (692 MB); everything needed to
+Nine scripts, run in order. Raw corpus files are gitignored (692 MB); everything needed to
 audit a claim is committed.
 
 | Script | Does |
@@ -59,9 +67,17 @@ audit a claim is committed.
 | `01_fetch_corpus.py` | Fetches the corpus and census, verifies SHA-256 against pinned values |
 | `02_scan_corpus.py` | Streams 260k documents against all 77 indicators |
 | `03_classify_hits.py` | Origin-vs-mention classification; merges hand adjudications |
-| `04_near_duplicates.py` | Shingle-based near-duplicate clustering across hit documents |
+| `04_near_duplicates.py` | Near-duplicate clustering across hit documents *(superseded by `08`; see §5.1)* |
 | `05_domain_census.py` | Cross-references OpenAI's whole-corpus domain census |
-| `06_headline_stats.py` | Aggregates every figure quoted below |
+| `06_headline_stats.py` | Aggregates every count quoted below |
+| `07_statistics.py` | Exact bounds, power, intervals, recall correction, agreement |
+| `08_corpus_duplication.py` | **Source-agnostic:** duplication over all 260k documents |
+| `09_census_anomaly.py` | **Source-agnostic:** rank-frequency outliers over all 1,000 domains |
+
+**Scripts `01`–`06` are confirmatory: they can only find what the indicator list already
+names.** That is a real limitation of the design, not a detail — see §7. Scripts `08` and
+`09` were added to answer it, and let the corpus nominate its own anomalies before identity
+is consulted.
 
 **Corpus.** OpenAI's `gpt-2-output-dataset` release of original WebText: 250,000 + 5,000 +
 5,000 = **260,000 documents, 152.2M byte-pair-encoding tokens, 680 MB of text**. This is
@@ -171,7 +187,7 @@ pattern as the Strategic Culture cluster: `ORIGINALLY PUBLISHED AT RT.COM`, `Rt.
 `Contributed by RT.com of RT.com`, `Press TV original title:`. A further **25 documents**
 are third-party pieces built on state-media sourcing.
 
-### 3.3 The census result: RT is the 92nd most-linked domain in WebText
+### 3.3 Where the state outlets sit in the census
 
 The text sample can only see documents that name their own source. `domains.txt` has no such
 limitation — it covers the entire corpus. Its counts sum to 21.8M against a corpus of ~8M
@@ -192,30 +208,19 @@ documents, so it counts **links** among the ~45M scraped, not final documents.
 | globalresearch | C | 736 | 6,424 |
 | telesurtv | B | 950 | 5,137 |
 
-**RT out-ranks Al Jazeera in Reddit's outbound link graph.** Four non-western state outlets
-and one documented amplifier sit inside the top 1,000 domains of GPT-2's training corpus.
+RT out-ranks Al Jazeera in Reddit's outbound link graph. Four non-western state outlets and
+one documented amplifier sit inside the top 1,000 domains of GPT-2's training corpus. **What
+that rank does and does not imply is settled in §5.2, not here** — quoted on its own it invites
+the reader to supply a baseline the data has not yet been asked for.
 
-And yet: Tier B is **0.29%** of top-1000 links and Tier C is **0.029%**, against **8.69%**
-for the eleven baseline outlets. State media is *present and unmistakable*, and *small*.
+Tier B is **0.29%** of top-1000 links and Tier C is **0.029%**, against **8.69%** for the
+eleven baseline outlets. State media is *present and unmistakable*, and *small*.
 
 **No attributed covert asset appears anywhere in the top 1,000.** The census and the text
 scan agree, and they are near-independent measurements — one covering the whole corpus by
 link, the other the sample by content.
 
-### 3.4 The coordination check returns a clean null
-
-If the same state-produced text entered WebText through multiple URLs, that would be
-republication doing what laundering is for, and each copy would have cleared the karma gate
-separately. Across all 578 non-baseline hit documents, using 8-word shingles and exact
-pairwise Jaccard similarity:
-
-**Zero pairs at similarity ≥ 0.50. Zero pairs even at the loosened ≥ 0.25.** No clusters.
-
-The two Neil Clark author-biography documents — the closest thing to a duplicate pair, sharing
-a verbatim biography paragraph — score **0.066**. Deduplication in the WebText pipeline may
-account for some of this; the null is reported as measured.
-
-### 3.5 The corpus talks about the war more coherently than it carries it
+### 3.4 The corpus talks about the war more coherently than it carries it
 
 Tier M markers appear in **18 documents, all 26 pairs classified as `mention`** — reporting on
 the Internet Research Agency, troll farms, and the 50 Cent Party. WebText is a corpus that
@@ -224,43 +229,230 @@ the vocabulary of people who study them closely — are all **zero**.
 
 ---
 
-## 4. What this does and does not support
+## 4. Putting bounds on the nulls
 
-**Refuted:** that WebText contains a meaningful body of *covert* influence-operation content.
-18 of 19 attributed covert domains are absent from 260,000 documents and none appears in the
-top-1,000 census. The one present asset contributes four documents by a single author.
+`07_statistics.py`. Exact methods throughout — the central results are zero-count
+observations, where the normal approximation is not merely inaccurate but degenerate: it
+returns a zero-width interval around zero.
+
+### 4.1 What "zero hits" actually bounds
+
+The study's headline is a null, and a null is worth nothing without the prevalence it
+excludes. Zero observations in 260,000 documents gives an exact (Clopper-Pearson) one-sided
+bound:
+
+| | 95% | 99% |
+|---|---|---|
+| Prevalence per document | < 1.152 × 10⁻⁵ | < 1.771 × 10⁻⁵ |
+| Per 10,000 documents | < 0.115 | < 0.177 |
+| **Implied ceiling, corpus-wide** | **~92 documents** | **~142 documents** |
+
+So each of the 18 absent covert assets contributes **at most ~92 documents to the whole
+~8-million-document corpus**, at 95% confidence. That is the sentence the first version of
+this document should have contained.
+
+Holding the family-wise error rate at 5% across all 18 domains simultaneously (Bonferroni,
+α = 0.00278) loosens the per-asset ceiling to **~181 documents** — a factor of 2, which does
+not change the conclusion.
+
+### 4.2 What the scan could have found
+
+A null is only as strong as the power behind it:
+
+| Power | Detects prevalence ≥ | ≈ corpus-wide documents |
+|---|---|---|
+| 50% | 0.027 / 10k | ~21 |
+| 80% | 0.062 / 10k | ~50 |
+| 95% | 0.115 / 10k | ~92 |
+
+A covert asset contributing **as few as ~50 documents corpus-wide** would have surfaced at
+least once here with 80% probability. The null is informative about assets of that size and
+larger, and uninformative about a handful of documents hiding in eight million.
+
+### 4.3 Intervals on what was observed
+
+| Quantity | Count | Per 10k | Exact 95% CI | Implied corpus-wide |
+|---|---|---|---|---|
+| **State-produced (all)** | 155 | 5.96 | 5.06 – 6.98 | 4,048 – 5,582 docs |
+| Russia / Sputnik | 74 | 2.85 | 2.24 – 3.57 | |
+| China / Xinhua | 42 | 1.62 | 1.16 – 2.18 | |
+| Iran / Press TV | 16 | 0.62 | 0.35 – 1.00 | |
+| Russia / RT | 9 | 0.35 | 0.16 – 0.66 | |
+
+### 4.4 Measuring the scanner instead of asserting its bias
+
+The earlier claim that "every count is a floor" was a hand-wave. It is measurable: the census
+predicts how many documents from a domain a 260k sample should hold, and the scan reports how
+many it caught. The ratio estimates recall.
+
+| Domain | Census links | Expected | Observed | Recall | p (exact) |
+|---|---|---|---|---|---|
+| rt | 38,575 | 222.9 | 9 | **0.04** | 1.1 × 10⁻⁸¹ |
+| sputniknews | 12,611 | 72.9 | 74 | **1.02** | 0.86 |
+| presstv | 7,122 | 41.1 | 16 | **0.39** | 1.5 × 10⁻⁵ |
+| globalresearch | 6,424 | 37.1 | 0 | 0.00 | 1.6 × 10⁻¹⁶ |
+| telesurtv | 5,137 | 29.7 | 0 | 0.00 | 2.6 × 10⁻¹³ |
+
+Recall ranges from **0.00 to 1.02** — pooling these would be dishonest arithmetic on wildly
+heterogeneous quantities, and the pooled figure (0.50, implying a ×2 correction to ~9,600
+documents corpus-wide) is reported in `statistics.json` **only** with that heterogeneity
+attached. The defensible reading is the qualitative one, now with numbers behind it: for RT
+the scan sees roughly 1 document in 25; for Sputnik, essentially all of them. The observed
+count remains the floor; the true figure is higher by an amount this data cannot pin down.
+
+The expectation itself assumes uniform survival from link to sampled document, which is an
+assumption and not a measurement — the census counts ~21.8M links against ~8M deduplicated
+documents.
+
+### 4.5 How much the classifier can be trusted
+
+Heuristic verdicts versus the 213 hand adjudications:
+
+| | Agreement | Cohen's κ |
+|---|---|---|
+| All adjudicated pairs | 0.441 | 0.348 |
+| **Pairs where the heuristic committed** (118) | **0.797** | **0.721** |
+
+The heuristics **abstained on 45%** of adjudicated pairs. Separating abstention from error
+matters: where the rules committed to a verdict, agreement with a human reader was
+substantial (κ = 0.72); the low overall figure is mostly the rules correctly declining to
+guess.
+
+**This is an in-sample fit, not a validation.** The heuristics were revised *after* reading
+these documents — wire-dateline, photo-credit and repost-credit patterns were added once
+adjudication revealed them. The honest use of these numbers is to show how far the rules had
+to be corrected, not to certify the 392 unadjudicated pairs.
+
+---
+
+## 5. Letting the corpus nominate its own anomalies
+
+Everything above is **confirmatory**: it can only find what `indicators.json` already names.
+It has no discovery power, cannot see an operation nobody has publicly attributed, and its
+window gap (§7) is a symptom of the same flaw. The two tests here consult no list. Both were
+run to completion **before** identity was examined.
+
+### 5.1 Duplication across all 260,000 documents
+
+`04_near_duplicates.py` compared only the 578 documents the indicator list had already
+flagged, found nothing, and reported a null — a null with **no positive control**, so
+uninterpretable. Rerunning the same question over the entire corpus (MinHash sketching,
+exact Jaccard on candidates, 45 seconds):
+
+| | |
+|---|---|
+| Documents compared | **260,000** (all of them) |
+| Pairs at Jaccard ≥ 0.25 | 30,897 |
+| Pairs at Jaccard ≥ 0.50 | 13,102 |
+| **Near-duplicate clusters** | **727** |
+| Documents inside a cluster | 2,860 (1.1% of corpus) |
+| **Clusters containing a state-produced document** | **0** |
+| Clusters touching *any* indicator | 1 — and it is `base-breitbart`, a **baseline** |
+
+**The detector works.** It finds 727 clusters: site-template furniture (identical NFL
+Draft Scout navigation pages, Jaccard = 1.00) and repeated author-bio boilerplate (the one
+indicator-touching cluster is six Colin Flaherty columns sharing a verbatim biography block).
+
+**And not one of the 155 state-produced documents is in any of them.** That is a
+qualitatively stronger statement than the original null: the corpus demonstrably contains
+detectable duplication, and the state-linked material is not part of it.
+
+### 5.2 Is anything over-represented relative to the corpus's own law?
+
+Fitting log(links) ~ log(rank) across all 1,000 census domains — no list, no identities:
+
+**log(links) = 14.442 − 0.856 × log(rank), R² = 0.9969, σ = 0.047**
+
+An extremely tight Zipf law. Positive residuals mark domains carrying more links than a
+corpus of this shape predicts for their rank. At z ≥ 2 there are **two** outliers:
+
+| Rank | Domain | Links | Predicted | z |
+|---|---|---|---|---|
+| 18 | imdb | 183,080 | 157,421 | +3.19 |
+| 17 | reuters | 183,592 | 165,317 | +2.22 |
+
+Neither is an influence operation. And every indicator domain sits essentially **on** the line:
+
+| Rank | Domain | Tier | z |
+|---|---|---|---|
+| 92 | **rt** | B | **−0.20** |
+| 345 | sputniknews | B | +0.09 |
+| 665 | presstv | B | −0.10 |
+| 735 | globalresearch | C | −0.47 |
+| 949 | telesurtv | B | −0.57 |
+
+For contrast, the **baselines** deviate far more than the state outlets do: nytimes −7.34,
+washingtonpost −2.41, foxnews −2.41, reuters +2.22.
+
+**This is the finding that corrects the headline.** RT's rank of 92 is not evidence of
+amplification — it is within a fifth of a standard deviation of exactly where the corpus's
+own link-sharing law predicts a domain at that rank should be. If RT, Sputnik or Press TV
+were being pushed into WebText by inauthentic link-sharing, the mechanism left **no trace in
+the link distribution**.
+
+Stated as strongly as the method allows and no further: rank and links are not independent
+(rank is *assigned by* links), so these residuals are descriptive distances from a fitted
+line, not test statistics with clean null distributions. They are deliberately not converted
+into p-values. A positive residual has many innocent causes — publication volume, absence of
+a paywall, archive depth.
+
+---
+
+## 6. What this does and does not support
+
+**Refuted, with a bound:** that WebText contains a meaningful body of *covert*
+influence-operation content. 18 of 19 attributed covert domains are absent from 260,000
+documents, none appears in the top-1,000 census, and each is capped at **~92 documents
+corpus-wide at 95% confidence** (~181 under family-wise correction). The scan had 80% power
+against anything contributing ~50 documents or more. The one present asset contributes four
+documents by a single author.
 
 **Not supported:** the botfarming mechanism. Not because it was tested and failed, but
 because **the released data cannot test it** — Reddit-side vote provenance was never
-published. The one text-visible proxy available, near-duplicate republication, returned a
-clean null. A 3-karma threshold is a bar a few genuine upvotes clear.
+published. Two text-visible proxies were run, and both came back negative with the detector
+demonstrably working: state-produced documents appear in **none** of the 727 near-duplicate
+clusters the corpus contains, and every state domain sits **on** the corpus's own
+rank-frequency law rather than above it. A 3-karma threshold is a bar a few genuine upvotes
+clear, and nothing in the link distribution suggests anything more than that was needed.
 
 **Supported, and worth stating plainly:** WebText ingested **non-western state media at
-measurable scale through ordinary organic sharing**. 155 documents of state-produced copy;
-RT the 92nd-ranked domain, ahead of Al Jazeera; 19 documents where state copy was laundered
-through a third-party rehost.
+measurable scale through ordinary organic sharing**. 155 documents of state-produced copy
+(95% CI 5.06–6.98 per 10,000, implying ~4,000–5,600 corpus-wide, and higher still after the
+scanner's measured recall deficit); 19 documents where state copy was laundered through a
+third-party rehost.
 
 The interesting finding is the *shape*, not the size. The covert apparatus — the part built
 to be amplified inauthentically — is essentially **absent**. The overt apparatus, which
 never needed a bot farm because it had genuine readers who genuinely posted its links, is
-**present throughout**. On this evidence WebText was not infiltrated. It was *read*.
+**present throughout**, and present in exactly the proportion an ordinary link-sharing
+process predicts. On this evidence WebText was not infiltrated. It was *read*.
 
 Whether 5.96 documents per 10,000 shifted anything in GPT-2's weights is a different
 question, and this study does not address it. It is a corpus audit, not a model probe.
 
 ---
 
-## 5. Limitations
+## 7. Limitations
 
+0. **The core design is confirmatory, and that is the deepest limitation here.** Scripts
+   `01`–`06` test a pre-specified list against the corpus. They have **no discovery power**:
+   they cannot find an operation nobody has publicly attributed, which is exactly the kind
+   most worth finding. Limitation 4 below is a symptom of this, not a separate problem.
+   Sections 5.1 and 5.2 were added to work the other way round — corpus first, identity
+   second — and are the only parts of this study capable of surfacing something unknown.
+   Two source-agnostic tests are not a complete forensic regime; a fuller one would add
+   stylometric clustering and burstiness analysis, neither of which this data supports
+   (no timestamps, no authorship).
 1. **Mechanism is out of reach.** No submitter accounts, no vote timing, no subreddit
    provenance. The central term of the hypothesis is unmeasurable from the released data.
 2. **The sample is the held-out split**, not the training split. Same pipeline, unbiased
    draw, but not the exact documents GPT-2 saw. The census covers everything and is the
    corrective.
-3. **Text capture is lossy and biased.** Most articles do not name their own domain. Sputnik
-   scored **zero** `sputniknews.com` text hits against 12,611 census links — the capture
-   came from phrase indicators instead. Real presence therefore **exceeds** every count here;
-   the state-produced figure is a **floor**, not an estimate.
+3. **Text capture is lossy and biased — now measured, §4.4.** Most articles do not name their
+   own domain. Estimated scanner recall ranges from **0.04 (RT) to 1.02 (Sputnik)**, so real
+   presence **exceeds** every count here by a domain-dependent and highly heterogeneous
+   factor. The state-produced figure is a **floor**, not an estimate, and the pooled ×2
+   correction in `statistics.json` should not be quoted without its heterogeneity.
 4. **Indicator coverage is bounded by public attribution, and by the window.** Documented
    covert Chinese English-language networks (the "Spamouflage" cluster) were reported from
    2019 — after WebText closed in December 2017. Their absence here is a scope condition,
@@ -274,10 +466,20 @@ question, and this study does not address it. It is a corpus audit, not a model 
 7. **Line 217 of `domains.txt` is malformed** in OpenAI's published file: a bare count
    (20,068) with no domain name. Recorded in `output/domain_census.json` under
    `census_anomalies`, included in link totals, attributable to nothing.
+8. **The Zipf residuals are not test statistics.** Rank is assigned *by* link count, so
+   residuals from a rank-frequency fit have no clean null distribution. They are descriptive
+   distances from a fitted line and are deliberately not converted into p-values.
+9. **The duplication sweep skips oversized sketch buckets** (>200 documents sharing a sketch
+   value) as boilerplate artefacts, and 27 documents were too short to sketch. Both are
+   recorded in `output/corpus_duplication.json`.
+10. **Duplication figures were non-reproducible in a first version** of `08`, which used
+    Python's `hash()` — salted per process, so cluster counts drifted run to run (726, then
+    722). Replaced with CRC32; two consecutive runs now agree exactly. Any duplication
+    figure predating that fix should be discarded.
 
 ---
 
-## 6. Reproducing
+## 8. Reproducing
 
 ```bash
 cd experiments/webtext_provenance
@@ -287,13 +489,22 @@ python3 03_classify_hits.py
 python3 04_near_duplicates.py
 python3 05_domain_census.py
 python3 06_headline_stats.py
-pytest ../../tests/test_webtext_provenance_scanlib.py
+python3 07_statistics.py         # exact bounds, power, intervals, recall, agreement
+python3 08_corpus_duplication.py # ~45 s, all 260k documents, needs numpy
+python3 09_census_anomaly.py     # rank-frequency fit over all 1,000 domains
+pytest ../../tests/test_webtext_provenance_scanlib.py \
+       ../../tests/test_webtext_provenance_statlib.py
 ```
+
+No new dependency: `statlib.py` implements the exact statistics in pure Python, and the
+tests cross-verify it against scipy where scipy happens to be installed (skipping if not).
+`08` uses numpy, already in `requirements.txt`.
 
 Committed outputs: `output/hits_nonbase.jsonl` (every non-baseline hit with context),
 `classified_hits.json`, `adjudications.json` (213 hand verdicts with quoted evidence),
 `scan_summary.json`, `classification_summary.json`, `domain_census.json`,
-`dup_clusters.json`, `headline_stats.json`.
+`dup_clusters.json`, `headline_stats.json`, `statistics.json`,
+`corpus_duplication.json`, `census_anomaly.json`.
 
 ### Glossary
 
@@ -306,3 +517,17 @@ Committed outputs: `output/hits_nonbase.jsonl` (every non-baseline hit with cont
 - **Karma** — Reddit's net-vote score. WebText required at least 3.
 - **Content laundering** — republishing state-origin material through an intermediary so it
   reaches audiences that would not visit the source.
+- **Clopper-Pearson bound** — an exact confidence bound on a proportion, computed from the
+  binomial distribution rather than a normal approximation. For zero observations it is the
+  only sensible choice: the normal approximation gives a zero-width interval around zero.
+- **Rule of three** — the approximation that zero events in *n* trials bounds the rate below
+  3/*n* at 95% confidence. The exact form is 1 − 0.05^(1/*n*).
+- **Cohen's κ (kappa)** — agreement between two raters, corrected for the agreement expected
+  by chance. 1.0 is perfect, 0 is chance-level.
+- **MinHash sketch** — a small set of hash values summarising a document, chosen so that two
+  documents sharing text are likely to share sketch values. Used to find candidate duplicate
+  pairs without comparing all ~34 billion pairs.
+- **Zipf / rank-frequency law** — the empirical regularity that frequency falls off as a
+  power of rank. Here, fitted to link counts to give each domain a predicted volume.
+- **Residual z-score** — how many standard deviations a domain's actual link count sits
+  above or below the fitted law. Descriptive here, not a significance test.
