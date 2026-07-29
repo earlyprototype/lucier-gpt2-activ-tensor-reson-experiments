@@ -353,9 +353,20 @@ exact Jaccard on candidates, 45 seconds):
 Draft Scout navigation pages, Jaccard = 1.00) and repeated author-bio boilerplate (the one
 indicator-touching cluster is six Colin Flaherty columns sharing a verbatim biography block).
 
-**And not one of the 155 state-produced documents is in any of them.** That is a
-qualitatively stronger statement than the original null: the corpus demonstrably contains
-detectable duplication, and the state-linked material is not part of it.
+Not one of the 155 state-produced documents is in any of them.
+
+**That last sentence carries far less than an earlier version of this document claimed.**
+It was presented here as the study's load-bearing result. It is not. Cluster membership
+across the corpus runs at 2,860/260,000 = 1.1%, so the *expected* number of state-produced
+documents in clusters was **1.7**. Observing zero happens **18% of the time by chance**
+(exact binomial, p = 0.18). The observation is consistent with the state-produced set being
+duplicated at exactly the corpus base rate, and this test cannot distinguish that from
+genuine depletion.
+
+What survives is the weaker and still worthwhile statement: the corpus contains detectable
+duplication, the detector demonstrably finds it, and the state-produced set shows **no
+enrichment** — no sign of the mass templating a content operation would leave. Ruling out
+*depletion* at this sample size is not possible; 155 documents is too few.
 
 ### 5.2 Is anything over-represented relative to the corpus's own law?
 

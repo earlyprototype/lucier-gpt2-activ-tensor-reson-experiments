@@ -224,13 +224,15 @@ def main():
         "state_produced_documents": len(produced_docs),
         "state_produced_documents_in_clusters": produced_in_clusters,
         "n_state_produced_in_clusters": len(produced_in_clusters),
-        "cluster_list_truncated_to": 200,
         "top_pairs": [
             {"a": f"{a[0]}:{a[1]}", "b": f"{b[0]}:{b[1]}", "jaccard": round(j, 3),
              "indicators_a": flagged.get(a, []), "indicators_b": flagged.get(b, [])}
             for a, b, j in scored[:60]
         ],
-        "cluster_list": cluster_out[:200],
+        # Full membership, not a truncated view. Any test of cluster
+        # membership against a null model needs every document; truncating to
+        # the largest 200 clusters would silently bias it toward big clusters.
+        "cluster_list": cluster_out,
         "runtime_seconds": round(time.time() - t0, 1),
     }
     with open(OUT / "corpus_duplication.json", "w") as f:
