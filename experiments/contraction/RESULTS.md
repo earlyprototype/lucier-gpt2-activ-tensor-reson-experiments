@@ -205,12 +205,19 @@ structured disagreement — enough for H-pos0's premise to be usable, and it hol
 iterations rather than growing. It does **not** establish that nothing structured hides below the
 arithmetic scale. No float32 measurement can. That needs the higher-precision run.
 
-**The one exception is worth keeping.** `Control_noise` sits at 2.66 ε, against 0.74–1.30 for the
-other seven — a factor of about 2.2 in the natural units, and 9× in the raw deviation, which is the
-same fact seen through a square. It is the only run above 2 ε. It is also the noise control, and the
-run with by far the largest rescale factor (10.1× amplification against 3.5×, see M5). Whether those
-are connected is not answerable from one run, but it is the one place here where something might sit
-above the floor.
+**The one exception is worth keeping, and it is the outlier on both measures.** Keeping them
+straight, since they are not the same quantity:
+
+| Measure | `Control_noise` | Other seven |
+|---|---|---|
+| RMS scale *d* | 2.66 ε | 0.74–1.30 ε |
+| Per-coordinate median | 3.38 ε | 1.69–1.90 ε |
+| Raw deviation 1 − sim | 1.01e−13 | 7.9e−15 – 2.4e−14 |
+
+Roughly a factor of two on either per-number measure — the 9× in the raw deviation is the same fact
+seen through a square, not a separate finding. It is also the noise control, and the run with by far
+the largest rescale factor (10.1× amplification against 3.5×, see M5). Whether those are connected is
+not answerable from one run, but it is the one place here where something might sit above the floor.
 
 <details>
 <summary>Secondary cross-check: a synthetic sensitivity sweep, and what it is not</summary>
@@ -517,9 +524,10 @@ arithmetic noise operates at, so no *large* structured disagreement fits in the 
 is usable on that basis. But a float32 measurement cannot show the absence of structure below float32's
 own noise, and this one does not. The higher-precision run is what would settle it.
 
-**Open, and the one loose thread in that table.** `Control_noise` sits at 2.66 ε per component, alone
-above 2 ε among the eight. It is also the noise control and has by far the largest rescale factor.
-One run; not answerable here.
+**Open, and the one loose thread.** `Control_noise` is the outlier on both measures, and they are
+different measures: RMS scale *d* = 2.66 ε against 0.74–1.30 for the other seven, and a per-coordinate
+median of 3.38 ε against 1.7–1.9. Roughly a factor of 2 either way. It is also the noise control and
+has by far the largest rescale factor. One run; not answerable here.
 
 **Not settled.** Whether pythia-410m converges at all given more iterations, or is a genuinely
 different regime. 60 iterations is not enough to tell, and extending it is a new run.
