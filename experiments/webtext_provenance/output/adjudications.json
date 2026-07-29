@@ -1,0 +1,854 @@
+{
+ "test:255585:irn-state-presstv-phrase": {
+  "note": "Earthquake liveblog quoting Press TV casualty claim.",
+  "verdict": "mention"
+ },
+ "test:255813:chn-state-xinhua-phrase": {
+  "note": "Belt-and-Road promotional article with '/Xinhua Photo' credits; likely CGTN copy carrying Xinhua material.",
+  "verdict": "wire_carriage"
+ },
+ "test:256092:chn-state-xinhua-phrase": {
+  "note": "Korea-streaming story; Xinhua referenced via Yonhap coverage.",
+  "verdict": "mention"
+ },
+ "test:256319:rus-state-rt": {
+  "note": "Blog post built on an rt.com story (Bolivia/Coca-Cola), with correction note.",
+  "verdict": "citation_amplification"
+ },
+ "test:256613:amp-globalresearch": {
+  "note": "Barry Chamish piece debunking the GlobalResearch-hosted 'CIA report'; hostile mention.",
+  "verdict": "mention"
+ },
+ "test:256613:irn-state-presstv-phrase": {
+  "note": "Press TV interview quoted inside material the document is debunking.",
+  "verdict": "mention"
+ },
+ "test:257556:chn-state-xinhua-phrase": {
+  "note": "Hong Kong/agency crime story citing Chinese reports.",
+  "verdict": "mention"
+ },
+ "test:258242:rus-state-rt": {
+  "note": "Mirror (UK tabloid) story sourcing details to RT.com.",
+  "verdict": "citation_amplification"
+ },
+ "test:259747:rus-state-sputnik-phrase": {
+  "note": "Sputnik article: '\u00a9 Sputnik / Ilya Pitalev' furniture (Assange item).",
+  "verdict": "origin"
+ },
+ "train:102028:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:102430:rus-state-rt": {
+  "note": "'state-funded RT.com claims' \u2014 distancing attribution.",
+  "verdict": "mention"
+ },
+ "train:1043:chn-state-chinadaily": {
+  "note": "China Daily byline/photo-credit furniture; the document is a China Daily article.",
+  "verdict": "origin"
+ },
+ "train:10485:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: mention.",
+  "verdict": "mention"
+ },
+ "train:105308:rus-state-rt": {
+  "note": "Reference to 'the RT.com dinner at which Mike Flynn was present'.",
+  "verdict": "mention"
+ },
+ "train:105738:chn-state-xinhua-phrase": {
+  "note": "BeiDou/GLONASS piece 'According to the Xinhua news agency' \u2014 style consistent with RT copy citing Xinhua.",
+  "verdict": "mention"
+ },
+ "train:105922:irn-state-presstv-phrase": {
+  "note": "Repost carrying the note that Press TV runs the site's Viewpoints commentaries \u2014 co-publication ecosystem.",
+  "verdict": "laundered_origin"
+ },
+ "train:106016:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: citation_amplification.",
+  "verdict": "citation_amplification"
+ },
+ "train:107372:rus-state-sputnik-phrase": {
+  "note": "Alt-media piece contesting NBC via William Binney's Radio Sputnik remarks.",
+  "verdict": "citation_amplification"
+ },
+ "train:109127:rus-state-sputnik-phrase": {
+  "note": "'According to a report by Sputnik, as covered by ISNA' \u2014 Iranian agency chain amplifying Sputnik.",
+  "verdict": "citation_amplification"
+ },
+ "train:109324:chn-state-xinhua-phrase": {
+  "note": "Xinhua photo-essay on wartime forced labour; '(Xinhua/Jiang Lin)' credit \u2014 Xinhua-produced material.",
+  "verdict": "wire_carriage"
+ },
+ "train:112645:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:112676:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:113050:rus-state-rt": {
+  "note": "Humour listicle crediting '[RT.com]' as its source.",
+  "verdict": "citation_amplification"
+ },
+ "train:113312:rus-ira-phrase-heart-of-texas": {
+  "note": "BBC report on Facebook's 126M-reach disclosure; Heart of Texas named as a Russian-operated page.",
+  "verdict": "mention"
+ },
+ "train:113845:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:114279:rus-state-sputnik-phrase": {
+  "note": "Sputnik article built on a Radio Sputnik interview (Trump biographer).",
+  "verdict": "origin"
+ },
+ "train:114874:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: mention.",
+  "verdict": "mention"
+ },
+ "train:115462:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:116892:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:117617:rus-intel-strategic-culture": {
+  "note": "Eric Zuesse essay opening 'originally posted at strategic-culture.org'; anti-NATO/Atlantic Council polemic. Strategic Culture Foundation content carried by a reposting site.",
+  "verdict": "laundered_origin"
+ },
+ "train:119681:rus-state-rt": {
+  "note": "'Rt.com reports:' followed by RT body copy (Austria EU-referendum petition).",
+  "verdict": "laundered_origin"
+ },
+ "train:119849:chn-state-xinhua-phrase": {
+  "note": "Ebola story quoting Xinhua quoting the WHO.",
+  "verdict": "mention"
+ },
+ "train:11990:rus-state-sputnik-phrase": {
+  "note": "'Sputnik had been told' \u2014 Sputnik house construction (London laundering piece).",
+  "verdict": "origin"
+ },
+ "train:120100:irn-state-presstv-phrase": {
+  "note": "'Press TV original title: ... First published February 27, 2015' \u2014 rehost of Press TV commentary.",
+  "verdict": "laundered_origin"
+ },
+ "train:12098:irn-state-presstv-phrase": {
+  "note": "'Watch the interview at Press TV' rehost of a Press TV Kevin Barrett interview (Veterans Today editor).",
+  "verdict": "laundered_origin"
+ },
+ "train:121742:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:122154:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: mention.",
+  "verdict": "mention"
+ },
+ "train:123945:chn-state-xinhua-phrase": {
+  "note": "'Xinhua contributed to this story' \u2014 Chinese state-media copy on the lawyers crackdown.",
+  "verdict": "wire_carriage"
+ },
+ "train:125655:amp-globalresearch": {
+  "note": "Search-scrape biography of Michel Chossudovsky (Global Research founder); descriptive.",
+  "verdict": "mention"
+ },
+ "train:127410:chn-state-xinhua-phrase": {
+  "note": "ecns-style Chinese state syndication; archaeologist 'told Xinhua'.",
+  "verdict": "wire_carriage"
+ },
+ "train:128118:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: mention.",
+  "verdict": "mention"
+ },
+ "train:128998:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: citation_amplification.",
+  "verdict": "citation_amplification"
+ },
+ "train:130594:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:13166:rus-state-sputnik-phrase": {
+  "note": "'\u00a9 AFP 2016/ Presidencia' Sputnik page furniture; expert 'told Sputnik'.",
+  "verdict": "origin"
+ },
+ "train:133066:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:135049:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:135975:rus-state-sputnik-phrase": {
+  "note": "Photo-pool credit '(Reuters/Aleksey Nikolsky/Sputnik/Kremlin)'.",
+  "verdict": "mention"
+ },
+ "train:136505:chn-state-xinhua-phrase": {
+  "note": "Screed citing '(Xinhua News Agency, ...)' as a reference.",
+  "verdict": "mention"
+ },
+ "train:136801:chn-state-cctv": {
+  "note": "Baidu search-results scrape; en.yp.cctv.com incidental in listing.",
+  "verdict": "mention"
+ },
+ "train:137111:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:137232:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: mention.",
+  "verdict": "mention"
+ },
+ "train:1383:chn-state-xinhua-phrase": {
+  "note": "'Source: Xinhua' footer \u2014 syndicated Xinhua sports copy.",
+  "verdict": "wire_carriage"
+ },
+ "train:138666:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:14181:rus-state-russia-today": {
+  "note": "Author bio: interviewed on Capital Account (Russia Today).",
+  "verdict": "mention"
+ },
+ "train:142298:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: origin.",
+  "verdict": "origin"
+ },
+ "train:146338:rus-state-rt": {
+  "note": "RT body copy with 'Source: https://www.rt.com/usa/...' footer.",
+  "verdict": "laundered_origin"
+ },
+ "train:146482:chn-state-xinhua-phrase": {
+  "note": "Trade story; official 'told Xinhua news'.",
+  "verdict": "mention"
+ },
+ "train:147432:rus-intel-strategic-culture": {
+  "note": "Zuesse essay, same repost header; Clinton/Saudi/ISIL wikileaks framing.",
+  "verdict": "laundered_origin"
+ },
+ "train:147792:chn-state-chinadaily": {
+  "note": "China Daily byline/photo-credit furniture; the document is a China Daily article.",
+  "verdict": "origin"
+ },
+ "train:153643:rus-state-rt": {
+  "note": "RT 'Truthseeker' episode blurb with rt.com/shows link, mirrored off-platform.",
+  "verdict": "laundered_origin"
+ },
+ "train:154341:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: citation_amplification.",
+  "verdict": "citation_amplification"
+ },
+ "train:155137:chn-state-peoples-daily": {
+  "note": "'State organs China Youth Daily and People.com.cn are both reporting' \u2014 tech-press coverage.",
+  "verdict": "mention"
+ },
+ "train:156352:prk-state-kcna": {
+  "note": "CNET-style piece on North Korea's 28 public websites; kcna.kp listed.",
+  "verdict": "mention"
+ },
+ "train:157159:irn-state-presstv-phrase": {
+  "note": "Article closing '-Press TV' credit.",
+  "verdict": "laundered_origin"
+ },
+ "train:157897:rus-state-russia-today": {
+  "note": "Reuters Google-downranking story.",
+  "verdict": "mention"
+ },
+ "train:157897:rus-state-sputnik-phrase": {
+  "note": "Reuters: Google to downrank Sputnik and Russia Today.",
+  "verdict": "mention"
+ },
+ "train:162588:rus-state-rt": {
+  "note": "'By RT' byline plus RT America where-to-watch boilerplate.",
+  "verdict": "origin"
+ },
+ "train:16432:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:164509:rus-state-russia-today": {
+  "note": "Daily Stormer post embedding 'Report by Russia Today:' video \u2014 RT content amplified on an extremist site.",
+  "verdict": "citation_amplification"
+ },
+ "train:166289:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: citation_amplification.",
+  "verdict": "citation_amplification"
+ },
+ "train:16636:chn-state-chinadaily": {
+  "note": "China Daily byline/photo-credit furniture; the document is a China Daily article.",
+  "verdict": "origin"
+ },
+ "train:166636:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:16818:rus-state-rt": {
+  "note": "Trade story sourced 'according to rt.com on Tuesday'.",
+  "verdict": "citation_amplification"
+ },
+ "train:169095:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:170491:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: mention.",
+  "verdict": "mention"
+ },
+ "train:171363:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:171840:chn-state-cctv": {
+  "note": "'Editor: Li Kun \u4e28CCTV.com' header; CCTV.com opinion article.",
+  "verdict": "origin"
+ },
+ "train:172113:rus-state-rt": {
+  "note": "Critical essay on Stephen Cohen; quotes an rt.com statistic with irony.",
+  "verdict": "mention"
+ },
+ "train:172328:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:175342:rus-state-rt": {
+  "note": "Police-story piece built on dashcam footage 'obtained by RT.com'.",
+  "verdict": "citation_amplification"
+ },
+ "train:176895:chn-state-chinadaily": {
+  "note": "China Daily byline/photo-credit furniture; the document is a China Daily article.",
+  "verdict": "origin"
+ },
+ "train:180809:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:180873:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:182843:rus-state-rt": {
+  "note": "Republished RT piece with bare 'RT.com' credit line mid-document.",
+  "verdict": "laundered_origin"
+ },
+ "train:187578:rus-state-rt": {
+  "note": "GlobalPost piece attributing a claim to RT.com.",
+  "verdict": "mention"
+ },
+ "train:187875:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:191275:irn-state-presstv-phrase": {
+  "note": "RT UK correspondent bio page; Press TV in contributor credits.",
+  "verdict": "mention"
+ },
+ "train:192201:rus-intel-strategic-culture": {
+  "note": "Zuesse essay; repost note states only Zero Hedge would publish it \u2014 the laundering path described in-document.",
+  "verdict": "laundered_origin"
+ },
+ "train:193563:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:195118:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: mention.",
+  "verdict": "mention"
+ },
+ "train:196661:rus-ira-phrase-heart-of-texas": {
+  "note": "BBC banned-records essay; 'Deep in the Heart of Texas' the 1941 song.",
+  "verdict": "false_positive"
+ },
+ "train:196789:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:197187:chn-state-chinadaily": {
+  "note": "China Daily byline/photo-credit furniture; the document is a China Daily article.",
+  "verdict": "origin"
+ },
+ "train:199455:amp-globalresearch": {
+  "note": "Conspiracist piece closing 'Sources: DailyStar.co.uk / GlobalResearch.ca'.",
+  "verdict": "citation_amplification"
+ },
+ "train:200721:chn-state-xinhua-phrase": {
+  "note": "Yonhap dispatch citing Xinhua.",
+  "verdict": "mention"
+ },
+ "train:20131:rus-ira-phrase-heart-of-texas": {
+  "note": "Heart of Texas Foundation, a Texas prison-ministry charity; unrelated to the Internet Research Agency page.",
+  "verdict": "false_positive"
+ },
+ "train:201359:rus-state-sputnik-phrase": {
+  "note": "Sputnik article; analyst 'told Radio Sputnik in December'.",
+  "verdict": "origin"
+ },
+ "train:201485:chn-state-xinhua-phrase": {
+  "note": "Academic analysis with '(Xinhua, April 28, 2016)' citation.",
+  "verdict": "mention"
+ },
+ "train:201511:rus-state-rt": {
+  "note": "'RT.com reports:' plus RT copy on the Podesta email dump.",
+  "verdict": "laundered_origin"
+ },
+ "train:202355:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:203024:chn-state-xinhua-phrase": {
+  "note": "Western wire style: 'statement carried by the official Xinhua news agency'.",
+  "verdict": "mention"
+ },
+ "train:203654:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: origin.",
+  "verdict": "origin"
+ },
+ "train:205191:rus-state-sputnik-phrase": {
+  "note": "Alwaght (Iran-linked outlet) building on a Sputnik interview \u2014 cross-amplification.",
+  "verdict": "citation_amplification"
+ },
+ "train:20648:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:207319:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:207700:irn-state-presstv-phrase": {
+  "note": "Prison Planet piece debunking staged photos circulated by Press TV; hostile mention.",
+  "verdict": "mention"
+ },
+ "train:208821:rus-intel-strategic-culture": {
+  "note": "'Submitted by Eric Zuesse, via strategic-culture.org' \u2014 Zero Hedge syndication header; the '28 pages' piece.",
+  "verdict": "laundered_origin"
+ },
+ "train:209102:rus-state-sputnik-phrase": {
+  "note": "Sputnik English item reporting its Sputnik Arabic interview (Deir ez-Zor).",
+  "verdict": "origin"
+ },
+ "train:209744:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:211358:rus-state-russia-today": {
+  "note": "Petition citing a Russia Today clip as evidence.",
+  "verdict": "citation_amplification"
+ },
+ "train:21186:rus-state-rbth": {
+  "note": "Image-search results dump; rbth.com URLs incidental JSON furniture.",
+  "verdict": "mention"
+ },
+ "train:21307:chn-state-chinadaily": {
+  "note": "China Daily byline/photo-credit furniture; the document is a China Daily article.",
+  "verdict": "origin"
+ },
+ "train:213179:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: origin.",
+  "verdict": "origin"
+ },
+ "train:213194:rus-state-sputnik-phrase": {
+  "note": "Kurdish news site '(With files from Sputnik | Reuters | AFP | AP)' \u2014 mixed-wire carriage.",
+  "verdict": "wire_carriage"
+ },
+ "train:218757:chn-state-xinhua-phrase": {
+  "note": "Washington Post guest post citing 'China's state newspaper, Xinhua'.",
+  "verdict": "mention"
+ },
+ "train:219358:amp-globalresearch": {
+  "note": "Bin-Laden-death denial citing a globalresearch.ca article as its evidence.",
+  "verdict": "citation_amplification"
+ },
+ "train:22011:rus-state-rt": {
+  "note": "Privacy piece listing RT.com among sites running session-replay scripts.",
+  "verdict": "mention"
+ },
+ "train:220181:chn-state-cctv": {
+  "note": "'CCTV.com' dateline header; CCTV English news item on Syria aid.",
+  "verdict": "origin"
+ },
+ "train:221119:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:222146:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:22289:chn-state-xinhua-phrase": {
+  "note": "Metro UK; '(Picture: Xinhua/REX Shutterstock)' credit.",
+  "verdict": "mention"
+ },
+ "train:227007:irn-state-presstv-phrase": {
+  "note": "'Ramin Mazaheri / Press TV, Paris' correspondent byline.",
+  "verdict": "origin"
+ },
+ "train:227621:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:227632:irn-state-presstv-phrase": {
+  "note": "'Press TV \u2013' source prefix on rehosted interview summary.",
+  "verdict": "laundered_origin"
+ },
+ "train:227954:rus-state-sputnik-phrase": {
+  "note": "'Alexei Nikolsky/Sputnik, Kremlin Pool Photo via AP' credit.",
+  "verdict": "mention"
+ },
+ "train:228664:amp-veteranstoday": {
+  "note": "'Readers Beware!' reliability warning about veteranstoday.com.",
+  "verdict": "mention"
+ },
+ "train:231062:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: mention.",
+  "verdict": "mention"
+ },
+ "train:231869:rus-ira-phrase-blacktivist": {
+  "note": "USA-Today-style report on Twitter's Capitol Hill testimony naming the Blacktivist campaign.",
+  "verdict": "mention"
+ },
+ "train:233394:rus-state-sputnik-phrase": {
+  "note": "Sputnik article: 'Chinese scholars have told Sputnik' (petro-yuan).",
+  "verdict": "origin"
+ },
+ "train:233514:chn-state-xinhua-phrase": {
+  "note": "AP-style story citing 'China's official Xinhua'.",
+  "verdict": "mention"
+ },
+ "train:234456:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:235540:chn-state-xinhua-phrase": {
+  "note": "'(Xinhua/NAN)' \u2014 News Agency of Nigeria carrying Xinhua copy.",
+  "verdict": "wire_carriage"
+ },
+ "train:235819:rus-state-sputnik-phrase": {
+  "note": "Sputnik interview writeup: 'spoke to Sputnik about'.",
+  "verdict": "origin"
+ },
+ "train:236683:chn-state-cctv": {
+  "note": "Listicle crediting english.cctv.com for one item.",
+  "verdict": "mention"
+ },
+ "train:237672:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:239417:chn-state-xinhua-phrase": {
+  "note": "Castro obituary citing Xinhua's eulogy.",
+  "verdict": "mention"
+ },
+ "train:241078:rus-state-sputnik-phrase": {
+  "note": "Sputnik article; Indian defence source 'told Sputnik Thursday'.",
+  "verdict": "origin"
+ },
+ "train:241946:rus-state-rt": {
+  "note": "Essay quoting an rt.com op-edge URL as its source.",
+  "verdict": "citation_amplification"
+ },
+ "train:24508:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:247565:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:248301:chn-state-xinhua-phrase": {
+  "note": "Opinion piece citing Xinhua's criticism of Trump strategy.",
+  "verdict": "mention"
+ },
+ "train:249785:rus-state-sputnik-phrase": {
+  "note": "Guccifer 2.0 investigation; Sputnik News named in an anecdote.",
+  "verdict": "mention"
+ },
+ "train:25395:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:26325:chn-state-xinhua-phrase": {
+  "note": "BBC story citing Xinhua on the Zhang Yimou fine.",
+  "verdict": "mention"
+ },
+ "train:28882:chn-state-xinhua-phrase": {
+  "note": "Guardian piece; 'Photograph: Xinhua/Rex/Shutterstock' credit.",
+  "verdict": "mention"
+ },
+ "train:29680:irn-state-presstv-phrase": {
+  "note": "TEHRAN (IQNA) item sourcing Press TV \u2014 Iranian state-adjacent agency citing Press TV.",
+  "verdict": "citation_amplification"
+ },
+ "train:3111:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:3375:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:33890:rus-state-rt": {
+  "note": "21st Century Wire essay citing RT UK in its bibliography. The document itself is 21st Century Wire content \u2014 a Tier C outlet the domain scan missed because bylines omit the domain.",
+  "verdict": "citation_amplification"
+ },
+ "train:33890:rus-state-russia-today": {
+  "note": "21st Century Wire bibliography entry (same document as the rt.com pair).",
+  "verdict": "citation_amplification"
+ },
+ "train:35168:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:35963:rus-state-sputnik-phrase": {
+  "note": "'Robert F. Kennedy Jr. told Sputnik in an exclusive interview'.",
+  "verdict": "origin"
+ },
+ "train:36243:chn-state-chinadaily": {
+  "note": "China Daily byline/photo-credit furniture; the document is a China Daily article.",
+  "verdict": "origin"
+ },
+ "train:38145:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:38235:rus-state-russia-today": {
+  "note": "Report on Congress revoking Russia Today USA's credentials.",
+  "verdict": "mention"
+ },
+ "train:38496:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:39794:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:40961:rus-state-rt": {
+  "note": "'Contributed by RT.com of RT.com.' \u2014 republication on an alt-news aggregator.",
+  "verdict": "laundered_origin"
+ },
+ "train:41779:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: origin.",
+  "verdict": "origin"
+ },
+ "train:42779:rus-state-sputnik-phrase": {
+  "note": "'Sputnik/Alexei Druzhinin/Sputnik via REUTERS' pool credit.",
+  "verdict": "mention"
+ },
+ "train:43414:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: origin.",
+  "verdict": "origin"
+ },
+ "train:46359:rus-state-sputnik-phrase": {
+  "note": "Sputnik article; coalition representative 'told Sputnik'.",
+  "verdict": "origin"
+ },
+ "train:46404:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:47470:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: origin.",
+  "verdict": "origin"
+ },
+ "train:4817:irn-state-presstv-phrase": {
+  "note": "Press TV article format: interviewee 'told Press TV on Wednesday'.",
+  "verdict": "origin"
+ },
+ "train:48367:rus-state-sputnik-phrase": {
+  "note": "Sputnik article; 'interview with Sputnik Chinese news service'.",
+  "verdict": "origin"
+ },
+ "train:51661:rus-state-rt": {
+  "note": "Story 'as reported by rt.com'.",
+  "verdict": "citation_amplification"
+ },
+ "train:52693:rus-state-sputnik-phrase": {
+  "note": "'Sputnik/Alexei Druzhinin/Kremlin via REUTERS' pool credit.",
+  "verdict": "mention"
+ },
+ "train:54312:chn-state-xinhua-phrase": {
+  "note": "Media-criticism piece about Xinhua and Global Times using dubious images.",
+  "verdict": "mention"
+ },
+ "train:54966:irn-state-presstv-phrase": {
+  "note": "Neil Clark author bio ('regular pundit on RT... Press TV') \u2014 document is an RT op-ed; for this indicator, a mention.",
+  "verdict": "mention"
+ },
+ "train:55805:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: citation_amplification.",
+  "verdict": "citation_amplification"
+ },
+ "train:56225:chn-state-xinhua-phrase": {
+  "note": "Reuters citing Xinhua on Ezubao arrests.",
+  "verdict": "mention"
+ },
+ "train:57447:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: mention.",
+  "verdict": "mention"
+ },
+ "train:60191:chn-state-xinhua-phrase": {
+  "note": "'[Photo: Xinhua]' on Chinese state outlet page (Ancient Civilization Forum item).",
+  "verdict": "wire_carriage"
+ },
+ "train:62093:irn-state-presstv-phrase": {
+  "note": "Same Neil Clark bio as train:54966 \u2014 near-duplicate pair.",
+  "verdict": "mention"
+ },
+ "train:63822:chn-state-chinadaily": {
+  "note": "China Daily article; reporter contact 'wuwencong@chinadaily.com.cn' in footer.",
+  "verdict": "origin"
+ },
+ "train:66304:irn-state-presstv-phrase": {
+  "note": "Advocacy essay against the UK ban of Press TV; sympathetic mention.",
+  "verdict": "mention"
+ },
+ "train:66560:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: citation_amplification.",
+  "verdict": "citation_amplification"
+ },
+ "train:6750:irn-state-presstv-phrase": {
+  "note": "'Press TV has conducted an interview with Kevin Barrett' \u2014 interview transcript.",
+  "verdict": "origin"
+ },
+ "train:67550:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:67582:chn-state-xinhua-phrase": {
+  "note": "Reuters citing Xinhua on the South China Sea.",
+  "verdict": "mention"
+ },
+ "train:67610:rus-state-russia-today": {
+  "note": "Putin on the 'Russia Today dinner' with Michael Flynn.",
+  "verdict": "mention"
+ },
+ "train:67858:rus-state-russia-today": {
+  "note": "Max Keiser identified as host of Russia Today's Keiser Report.",
+  "verdict": "mention"
+ },
+ "train:68254:irn-state-presstv-phrase": {
+  "note": "Iran-attacks story with editorial note about 'Press TV in its original version of the above story' \u2014 edited rehost.",
+  "verdict": "laundered_origin"
+ },
+ "train:68524:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:7054:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: citation_amplification.",
+  "verdict": "citation_amplification"
+ },
+ "train:72766:rus-state-sputnik-phrase": {
+  "note": "'Credit RIA Novosti/Sputnik, via Associated Press' photo credit.",
+  "verdict": "mention"
+ },
+ "train:72873:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:74677:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:75226:chn-state-xinhua-phrase": {
+  "note": "china.org.cn-style page ('\u89c6\u9891\u64ad\u653e\u4f4d\u7f6e') with '[Photo/Xinhua]' \u2014 state syndication of Xinhua material.",
+  "verdict": "wire_carriage"
+ },
+ "train:76043:chn-state-xinhua-phrase": {
+  "note": "Reuters citing Xinhua on Brazzaville explosions.",
+  "verdict": "mention"
+ },
+ "train:7754:rus-state-sputnik-phrase": {
+  "note": "Story built on Craig Murray's claims 'tells Sputnik (a Russian media outlet)'.",
+  "verdict": "citation_amplification"
+ },
+ "train:79220:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: origin.",
+  "verdict": "origin"
+ },
+ "train:81776:chn-state-xinhua-phrase": {
+  "note": "BBC dictionary story; campaigner 'told... Xinhua'.",
+  "verdict": "mention"
+ },
+ "train:83197:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:84309:chn-state-xinhua-phrase": {
+  "note": "Sydney Morning Herald; 'Photo: Xinhua' credit.",
+  "verdict": "mention"
+ },
+ "train:86000:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:86617:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: mention.",
+  "verdict": "mention"
+ },
+ "train:87681:rus-state-rt": {
+  "note": "'ORIGINALLY PUBLISHED AT RT.COM' footer.",
+  "verdict": "laundered_origin"
+ },
+ "train:90390:irn-state-presstv-phrase": {
+  "note": "Press TV phrase pair; manual review verdict: mention.",
+  "verdict": "mention"
+ },
+ "train:91021:amp-globalresearch": {
+  "note": "PRI fact-check about a GlobalResearch.ca article, with archive screenshots; critical coverage.",
+  "verdict": "mention"
+ },
+ "train:91214:chn-state-xinhua-phrase": {
+  "note": "Xinhua English photo-gallery format ('Photo taken on Feb. 27, 2013 shows...').",
+  "verdict": "wire_carriage"
+ },
+ "train:91572:rus-state-rt": {
+  "note": "Video-mirror page carrying RT Documentary boilerplate (RTD.rt.com, RT_DOC).",
+  "verdict": "laundered_origin"
+ },
+ "train:91580:rus-state-sputnik-phrase": {
+  "note": "Sputnik wire copy: '(Sputnik) \u2014' dateline and/or '\u00a9 Sputnik /' photo furniture.",
+  "verdict": "origin"
+ },
+ "train:93002:chn-state-xinhua-phrase": {
+  "note": "R&D-fraud feature; expos\u00e9 'posted on the Xinhua bulletin board'.",
+  "verdict": "mention"
+ },
+ "train:94293:rus-state-sputnik-phrase": {
+  "note": "The satellite, Pluto's Sputnik Planum, or an unrelated namesake \u2014 not the outlet.",
+  "verdict": "false_positive"
+ },
+ "train:95769:rus-state-sputnik-phrase": {
+  "note": "Sputnik-derived copy (Craig Murray 'told Sputnik') rehosted on an alt-news page with video-embed furniture.",
+  "verdict": "laundered_origin"
+ },
+ "train:98112:rus-state-sputnik-phrase": {
+  "note": "'(Alexei Nikolsky/Sputnik, Kremlin Pool Photo via AP)' credit.",
+  "verdict": "mention"
+ },
+ "train:99067:chn-state-xinhua-phrase": {
+  "note": "NBA story citing 'the Xinhua News Agency (via ...)'.",
+  "verdict": "mention"
+ },
+ "valid:251167:rus-state-sputnik-phrase": {
+  "note": "Sputnik Planum (Pluto).",
+  "verdict": "false_positive"
+ },
+ "valid:251326:rus-state-sputnik-phrase": {
+  "note": "'New Delhi (Sputnik) \u2014' dateline.",
+  "verdict": "origin"
+ },
+ "valid:252657:rus-state-sputnik-phrase": {
+  "note": "Sputnik Planum (Pluto).",
+  "verdict": "false_positive"
+ },
+ "valid:253943:rus-state-sputnik-phrase": {
+  "note": "Blog analyzing and quoting 'This article on Sputnik International'.",
+  "verdict": "citation_amplification"
+ }
+}

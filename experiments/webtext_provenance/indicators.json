@@ -1,0 +1,939 @@
+{
+  "schema": 1,
+  "purpose": "Tiered indicator list for scanning the WebText sample for material from non-western state-linked influence operations. Every entry carries its public-record attribution. Tier is an evidence class, not a severity: finding Tier A content in the corpus supports the coordinated-amplification reading much more strongly than finding Tier B content, because Tier A assets had little organic audience and documented inauthentic distribution, while Tier B outlets plausibly clear a 3-karma gate organically.",
+  "window_note": "WebText contains outbound Reddit links posted up to December 2017 (Radford et al. 2019, section 2.1). Attribution dates may postdate the window (many do: 2018-2021); what matters for presence is that the asset was ACTIVE and publishing in-window. Entries whose activity began after the window are excluded by construction and noted in coverage_notes.",
+  "tiers": {
+    "A": "Attributed covert influence-operation asset: a site or persona publicly attributed to a state influence apparatus by a government, platform, or named forensic investigation.",
+    "B": "Overt state media of a non-western state: openly state-owned or state-directed outlets. Presence in the corpus establishes the pipeline admitted state content, not that its karma was inauthentic.",
+    "C": "Documented amplifier/proxy: not state organs, but outlets repeatedly documented as laundering or amplifying state influence-operation content.",
+    "M": "Meta-discussion marker: vocabulary of coverage ABOUT influence operations. Measures how much the corpus talks about the war, as a contrast to carrying its munitions.",
+    "BASE": "Baseline comparator for rate context: mainstream outlets (plus one deliberately chosen state-funded-but-normalized comparator, Al Jazeera). Not part of the hypothesis."
+  },
+  "coverage_notes": [
+    "China, covert (Tier A): empty by scope, not by finding. The documented covert Chinese English-language networks (e.g. the network Graphika later named 'Spamouflage Dragon', reported from 2019) postdate the WebText window; no public attribution names pre-2018 covert Chinese web assets in English that this study could locate. The Chinese entries here are therefore all Tier B overt state media.",
+    "Russian-language Prigozhin media-arm sentinels (riafan.ru, politexpert.net) are expected to be near-null in a Reddit-outbound English-dominated corpus; they are included so that the null is a recorded check rather than an unasked question. Sister sites of the same group (nevnov.ru, inforeactor.ru, nation-news.ru, newinform.com, slovodel.com) are omitted as redundant with the two sentinels.",
+    "North Korean state domains are included as expected-null sentinels for the same reason.",
+    "Persona/page-brand phrases (Blacktivist, Heart of Texas, ...) will overwhelmingly surface in press coverage ABOUT the operations. They are scanned to find any document that embeds or reproduces operation content, and every hit is classified origin-vs-mention rather than counted naively."
+  ],
+  "indicators": [
+    {
+      "id": "rus-ira-blackmattersus",
+      "tier": "A",
+      "actor": "Russia / Internet Research Agency",
+      "type": "domain",
+      "pattern": "blackmattersus.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "New Knowledge, 'The Tactics & Tropes of the Internet Research Agency' (report prepared for the U.S. Senate Select Committee on Intelligence, Dec 2018) — BlackMattersUS documented as an Internet Research Agency web property",
+        "RBC Magazine investigation of the Internet Research Agency (Oct 2017)"
+      ]
+    },
+    {
+      "id": "rus-ira-blacktolive",
+      "tier": "A",
+      "actor": "Russia / Internet Research Agency",
+      "type": "domain",
+      "pattern": "blacktolive.org",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "New Knowledge report for the U.S. Senate Select Committee on Intelligence (Dec 2018) — Black4Black/BlackToLive cluster of Internet Research Agency sites"
+      ]
+    },
+    {
+      "id": "rus-ira-donotshoot",
+      "tier": "A",
+      "actor": "Russia / Internet Research Agency",
+      "type": "domain",
+      "pattern": "donotshoot.us",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "New Knowledge report for the U.S. Senate Select Committee on Intelligence (Dec 2018) — 'Don't Shoot Us' campaign site attributed to the Internet Research Agency"
+      ]
+    },
+    {
+      "id": "rus-ira-black4black",
+      "tier": "A",
+      "actor": "Russia / Internet Research Agency",
+      "type": "domain",
+      "pattern": "black4black.info",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "New Knowledge report for the U.S. Senate Select Committee on Intelligence (Dec 2018)"
+      ]
+    },
+    {
+      "id": "rus-ira-phrase-blacktivist",
+      "tier": "A",
+      "actor": "Russia / Internet Research Agency",
+      "type": "phrase",
+      "pattern": "Blacktivist",
+      "case_sensitive": true,
+      "active_in_window": true,
+      "fp_risk": "low-medium",
+      "fp_note": "Distinctive coinage, but most hits will be press coverage about the persona; classify origin-vs-mention.",
+      "attribution": [
+        "U.S. Department of Justice, United States v. Internet Research Agency LLC et al. (indictment, Feb 16 2018) — 'Blacktivist' named among Internet Research Agency-controlled social-media personas",
+        "U.S. Senate Select Committee on Intelligence, 'Russia's Use of Social Media' (Volume 2, 2019)"
+      ]
+    },
+    {
+      "id": "rus-ira-phrase-heart-of-texas",
+      "tier": "A",
+      "actor": "Russia / Internet Research Agency",
+      "type": "phrase",
+      "pattern": "Heart of Texas",
+      "case_sensitive": true,
+      "active_in_window": true,
+      "fp_risk": "high",
+      "fp_note": "Ordinary idiom ('deep in the heart of Texas'), song title, business names. Hits are candidates only; classification decides.",
+      "attribution": [
+        "U.S. Department of Justice, United States v. Internet Research Agency LLC et al. (indictment, Feb 16 2018) — 'Heart of Texas' named among Internet Research Agency-controlled groups"
+      ]
+    },
+    {
+      "id": "rus-ira-phrase-being-patriotic",
+      "tier": "A",
+      "actor": "Russia / Internet Research Agency",
+      "type": "phrase",
+      "pattern": "Being Patriotic",
+      "case_sensitive": true,
+      "active_in_window": true,
+      "fp_risk": "high",
+      "fp_note": "Capitalized gerund phrase occurs in ordinary prose and headlines; classification decides.",
+      "attribution": [
+        "U.S. Department of Justice, United States v. Internet Research Agency LLC et al. (indictment, Feb 16 2018)"
+      ]
+    },
+    {
+      "id": "rus-ira-phrase-secured-borders",
+      "tier": "A",
+      "actor": "Russia / Internet Research Agency",
+      "type": "phrase",
+      "pattern": "Secured Borders",
+      "case_sensitive": true,
+      "active_in_window": true,
+      "fp_risk": "medium-high",
+      "attribution": [
+        "U.S. Department of Justice, United States v. Internet Research Agency LLC et al. (indictment, Feb 16 2018)"
+      ]
+    },
+    {
+      "id": "rus-ira-phrase-army-of-jesus",
+      "tier": "A",
+      "actor": "Russia / Internet Research Agency",
+      "type": "phrase",
+      "pattern": "Army of Jesus",
+      "case_sensitive": true,
+      "active_in_window": true,
+      "fp_risk": "medium",
+      "attribution": [
+        "U.S. Department of Justice, United States v. Internet Research Agency LLC et al. (indictment, Feb 16 2018)"
+      ]
+    },
+    {
+      "id": "rus-ira-phrase-united-muslims",
+      "tier": "A",
+      "actor": "Russia / Internet Research Agency",
+      "type": "phrase",
+      "pattern": "United Muslims of America",
+      "case_sensitive": true,
+      "active_in_window": true,
+      "fp_risk": "medium",
+      "fp_note": "Also the name of a real, unrelated U.S. organization founded in the 1980s; the Internet Research Agency impersonated the name.",
+      "attribution": [
+        "U.S. Department of Justice, United States v. Internet Research Agency LLC et al. (indictment, Feb 16 2018)"
+      ]
+    },
+    {
+      "id": "rus-ira-phrase-jenna-abrams",
+      "tier": "A",
+      "actor": "Russia / Internet Research Agency",
+      "type": "phrase",
+      "pattern": "Jenna Abrams",
+      "case_sensitive": true,
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "U.S. House Permanent Select Committee on Intelligence release of Internet Research Agency Twitter handles (Nov 2017) — @Jenn_Abrams",
+        "Contemporaneous forensic press reporting (The Daily Beast, Nov 2017) unmasking the 'Jenna Abrams' persona"
+      ]
+    },
+    {
+      "id": "rus-ira-phrase-ten-gop",
+      "tier": "A",
+      "actor": "Russia / Internet Research Agency",
+      "type": "phrase",
+      "pattern": "TEN_GOP",
+      "case_sensitive": true,
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "U.S. Department of Justice, United States v. Internet Research Agency LLC et al. (indictment, Feb 16 2018) — @TEN_GOP, the fake 'Tennessee GOP' account",
+        "U.S. House Permanent Select Committee on Intelligence handle release (Nov 2017)"
+      ]
+    },
+    {
+      "id": "rus-ira-media-riafan",
+      "tier": "A",
+      "actor": "Russia / Internet Research Agency media arm (Federal News Agency)",
+      "type": "domain",
+      "pattern": "riafan.ru",
+      "active_in_window": true,
+      "expected": "near-null (Russian-language); included as a recorded check",
+      "fp_risk": "low",
+      "attribution": [
+        "U.S. Treasury, Office of Foreign Assets Control, Project Lakhta-related designations (2018-2020) — Federal News Agency LLC within the Prigozhin media group",
+        "RBC Magazine investigation (Oct 2017)"
+      ]
+    },
+    {
+      "id": "rus-ira-media-politexpert",
+      "tier": "A",
+      "actor": "Russia / Prigozhin media group",
+      "type": "domain",
+      "pattern": "politexpert.net",
+      "active_in_window": true,
+      "expected": "near-null (Russian-language); included as a recorded check",
+      "fp_risk": "low",
+      "attribution": [
+        "RBC Magazine investigation (Oct 2017) — Prigozhin 'media factory' cluster"
+      ]
+    },
+    {
+      "id": "rus-intel-southfront",
+      "tier": "A",
+      "actor": "Russia / FSB-directed front (per U.S. Treasury)",
+      "type": "domain",
+      "pattern": "southfront.org",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "U.S. Treasury, Office of Foreign Assets Control press release (Apr 15 2021) — SouthFront designated, described as receiving taskings from the Federal Security Service (FSB)",
+        "U.S. State Department Global Engagement Center, 'Pillars of Russia's Disinformation and Propaganda Ecosystem' (Aug 2020)"
+      ],
+      "notes": "English-language military-analysis front, publishing since 2014-2015 — squarely in-window."
+    },
+    {
+      "id": "rus-intel-newsfront",
+      "tier": "A",
+      "actor": "Russia / FSB-linked front (per U.S. Treasury)",
+      "type": "domain",
+      "pattern": "newsfront.info",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "U.S. Treasury, Office of Foreign Assets Control press release (Apr 15 2021) — News Front (Crimea) designated",
+        "U.S. State Department Global Engagement Center, 'Pillars' report (Aug 2020)"
+      ]
+    },
+    {
+      "id": "rus-intel-strategic-culture",
+      "tier": "A",
+      "actor": "Russia / SVR-directed front (per U.S. Treasury)",
+      "type": "domain",
+      "pattern": "strategic-culture.org",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "U.S. Treasury, Office of Foreign Assets Control press release (Apr 15 2021) — Strategic Culture Foundation designated, described as directed by the Foreign Intelligence Service (SVR)",
+        "U.S. State Department Global Engagement Center, 'Pillars' report (Aug 2020)"
+      ],
+      "notes": "Long-running English-language journal; years of in-window activity."
+    },
+    {
+      "id": "rus-intel-inforos",
+      "tier": "A",
+      "actor": "Russia / GRU-linked (per U.S. Treasury)",
+      "type": "domain",
+      "pattern": "inforos.ru",
+      "active_in_window": true,
+      "expected": "low (mostly Russian-language, some English)",
+      "fp_risk": "low",
+      "attribution": [
+        "U.S. Treasury, Office of Foreign Assets Control press release (Apr 15 2021) — InfoRos designated; U.S. government statements link it to the GRU's psychological-operations apparatus"
+      ]
+    },
+    {
+      "id": "rus-intel-journal-neo",
+      "tier": "A",
+      "actor": "Russia / intelligence-linked outlet (per U.S. State Dept)",
+      "type": "domain",
+      "pattern": "journal-neo.org",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "U.S. State Department Global Engagement Center, 'Pillars of Russia's Disinformation and Propaganda Ecosystem' (Aug 2020) — New Eastern Outlook profiled as an intelligence-linked pillar outlet"
+      ]
+    },
+    {
+      "id": "rus-intel-katehon",
+      "tier": "A",
+      "actor": "Russia / Kremlin-linked think-tank outlet (per U.S. State Dept)",
+      "type": "domain",
+      "pattern": "katehon.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "U.S. State Department Global Engagement Center, 'Pillars' report (Aug 2020) — Katehon profiled as a pillar outlet"
+      ]
+    },
+    {
+      "id": "rus-intel-geopolitica",
+      "tier": "A",
+      "actor": "Russia / Kremlin-aligned outlet (per U.S. State Dept)",
+      "type": "domain",
+      "pattern": "geopolitica.ru",
+      "active_in_window": true,
+      "expected": "low (mostly Russian-language)",
+      "fp_risk": "low",
+      "attribution": [
+        "U.S. State Department Global Engagement Center, 'Pillars' report (Aug 2020) — Geopolitica.ru profiled as a pillar outlet"
+      ]
+    },
+    {
+      "id": "irn-lfp-libertyfrontpress",
+      "tier": "A",
+      "actor": "Iran / 'Liberty Front Press' network (IRGC-linked per FireEye)",
+      "type": "domain",
+      "pattern": "libertyfrontpress.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "FireEye, 'Suspected Iranian Influence Operation' (Aug 21 2018) — Liberty Front Press network, active since approximately 2013",
+        "Facebook and Twitter coordinated-inauthentic-behavior takedowns of the same network (Aug 2018)"
+      ]
+    },
+    {
+      "id": "irn-lfp-awdnews",
+      "tier": "A",
+      "actor": "Iran / covert network (per FireEye)",
+      "type": "domain",
+      "pattern": "awdnews.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "FireEye, 'Suspected Iranian Influence Operation' (Aug 21 2018)",
+        "AWD News's fabricated Israeli-nuclear-threat story of Dec 2016, which drew a real nuclear-tinged reply from Pakistan's defence minister (contemporaneous international press coverage)"
+      ]
+    },
+    {
+      "id": "irn-lfp-iuvmpress",
+      "tier": "A",
+      "actor": "Iran / International Union of Virtual Media (per FireEye)",
+      "type": "domain",
+      "pattern": "iuvmpress.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "FireEye, 'Suspected Iranian Influence Operation' (Aug 21 2018) — the IUVM (International Union of Virtual Media) content-laundering hub"
+      ]
+    },
+    {
+      "id": "irn-lfp-whatsupic",
+      "tier": "A",
+      "actor": "Iran / covert network (per FireEye)",
+      "type": "domain",
+      "pattern": "whatsupic.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "FireEye, 'Suspected Iranian Influence Operation' (Aug 21 2018)"
+      ]
+    },
+    {
+      "id": "irn-lfp-realprogressivefront",
+      "tier": "A",
+      "actor": "Iran / covert network (per FireEye)",
+      "type": "domain",
+      "pattern": "realprogressivefront.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "FireEye, 'Suspected Iranian Influence Operation' (Aug 21 2018) — 'Real Progressive Front'"
+      ]
+    },
+    {
+      "id": "irn-lfp-britishleft",
+      "tier": "A",
+      "actor": "Iran / covert network (per FireEye)",
+      "type": "domain",
+      "pattern": "britishleft.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "FireEye, 'Suspected Iranian Influence Operation' (Aug 21 2018)"
+      ]
+    },
+    {
+      "id": "rus-state-rt",
+      "tier": "B",
+      "actor": "Russia / RT (state-funded international broadcaster)",
+      "type": "domain",
+      "pattern": "rt.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "fp_note": "Suffix-matching prevents 'support.com'-style substring false positives; 'rt.com' must be the registrable tail of the extracted domain token.",
+      "attribution": [
+        "U.S. Office of the Director of National Intelligence, 'Assessing Russian Activities and Intentions in Recent US Elections' (Jan 2017) — annex on RT",
+        "Foreign Agents Registration Act registration of RT America's production company (Nov 2017)"
+      ]
+    },
+    {
+      "id": "rus-state-russia-today",
+      "tier": "B",
+      "actor": "Russia / RT",
+      "type": "phrase",
+      "pattern": "Russia Today",
+      "case_sensitive": true,
+      "active_in_window": true,
+      "fp_risk": "medium",
+      "fp_note": "Legacy brand name; also ordinary words ('...in Russia today...'). Case-sensitive match; classification decides.",
+      "attribution": [
+        "Same as rt.com"
+      ]
+    },
+    {
+      "id": "rus-state-sputniknews",
+      "tier": "B",
+      "actor": "Russia / Sputnik (Rossiya Segodnya)",
+      "type": "domain",
+      "pattern": "sputniknews.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "U.S. Office of the Director of National Intelligence report (Jan 2017)",
+        "Foreign Agents Registration Act registration of Sputnik's U.S. operator (2017-2018)"
+      ]
+    },
+    {
+      "id": "rus-state-sputnik-phrase",
+      "tier": "B",
+      "actor": "Russia / Sputnik",
+      "type": "phrase",
+      "pattern": "Sputnik",
+      "case_sensitive": true,
+      "active_in_window": true,
+      "fp_risk": "high",
+      "fp_note": "Collides with the satellites and other uses of the word. Added because Sputnik articles do not self-link their domain in body text (sputniknews.com scored zero text hits against a census expectation of hundreds), so domain matching alone cannot see Sputnik-origin documents. Classification decides.",
+      "attribution": [
+        "As sputniknews.com"
+      ]
+    },
+    {
+      "id": "rus-state-tass",
+      "tier": "B",
+      "actor": "Russia / TASS (state news agency)",
+      "type": "domain",
+      "pattern": "tass.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "TASS is the Russian Federation's state news agency (statutory state enterprise)"
+      ]
+    },
+    {
+      "id": "rus-state-tass-ru",
+      "tier": "B",
+      "actor": "Russia / TASS",
+      "type": "domain",
+      "pattern": "tass.ru",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "As tass.com"
+      ]
+    },
+    {
+      "id": "rus-state-ria",
+      "tier": "B",
+      "actor": "Russia / RIA Novosti (Rossiya Segodnya)",
+      "type": "domain",
+      "pattern": "ria.ru",
+      "active_in_window": true,
+      "expected": "low (Russian-language)",
+      "fp_risk": "low",
+      "attribution": [
+        "RIA Novosti brand of the state media group Rossiya Segodnya"
+      ]
+    },
+    {
+      "id": "rus-state-rbth",
+      "tier": "B",
+      "actor": "Russia / Russia Beyond The Headlines (Rossiyskaya Gazeta)",
+      "type": "domain",
+      "pattern": "rbth.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "Russia Beyond The Headlines, published by the Russian government's official newspaper Rossiyskaya Gazeta / TV-Novosti"
+      ]
+    },
+    {
+      "id": "irn-state-presstv-ir",
+      "tier": "B",
+      "actor": "Iran / Press TV (Islamic Republic of Iran Broadcasting)",
+      "type": "domain",
+      "pattern": "presstv.ir",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "Press TV is the English-language network of the state broadcaster, Islamic Republic of Iran Broadcasting (IRIB)"
+      ]
+    },
+    {
+      "id": "irn-state-presstv-com",
+      "tier": "B",
+      "actor": "Iran / Press TV",
+      "type": "domain",
+      "pattern": "presstv.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "As presstv.ir"
+      ]
+    },
+    {
+      "id": "irn-state-presstv-phrase",
+      "tier": "B",
+      "actor": "Iran / Press TV",
+      "type": "phrase",
+      "pattern": "Press TV",
+      "case_sensitive": true,
+      "active_in_window": true,
+      "fp_risk": "low-medium",
+      "attribution": [
+        "As presstv.ir"
+      ]
+    },
+    {
+      "id": "irn-state-farsnews",
+      "tier": "B",
+      "actor": "Iran / Fars News Agency (IRGC-affiliated)",
+      "type": "domain",
+      "pattern": "farsnews.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "Fars News Agency, Iran's semi-official agency, widely documented as affiliated with the Islamic Revolutionary Guard Corps (IRGC)"
+      ]
+    },
+    {
+      "id": "irn-state-mehrnews",
+      "tier": "B",
+      "actor": "Iran / Mehr News Agency",
+      "type": "domain",
+      "pattern": "mehrnews.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "Mehr News Agency, owned by the state-linked Islamic Ideology Dissemination Organization"
+      ]
+    },
+    {
+      "id": "irn-state-tasnim",
+      "tier": "B",
+      "actor": "Iran / Tasnim News Agency (IRGC-linked)",
+      "type": "domain",
+      "pattern": "tasnimnews.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "Tasnim News Agency, widely documented as close to the Islamic Revolutionary Guard Corps (IRGC)"
+      ]
+    },
+    {
+      "id": "chn-state-xinhuanet",
+      "tier": "B",
+      "actor": "China / Xinhua (official state news agency)",
+      "type": "domain",
+      "pattern": "xinhuanet.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "Xinhua is the official state news agency of the People's Republic of China"
+      ]
+    },
+    {
+      "id": "chn-state-xinhua-phrase",
+      "tier": "B",
+      "actor": "China / Xinhua",
+      "type": "phrase",
+      "pattern": "Xinhua",
+      "case_sensitive": true,
+      "active_in_window": true,
+      "fp_risk": "low-medium",
+      "fp_note": "Distinctive word; hits will be dominated by wire attributions ('Xinhua reported'), which are mentions of the agency carrying its content second-hand — classified separately.",
+      "attribution": [
+        "As xinhuanet.com"
+      ]
+    },
+    {
+      "id": "chn-state-globaltimes",
+      "tier": "B",
+      "actor": "China / Global Times (People's Daily subsidiary)",
+      "type": "domain",
+      "pattern": "globaltimes.cn",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "Global Times is published under the People's Daily, the Chinese Communist Party's official newspaper"
+      ]
+    },
+    {
+      "id": "chn-state-chinadaily",
+      "tier": "B",
+      "actor": "China / China Daily (state-run)",
+      "type": "domain",
+      "pattern": "chinadaily.com.cn",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "China Daily is the Chinese state's English-language newspaper (publicity department of the Chinese Communist Party)"
+      ]
+    },
+    {
+      "id": "chn-state-cgtn",
+      "tier": "B",
+      "actor": "China / China Global Television Network (CGTN)",
+      "type": "domain",
+      "pattern": "cgtn.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "notes": "CGTN launched as a rebrand of CCTV's international channels on Dec 31 2016 — inside the window for 2017 links.",
+      "attribution": [
+        "China Global Television Network is the international division of the state broadcaster China Central Television (CCTV)"
+      ]
+    },
+    {
+      "id": "chn-state-cctv",
+      "tier": "B",
+      "actor": "China / China Central Television (CCTV)",
+      "type": "domain",
+      "pattern": "cctv.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "China Central Television is the Chinese state broadcaster"
+      ]
+    },
+    {
+      "id": "chn-state-peoples-daily",
+      "tier": "B",
+      "actor": "China / People's Daily",
+      "type": "domain",
+      "pattern": "people.com.cn",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "People's Daily is the official newspaper of the Central Committee of the Chinese Communist Party"
+      ]
+    },
+    {
+      "id": "chn-state-peoples-daily-cn",
+      "tier": "B",
+      "actor": "China / People's Daily (en.people.cn)",
+      "type": "domain",
+      "pattern": "people.cn",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "As people.com.cn"
+      ]
+    },
+    {
+      "id": "prk-state-kcna",
+      "tier": "B",
+      "actor": "North Korea / Korean Central News Agency (KCNA)",
+      "type": "domain",
+      "pattern": "kcna.kp",
+      "active_in_window": true,
+      "expected": "near-null sentinel",
+      "fp_risk": "low",
+      "attribution": [
+        "The Korean Central News Agency is the state news agency of the Democratic People's Republic of Korea"
+      ]
+    },
+    {
+      "id": "prk-state-kcna-jp",
+      "tier": "B",
+      "actor": "North Korea / KCNA (Japan-hosted legacy mirror)",
+      "type": "domain",
+      "pattern": "kcna.co.jp",
+      "active_in_window": true,
+      "expected": "near-null sentinel",
+      "fp_risk": "low",
+      "attribution": [
+        "kcna.co.jp was the long-standing Japan-hosted access point for Korean Central News Agency dispatches"
+      ]
+    },
+    {
+      "id": "prk-state-uriminzokkiri",
+      "tier": "B",
+      "actor": "North Korea / Uriminzokkiri",
+      "type": "domain",
+      "pattern": "uriminzokkiri.com",
+      "active_in_window": true,
+      "expected": "near-null sentinel",
+      "fp_risk": "low",
+      "attribution": [
+        "Uriminzokkiri is a Democratic People's Republic of Korea state-run outreach site"
+      ]
+    },
+    {
+      "id": "ven-state-telesur",
+      "tier": "B",
+      "actor": "Venezuela / Telesur (state-led regional broadcaster)",
+      "type": "domain",
+      "pattern": "telesurtv.net",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "Telesur is a Latin American broadcaster founded and majority-funded by the Venezuelan state; English service launched 2014"
+      ]
+    },
+    {
+      "id": "ven-state-telesur-en",
+      "tier": "B",
+      "actor": "Venezuela / Telesur English",
+      "type": "domain",
+      "pattern": "telesurenglish.net",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "As telesurtv.net"
+      ]
+    },
+    {
+      "id": "amp-globalresearch",
+      "tier": "C",
+      "actor": "Amplifier / Global Research (Centre for Research on Globalization, Canada)",
+      "type": "domain",
+      "pattern": "globalresearch.ca",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "notes": "Western-hosted, which matters for interpretation: a proxy that launders and amplifies non-western state narratives rather than a state organ.",
+      "attribution": [
+        "U.S. State Department Global Engagement Center, 'Pillars of Russia's Disinformation and Propaganda Ecosystem' (Aug 2020) — Global Research profiled as a key amplification node",
+        "Starbird, 'Examining the Alternative Media Ecosystem through the Production of Alternative Narratives' (ICWSM 2017)"
+      ]
+    },
+    {
+      "id": "amp-veteranstoday",
+      "tier": "C",
+      "actor": "Amplifier / Veterans Today",
+      "type": "domain",
+      "pattern": "veteranstoday.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "Documented cross-posting relationships with Iranian and Russian state outlets (editorial staff roles at Press TV and New Eastern Outlook; see also Starbird, ICWSM 2017)"
+      ]
+    },
+    {
+      "id": "amp-21stcenturywire",
+      "tier": "C",
+      "actor": "Amplifier / 21st Century Wire",
+      "type": "domain",
+      "pattern": "21stcenturywire.com",
+      "active_in_window": true,
+      "fp_risk": "low",
+      "attribution": [
+        "Founded by an RT contributor; recurrent node in alternative-media ecosystem mappings (Starbird, ICWSM 2017)"
+      ]
+    },
+    {
+      "id": "meta-internet-research-agency",
+      "tier": "M",
+      "actor": "meta",
+      "type": "phrase",
+      "pattern": "Internet Research Agency",
+      "case_sensitive": true,
+      "fp_risk": "low",
+      "attribution": ["meta-discussion marker"]
+    },
+    {
+      "id": "meta-troll-factory",
+      "tier": "M",
+      "actor": "meta",
+      "type": "phrase",
+      "pattern": "troll factory",
+      "case_sensitive": false,
+      "fp_risk": "low",
+      "attribution": ["meta-discussion marker"]
+    },
+    {
+      "id": "meta-troll-farm",
+      "tier": "M",
+      "actor": "meta",
+      "type": "phrase",
+      "pattern": "troll farm",
+      "case_sensitive": false,
+      "fp_risk": "low",
+      "attribution": ["meta-discussion marker"]
+    },
+    {
+      "id": "meta-web-brigades",
+      "tier": "M",
+      "actor": "meta",
+      "type": "phrase",
+      "pattern": "web brigades",
+      "case_sensitive": false,
+      "fp_risk": "low",
+      "attribution": ["meta-discussion marker"]
+    },
+    {
+      "id": "meta-olgino",
+      "tier": "M",
+      "actor": "meta",
+      "type": "phrase",
+      "pattern": "Olgino",
+      "case_sensitive": true,
+      "fp_risk": "low",
+      "attribution": ["meta-discussion marker — St. Petersburg district, metonym for the Internet Research Agency"]
+    },
+    {
+      "id": "meta-savushkina",
+      "tier": "M",
+      "actor": "meta",
+      "type": "phrase",
+      "pattern": "Savushkina",
+      "case_sensitive": true,
+      "fp_risk": "low",
+      "attribution": ["meta-discussion marker — 55 Savushkina Street, the Internet Research Agency's documented address"]
+    },
+    {
+      "id": "meta-glavset",
+      "tier": "M",
+      "actor": "meta",
+      "type": "phrase",
+      "pattern": "Glavset",
+      "case_sensitive": true,
+      "fp_risk": "low",
+      "attribution": ["meta-discussion marker — successor legal entity of the Internet Research Agency"]
+    },
+    {
+      "id": "meta-50-cent-party",
+      "tier": "M",
+      "actor": "meta",
+      "type": "phrase",
+      "pattern": "50 Cent Party",
+      "case_sensitive": true,
+      "fp_risk": "medium",
+      "fp_note": "Collides with the rapper 50 Cent plus 'party'; case-sensitive match and classification handle it.",
+      "attribution": ["meta-discussion marker — colloquial name for China's state-directed online commentators"]
+    },
+    {
+      "id": "meta-wumao",
+      "tier": "M",
+      "actor": "meta",
+      "type": "phrase",
+      "pattern": "wumao",
+      "case_sensitive": false,
+      "fp_risk": "low",
+      "attribution": ["meta-discussion marker — 'wumao'/'wu mao', the same colloquial name transliterated"]
+    },
+    {
+      "id": "base-bbc",
+      "tier": "BASE",
+      "actor": "baseline / BBC",
+      "type": "domain",
+      "pattern": "bbc.co.uk",
+      "fp_risk": "low",
+      "attribution": ["baseline comparator"]
+    },
+    {
+      "id": "base-bbc-com",
+      "tier": "BASE",
+      "actor": "baseline / BBC",
+      "type": "domain",
+      "pattern": "bbc.com",
+      "fp_risk": "low",
+      "attribution": ["baseline comparator"]
+    },
+    {
+      "id": "base-nytimes",
+      "tier": "BASE",
+      "actor": "baseline / New York Times",
+      "type": "domain",
+      "pattern": "nytimes.com",
+      "fp_risk": "low",
+      "attribution": ["baseline comparator"]
+    },
+    {
+      "id": "base-guardian",
+      "tier": "BASE",
+      "actor": "baseline / The Guardian",
+      "type": "domain",
+      "pattern": "theguardian.com",
+      "fp_risk": "low",
+      "attribution": ["baseline comparator"]
+    },
+    {
+      "id": "base-reuters",
+      "tier": "BASE",
+      "actor": "baseline / Reuters",
+      "type": "domain",
+      "pattern": "reuters.com",
+      "fp_risk": "low",
+      "attribution": ["baseline comparator"]
+    },
+    {
+      "id": "base-cnn",
+      "tier": "BASE",
+      "actor": "baseline / CNN",
+      "type": "domain",
+      "pattern": "cnn.com",
+      "fp_risk": "low",
+      "attribution": ["baseline comparator"]
+    },
+    {
+      "id": "base-foxnews",
+      "tier": "BASE",
+      "actor": "baseline / Fox News",
+      "type": "domain",
+      "pattern": "foxnews.com",
+      "fp_risk": "low",
+      "attribution": ["baseline comparator"]
+    },
+    {
+      "id": "base-breitbart",
+      "tier": "BASE",
+      "actor": "baseline / Breitbart",
+      "type": "domain",
+      "pattern": "breitbart.com",
+      "fp_risk": "low",
+      "attribution": ["baseline comparator"]
+    },
+    {
+      "id": "base-aljazeera",
+      "tier": "BASE",
+      "actor": "baseline / Al Jazeera (Qatari state-funded; deliberate comparator)",
+      "type": "domain",
+      "pattern": "aljazeera.com",
+      "fp_risk": "low",
+      "attribution": ["baseline comparator — a state-funded broadcaster whose presence in western link-sharing habits is normalized; useful contrast for the Tier B interpretation"]
+    },
+    {
+      "id": "base-dailymail",
+      "tier": "BASE",
+      "actor": "baseline / Daily Mail",
+      "type": "domain",
+      "pattern": "dailymail.co.uk",
+      "fp_risk": "low",
+      "attribution": ["baseline comparator"]
+    },
+    {
+      "id": "base-washingtonpost",
+      "tier": "BASE",
+      "actor": "baseline / Washington Post",
+      "type": "domain",
+      "pattern": "washingtonpost.com",
+      "fp_risk": "low",
+      "attribution": ["baseline comparator"]
+    }
+  ]
+}

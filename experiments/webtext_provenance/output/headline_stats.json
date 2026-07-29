@@ -1,0 +1,236 @@
+{
+ "generated_by": "06_headline_stats.py",
+ "corpus": {
+  "sample_docs": 260000,
+  "sample_splits": {
+   "train": 250000,
+   "valid": 5000,
+   "test": 5000
+  },
+  "sample_bpe_tokens": 152159454,
+  "sample_chars": 680097337
+ },
+ "scan": {
+  "indicators_total": 77,
+  "indicators_with_zero_hits": 46,
+  "zero_hit_indicator_ids": [
+   "amp-21stcenturywire",
+   "chn-state-cgtn",
+   "chn-state-globaltimes",
+   "chn-state-peoples-daily-cn",
+   "chn-state-xinhuanet",
+   "irn-lfp-awdnews",
+   "irn-lfp-britishleft",
+   "irn-lfp-iuvmpress",
+   "irn-lfp-libertyfrontpress",
+   "irn-lfp-realprogressivefront",
+   "irn-lfp-whatsupic",
+   "irn-state-farsnews",
+   "irn-state-mehrnews",
+   "irn-state-presstv-com",
+   "irn-state-presstv-ir",
+   "irn-state-tasnim",
+   "meta-glavset",
+   "meta-olgino",
+   "meta-savushkina",
+   "meta-wumao",
+   "prk-state-kcna-jp",
+   "prk-state-uriminzokkiri",
+   "rus-intel-geopolitica",
+   "rus-intel-inforos",
+   "rus-intel-journal-neo",
+   "rus-intel-katehon",
+   "rus-intel-newsfront",
+   "rus-intel-southfront",
+   "rus-ira-black4black",
+   "rus-ira-blackmattersus",
+   "rus-ira-blacktolive",
+   "rus-ira-donotshoot",
+   "rus-ira-media-politexpert",
+   "rus-ira-media-riafan",
+   "rus-ira-phrase-army-of-jesus",
+   "rus-ira-phrase-being-patriotic",
+   "rus-ira-phrase-jenna-abrams",
+   "rus-ira-phrase-secured-borders",
+   "rus-ira-phrase-ten-gop",
+   "rus-ira-phrase-united-muslims",
+   "rus-state-ria",
+   "rus-state-sputniknews",
+   "rus-state-tass",
+   "rus-state-tass-ru",
+   "ven-state-telesur",
+   "ven-state-telesur-en"
+  ],
+  "docs_with_any_hit": 1106,
+  "pairs_total": 605,
+  "pairs_adjudicated": 213
+ },
+ "tier_A": {
+  "indicators_in_list": 27,
+  "indicators_with_any_hit": [
+   "rus-intel-strategic-culture",
+   "rus-ira-phrase-blacktivist",
+   "rus-ira-phrase-heart-of-texas"
+  ],
+  "verdicts": {
+   "false_positive": 2,
+   "mention": 2,
+   "laundered_origin": 4
+  },
+  "state_produced_pairs": [
+   "train:117617:rus-intel-strategic-culture",
+   "train:147432:rus-intel-strategic-culture",
+   "train:192201:rus-intel-strategic-culture",
+   "train:208821:rus-intel-strategic-culture"
+  ],
+  "covert_asset_domains_with_zero_hits": [
+   "irn-lfp-awdnews",
+   "irn-lfp-britishleft",
+   "irn-lfp-iuvmpress",
+   "irn-lfp-libertyfrontpress",
+   "irn-lfp-realprogressivefront",
+   "irn-lfp-whatsupic",
+   "rus-intel-geopolitica",
+   "rus-intel-inforos",
+   "rus-intel-journal-neo",
+   "rus-intel-katehon",
+   "rus-intel-newsfront",
+   "rus-intel-southfront",
+   "rus-ira-black4black",
+   "rus-ira-blackmattersus",
+   "rus-ira-blacktolive",
+   "rus-ira-donotshoot",
+   "rus-ira-media-politexpert",
+   "rus-ira-media-riafan"
+  ]
+ },
+ "state_produced": {
+  "docs_total": 155,
+  "rate_per_10k_docs": 5.96,
+  "laundered_docs": 19,
+  "citation_amplification_docs": 25,
+  "per_actor": {
+   "Russia / Sputnik": 74,
+   "China / Xinhua": 42,
+   "Iran / Press TV": 16,
+   "Russia / RT (state-funded international broadcaster)": 9,
+   "China / China Daily (state-run)": 8,
+   "Russia / SVR-directed front (per U.S. Treasury)": 4,
+   "China / China Central Television (CCTV)": 2
+  }
+ },
+ "meta_discussion": {
+  "verdicts": {
+   "mention": 26
+  },
+  "docs": 18
+ },
+ "near_duplicate": {
+  "docs_compared": 578,
+  "pairs_at_or_above_0.50": 0,
+  "pairs_at_or_above_0.25": 0,
+  "clusters": 0
+ },
+ "census": {
+  "top1000_total_links": 21793666,
+  "share_of_45M_links": 0.4843,
+  "ranked_rows": {
+   "nytimes": {
+    "tier": "BASE",
+    "rank": 5,
+    "links": 333160,
+    "sample_produced_docs": null
+   },
+   "washingtonpost": {
+    "tier": "BASE",
+    "rank": 7,
+    "links": 315368,
+    "sample_produced_docs": null
+   },
+   "bbc": {
+    "tier": "BASE",
+    "rank": 9,
+    "links": 311917,
+    "sample_produced_docs": null
+   },
+   "theguardian": {
+    "tier": "BASE",
+    "rank": 10,
+    "links": 246303,
+    "sample_produced_docs": null
+   },
+   "cnn": {
+    "tier": "BASE",
+    "rank": 13,
+    "links": 199360,
+    "sample_produced_docs": null
+   },
+   "reuters": {
+    "tier": "BASE",
+    "rank": 17,
+    "links": 183592,
+    "sample_produced_docs": null
+   },
+   "dailymail": {
+    "tier": "BASE",
+    "rank": 24,
+    "links": 118676,
+    "sample_produced_docs": null
+   },
+   "foxnews": {
+    "tier": "BASE",
+    "rank": 35,
+    "links": 79494,
+    "sample_produced_docs": null
+   },
+   "breitbart": {
+    "tier": "BASE",
+    "rank": 44,
+    "links": 71743,
+    "sample_produced_docs": null
+   },
+   "rt": {
+    "tier": "B",
+    "rank": 92,
+    "links": 38575,
+    "sample_produced_docs": 9
+   },
+   "aljazeera": {
+    "tier": "BASE",
+    "rank": 112,
+    "links": 33867,
+    "sample_produced_docs": null
+   },
+   "people": {
+    "tier": "B",
+    "rank": 341,
+    "links": 12774,
+    "sample_produced_docs": 0
+   },
+   "sputniknews": {
+    "tier": "B",
+    "rank": 346,
+    "links": 12611,
+    "sample_produced_docs": 74
+   },
+   "presstv": {
+    "tier": "B",
+    "rank": 666,
+    "links": 7122,
+    "sample_produced_docs": 16
+   },
+   "globalresearch": {
+    "tier": "C",
+    "rank": 736,
+    "links": 6424,
+    "sample_produced_docs": 0
+   },
+   "telesurtv": {
+    "tier": "B",
+    "rank": 950,
+    "links": 5137,
+    "sample_produced_docs": 0
+   }
+  }
+ }
+}

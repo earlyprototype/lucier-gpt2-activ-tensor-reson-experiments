@@ -1,0 +1,298 @@
+{
+ "generated_by": "02_scan_corpus.py",
+ "indicators_sha256": "41233b7baf9b7a4dd71b2385e8e044cd592afcf515827235f1b5ca228b186643",
+ "runtime_seconds": 52.1,
+ "corpus": {
+  "train": {
+   "docs": 250000,
+   "chars": 654011978,
+   "bpe_tokens": 146326265
+  },
+  "valid": {
+   "docs": 5000,
+   "chars": 13116543,
+   "bpe_tokens": 2932891
+  },
+  "test": {
+   "docs": 5000,
+   "chars": 12968816,
+   "bpe_tokens": 2900298
+  }
+ },
+ "total_docs": 260000,
+ "docs_with_any_hit": 1106,
+ "per_tier_docs": {
+  "A": 8,
+  "B": 551,
+  "BASE": 533,
+  "C": 6,
+  "M": 18
+ },
+ "per_indicator": {
+  "chn-state-xinhua-phrase": {
+   "tier": "B",
+   "actor": "China / Xinhua",
+   "pattern": "Xinhua",
+   "docs": 244,
+   "occurrences": 420
+  },
+  "rus-state-sputnik-phrase": {
+   "tier": "B",
+   "actor": "Russia / Sputnik",
+   "pattern": "Sputnik",
+   "docs": 182,
+   "occurrences": 333
+  },
+  "base-foxnews": {
+   "tier": "BASE",
+   "actor": "baseline / Fox News",
+   "pattern": "foxnews.com",
+   "docs": 112,
+   "occurrences": 175
+  },
+  "base-breitbart": {
+   "tier": "BASE",
+   "actor": "baseline / Breitbart",
+   "pattern": "breitbart.com",
+   "docs": 98,
+   "occurrences": 109
+  },
+  "base-nytimes": {
+   "tier": "BASE",
+   "actor": "baseline / New York Times",
+   "pattern": "nytimes.com",
+   "docs": 68,
+   "occurrences": 83
+  },
+  "base-cnn": {
+   "tier": "BASE",
+   "actor": "baseline / CNN",
+   "pattern": "cnn.com",
+   "docs": 63,
+   "occurrences": 71
+  },
+  "rus-state-russia-today": {
+   "tier": "B",
+   "actor": "Russia / RT",
+   "pattern": "Russia Today",
+   "docs": 60,
+   "occurrences": 98
+  },
+  "base-bbc": {
+   "tier": "BASE",
+   "actor": "baseline / BBC",
+   "pattern": "bbc.co.uk",
+   "docs": 58,
+   "occurrences": 64
+  },
+  "irn-state-presstv-phrase": {
+   "tier": "B",
+   "actor": "Iran / Press TV",
+   "pattern": "Press TV",
+   "docs": 42,
+   "occurrences": 67
+  },
+  "base-dailymail": {
+   "tier": "BASE",
+   "actor": "baseline / Daily Mail",
+   "pattern": "dailymail.co.uk",
+   "docs": 35,
+   "occurrences": 40
+  },
+  "base-washingtonpost": {
+   "tier": "BASE",
+   "actor": "baseline / Washington Post",
+   "pattern": "washingtonpost.com",
+   "docs": 35,
+   "occurrences": 38
+  },
+  "base-guardian": {
+   "tier": "BASE",
+   "actor": "baseline / The Guardian",
+   "pattern": "theguardian.com",
+   "docs": 33,
+   "occurrences": 35
+  },
+  "rus-state-rt": {
+   "tier": "B",
+   "actor": "Russia / RT (state-funded international broadcaster)",
+   "pattern": "rt.com",
+   "docs": 22,
+   "occurrences": 31
+  },
+  "base-bbc-com": {
+   "tier": "BASE",
+   "actor": "baseline / BBC",
+   "pattern": "bbc.com",
+   "docs": 20,
+   "occurrences": 22
+  },
+  "base-reuters": {
+   "tier": "BASE",
+   "actor": "baseline / Reuters",
+   "pattern": "reuters.com",
+   "docs": 19,
+   "occurrences": 32
+  },
+  "meta-internet-research-agency": {
+   "tier": "M",
+   "actor": "meta",
+   "pattern": "Internet Research Agency",
+   "docs": 12,
+   "occurrences": 12
+  },
+  "chn-state-chinadaily": {
+   "tier": "B",
+   "actor": "China / China Daily (state-run)",
+   "pattern": "chinadaily.com.cn",
+   "docs": 8,
+   "occurrences": 10
+  },
+  "meta-troll-farm": {
+   "tier": "M",
+   "actor": "meta",
+   "pattern": "troll farm",
+   "docs": 7,
+   "occurrences": 9
+  },
+  "amp-globalresearch": {
+   "tier": "C",
+   "actor": "Amplifier / Global Research (Centre for Research on Globalization, Canada)",
+   "pattern": "globalresearch.ca",
+   "docs": 5,
+   "occurrences": 5
+  },
+  "meta-troll-factory": {
+   "tier": "M",
+   "actor": "meta",
+   "pattern": "troll factory",
+   "docs": 5,
+   "occurrences": 6
+  },
+  "base-aljazeera": {
+   "tier": "BASE",
+   "actor": "baseline / Al Jazeera (Qatari state-funded; deliberate comparator)",
+   "pattern": "aljazeera.com",
+   "docs": 4,
+   "occurrences": 4
+  },
+  "chn-state-cctv": {
+   "tier": "B",
+   "actor": "China / China Central Television (CCTV)",
+   "pattern": "cctv.com",
+   "docs": 4,
+   "occurrences": 6
+  },
+  "rus-intel-strategic-culture": {
+   "tier": "A",
+   "actor": "Russia / SVR-directed front (per U.S. Treasury)",
+   "pattern": "strategic-culture.org",
+   "docs": 4,
+   "occurrences": 4
+  },
+  "rus-ira-phrase-heart-of-texas": {
+   "tier": "A",
+   "actor": "Russia / Internet Research Agency",
+   "pattern": "Heart of Texas",
+   "docs": 3,
+   "occurrences": 3
+  },
+  "amp-veteranstoday": {
+   "tier": "C",
+   "actor": "Amplifier / Veterans Today",
+   "pattern": "veteranstoday.com",
+   "docs": 1,
+   "occurrences": 1
+  },
+  "chn-state-peoples-daily": {
+   "tier": "B",
+   "actor": "China / People's Daily",
+   "pattern": "people.com.cn",
+   "docs": 1,
+   "occurrences": 1
+  },
+  "meta-50-cent-party": {
+   "tier": "M",
+   "actor": "meta",
+   "pattern": "50 Cent Party",
+   "docs": 1,
+   "occurrences": 2
+  },
+  "meta-web-brigades": {
+   "tier": "M",
+   "actor": "meta",
+   "pattern": "web brigades",
+   "docs": 1,
+   "occurrences": 6
+  },
+  "prk-state-kcna": {
+   "tier": "B",
+   "actor": "North Korea / Korean Central News Agency (KCNA)",
+   "pattern": "kcna.kp",
+   "docs": 1,
+   "occurrences": 1
+  },
+  "rus-ira-phrase-blacktivist": {
+   "tier": "A",
+   "actor": "Russia / Internet Research Agency",
+   "pattern": "Blacktivist",
+   "docs": 1,
+   "occurrences": 1
+  },
+  "rus-state-rbth": {
+   "tier": "B",
+   "actor": "Russia / Russia Beyond The Headlines (Rossiyskaya Gazeta)",
+   "pattern": "rbth.com",
+   "docs": 1,
+   "occurrences": 5
+  }
+ },
+ "zero_hit_indicators": [
+  "amp-21stcenturywire",
+  "chn-state-cgtn",
+  "chn-state-globaltimes",
+  "chn-state-peoples-daily-cn",
+  "chn-state-xinhuanet",
+  "irn-lfp-awdnews",
+  "irn-lfp-britishleft",
+  "irn-lfp-iuvmpress",
+  "irn-lfp-libertyfrontpress",
+  "irn-lfp-realprogressivefront",
+  "irn-lfp-whatsupic",
+  "irn-state-farsnews",
+  "irn-state-mehrnews",
+  "irn-state-presstv-com",
+  "irn-state-presstv-ir",
+  "irn-state-tasnim",
+  "meta-glavset",
+  "meta-olgino",
+  "meta-savushkina",
+  "meta-wumao",
+  "prk-state-kcna-jp",
+  "prk-state-uriminzokkiri",
+  "rus-intel-geopolitica",
+  "rus-intel-inforos",
+  "rus-intel-journal-neo",
+  "rus-intel-katehon",
+  "rus-intel-newsfront",
+  "rus-intel-southfront",
+  "rus-ira-black4black",
+  "rus-ira-blackmattersus",
+  "rus-ira-blacktolive",
+  "rus-ira-donotshoot",
+  "rus-ira-media-politexpert",
+  "rus-ira-media-riafan",
+  "rus-ira-phrase-army-of-jesus",
+  "rus-ira-phrase-being-patriotic",
+  "rus-ira-phrase-jenna-abrams",
+  "rus-ira-phrase-secured-borders",
+  "rus-ira-phrase-ten-gop",
+  "rus-ira-phrase-united-muslims",
+  "rus-state-ria",
+  "rus-state-sputniknews",
+  "rus-state-tass",
+  "rus-state-tass-ru",
+  "ven-state-telesur",
+  "ven-state-telesur-en"
+ ]
+}

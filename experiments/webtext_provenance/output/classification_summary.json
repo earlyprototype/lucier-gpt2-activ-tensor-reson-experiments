@@ -1,0 +1,91 @@
+{
+ "generated_by": "03_classify_hits.py",
+ "pairs_total": 605,
+ "adjudicated_pairs": 213,
+ "per_tier_verdicts": {
+  "A": {
+   "false_positive": 2,
+   "mention": 2,
+   "laundered_origin": 4
+  },
+  "B": {
+   "mention": 344,
+   "false_positive": 46,
+   "origin": 93,
+   "wire_carriage": 43,
+   "citation_amplification": 24,
+   "laundered_origin": 15
+  },
+  "C": {
+   "mention": 4,
+   "citation_amplification": 2
+  },
+  "M": {
+   "mention": 26
+  }
+ },
+ "per_actor_verdicts": {
+  "Amplifier / Global Research (Centre for Research on Globalization, Canada)": {
+   "mention": 3,
+   "citation_amplification": 2
+  },
+  "Amplifier / Veterans Today": {
+   "mention": 1
+  },
+  "China / China Central Television (CCTV)": {
+   "mention": 2,
+   "origin": 2
+  },
+  "China / China Daily (state-run)": {
+   "origin": 8
+  },
+  "China / People's Daily": {
+   "mention": 1
+  },
+  "China / Xinhua": {
+   "wire_carriage": 42,
+   "mention": 202
+  },
+  "Iran / Press TV": {
+   "origin": 10,
+   "citation_amplification": 8,
+   "mention": 18,
+   "laundered_origin": 6
+  },
+  "North Korea / Korean Central News Agency (KCNA)": {
+   "mention": 1
+  },
+  "Russia / Internet Research Agency": {
+   "false_positive": 2,
+   "mention": 2
+  },
+  "Russia / RT": {
+   "mention": 57,
+   "citation_amplification": 3
+  },
+  "Russia / RT (state-funded international broadcaster)": {
+   "citation_amplification": 8,
+   "mention": 5,
+   "laundered_origin": 8,
+   "origin": 1
+  },
+  "Russia / Russia Beyond The Headlines (Rossiyskaya Gazeta)": {
+   "mention": 1
+  },
+  "Russia / SVR-directed front (per U.S. Treasury)": {
+   "laundered_origin": 4
+  },
+  "Russia / Sputnik": {
+   "mention": 57,
+   "false_positive": 46,
+   "origin": 72,
+   "citation_amplification": 5,
+   "laundered_origin": 1,
+   "wire_carriage": 1
+  },
+  "meta": {
+   "mention": 26
+  }
+ },
+ "unreviewed_tier_A_pairs": []
+}

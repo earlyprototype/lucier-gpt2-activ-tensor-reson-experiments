@@ -1,0 +1,847 @@
+{
+ "generated_by": "05_domain_census.py",
+ "census_provenance": "openai/gpt-2 domains.txt \u2014 'the top 1,000 domains present in WebText and their frequency' (model card)",
+ "census_unit": "links among the ~45M scraped (counts sum to ~21.8M, far above the ~8M deduplicated documents)",
+ "total_links_nominal": 45000000,
+ "top1000_total_links": 21793666,
+ "top1000_share_of_links_nominal": 0.4843,
+ "per_tier_census_links_excluding_collisions": {
+  "BASE": 1893480,
+  "B": 63445,
+  "C": 6424,
+  "A": 0
+ },
+ "census_anomalies": [
+  {
+   "rank": 217,
+   "raw": "20068"
+  }
+ ],
+ "rows": [
+  {
+   "census_label": "nytimes",
+   "tier": "BASE",
+   "actors": [
+    "baseline / New York Times"
+   ],
+   "domains": [
+    "nytimes.com"
+   ],
+   "census_rank": 5,
+   "census_links": 333160,
+   "share_of_top1000_links": 0.01529,
+   "naive_expected_in_sample": 1924.9,
+   "sample_produced_docs": null,
+   "label_collision": null
+  },
+  {
+   "census_label": "washingtonpost",
+   "tier": "BASE",
+   "actors": [
+    "baseline / Washington Post"
+   ],
+   "domains": [
+    "washingtonpost.com"
+   ],
+   "census_rank": 7,
+   "census_links": 315368,
+   "share_of_top1000_links": 0.01447,
+   "naive_expected_in_sample": 1822.1,
+   "sample_produced_docs": null,
+   "label_collision": null
+  },
+  {
+   "census_label": "bbc",
+   "tier": "BASE",
+   "actors": [
+    "baseline / BBC"
+   ],
+   "domains": [
+    "bbc.co.uk",
+    "bbc.com"
+   ],
+   "census_rank": 9,
+   "census_links": 311917,
+   "share_of_top1000_links": 0.01431,
+   "naive_expected_in_sample": 1802.2,
+   "sample_produced_docs": null,
+   "label_collision": null
+  },
+  {
+   "census_label": "theguardian",
+   "tier": "BASE",
+   "actors": [
+    "baseline / The Guardian"
+   ],
+   "domains": [
+    "theguardian.com"
+   ],
+   "census_rank": 10,
+   "census_links": 246303,
+   "share_of_top1000_links": 0.0113,
+   "naive_expected_in_sample": 1423.1,
+   "sample_produced_docs": null,
+   "label_collision": null
+  },
+  {
+   "census_label": "cnn",
+   "tier": "BASE",
+   "actors": [
+    "baseline / CNN"
+   ],
+   "domains": [
+    "cnn.com"
+   ],
+   "census_rank": 13,
+   "census_links": 199360,
+   "share_of_top1000_links": 0.00915,
+   "naive_expected_in_sample": 1151.9,
+   "sample_produced_docs": null,
+   "label_collision": null
+  },
+  {
+   "census_label": "reuters",
+   "tier": "BASE",
+   "actors": [
+    "baseline / Reuters"
+   ],
+   "domains": [
+    "reuters.com"
+   ],
+   "census_rank": 17,
+   "census_links": 183592,
+   "share_of_top1000_links": 0.00842,
+   "naive_expected_in_sample": 1060.8,
+   "sample_produced_docs": null,
+   "label_collision": null
+  },
+  {
+   "census_label": "dailymail",
+   "tier": "BASE",
+   "actors": [
+    "baseline / Daily Mail"
+   ],
+   "domains": [
+    "dailymail.co.uk"
+   ],
+   "census_rank": 24,
+   "census_links": 118676,
+   "share_of_top1000_links": 0.00545,
+   "naive_expected_in_sample": 685.7,
+   "sample_produced_docs": null,
+   "label_collision": null
+  },
+  {
+   "census_label": "foxnews",
+   "tier": "BASE",
+   "actors": [
+    "baseline / Fox News"
+   ],
+   "domains": [
+    "foxnews.com"
+   ],
+   "census_rank": 35,
+   "census_links": 79494,
+   "share_of_top1000_links": 0.00365,
+   "naive_expected_in_sample": 459.3,
+   "sample_produced_docs": null,
+   "label_collision": null
+  },
+  {
+   "census_label": "breitbart",
+   "tier": "BASE",
+   "actors": [
+    "baseline / Breitbart"
+   ],
+   "domains": [
+    "breitbart.com"
+   ],
+   "census_rank": 44,
+   "census_links": 71743,
+   "share_of_top1000_links": 0.00329,
+   "naive_expected_in_sample": 414.5,
+   "sample_produced_docs": null,
+   "label_collision": null
+  },
+  {
+   "census_label": "rt",
+   "tier": "B",
+   "actors": [
+    "Russia / RT (state-funded international broadcaster)"
+   ],
+   "domains": [
+    "rt.com"
+   ],
+   "census_rank": 92,
+   "census_links": 38575,
+   "share_of_top1000_links": 0.00177,
+   "naive_expected_in_sample": 222.9,
+   "sample_produced_docs": 9,
+   "label_collision": "assumed rt.com at this volume; minor collision possible (e.g. rt.de is also RT)"
+  },
+  {
+   "census_label": "aljazeera",
+   "tier": "BASE",
+   "actors": [
+    "baseline / Al Jazeera (Qatari state-funded; deliberate comparator)"
+   ],
+   "domains": [
+    "aljazeera.com"
+   ],
+   "census_rank": 112,
+   "census_links": 33867,
+   "share_of_top1000_links": 0.00155,
+   "naive_expected_in_sample": 195.7,
+   "sample_produced_docs": null,
+   "label_collision": null
+  },
+  {
+   "census_label": "people",
+   "tier": "B",
+   "actors": [
+    "China / People's Daily",
+    "China / People's Daily (en.people.cn)"
+   ],
+   "domains": [
+    "people.cn",
+    "people.com.cn"
+   ],
+   "census_rank": 341,
+   "census_links": 12774,
+   "share_of_top1000_links": 0.00059,
+   "naive_expected_in_sample": 73.8,
+   "sample_produced_docs": 0,
+   "label_collision": "almost certainly people.com (People magazine), not people.com.cn \u2014 excluded from totals"
+  },
+  {
+   "census_label": "sputniknews",
+   "tier": "B",
+   "actors": [
+    "Russia / Sputnik (Rossiya Segodnya)"
+   ],
+   "domains": [
+    "sputniknews.com"
+   ],
+   "census_rank": 346,
+   "census_links": 12611,
+   "share_of_top1000_links": 0.00058,
+   "naive_expected_in_sample": 72.9,
+   "sample_produced_docs": 74,
+   "label_collision": null
+  },
+  {
+   "census_label": "presstv",
+   "tier": "B",
+   "actors": [
+    "Iran / Press TV",
+    "Iran / Press TV (Islamic Republic of Iran Broadcasting)"
+   ],
+   "domains": [
+    "presstv.com",
+    "presstv.ir"
+   ],
+   "census_rank": 666,
+   "census_links": 7122,
+   "share_of_top1000_links": 0.00033,
+   "naive_expected_in_sample": 41.1,
+   "sample_produced_docs": 16,
+   "label_collision": null
+  },
+  {
+   "census_label": "globalresearch",
+   "tier": "C",
+   "actors": [
+    "Amplifier / Global Research (Centre for Research on Globalization, Canada)"
+   ],
+   "domains": [
+    "globalresearch.ca"
+   ],
+   "census_rank": 736,
+   "census_links": 6424,
+   "share_of_top1000_links": 0.00029,
+   "naive_expected_in_sample": 37.1,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "telesurtv",
+   "tier": "B",
+   "actors": [
+    "Venezuela / Telesur (state-led regional broadcaster)"
+   ],
+   "domains": [
+    "telesurtv.net"
+   ],
+   "census_rank": 950,
+   "census_links": 5137,
+   "share_of_top1000_links": 0.00024,
+   "naive_expected_in_sample": 29.7,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "blackmattersus",
+   "tier": "A",
+   "actors": [
+    "Russia / Internet Research Agency"
+   ],
+   "domains": [
+    "blackmattersus.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "blacktolive",
+   "tier": "A",
+   "actors": [
+    "Russia / Internet Research Agency"
+   ],
+   "domains": [
+    "blacktolive.org"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "donotshoot",
+   "tier": "A",
+   "actors": [
+    "Russia / Internet Research Agency"
+   ],
+   "domains": [
+    "donotshoot.us"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "black4black",
+   "tier": "A",
+   "actors": [
+    "Russia / Internet Research Agency"
+   ],
+   "domains": [
+    "black4black.info"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "riafan",
+   "tier": "A",
+   "actors": [
+    "Russia / Internet Research Agency media arm (Federal News Agency)"
+   ],
+   "domains": [
+    "riafan.ru"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "politexpert",
+   "tier": "A",
+   "actors": [
+    "Russia / Prigozhin media group"
+   ],
+   "domains": [
+    "politexpert.net"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "southfront",
+   "tier": "A",
+   "actors": [
+    "Russia / FSB-directed front (per U.S. Treasury)"
+   ],
+   "domains": [
+    "southfront.org"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "newsfront",
+   "tier": "A",
+   "actors": [
+    "Russia / FSB-linked front (per U.S. Treasury)"
+   ],
+   "domains": [
+    "newsfront.info"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "strategic-culture",
+   "tier": "A",
+   "actors": [
+    "Russia / SVR-directed front (per U.S. Treasury)"
+   ],
+   "domains": [
+    "strategic-culture.org"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 4,
+   "label_collision": null
+  },
+  {
+   "census_label": "inforos",
+   "tier": "A",
+   "actors": [
+    "Russia / GRU-linked (per U.S. Treasury)"
+   ],
+   "domains": [
+    "inforos.ru"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "journal-neo",
+   "tier": "A",
+   "actors": [
+    "Russia / intelligence-linked outlet (per U.S. State Dept)"
+   ],
+   "domains": [
+    "journal-neo.org"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "katehon",
+   "tier": "A",
+   "actors": [
+    "Russia / Kremlin-linked think-tank outlet (per U.S. State Dept)"
+   ],
+   "domains": [
+    "katehon.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "geopolitica",
+   "tier": "A",
+   "actors": [
+    "Russia / Kremlin-aligned outlet (per U.S. State Dept)"
+   ],
+   "domains": [
+    "geopolitica.ru"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "libertyfrontpress",
+   "tier": "A",
+   "actors": [
+    "Iran / 'Liberty Front Press' network (IRGC-linked per FireEye)"
+   ],
+   "domains": [
+    "libertyfrontpress.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "awdnews",
+   "tier": "A",
+   "actors": [
+    "Iran / covert network (per FireEye)"
+   ],
+   "domains": [
+    "awdnews.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "iuvmpress",
+   "tier": "A",
+   "actors": [
+    "Iran / International Union of Virtual Media (per FireEye)"
+   ],
+   "domains": [
+    "iuvmpress.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "whatsupic",
+   "tier": "A",
+   "actors": [
+    "Iran / covert network (per FireEye)"
+   ],
+   "domains": [
+    "whatsupic.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "realprogressivefront",
+   "tier": "A",
+   "actors": [
+    "Iran / covert network (per FireEye)"
+   ],
+   "domains": [
+    "realprogressivefront.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "britishleft",
+   "tier": "A",
+   "actors": [
+    "Iran / covert network (per FireEye)"
+   ],
+   "domains": [
+    "britishleft.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "tass",
+   "tier": "B",
+   "actors": [
+    "Russia / TASS",
+    "Russia / TASS (state news agency)"
+   ],
+   "domains": [
+    "tass.com",
+    "tass.ru"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "ria",
+   "tier": "B",
+   "actors": [
+    "Russia / RIA Novosti (Rossiya Segodnya)"
+   ],
+   "domains": [
+    "ria.ru"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "rbth",
+   "tier": "B",
+   "actors": [
+    "Russia / Russia Beyond The Headlines (Rossiyskaya Gazeta)"
+   ],
+   "domains": [
+    "rbth.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "farsnews",
+   "tier": "B",
+   "actors": [
+    "Iran / Fars News Agency (IRGC-affiliated)"
+   ],
+   "domains": [
+    "farsnews.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "mehrnews",
+   "tier": "B",
+   "actors": [
+    "Iran / Mehr News Agency"
+   ],
+   "domains": [
+    "mehrnews.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "tasnimnews",
+   "tier": "B",
+   "actors": [
+    "Iran / Tasnim News Agency (IRGC-linked)"
+   ],
+   "domains": [
+    "tasnimnews.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "xinhua",
+   "tier": "B",
+   "actors": [
+    "China / Xinhua (official state news agency)"
+   ],
+   "domains": [
+    "xinhuanet.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 42,
+   "label_collision": null
+  },
+  {
+   "census_label": "globaltimes",
+   "tier": "B",
+   "actors": [
+    "China / Global Times (People's Daily subsidiary)"
+   ],
+   "domains": [
+    "globaltimes.cn"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "chinadaily",
+   "tier": "B",
+   "actors": [
+    "China / China Daily (state-run)"
+   ],
+   "domains": [
+    "chinadaily.com.cn"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 8,
+   "label_collision": null
+  },
+  {
+   "census_label": "cgtn",
+   "tier": "B",
+   "actors": [
+    "China / China Global Television Network (CGTN)"
+   ],
+   "domains": [
+    "cgtn.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "cctv",
+   "tier": "B",
+   "actors": [
+    "China / China Central Television (CCTV)"
+   ],
+   "domains": [
+    "cctv.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 2,
+   "label_collision": null
+  },
+  {
+   "census_label": "kcna",
+   "tier": "B",
+   "actors": [
+    "North Korea / KCNA (Japan-hosted legacy mirror)",
+    "North Korea / Korean Central News Agency (KCNA)"
+   ],
+   "domains": [
+    "kcna.co.jp",
+    "kcna.kp"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "uriminzokkiri",
+   "tier": "B",
+   "actors": [
+    "North Korea / Uriminzokkiri"
+   ],
+   "domains": [
+    "uriminzokkiri.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "telesurenglish",
+   "tier": "B",
+   "actors": [
+    "Venezuela / Telesur English"
+   ],
+   "domains": [
+    "telesurenglish.net"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "veteranstoday",
+   "tier": "C",
+   "actors": [
+    "Amplifier / Veterans Today"
+   ],
+   "domains": [
+    "veteranstoday.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  },
+  {
+   "census_label": "21stcenturywire",
+   "tier": "C",
+   "actors": [
+    "Amplifier / 21st Century Wire"
+   ],
+   "domains": [
+    "21stcenturywire.com"
+   ],
+   "census_rank": null,
+   "census_links": 0,
+   "share_of_top1000_links": 0.0,
+   "naive_expected_in_sample": 0.0,
+   "sample_produced_docs": 0,
+   "label_collision": null
+  }
+ ]
+}

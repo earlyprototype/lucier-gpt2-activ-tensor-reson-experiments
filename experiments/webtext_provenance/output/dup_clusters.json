@@ -1,0 +1,10 @@
+{
+ "generated_by": "04_near_duplicates.py",
+ "n_docs_compared": 578,
+ "shingle_words": 8,
+ "jaccard_threshold": 0.5,
+ "n_pairs_over_cluster_threshold": 0,
+ "n_pairs_over_low_threshold": 0,
+ "pairs": [],
+ "clusters": []
+}
