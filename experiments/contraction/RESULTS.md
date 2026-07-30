@@ -64,8 +64,10 @@ flat for the first thirty iterations and then contracts, so no single rate descr
 **M5.** M5 asks for the per-step rescale factor and is filed as gated on the grounds that it is never
 recorded. It is derivable from what is recorded. Measured, the loop rescales the state to **29%** of
 its size per round in one run and **10%** in another, stable across iterations. H-pos0 states this
-figure is 1 at a settled state. Because the map is not scale-invariant over this range (#69), the
-scalar does not drop out of the fixed-point condition.
+figure is 1 at a settled state. It is not, and the reason is simple: the loop shrinks the state back
+to the size of the *original prompt's* activations, and one pass through the model grows it 3.5–10×.
+Those two cancel, which is why the size looks steady — but neither is 1. The figure would be 1 only
+if the loop reset to the previous step's size instead of the seed's.
 
 ---
 
@@ -434,22 +436,74 @@ the state *after* *n* passes and *before* the rescale that precedes pass *n*+1, 
 
 ### Relation to H-pos0
 
+Terms used in this subsection:
+
+- **ν** — `initial_norm`; the length the loop rescales back to. Computed once at
+  `atr_engine.py:176` and never updated.
+- **λ** — the length the forward pass hands back, ‖*F*(ν*u*)‖. At settlement this is the recorded
+  `settled ‖x‖`.
+- ***c*** — the rescale factor, ν/λ.
+- ***u*** — the state as a pure direction, *x*/‖*x*‖.
+- ***F*** — one full pass through the 12 blocks; ***F₀*** the same restricted to position 0.
+- **Δ** — everything the blocks add to the residual stream: *F*(*x*) = *x* + Δ(*x*).
+- **gain** — λ/ν, the factor by which one forward pass multiplies length. Listed as
+  `amplification` in the table above.
+- **fixed point** — a state the loop leaves unchanged.
+- **nonlinear eigenvector** — a direction a nonlinear map sends to a positive multiple of itself.
+- **LayerNorm scale-invariance** — LN(*cx*) = LN(*x*) for *c* > 0, because (*cx* − *cμ*)/(*cσ*)
+  = (*x* − *μ*)/*σ*. Exact up to the ε in the denominator.
+
 #75 states the H-pos0 argument as:
 
 > At a settled, position-uniform state ‖xⁿ‖ is constant, so ***c_n* = 1**, and the shared vector must
 > satisfy ***x\* = F₀(x\*)***
 
-‖xⁿ‖ is constant at settlement, as stated. The measured *c* at settlement is not 1: the rescale
-target is the *initial* norm and the settled norm is 3.5–10× that, giving *c* = 0.288, 0.099, 0.266 in
-the three committed runs.
+‖xⁿ‖ is constant at settlement, as stated. The step from there to *c_n* = 1 does not hold, and the
+reason is worth stating precisely, because it is a legible error rather than a loose one.
+
+**Constant and equal-to-one are different claims, and which one you get depends on the rescale
+target.** If the loop rescaled to the *previous iteration's* norm, *c* = ‖xⁿ⁻¹‖/‖xⁿ‖ would indeed be
+1 at settlement — nothing is drifting, so the correction is trivial. That is the reading under which
+#75's inference is valid. But this loop rescales to a target frozen at iteration 0
+(`atr_engine.py:176`, `215`), so *c* = ν/λ with ν fixed. At settlement that is constant, which is
+what "settled" buys, and it equals 1 only if the forward pass returns the length it was given.
+
+It does not. Measured on `Divine_Syntactic`, ν = 1468.49 in and λ = 5098.14 out — a gain of 3.47.
+So *c* = 0.288, and the three committed runs give 0.288, 0.099, 0.266.
+
+**Stated as a dynamical system.** Because the norm is clamped on entry every iteration, only the
+direction evolves, and the loop is a map on the unit sphere in ℝ⁷⁶⁸:
+
+> *u*ₙ₊₁ = *F*(ν*u*ₙ) / ‖*F*(ν*u*ₙ)‖
+
+Fixed points satisfy *F*(ν*u\**) = λ*u\**, a nonlinear eigenvector condition, with *c* = ν/λ. This
+**derives** the measured *c* rather than observing it, and it is why the engine docstring's
+"nonlinear analogue of power iteration" is literally accurate rather than a metaphor.
 
 The fixed-point condition is therefore not *x\** = *F₀*(*x\**) but
 
 > *x\** = *c* · *x\** + *g₀*(LN(*x\**))   with *c* ≈ 0.29 measured
 
-**The scalar does not drop out**, because the map is not scale-invariant over this range. #69 measured
-cos(*F*(*c*·*x*), *F*(*x*)) at 0.936 for *c* = 2 and 0.505 for *c* = 10; the measured amplification here
-is 3.5–10×.
+equivalently Δ(*u\**) = (λ − ν)*u\**: the accumulated write of all blocks must point along *u\**. Its
+size follows — ‖Δ‖ = (1 − *c*)λ = 3629.65 for `Divine_Syntactic`. The network writes about 3630 of
+length onto a state of length 1468.
+
+**Where the scale dependence actually lives — this corrects an earlier statement in this file.** A
+previous revision said the scalar does not drop out "because the map is not scale-invariant over this
+range", citing #69. That is true but attributes it to the wrong place. LayerNorm is *exactly*
+scale-invariant, so every block reads a ν-independent input at first order and block 0's write does
+not see ν at all. The ν-dependence enters through the residual term: block 1 reads
+LN(ν*u* + Δ₀(*u*)) = LN(*u* + Δ₀(*u*)/ν), so it is the ratios ‖Δ_l‖/ν that carry it, and they shrink
+as ν grows. #69's own breakdown is the confirming measurement, not merely a citation for it: it
+reports the invariance holding to ~10⁻⁵ *at the LayerNorm* and failing *around the residual path*,
+which is exactly this split.
+
+**Consequence: *c* = 1 is not an absurd condition, it is a large-ν condition.** Gain is
+1 + ‖Δ‖/ν, and since Δ is fixed by direction rather than length, gain falls toward 1 as ν rises. At
+ν ≈ 3630 the gain would be about 2. These runs sit at *c* ≈ 0.29 because ν ≈ 1468 is small against
+what the network writes — and ν is small because it is whatever norm the seed prompt happened to
+produce. So the quantity is not arbitrary in the sense of meaningless; it is set by the seed, and it
+selects a position on a continuum that has *c* = 1 at one end.
 
 **Unaffected:** H-pos0's structure. Position 0's trajectory remains autonomous up to one scalar, and
 an *n* = 1 run implements the same rescaled map. The intermediate claim and the fixed-point form
@@ -520,9 +574,12 @@ oppositely. GPT-2 Small's poor single-rate fit is a latency rather than a slow r
 by the massive-activation effect documented in `sink_geometry`.
 
 **Determined.** The rescale factor *c* settles to a stable constant that is not 1: 0.288, 0.099, 0.266
-across three committed runs. H-pos0 (#75) states this figure is 1 at a settled state. Because the map
-is not scale-invariant over the measured range (#69), the scalar does not drop out of the fixed-point
-condition. M5 required neither a forward pass nor an engine change.
+across three committed runs. It is *c* = ν/λ, the seed norm over the norm one forward pass returns, so
+it is 1 only if the pass has unit gain; measured gain is 3.5–10×. H-pos0 (#75) infers *c* = 1 from the
+settled norm being constant, which would hold if the loop rescaled to the previous iteration's norm
+but does not, because the target is frozen at iteration 0. The scalar does not drop out of the
+fixed-point condition, and it enters through the residual path rather than through LayerNorm, which is
+exactly scale-invariant. M5 required neither a forward pass nor an engine change.
 
 **Bounded, not determined.** Whether the position collapse is exactly exact. The typical coordinate
 agrees to ~2 float32 ε, the scale of arithmetic noise, which bounds a structured disagreement to below
