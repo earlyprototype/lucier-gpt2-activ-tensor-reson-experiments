@@ -439,7 +439,11 @@ the state *after* *n* passes and *before* the rescale that precedes pass *n*+1, 
 Terms used in this subsection:
 
 - **ν** — `initial_norm`; the length the loop rescales back to. Computed once at
-  `atr_engine.py:176` and never updated.
+  `atr_engine.py:176` and never updated. It is the **whole-tensor Frobenius** norm over `[T, 768]`
+  (`atr_engine.py:214`), so the per-position norm is ν/√T — 1392.65/√12 = 402.02 for
+  `Control_prolet_Semantic`, matching its measured row norm. That identity holds only *because*
+  positions collapse (row-norm spread ~4×10⁻⁷ relative); it is not general. The same √T is what
+  `RESULTS_SUMMARY.md` flags as substituted in the random baseline's calibration.
 - **λ** — the length the forward pass hands back, ‖*F*(ν*u*)‖. At settlement this is the recorded
   `settled ‖x‖`.
 - ***c*** — the rescale factor, ν/λ.
@@ -472,22 +476,43 @@ It does not. Measured on `Control_prolet_Semantic`, ν = 1392.65 in and λ = 523
 3.76. So *c* = 0.2662, and the three committed runs give 0.288, 0.099, 0.266.
 
 **Which run to use as the worked example, and a correction.** `Control_prolet_Semantic` is used above
-because it is a genuine fixed point. `Divine_Syntactic` is not: F9/F10 established it is an exact
-period-2 limit cycle, cos(*A*, *f*(*f*(*A*))) = 1.000000. For a 2-cycle *F*(ν*u_A*) = λ*u_B* with
-*u_B* ≠ *u_A*, so *F*(ν*u*) is **not** parallel to *u* and the fixed-point relation below does not
-apply to it. An earlier revision of this section used `Divine_Syntactic` as the worked example and
-reported ‖Δ‖ = 3629.65 for it; that figure is withdrawn. Note *c* = ν/λ itself is unaffected — it is
-the recorded rescale factor either way — and the M5 table above is unchanged.
+because it is a genuine fixed point — flat at every lag, worst deviation 3.9×10⁻⁷ relative.
+`Divine_Syntactic` is not: F9/F10 established it is an exact period-2 limit cycle,
+cos(*A*, *f*(*f*(*A*))) = 1.000000. For a 2-cycle *F*(ν*u_A*) = λ_A*u_B* with *u_B* ≠ *u_A*, so
+*F*(ν*u*) is **not** parallel to *u* and the fixed-point relation below does not apply to it.
 
-Worth recording *why* the error was easy to make, because it is a property of the archive rather than
-carelessness: `05_divine_motion.py` samples every 10 iterations from 800, and **10 is even**, so every
-snapshot catches the same phase of a period-2 cycle. Consecutive archived states have pairwise cosine
-1.0000 at both lag 1 and lag 2. The schedule aliases the cycle into looking like a fixed point, and
-nothing in the archived state distinguishes the two. A period-2 orbit is only visible on an
-odd-spaced schedule, or by the lag-2 test F9 used.
+An earlier revision of this section used `Divine_Syntactic` as the worked example and reported
+‖Δ‖ = 3629.65 for it. That figure is withdrawn, and **no single ‖Δ‖ is correct for that run in
+principle**: the two phases have different output norms — λ_A = 5098.14, λ_B = 4837.94, both recorded
+in `output_hinge_eigen/hinge_eigenvalue.json` — so there are two half-step magnitudes, **3978.73** for
+*A* → *B* and **4229.92** for *B* → *A*.
+
+***c* is not a stable constant for that run either, and the M5 table above needs reading with that in
+mind.** `hinge_eigenvalue.json` records shell factors **0.288044 at *A* and 0.303536 at *B***, a 5.4%
+alternation. The table reports `Divine_Syntactic`'s *c* as settling to a spread of 2×10⁻⁴; that
+figure is the aliasing artefact described next, not a measurement of stability. *c* is a genuine
+stable constant for `Control_prolet_Semantic` and `Control_noise`, and alternates for
+`Divine_Syntactic`.
+
+**Why the error was easy to make.** `05_divine_motion.py` samples every 10 iterations from 800, and
+**10 is even**, so all 21 late snapshots sit at one parity of a period-2 cycle: their pairwise cosines
+are 1.0000 at both lag 1 and lag 2. The schedule aliases the cycle into looking converged.
+
+**But the archive is not silent about it** — an earlier revision of this paragraph claimed nothing in
+the archived state distinguishes the two, and that is wrong. Every snapshot carries `cosine_sim_last`,
+the true lag-1 cosine, reading **0.684912** at each late `Divine_Syntactic` snapshot against exactly
+1.0 for `Control_prolet_Semantic`; `output_divine_motion/probe_lag1_results.json` records the same
+split directly (odd lags L2 = 1249.43, cos = 0.684912; even lags L2 ≈ 3×10⁻⁴, cos = 1.000000). The
+alternation is in the committed data in plain sight. What the even-spaced schedule hides is only the
+*tensor* trajectory, from anyone reading the states alone.
 
 **Stated as a dynamical system.** Because the norm is clamped on entry every iteration, only the
-direction evolves, and the loop is a map on the unit sphere in ℝ⁷⁶⁸:
+direction evolves, and the loop is a map on the unit sphere in ℝ⁷⁶⁸. **Scope of that reduction:** the
+true state space is ℝ^(T×768) and the sphere is S^(768T−1); the reduction holds on the row-uniform
+subspace, which is exactly invariant (identical rows give identical queries, keys and values, so every
+softmax row averages identical vectors and returns them, and LayerNorm, MLP and the residual add are
+per-position). The 768(*T*−1) transverse directions are not covered by anything below; that they
+contract is an empirical fact from M1, not a consequence of this algebra.
 
 > *u*ₙ₊₁ = *F*(ν*u*ₙ) / ‖*F*(ν*u*ₙ)‖
 
