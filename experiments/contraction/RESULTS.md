@@ -468,8 +468,23 @@ target.** If the loop rescaled to the *previous iteration's* norm, *c* = ‖xⁿ
 (`atr_engine.py:176`, `215`), so *c* = ν/λ with ν fixed. At settlement that is constant, which is
 what "settled" buys, and it equals 1 only if the forward pass returns the length it was given.
 
-It does not. Measured on `Divine_Syntactic`, ν = 1468.49 in and λ = 5098.14 out — a gain of 3.47.
-So *c* = 0.288, and the three committed runs give 0.288, 0.099, 0.266.
+It does not. Measured on `Control_prolet_Semantic`, ν = 1392.65 in and λ = 5230.65 out — a gain of
+3.76. So *c* = 0.2662, and the three committed runs give 0.288, 0.099, 0.266.
+
+**Which run to use as the worked example, and a correction.** `Control_prolet_Semantic` is used above
+because it is a genuine fixed point. `Divine_Syntactic` is not: F9/F10 established it is an exact
+period-2 limit cycle, cos(*A*, *f*(*f*(*A*))) = 1.000000. For a 2-cycle *F*(ν*u_A*) = λ*u_B* with
+*u_B* ≠ *u_A*, so *F*(ν*u*) is **not** parallel to *u* and the fixed-point relation below does not
+apply to it. An earlier revision of this section used `Divine_Syntactic` as the worked example and
+reported ‖Δ‖ = 3629.65 for it; that figure is withdrawn. Note *c* = ν/λ itself is unaffected — it is
+the recorded rescale factor either way — and the M5 table above is unchanged.
+
+Worth recording *why* the error was easy to make, because it is a property of the archive rather than
+carelessness: `05_divine_motion.py` samples every 10 iterations from 800, and **10 is even**, so every
+snapshot catches the same phase of a period-2 cycle. Consecutive archived states have pairwise cosine
+1.0000 at both lag 1 and lag 2. The schedule aliases the cycle into looking like a fixed point, and
+nothing in the archived state distinguishes the two. A period-2 orbit is only visible on an
+odd-spaced schedule, or by the lag-2 test F9 used.
 
 **Stated as a dynamical system.** Because the norm is clamped on entry every iteration, only the
 direction evolves, and the loop is a map on the unit sphere in ℝ⁷⁶⁸:
@@ -485,8 +500,9 @@ The fixed-point condition is therefore not *x\** = *F₀*(*x\**) but
 > *x\** = *c* · *x\** + *g₀*(LN(*x\**))   with *c* ≈ 0.29 measured
 
 equivalently Δ(*u\**) = (λ − ν)*u\**: the accumulated write of all blocks must point along *u\**. Its
-size follows — ‖Δ‖ = (1 − *c*)λ = 3629.65 for `Divine_Syntactic`. The network writes about 3630 of
-length onto a state of length 1468.
+size follows — ‖Δ‖ = (1 − *c*)λ = **3838.00** for `Control_prolet_Semantic`. The network writes about
+3838 of length onto a state of length 1393. (This relation holds only at a true fixed point; see the
+`Divine_Syntactic` note above.)
 
 **Where the scale dependence actually lives — this corrects an earlier statement in this file.** A
 previous revision said the scalar does not drop out "because the map is not scale-invariant over this
@@ -500,7 +516,7 @@ which is exactly this split.
 
 **Consequence: *c* = 1 is not an absurd condition, it is a large-ν condition.** Gain is
 1 + ‖Δ‖/ν, and since Δ is fixed by direction rather than length, gain falls toward 1 as ν rises. At
-ν ≈ 3630 the gain would be about 2. These runs sit at *c* ≈ 0.29 because ν ≈ 1468 is small against
+ν ≈ 3838 the gain would be about 2. These runs sit at *c* ≈ 0.27 because ν ≈ 1393 is small against
 what the network writes — and ν is small because it is whatever norm the seed prompt happened to
 produce. So the quantity is not arbitrary in the sense of meaningless; it is set by the seed, and it
 selects a position on a continuum that has *c* = 1 at one end.
