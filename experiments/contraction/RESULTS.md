@@ -431,7 +431,10 @@ uses it — it holds to 2–6 × 10⁻⁷. `initial_norm` is recorded directly.
 | Control_prolet_Semantic | 12 | 1392.65 | 5230.65 | **0.2662** | 3.76× |
 
 *c* settles fast and then holds: from *c*₁₀₁ to *c*₁₀₀₁ the spread is 2×10⁻⁴ to 6×10⁻³. It is a
-**stable constant**. (Index convention, easy to get wrong: a snapshot recorded at iteration *n* holds
+**stable constant for `Control_prolet_Semantic` and `Control_noise`**. It is **not** one for
+`Divine_Syntactic`: that run is a period-2 cycle whose *c* alternates 0.288044 / 0.303536, and the
+2×10⁻⁴ spread quoted for it here is an artefact of the even-spaced snapshot schedule sampling one
+phase. See "Relation to H-pos0" below. (Index convention, easy to get wrong: a snapshot recorded at iteration *n* holds
 the state *after* *n* passes and *before* the rescale that precedes pass *n*+1, so it yields *c*ₙ₊₁.)
 
 ### Relation to H-pos0

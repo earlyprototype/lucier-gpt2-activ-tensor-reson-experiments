@@ -132,6 +132,12 @@ def trajectory(pairs):
     underestimates it. The first is shown for context and marked, not used.
     """
     print("Step 3 -- does c vary, or settle to a constant?")
+    print("  WARNING: this reconstruction cannot see a period-2 cycle. The snapshot")
+    print("  schedule steps by 10, which is even, so every sample lands on one phase.")
+    print("  Divine_Syntactic is such a cycle (F9/F10): its c alternates")
+    print("  0.288044 / 0.303536 and the near-zero spread printed below for it is an")
+    print("  aliasing artefact, not stability. Check snapshots' cosine_sim_last")
+    print("  (0.684912 for a 2-cycle, 1.0 for a fixed point) before trusting a row.")
     print("  (a snapshot at iteration n gives c_{n+1}, labelled accordingly;")
     print("   c_1 comes from the pre-collapse state, so it is an artefact of the")
     print("   reconstruction and is marked * rather than trusted)")
