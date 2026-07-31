@@ -1363,10 +1363,21 @@ async function main() {
                 th.hubCount > 0 &&
                 th.nodeCount === evidenceCount + th.hubCount;
 
+            // "answered-unrecorded" is the record-has-fallen-behind class, and
+            // an empty one is the healthy state: it emptied on 2026-07-31 when
+            // the operator's #54 ruling recorded H4's disposition and detector
+            // A learned to retire a claim once a disposition exists. So the
+            // paint check is conditional on membership: when the report says
+            // the class is empty, demanding a painted node would fail the
+            // build for being caught up. Readiness colouring in general is
+            // still exercised: some non-neutral class must be populated.
+            const answeredCount = th.byReadiness['answered-unrecorded'] || 0;
+            const answeredOk = answeredCount > 0
+                ? th.answeredColour === '#C1443C'
+                : th.answeredColour === null;
             const rendersOk = th.renderMode === 'threads' && th.reportLoaded &&
                 th.canvases >= 1 && th.readinessChipsVisible &&
-                th.answeredColour === '#C1443C' &&
-                (th.byReadiness['answered-unrecorded'] || 0) > 0 &&
+                answeredOk &&
                 (th.byReadiness['neutral'] || 0) < th.nodeCount;
 
             // (c) round trip out through dissolution and back to evidence.
@@ -1424,7 +1435,9 @@ async function main() {
                 `edges=${th.edgeCount}${rendersOk ? '' : ' <-- RENDER'}\n` +
                 `readiness: ` +
                 Object.keys(th.byReadiness).sort().map(k => `${k}=${th.byReadiness[k]}`).join(' ') +
-                `; answered-unrecorded painted ${th.answeredColour} (expected #C1443C)\n` +
+                (answeredCount > 0
+                    ? `; answered-unrecorded painted ${th.answeredColour} (expected #C1443C)\n`
+                    : `; answered-unrecorded class empty (record caught up; no paint expected)\n`) +
                 `fruit list: ${th.fruitRows} rows vs ${reportFruit} in threads.json; ` +
                 `click rank 1 -> currentNodeId=${focusSelected} (report says ${firstFruit.claim}), ` +
                 `pill=${focusPill === null ? 'MISSING' : '"' + focusPill + '"'}, ` +

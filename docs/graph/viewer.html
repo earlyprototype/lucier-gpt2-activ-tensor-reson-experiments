@@ -3722,8 +3722,71 @@
         // zero-tolerance round trip is checking.
         function fitOrderedLayout() {
             if (!network) return;
-            network.fit({ animation: false });
-            if (isMobileLayout()) return;   // the legend is a closed disclosure there
+            if (isMobileLayout()) {
+                // The narrow grid is its own documented design (captions off,
+                // transposed): whole-grid fit remains correct there, and the
+                // legend is a closed disclosure, so nothing below applies.
+                network.fit({ animation: false });
+                return;
+            }
+            // STOP FITTING THE WHOLE GRID. The grid grows a band every time
+            // any node gains a new date, and those bands run under the claim
+            // lanes too, so shrink-to-fit hands the reader smaller and smaller
+            // captions as the record grows: measured 11.5px falling to 10.53px
+            // when two run dates joined the grid, against an 11px floor the
+            // pitch was solved for. The smoke test predicted this and named
+            // the fix: do not lower the floor, stop fitting everything.
+            //
+            // So: fit the VISIBLE nodes, then clamp the camera into the band
+            // where the index is actually readable. If honouring the floor
+            // means the grid no longer fits the window, top-align it and let
+            // the reader pan; an index that scrolls is an index, an index
+            // nobody can read is not. The camera moves, the nodes never do:
+            // positions stay byte-identical for assertion 15.
+            const shown = nodesDataSet
+                ? nodesDataSet.get().filter(function (n) { return n.hidden !== true; })
+                : [];
+            const shownIds = shown.map(function (n) { return n.id; });
+            if (shownIds.length) {
+                network.fit({ nodes: shownIds, animation: false });
+            } else {
+                network.fit({ animation: false });
+            }
+            const fitted = network.getScale();
+            // Floor: the legibility target plus a quarter-pixel of air, so a
+            // float rounding cannot land the caption at 10.9999px. Ceiling:
+            // 100%, where a close fit on a small set turns captions into
+            // billboards.
+            const floorScale = (ORDERED_TARGET_LABEL_PX + 0.25) / ORDERED_FONT;
+            const clampedScale = Math.min(Math.max(fitted, floorScale), 1);
+            if (isFinite(clampedScale) && clampedScale !== fitted && shownIds.length) {
+                const positions = network.getPositions(shownIds);
+                let top = Infinity, leftW = Infinity, rightW = -Infinity;
+                shownIds.forEach(function (id) {
+                    const p = positions[id];
+                    if (!p) return;
+                    if (p.y < top) top = p.y;
+                    if (p.x < leftW) leftW = p.x;
+                    if (p.x > rightW) rightW = p.x;
+                });
+                const graphEl = document.getElementById('graph');
+                const viewH = graphEl ? graphEl.clientHeight : 0;
+                const centreY = (clampedScale > fitted && isFinite(top) && viewH)
+                    // Zoomed in past the fit: the grid overflows the window
+                    // downward, so align its top edge under the top of the
+                    // canvas (one row of margin) instead of centring on the
+                    // middle and hiding both ends.
+                    ? top + (viewH / 2 - ORDERED_ROW) / clampedScale
+                    : network.getViewPosition().y;
+                const centreX = (isFinite(leftW) && isFinite(rightW))
+                    ? (leftW + rightW) / 2
+                    : network.getViewPosition().x;
+                network.moveTo({
+                    position: { x: centreX, y: centreY },
+                    scale: clampedScale,
+                    animation: false
+                });
+            }
             const legend = document.getElementById('legend');
             const graph = document.getElementById('graph');
             if (!legend || !graph || !nodesDataSet) return;
