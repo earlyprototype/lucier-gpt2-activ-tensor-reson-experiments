@@ -3,7 +3,7 @@
     "domain": "evidence",
     "version": "1.0",
     "created": "2026-07-25",
-    "last_updated": "2026-07-31",
+    "last_updated": "2026-07-25",
     "source_last_updated": "2026-07-23",
     "title": "ATR Evidence Graph: hypotheses, findings, runs and self-corrections",
     "description": "The Activation Tensor Resonance series as an evidence graph: 17 principal findings, 16 key discoveries, 12 hypotheses, the concepts they run on and the questions the record leaves open, wired to the runs, models and artefacts that produced them, with every recorded correction, retirement and supersession carried as a signed edge and every stated blocker as a blocks / blocked-by edge.",
@@ -601,7 +601,7 @@
       "label": "H-pos0: The shared attractor is a fixed point of the single-position map at position 0",
       "type": "hypothesis",
       "status": "untested",
-      "description": "The shared attractor is a fixed point of the single-position map at position 0. Disposition: Registered, untested (2026-07-28): under the causal mask, attention at position 0 attends only to position 0 (its softmax row has one unmasked entry, so the weight is exactly 1), and LayerNorm, the MLP and the residual add are all per-position. Position 0's forward map is therefore a function of position 0's input alone — architectural, not empirical. The ATR loop qualifies this: the rescale uses the whole-tensor Frobenius norm, so position 0 is coupled to the rest of the sequence through one scalar per iteration, c_n. At a settled state ‖xⁿ‖ is constant, c_n = 1, and the shared vector must satisfy *x\\ = F₀(*x\\) — pinning an attractor of a map on ℝ^(T×768) inside the fixed-point set of a map on ℝ⁷⁶⁸. Same argument makes the Divine cycle a period-2 orbit of F₀, consistent with F14 localising it to one head that, at position 0, can only attend to position 0. Test: ATR at sequence length 1 (requires prepend_bos=False or a token-ID path, which the engine does not expose), seeded at <|endoftext|> to match the sweep's position 0. Predicts the same terminal basin. Predicts terminal state only, not trajectory: off the fixed point c_n differs between the two runs. Falsifiers: position collapse is approximate rather than exact (0.9999 and 1.0000 are different claims and the archived 4-dp reporting cannot separate them), or the attractor is sustained by the c_n coupling. Rationale: GPT2_DEEP_DIVE.md §2.5. Conditional on caveat 7.",
+      "description": "The shared attractor is a fixed point of the single-position map at position 0. Disposition: Registered, untested (2026-07-28): under the causal mask, attention at position 0 attends only to position 0 (its softmax row has one unmasked entry, so the weight is exactly 1), and LayerNorm, the MLP and the residual add are all per-position. Position 0's forward map is therefore a function of position 0's input alone — architectural, not empirical. The ATR loop qualifies this: the rescale uses the whole-tensor Frobenius norm, so position 0 is coupled to the rest of the sequence through one scalar per iteration, c_n. At a settled state ‖xⁿ‖ is constant. #75 inferred c_n = 1 from that and concluded the shared vector must satisfy *x\\ = F₀(*x\\). That step is wrong and the corrected form is *x\\ = c·*x\\ + g₀(LN(*x\\)) with c = 0.288, 0.099, 0.266 measured (contraction/RESULTS.md, M5). Constant and equal-to-one are different claims: c = ν/λ is the seed norm over the norm one forward pass returns, so it is 1 only at unit gain, and measured gain is 3.5–10×. It would be 1 if the loop rescaled to the previous iteration's norm, but the target is frozen at iteration 0 (atr_engine.py:176). The conclusion this clause was supporting — pinning an attractor of a map on ℝ^(T×768) inside the fixed-point set of a map on ℝ⁷⁶⁸ — survives, because the rescaled map is still a map on ℝ⁷⁶⁸; only the form of the fixed-point equation changes. Same argument makes the Divine cycle a period-2 orbit of F₀, consistent with F14 localising it to one head that, at position 0, can only attend to position 0. Test: ATR at sequence length 1 (the engine now exposes both prepend_bos=False and a token-ID path; PR #82, tests in tests/test_atr_engine_prepend_bos.py), seeded at <|endoftext|> to match the sweep's position 0. Predicts the same terminal basin. Predicts terminal state only, not trajectory: off the fixed point c_n differs between the two runs. Falsifiers: position collapse is approximate rather than exact (0.9999 and 1.0000 are different claims and the archived 4-dp reporting cannot separate them), or the attractor is sustained by the c_n coupling. Rationale: GPT2_DEEP_DIVE.md §2.5. Conditional on caveat 7.",
       "phase": "phase-5",
       "asserted": "2026-07-28",
       "retired": null,
@@ -913,7 +913,7 @@
       "label": "Glitch token",
       "type": "concept",
       "status": "corrected",
-      "description": "Anomalous BPE tokens with unusual embedding properties (e.g., SolidGoldMagworthy), ruled out for our basins. First appearance: Session 01.",
+      "description": "Anomalous BPE tokens with unusual embedding properties (the SolidGoldMagikarp family). Ruled out for the basin identities (Session 01), then ruled back in for the Divine object: the cycle's phase-B pole aligns with the under-trained token core at cos +0.596, p < 0.001 (FINDINGS F10, F13). First appearance: Session 01; F13 (2026-07-19).",
       "phase": "phase-4",
       "asserted": "2026-03-20",
       "retired": null,
@@ -1188,7 +1188,7 @@
       "label": "Q: Is the 125-prompt library restored (issue #9)?",
       "type": "question",
       "status": "retired",
-      "description": "Caveats 11 and 14 both file the same gate in the same three words, \"prompt library pending, issue #9\", and FINDINGS section 5 names it as the blocker on two separate directions at once: the re-gate of the 34 cycling prompts and the flip-axis generality question are \"blocked in part on the prompt-library restoration, issue #9\". This node is a restoration task rather than a question about the model; it is in the graph so that the two threads it gates point at one blocker instead of repeating one sentence in two descriptions, where nothing can pair them. Answered 2026-07-31: yes. prompt_library.py is restored on main (issue #24), the record's 'blocked on' language is lifted, and the two formerly gated threads (flip-axis generality, the 33-prompt re-gate) are queued in ALIGNMENT_REVIEW.md section 5.",
+      "description": "Caveats 11 and 14 both filed the same gate in the same three words, \"prompt library pending, issue #9\", and FINDINGS section 5 named it as the blocker on two separate directions at once: the re-gate of the 34 cycling prompts and the flip-axis generality question. This node was a restoration task rather than a question about the model; it is in the graph so that the two threads it gated point at one blocker instead of repeating one sentence in two descriptions, where nothing can pair them. Answered 2026-07-31: yes. prompt_library.py is restored on main (issue #24, provenance-flagged full restoration), the record's blocked-on language is lifted (PR #103), and the two formerly gated threads are queued in ALIGNMENT_REVIEW.md section 5.",
       "phase": "phase-5",
       "asserted": "2026-07-19",
       "retired": "2026-07-31",
@@ -1805,6 +1805,13 @@
       "description": "10,000 random 14-token sets, seed 1969: 9,994 are also all-positive, so the all-warm matrix is an anisotropy artifact."
     },
     {
+      "id": "art-prompt-library",
+      "title": "The restored 125-prompt library",
+      "type": "artefact",
+      "path": "prompt_library.py",
+      "description": "Provenance-flagged full restoration of the original 125 prompts (issue #24): every entry recovered verbatim from committed records, zero re-authored prompts, per-prompt provenance flags in the module's PROVENANCE dict."
+    },
+    {
       "id": "art-random-baseline-report",
       "title": "Random-baseline (null model) report",
       "type": "artefact",
@@ -1989,28 +1996,12 @@
       "weight": 7
     },
     {
-      "from": "q-flip-axis-generality",
-      "to": "q-prompt-library",
-      "type": "relates-to",
-      "description": "Formerly blocked-by: F10's own words: the flip-axis generality question is \"blocked on the prompt-library restoration, issue #9\", repeated in caveats 11 and 14 as \"prompt library pending, issue #9\". Blocker cleared 2026-07-31: prompt_library.py is restored (issue #24, provenance-flagged full restoration), the ATR pause is lifted, and the run is queued in ALIGNMENT_REVIEW.md section 5.",
-      "weight": 8,
-      "asserted": "2026-07-19"
-    },
-    {
       "from": "q-fractal-dimension",
       "to": "q-tmix-llm",
       "type": "blocked-by",
       "description": "JOURNEY_MAP section 7 states the order in two words: the fractal-dimension question \"Requires T_mix first\".",
       "weight": 4,
       "asserted": "2026-07-10"
-    },
-    {
-      "from": "q-lag2-regate-33",
-      "to": "q-prompt-library",
-      "type": "relates-to",
-      "description": "Formerly blocked-by: F15's own words: \"The other 33 period-2 prompts remain blocked on the prompt library (issue #9)\", and JOURNEY_MAP section 7 gives the next step as \"Re-gate the other 33 prompts (blocked on issue #9)\". Blocker cleared 2026-07-31: prompt_library.py is restored (issue #24, provenance-flagged full restoration), the ATR pause is lifted, and the run is queued in ALIGNMENT_REVIEW.md section 5.",
-      "weight": 8,
-      "asserted": "2026-07-19"
     },
     {
       "from": "q-hook-window-depth",
@@ -4410,6 +4401,14 @@
       "asserted": "2026-07-19"
     },
     {
+      "from": "q-flip-axis-generality",
+      "to": "q-prompt-library",
+      "type": "relates-to",
+      "description": "Formerly blocked-by: F10's own words were that the flip-axis generality question is \"blocked on the prompt-library restoration, issue #9\", repeated in caveats 11 and 14. Blocker cleared 2026-07-31: the library is restored (issue #24) and the 34-prompt run is queued in ALIGNMENT_REVIEW.md section 5.",
+      "weight": 8,
+      "asserted": "2026-07-19"
+    },
+    {
       "from": "q-fractal-dimension",
       "to": "concept-fractal-dimension",
       "type": "relates-to",
@@ -4474,6 +4473,14 @@
       "asserted": "2026-07-19"
     },
     {
+      "from": "q-lag2-regate-33",
+      "to": "q-prompt-library",
+      "type": "relates-to",
+      "description": "Formerly blocked-by: F15's own words were \"The other 33 period-2 prompts remain blocked on the prompt library (issue #9)\". Blocker cleared 2026-07-31: the library is restored (issue #24) and the re-gate is queued in ALIGNMENT_REVIEW.md section 5.",
+      "weight": 8,
+      "asserted": "2026-07-19"
+    },
+    {
       "from": "q-shape-class-null",
       "to": "f12-medium-typographic-cluster",
       "type": "relates-to",
@@ -4528,6 +4535,14 @@
       "description": "F8 sharpened what has to be explained: not a confident winner but a low-probability argmax over a coherent lexical field.",
       "weight": 6,
       "asserted": "2026-07-19"
+    },
+    {
+      "from": "art-prompt-library",
+      "to": "q-prompt-library",
+      "type": "retires",
+      "description": "The restored library answers the question: all 125 prompts recovered verbatim from committed records, every entry flagged original (issue #24). The two threads the question gated are queued in ALIGNMENT_REVIEW.md section 5.",
+      "weight": 6,
+      "asserted": "2026-07-31"
     },
     {
       "from": "f3-fingerprint-refuted",
