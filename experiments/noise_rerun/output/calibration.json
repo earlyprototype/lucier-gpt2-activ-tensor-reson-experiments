@@ -1,0 +1,649 @@
+{
+  "config": {
+    "experiment": "matched_nu_noise_baseline",
+    "repairs": "FINDINGS caveat 18 / issue #97",
+    "seed": 42,
+    "n_trials": 125,
+    "layers": "0->11",
+    "gate": {
+      "max_iter": 1000,
+      "threshold": 0.999,
+      "patience": 3,
+      "check_every": 10,
+      "check_start": 100,
+      "gate_lag": 1
+    },
+    "calibration_mode": "pair-matched (trial k <- prompt k's seq_len and Frobenius norm)",
+    "frobenius_mean": 1427.4935590820312,
+    "frobenius_min": 549.2833862304688,
+    "frobenius_max": 2388.959716796875,
+    "torch": "2.13.0+cpu"
+  },
+  "per_prompt": [
+    {
+      "prompt_id": "A01_physics",
+      "seq_len": 10,
+      "frobenius_norm": 1289.226318359375
+    },
+    {
+      "prompt_id": "A02_medical",
+      "seq_len": 11,
+      "frobenius_norm": 1331.042724609375
+    },
+    {
+      "prompt_id": "A03_neuro",
+      "seq_len": 10,
+      "frobenius_norm": 1366.6617431640625
+    },
+    {
+      "prompt_id": "A04_climate",
+      "seq_len": 11,
+      "frobenius_norm": 1383.2130126953125
+    },
+    {
+      "prompt_id": "A05_evolution",
+      "seq_len": 10,
+      "frobenius_norm": 1367.300537109375
+    },
+    {
+      "prompt_id": "A06_epistemology",
+      "seq_len": 11,
+      "frobenius_norm": 1412.3671875
+    },
+    {
+      "prompt_id": "A07_sociology",
+      "seq_len": 10,
+      "frobenius_norm": 1349.3154296875
+    },
+    {
+      "prompt_id": "A08_linguistics",
+      "seq_len": 11,
+      "frobenius_norm": 1439.7431640625
+    },
+    {
+      "prompt_id": "A09_code",
+      "seq_len": 9,
+      "frobenius_norm": 1282.153076171875
+    },
+    {
+      "prompt_id": "A10_sql",
+      "seq_len": 11,
+      "frobenius_norm": 1393.7010498046875
+    },
+    {
+      "prompt_id": "A11_ml",
+      "seq_len": 12,
+      "frobenius_norm": 1487.2801513671875
+    },
+    {
+      "prompt_id": "A12_systems",
+      "seq_len": 10,
+      "frobenius_norm": 1296.5498046875
+    },
+    {
+      "prompt_id": "A13_networking",
+      "seq_len": 10,
+      "frobenius_norm": 1262.3629150390625
+    },
+    {
+      "prompt_id": "A14_kant",
+      "seq_len": 10,
+      "frobenius_norm": 1412.3009033203125
+    },
+    {
+      "prompt_id": "A15_sartre",
+      "seq_len": 10,
+      "frobenius_norm": 1495.376220703125
+    },
+    {
+      "prompt_id": "A16_wittgenstein",
+      "seq_len": 9,
+      "frobenius_norm": 1102.950927734375
+    },
+    {
+      "prompt_id": "A17_marx",
+      "seq_len": 9,
+      "frobenius_norm": 1318.6175537109375
+    },
+    {
+      "prompt_id": "A18_gothic",
+      "seq_len": 10,
+      "frobenius_norm": 1409.0345458984375
+    },
+    {
+      "prompt_id": "A19_romantic",
+      "seq_len": 9,
+      "frobenius_norm": 1284.430908203125
+    },
+    {
+      "prompt_id": "A20_modernist",
+      "seq_len": 13,
+      "frobenius_norm": 1444.3988037109375
+    },
+    {
+      "prompt_id": "A21_dickens",
+      "seq_len": 10,
+      "frobenius_norm": 1423.1668701171875
+    },
+    {
+      "prompt_id": "A22_legal",
+      "seq_len": 12,
+      "frobenius_norm": 1542.6339111328125
+    },
+    {
+      "prompt_id": "A23_contract",
+      "seq_len": 13,
+      "frobenius_norm": 1499.062255859375
+    },
+    {
+      "prompt_id": "A24_patent",
+      "seq_len": 9,
+      "frobenius_norm": 1398.0245361328125
+    },
+    {
+      "prompt_id": "A25_academic_abs",
+      "seq_len": 11,
+      "frobenius_norm": 1538.0869140625
+    },
+    {
+      "prompt_id": "B01_napoleon",
+      "seq_len": 10,
+      "frobenius_norm": 1280.966064453125
+    },
+    {
+      "prompt_id": "B02_wwi",
+      "seq_len": 14,
+      "frobenius_norm": 1245.1533203125
+    },
+    {
+      "prompt_id": "B03_moon",
+      "seq_len": 9,
+      "frobenius_norm": 1327.8802490234375
+    },
+    {
+      "prompt_id": "B04_rome",
+      "seq_len": 9,
+      "frobenius_norm": 1221.865966796875
+    },
+    {
+      "prompt_id": "B05_mlk",
+      "seq_len": 9,
+      "frobenius_norm": 1397.9449462890625
+    },
+    {
+      "prompt_id": "B06_sources",
+      "seq_len": 9,
+      "frobenius_norm": 1344.7694091796875
+    },
+    {
+      "prompt_id": "B07_breaking",
+      "seq_len": 9,
+      "frobenius_norm": 1301.579833984375
+    },
+    {
+      "prompt_id": "B08_editorial",
+      "seq_len": 10,
+      "frobenius_norm": 1360.99755859375
+    },
+    {
+      "prompt_id": "B09_sports",
+      "seq_len": 9,
+      "frobenius_norm": 1295.7498779296875
+    },
+    {
+      "prompt_id": "B10_weather",
+      "seq_len": 10,
+      "frobenius_norm": 1334.416748046875
+    },
+    {
+      "prompt_id": "B11_alone",
+      "seq_len": 10,
+      "frobenius_norm": 1497.5936279296875
+    },
+    {
+      "prompt_id": "B12_fear",
+      "seq_len": 9,
+      "frobenius_norm": 1341.2227783203125
+    },
+    {
+      "prompt_id": "B13_joy",
+      "seq_len": 9,
+      "frobenius_norm": 1398.6346435546875
+    },
+    {
+      "prompt_id": "B14_anger",
+      "seq_len": 9,
+      "frobenius_norm": 1328.533447265625
+    },
+    {
+      "prompt_id": "B15_casual",
+      "seq_len": 9,
+      "frobenius_norm": 1507.568115234375
+    },
+    {
+      "prompt_id": "B16_gossip",
+      "seq_len": 9,
+      "frobenius_norm": 1351.265380859375
+    },
+    {
+      "prompt_id": "B17_argument",
+      "seq_len": 9,
+      "frobenius_norm": 1396.013916015625
+    },
+    {
+      "prompt_id": "B18_advice",
+      "seq_len": 9,
+      "frobenius_norm": 1494.1304931640625
+    },
+    {
+      "prompt_id": "B19_question",
+      "seq_len": 9,
+      "frobenius_norm": 1509.44091796875
+    },
+    {
+      "prompt_id": "B20_reddit",
+      "seq_len": 10,
+      "frobenius_norm": 1468.0457763671875
+    },
+    {
+      "prompt_id": "D01_water",
+      "seq_len": 18,
+      "frobenius_norm": 1590.6053466796875
+    },
+    {
+      "prompt_id": "D02_periodic",
+      "seq_len": 12,
+      "frobenius_norm": 1801.691650390625
+    },
+    {
+      "prompt_id": "D03_organic",
+      "seq_len": 18,
+      "frobenius_norm": 2100.556884765625
+    },
+    {
+      "prompt_id": "D04_equation",
+      "seq_len": 16,
+      "frobenius_norm": 1731.7305908203125
+    },
+    {
+      "prompt_id": "D05_amino",
+      "seq_len": 14,
+      "frobenius_norm": 1523.7333984375
+    },
+    {
+      "prompt_id": "D06_physics_eq",
+      "seq_len": 12,
+      "frobenius_norm": 1436.418212890625
+    },
+    {
+      "prompt_id": "D07_dna",
+      "seq_len": 17,
+      "frobenius_norm": 2253.48681640625
+    },
+    {
+      "prompt_id": "D08_math",
+      "seq_len": 17,
+      "frobenius_norm": 1924.95947265625
+    },
+    {
+      "prompt_id": "D09_units",
+      "seq_len": 10,
+      "frobenius_norm": 1418.19482421875
+    },
+    {
+      "prompt_id": "D10_isotopes",
+      "seq_len": 20,
+      "frobenius_norm": 1785.5611572265625
+    },
+    {
+      "prompt_id": "E01_politics",
+      "seq_len": 14,
+      "frobenius_norm": 1456.5313720703125
+    },
+    {
+      "prompt_id": "E02_tech",
+      "seq_len": 9,
+      "frobenius_norm": 1352.5421142578125
+    },
+    {
+      "prompt_id": "E03_orgs",
+      "seq_len": 9,
+      "frobenius_norm": 1411.7945556640625
+    },
+    {
+      "prompt_id": "E04_internet",
+      "seq_len": 17,
+      "frobenius_norm": 1918.900390625
+    },
+    {
+      "prompt_id": "E05_finance",
+      "seq_len": 14,
+      "frobenius_norm": 1598.6712646484375
+    },
+    {
+      "prompt_id": "E06_medical",
+      "seq_len": 12,
+      "frobenius_norm": 1575.305908203125
+    },
+    {
+      "prompt_id": "E07_military",
+      "seq_len": 13,
+      "frobenius_norm": 1538.48193359375
+    },
+    {
+      "prompt_id": "E08_academic",
+      "seq_len": 12,
+      "frobenius_norm": 1487.4644775390625
+    },
+    {
+      "prompt_id": "E09_mixed",
+      "seq_len": 11,
+      "frobenius_norm": 1485.4879150390625
+    },
+    {
+      "prompt_id": "E10_crypto",
+      "seq_len": 15,
+      "frobenius_norm": 1521.9901123046875
+    },
+    {
+      "prompt_id": "C01_jack_jill",
+      "seq_len": 9,
+      "frobenius_norm": 1282.134033203125
+    },
+    {
+      "prompt_id": "C02_king_cole",
+      "seq_len": 9,
+      "frobenius_norm": 1252.9361572265625
+    },
+    {
+      "prompt_id": "C03_mary_lamb",
+      "seq_len": 10,
+      "frobenius_norm": 1247.9451904296875
+    },
+    {
+      "prompt_id": "C04_humpty",
+      "seq_len": 13,
+      "frobenius_norm": 1441.8358154296875
+    },
+    {
+      "prompt_id": "C05_twinkle",
+      "seq_len": 11,
+      "frobenius_norm": 1470.430419921875
+    },
+    {
+      "prompt_id": "C06_dog",
+      "seq_len": 9,
+      "frobenius_norm": 1241.7667236328125
+    },
+    {
+      "prompt_id": "C07_cat_mat",
+      "seq_len": 9,
+      "frobenius_norm": 1299.8873291015625
+    },
+    {
+      "prompt_id": "C08_boy_girl",
+      "seq_len": 9,
+      "frobenius_norm": 1268.8641357421875
+    },
+    {
+      "prompt_id": "C09_run",
+      "seq_len": 9,
+      "frobenius_norm": 931.42431640625
+    },
+    {
+      "prompt_id": "C10_spot",
+      "seq_len": 9,
+      "frobenius_norm": 1436.132080078125
+    },
+    {
+      "prompt_id": "C11_genesis",
+      "seq_len": 9,
+      "frobenius_norm": 1330.515869140625
+    },
+    {
+      "prompt_id": "C12_beatitudes",
+      "seq_len": 11,
+      "frobenius_norm": 1390.33544921875
+    },
+    {
+      "prompt_id": "C13_psalm",
+      "seq_len": 9,
+      "frobenius_norm": 1342.858154296875
+    },
+    {
+      "prompt_id": "C14_commandment",
+      "seq_len": 10,
+      "frobenius_norm": 1310.018798828125
+    },
+    {
+      "prompt_id": "C15_fox_hen",
+      "seq_len": 9,
+      "frobenius_norm": 1196.9671630859375
+    },
+    {
+      "prompt_id": "C16_ant_dove",
+      "seq_len": 9,
+      "frobenius_norm": 1317.3392333984375
+    },
+    {
+      "prompt_id": "C17_tortoise",
+      "seq_len": 11,
+      "frobenius_norm": 1384.4722900390625
+    },
+    {
+      "prompt_id": "C18_wolf",
+      "seq_len": 9,
+      "frobenius_norm": 1328.1239013671875
+    },
+    {
+      "prompt_id": "C19_lion_mouse",
+      "seq_len": 9,
+      "frobenius_norm": 1258.3974609375
+    },
+    {
+      "prompt_id": "C20_crow",
+      "seq_len": 9,
+      "frobenius_norm": 1300.8057861328125
+    },
+    {
+      "prompt_id": "F01_anger",
+      "seq_len": 9,
+      "frobenius_norm": 1428.4139404296875
+    },
+    {
+      "prompt_id": "F02_insult",
+      "seq_len": 9,
+      "frobenius_norm": 1391.206298828125
+    },
+    {
+      "prompt_id": "F03_frustration",
+      "seq_len": 10,
+      "frobenius_norm": 1474.8294677734375
+    },
+    {
+      "prompt_id": "F04_argument",
+      "seq_len": 10,
+      "frobenius_norm": 1525.1732177734375
+    },
+    {
+      "prompt_id": "F05_rant",
+      "seq_len": 9,
+      "frobenius_norm": 1345.523193359375
+    },
+    {
+      "prompt_id": "F06_dismissal",
+      "seq_len": 9,
+      "frobenius_norm": 1467.441650390625
+    },
+    {
+      "prompt_id": "F07_shock",
+      "seq_len": 9,
+      "frobenius_norm": 1442.657470703125
+    },
+    {
+      "prompt_id": "F08_mild",
+      "seq_len": 9,
+      "frobenius_norm": 1482.73486328125
+    },
+    {
+      "prompt_id": "F09_slur_adjacent",
+      "seq_len": 9,
+      "frobenius_norm": 1343.876708984375
+    },
+    {
+      "prompt_id": "F10_exasperation",
+      "seq_len": 9,
+      "frobenius_norm": 1311.617919921875
+    },
+    {
+      "prompt_id": "G01_punctuation",
+      "seq_len": 15,
+      "frobenius_norm": 1975.2099609375
+    },
+    {
+      "prompt_id": "G02_brackets",
+      "seq_len": 15,
+      "frobenius_norm": 1648.2835693359375
+    },
+    {
+      "prompt_id": "G03_counting",
+      "seq_len": 10,
+      "frobenius_norm": 1280.0809326171875
+    },
+    {
+      "prompt_id": "G04_fibonacci",
+      "seq_len": 11,
+      "frobenius_norm": 1351.6922607421875
+    },
+    {
+      "prompt_id": "G05_primes",
+      "seq_len": 11,
+      "frobenius_norm": 1349.87060546875
+    },
+    {
+      "prompt_id": "G06_binary",
+      "seq_len": 16,
+      "frobenius_norm": 2114.606201171875
+    },
+    {
+      "prompt_id": "G07_the",
+      "seq_len": 2,
+      "frobenius_norm": 634.6893920898438
+    },
+    {
+      "prompt_id": "G08_period",
+      "seq_len": 2,
+      "frobenius_norm": 556.1939086914062
+    },
+    {
+      "prompt_id": "G09_space",
+      "seq_len": 2,
+      "frobenius_norm": 549.2833862304688
+    },
+    {
+      "prompt_id": "G10_newline",
+      "seq_len": 4,
+      "frobenius_norm": 1242.234130859375
+    },
+    {
+      "prompt_id": "G11_aaa",
+      "seq_len": 11,
+      "frobenius_norm": 1874.033203125
+    },
+    {
+      "prompt_id": "G12_the_the",
+      "seq_len": 9,
+      "frobenius_norm": 1669.552734375
+    },
+    {
+      "prompt_id": "G13_buffalo",
+      "seq_len": 9,
+      "frobenius_norm": 1374.5078125
+    },
+    {
+      "prompt_id": "G14_nursery_acad",
+      "seq_len": 9,
+      "frobenius_norm": 1263.188232421875
+    },
+    {
+      "prompt_id": "G15_bible_code",
+      "seq_len": 9,
+      "frobenius_norm": 1339.8988037109375
+    },
+    {
+      "prompt_id": "G16_nursery_vulgar",
+      "seq_len": 9,
+      "frobenius_norm": 1254.0777587890625
+    },
+    {
+      "prompt_id": "G17_formal_slang",
+      "seq_len": 10,
+      "frobenius_norm": 1307.608154296875
+    },
+    {
+      "prompt_id": "G18_french",
+      "seq_len": 11,
+      "frobenius_norm": 1657.3526611328125
+    },
+    {
+      "prompt_id": "G19_german",
+      "seq_len": 16,
+      "frobenius_norm": 1754.573974609375
+    },
+    {
+      "prompt_id": "G20_spanish",
+      "seq_len": 14,
+      "frobenius_norm": 1767.7386474609375
+    },
+    {
+      "prompt_id": "G21_latin",
+      "seq_len": 14,
+      "frobenius_norm": 1557.1727294921875
+    },
+    {
+      "prompt_id": "G22_japanese_rom",
+      "seq_len": 17,
+      "frobenius_norm": 2016.50634765625
+    },
+    {
+      "prompt_id": "G23_emoji",
+      "seq_len": 25,
+      "frobenius_norm": 2388.959716796875
+    },
+    {
+      "prompt_id": "G24_beatles",
+      "seq_len": 9,
+      "frobenius_norm": 1285.830810546875
+    },
+    {
+      "prompt_id": "G25_rickroll",
+      "seq_len": 9,
+      "frobenius_norm": 1431.3267822265625
+    },
+    {
+      "prompt_id": "G26_bohemian",
+      "seq_len": 9,
+      "frobenius_norm": 1357.4893798828125
+    },
+    {
+      "prompt_id": "G27_ignore",
+      "seq_len": 10,
+      "frobenius_norm": 1395.0736083984375
+    },
+    {
+      "prompt_id": "G28_system",
+      "seq_len": 14,
+      "frobenius_norm": 1516.2431640625
+    },
+    {
+      "prompt_id": "G29_palindrome",
+      "seq_len": 9,
+      "frobenius_norm": 1207.108154296875
+    },
+    {
+      "prompt_id": "G30_alphabet",
+      "seq_len": 12,
+      "frobenius_norm": 1222.7598876953125
+    }
+  ]
+}
