@@ -17,8 +17,9 @@ to eighteen non-semantic attractors disjoint from the five, locating the basins
 in the language-driven regime rather than the weight geometry per se. That last
 clause did not survive its own repair: the original noise arm ran at the wrong
 injection scale and was counted before convergence (caveat 18), and the
-matched-scale, convergence-gated re-run (2026-07-31, run 17) inverts it, with
-noise falling overwhelmingly into four of the language arm's own five basins
+matched-scale, convergence-gated re-run (2026-07-31, run 17) inverts it:
+classified at the smallest passing lag, the noise trials reproduce all five of
+the language arm's basins, with 97 of 125 trials landing in them
 (F4). At the injection scale this apparatus uses, the basins belong to the
 weights; what language input contributes is again an open question. Diagnostics
 attribute the cross-model differences to intrinsic model dynamics, not
@@ -204,10 +205,16 @@ fixed points of the weight geometry.
 > converged trials (the report's basin table; 77 trials, an 85.6% combined
 > share), with `prolet` dominant exactly as in the language arm. The old run's
 > dominant basin, the horizontal-bar token `―`, never appears. The remaining
-> converged basins are `Spells` (10), `bourgeois` (2) and `agitation` (1). All
-> 35 trials that fail the lag-1 gate pass at lag 2, the `Divine` cycle's
-> period-2 signature (F9, F15), and five of them terminate on `Divine` itself
-> (`run.log`, trials R044, R067, R070, R091, R124). **Reading:** at this apparatus's injection scale the
+> converged basins are `Spells` (10), `bourgeois` (2) and `agitation` (1);
+> that seven-basin table covers the 90 lag-1 lock-ins only. The other 35
+> trials all pass at lag 2, the `Divine` cycle's period-2 signature (F9, F15),
+> and F15's rule (classify each state at its smallest passing lag) makes them
+> basins too: labeled by terminal readout they split `till` 15, `i` 10,
+> `player` 5 and `Divine` 5 (the report's periodic table), so the language
+> arm's period-2 `Divine` basin itself reappears under noise. Over all 125
+> trials at their smallest passing lag the noise arm shows 10 distinct labels,
+> every one of the language arm's five among them, and 97/125 trials (77.6%)
+> land in those five (the report's all-trials table). **Reading:** at this apparatus's injection scale the
 > basins are properties of the weights, not of language-driven input; the
 > registered 5-vs-18 gap was manufactured entirely by the two confounds above.
 > What language input does contribute at other injection scales is not

@@ -337,7 +337,10 @@ FINDING_META = {
             "gated re-run (run 17): at pair-matched injection norms 90/125 noise trials lock in to "
             "7 basins, four of them the language arm's own (prolet, solidarity, Anarch, till; 85.6% "
             "of converged trials), the em-dash basin never appears, and all 35 unconverged trials "
-            "carry the Divine cycle's period-2 signature. At this injection scale the basins belong "
+            "pass at lag 2, the Divine cycle's period-2 signature. Labeled at their smallest "
+            "passing lag (F15's rule) those periodic trials decode to till, i, player and Divine "
+            "itself, so all five language basins reappear and 97/125 trials (77.6%) land in them. "
+            "At this injection scale the basins belong "
             "to the weights, not the input regime; the nu-sweep is the registered follow-up."),
     ),
     "F5": dict(
@@ -1482,7 +1485,8 @@ MODELS = [
                          "calibration wrong (a per-position statistic applied as the Frobenius "
                          "target) and the 18-basin count read before convergence. Superseded "
                          "2026-07-31 by run 17, the pair-matched, gated re-run, which finds noise "
-                         "converging into four of the language arm's five basins (F4).")),
+                         "landing in the language arm's own basins, all five at smallest "
+                         "passing lag (F4).")),
         ("n", "125 Gaussian tensors (seed 42); 15 calibrated trials in the confidence audit"),
         ("date", D_SERIES_CLOSE), ("phase", "phase-5"),
         ("doc_ref", "docs/FINDINGS.md#f4-the-five-basins-belong-to-the-language-driven-regime-not-the-weights-in-general-null-model"),
@@ -1783,15 +1787,18 @@ def curated_relationships():
         rel(F4, HFP, "refutes",
             "The refutation survives F4's inversion with its sign flipped. Originally: noise "
             "found 18 disjoint basins, so the five seemed input-specific. Run 17's matched-nu "
-            "control: noise finds four of the five, so at this injection scale the basins are "
-            "weight-native and read nothing about the input, let alone the training corpus. "
+            "control: noise finds all five (97/125 trials at smallest passing lag), so at this "
+            "injection scale the basins do not require language-shaped input; the noise still "
+            "passes through the trained weights, so what refutes the corpus reading is F3's "
+            "cross-model table (same corpus, no shared basins), which run 17 leaves untouched. "
             "Either way, not a fingerprint.", 9, D_RESCORE),
         rel(F3, H3, "qualifies",
             "The corpus-causal half of H3 fails cross-model: same corpus, different landscape. "
             "Only the embedding-space clustering observation survives.", 8, D_SERIES_CLOSE),
         rel(F4, H3, "qualifies",
-            "Inverted 2026-07-31 (run 17): the matched-nu control finds four of the five "
-            "basins under noise, so any corpus topology H3 reads is a property of the weights "
+            "Inverted 2026-07-31 (run 17): the matched-nu control finds all five basins "
+            "under noise (97/125 trials at smallest passing lag), so any corpus topology H3 "
+            "reads is a property of the weights "
             "at this injection scale, not of language-driven input.", 6, D_RESCORE),
         rel(F8, H3, "supports",
             "The semantic-coherence half of H3 is upgraded: it now holds in the full readout "
@@ -1888,7 +1895,7 @@ def curated_relationships():
             5, D_ACT_II_5),
         rel(F4, F1, "qualifies",
             "Inverted 2026-07-31 (run 17): F1's basins are not regime-specific after all; noise "
-            "at matched injection scale finds four of the five, so the landscape belongs to the "
+            "at matched injection scale finds all five, so the landscape belongs to the "
             "weights at this scale, with scale-dependence the registered open question "
             "(nu-sweep).", 6, D_RESCORE),
         rel(F12, F8, "qualifies",
@@ -2013,7 +2020,7 @@ def curated_relationships():
         rel(F4, D["13"], "corrects",
             "F4's null model was the evidence this discovery recorded (18 non-semantic "
             "basins, ~zero overlap), and F4's own repair overturned it: run 17's matched-nu, "
-            "gated re-run sends noise into four of the language arm's five basins, so the "
+            "gated re-run sends noise into the language arm's own five basins, so the "
             "regime-specific reading this discovery states is inverted at the tested scale.",
             7, D_RESCORE),
         rel(F5, D["16"], "supports",
@@ -2089,7 +2096,7 @@ def curated_relationships():
             "The correction has itself been corrected. First: there is no single native voice, "
             "and what the loop settles into depends on what drove it. Run 17 inverted the "
             "second half: converged noise lands in four of the language arm's five basins "
-            "(with the fifth's period-2 signature in the unconverged trials), so at this "
+            "(and the period-2 trials decode to the fifth, Divine, itself), so at this "
             "injection scale the weights do carry native voices, several rather than the "
             "metaphor's one.", 7, D_RESCORE),
         rel(F13, "concept-glitch-token", "corrects",

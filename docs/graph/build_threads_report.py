@@ -1183,10 +1183,14 @@ def detect_open_threads(graph: Graph, answered, blockers, repo_modules):
         # artifact regeneration") does not read as pending work merely
         # because it cites the issue it closed.
         for sentence in sentences_of(desc):
+            found = [m.group(0).lower()
+                     for m in PENDING_RE.finditer(sentence)]
+            # A receipt sentence cites the issue it closed, so its issue
+            # reference is not pending work. Other pending language in the
+            # same sentence still is ("withdrawn pending re-derivation").
             if RESOLVED_RE.search(sentence):
-                continue
-            hits.update(m.group(0).lower()
-                        for m in PENDING_RE.finditer(sentence))
+                found = [h for h in found if not h.startswith("issue #")]
+            hits.update(found)
         hits = sorted(hits)
         if hits:
             claim_ids.add(claim_id)

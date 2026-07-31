@@ -635,8 +635,11 @@ def test_content_h_fingerprint_is_refuted_by_f3_and_f4(entities):
     2026-07-31: F4 moved from "supported" to "corrected" when run 17 inverted
     its registered reading (matched-nu noise finds the language arm's own
     basins). The refutation of H-fingerprint survives the inversion with its
-    sign flipped: basins that appear with no input at all read nothing about
-    the training corpus. So F4 remains a legitimate refuter while carrying
+    sign flipped: the basins do not require language-shaped input at the
+    tested scale, and the corpus reading itself is refuted by F3's
+    cross-model table (the noise still passes through the trained weights,
+    so run 17 alone cannot rule on corpus content). So F4 remains a
+    legitimate refuter while carrying
     "corrected"; F3's refutation is untouched and stays "supported".
     """
     hypothesis = _claim(entities, "h-fingerprint")

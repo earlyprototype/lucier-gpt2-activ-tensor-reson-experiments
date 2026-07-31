@@ -87,9 +87,9 @@ identity.
 tested to destruction in three specific places. A room mode is a fixed point; `Divine` is an exact
 period-2 limit cycle, home only every second pass (F9). A room's modes are a property of the room;
 GPT-2 Small's basins first seemed not to be, when a mis-calibrated noise control appeared to find
-eighteen different ones, but the corrected matched-energy re-run (run 17, 2026-07-31) reversed
-that: noise raises four of the language arm's five basins, so on this test the analogy now holds
-at the tested energy (F4, corrected). And the argument that promoted the analogy to a theorem — every
+eighteen different ones, but the corrected matched-ν re-run (run 17, 2026-07-31) reversed
+that: noise raises the language arm's own five basins, so on this test the analogy now holds
+at the tested injection scale (F4, corrected). And the argument that promoted the analogy to a theorem — every
 normalised transformer must have basins, by Brouwer — is in the graph too, in correction blue, with
 the reason it fell over attached to it: the L2 shell is a sphere, and a sphere is not convex
 (JOURNEY_MAP Key Discovery 11, corrected 2026-07-23).
@@ -490,8 +490,10 @@ four hops:
 > which is evidenced by **run 2, the cross-model sweeps**, run on **GPT-2 Medium**, which shares
 > GPT-2 Small's corpus and produces no semantic basins at all. And it is refuted again, from a
 > different direction, by **F4**, whose corrected control (**run 17**, superseding run 3's
-> mis-calibrated arm) finds noise landing in the language arm's own basins: states that appear
-> with no input at all read nothing about the training corpus.
+> mis-calibrated arm) finds noise landing in the language arm's own basins: the basins do not
+> require language-shaped input at the tested injection scale, and F3's cross-model table is
+> what pins the corpus half down (the noise still flows through the trained weights, so run 17
+> alone cannot say what those weights absorbed from the corpus).
 
 Two independent trails converging on one dead claim. That is what a refutation looks like when it
 is done properly, and it is legible in the graph in about five seconds.

@@ -63,7 +63,10 @@ import torch
 
 # requirements.txt declares numpy>=1.24; np.trapezoid arrived in numpy 2.0
 # and np.trapz left in numpy 2.4, so neither name spans the declared range.
-_trapezoid = getattr(np, "trapezoid", None) or getattr(np, "trapz")
+try:
+    _trapezoid = np.trapezoid
+except AttributeError:
+    _trapezoid = np.trapz
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA = REPO_ROOT / "experiments" / "_DATA" / "EXP_009"

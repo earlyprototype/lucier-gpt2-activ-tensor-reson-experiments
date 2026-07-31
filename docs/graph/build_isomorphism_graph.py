@@ -192,11 +192,26 @@ RUNS = [
                        "of prompts; first reported as 18 non-semantic attractors with no "
                        "overlap with the five. Superseded 2026-07-31: this arm ran "
                        "mis-calibrated and was counted before convergence (FINDINGS caveat "
-                       "18); the matched-nu re-run (run 17) finds noise converging into four "
-                       "of the language arm's five basins.",
+                       "18); the matched-nu re-run (run 17) finds noise landing in the "
+                       "language arm's own basins.",
         "script": "experiments/gpt2_small/03_random_baseline.ipynb",
         "output_dir": "experiments/gpt2_small/output_random_baseline/",
         "n": "125 Gaussian tensors, seed 42",
+    },
+    {
+        "id": "run-17-matched-nu-noise",
+        "label": "Run 17: matched-nu noise re-run (2026-07-31)",
+        "type": "null-model",
+        "description": "The corrected null control: 125 Gaussian tensors, each pair-matched "
+                       "to one real prompt's exact sequence length and iteration-0 Frobenius "
+                       "norm, run under the engine's convergence gate. 90/125 lock in to 7 "
+                       "basins, four of them the language arm's own; the 35 period-2 trials "
+                       "decode to till, i, player and Divine itself, so at each trial's "
+                       "smallest passing lag all five language basins reappear and 97/125 "
+                       "trials land in them (FINDINGS F4, corrected).",
+        "script": "experiments/noise_rerun/01_matched_nu_noise_baseline.py",
+        "output_dir": "experiments/noise_rerun/output/",
+        "n": "125 Gaussian tensors, pair-matched, seed 42",
     },
     {
         "id": "run-08-divine-motion",
@@ -436,8 +451,9 @@ CLAIMS_RAW = [
         "As first recorded: pure noise seemed to converge into eighteen non-semantic "
         "attractors with no overlap with the five, so the basins looked like properties of "
         "the model as driven by language. Inverted 2026-07-31 (run 17): that noise arm was "
-        "mis-calibrated and counted before convergence; at matched injection energy and "
-        "gated convergence, noise falls into four of the language arm's five basins. At the "
+        "mis-calibrated and counted before convergence; at matched injection scale and "
+        "gated convergence, noise falls into the language arm's own basins, all five "
+        "reappearing at the trials' smallest passing lag. At the "
         "tested scale the basins belong to the weights; other scales await the nu-sweep.",
     ),
     (
@@ -598,19 +614,25 @@ RELS_RAW = [
      "cos(A, f(f(A))) = 1.000000.", 6),
 
     # ---- the regime correction, itself corrected: at matched injection
-    # energy the room analogy PASSES this test (run 17, 2026-07-31).
+    # scale the room analogy PASSES this test (run 17, 2026-07-31).
     ("ac-resonant-frequency", "concept-regime-dependence", "breaks-down-at",
      "Excite a room with anything broadband and the same modes rise: they are a property of "
      "the space. The five basins first seemed to fail that test (noise appeared to raise "
-     "eighteen different, non-semantic attractors), but the corrected matched-energy control "
-     "(run 17, 2026-07-31) reverses it: noise raises four of the language arm's five basins, "
-     "so at the tested injection energy the analogy passes and the basins do belong to the "
+     "eighteen different, non-semantic attractors), but the corrected matched-nu control "
+     "(run 17, 2026-07-31) reverses it: noise raises the language arm's own five basins, "
+     "so at the tested injection scale the analogy passes and the basins do belong to the "
      "room. The edge is kept as the record of the correction; whether the analogy holds at "
-     "other energies is the nu-sweep's question.", 9),
+     "other injection scales is the nu-sweep's question.", 9),
     ("concept-regime-dependence", "run-03-random-baseline", "evidenced-by",
-     "The original evidence, now superseded: 125 mis-calibrated Gaussian tensors, counted "
+     "The original evidence, now superseded and kept as the historical record: 125 "
+     "mis-calibrated Gaussian tensors, counted "
      "pre-convergence, appeared to give 18 non-semantic basins. Run 17's matched-nu, gated "
      "re-run inverts the reading (FINDINGS F4).", 6),
+    ("concept-regime-dependence", "run-17-matched-nu-noise", "evidenced-by",
+     "The current evidence for the corrected reading: pair-matched, convergence-gated noise "
+     "lands in the language arm's own basins (all five at each trial's smallest passing "
+     "lag, 97/125 trials), so at the tested injection scale the basins belong to the "
+     "weights (FINDINGS F4).", 9),
 
     # ---- the apparatus difference
     ("ac-tape-recorder", "concept-readout-bypass", "breaks-down-at",
