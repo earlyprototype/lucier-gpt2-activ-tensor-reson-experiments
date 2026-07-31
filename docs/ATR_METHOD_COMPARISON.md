@@ -170,7 +170,7 @@ Other methods tell you what the model does with a specific input. ATR tells you 
 - [ ] T_mix_LLM measurement
 - [ ] Basin-sorted convergence matrix
 - [ ] Automated ATR pipeline (parameterisable model, prompt set, output directory)
-- [ ] SVD/spectral-gap prediction of per-head resonant states vs. observed convergence (scaffolded in `spectral_resonance.ipynb`; not yet run)
+- [x] SVD/spectral-gap prediction of per-head resonant states vs. observed convergence (`spectral_resonance.ipynb`, executed 2026-07-25; not supported as registered, and rescored 2026-07-31 against the loop's true target, the dominant eigenvector; FINDINGS.md §3, H4)
 
 ### Short-Term (Pre-HPC)
 - [ ] ATR on GPT-2 Medium/Large (validate scaling locally)

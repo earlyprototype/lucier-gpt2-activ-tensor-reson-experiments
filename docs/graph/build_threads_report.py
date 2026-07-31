@@ -551,6 +551,8 @@ def prose_mentions(needle: str, matcher: re.Pattern, limit=6):
     """Markdown lines mentioning `needle` that also match `matcher`."""
     hits = []
     for path, no, text in markdown_index():
+        if path.endswith("PODCAST_SOURCES.md"):
+            continue  # dated snapshot bundle; its mirrored prose is not the record
         if needle in text and matcher.search(text):
             hits.append({"file": path, "line": no,
                          "text": " ".join(text.split())[:300]})
@@ -588,6 +590,14 @@ def detect_answered_but_unrecorded(graph: Graph, repo_modules):
         verdicts = [e for e in graph.incoming.get(claim_id, [])
                     if e["type"] in VERDICT_EDGES]
         if verdicts:
+            continue
+        # A recorded disposition IS the record's verdict for a hypothesis.
+        # This detector exists for claims the record has fallen behind on,
+        # not for ones the operator has ruled on: once the status leaves
+        # "untested", the gap this detector reports is closed (H4 / issue
+        # #54 was the motivating case in both directions).
+        if claim.get("type") == "hypothesis" and claim.get("status") not in (
+                None, "untested", "open"):
             continue
 
         record = {
@@ -1662,7 +1672,7 @@ def render_markdown(graph, answered, blockers, threads, frontier, undeveloped,
             add("")
         if record["disk_evidence"]:
             state = record["disk_evidence"][0].get("script_state") or {}
-            if state.get("banner"):
+            if state.get("banner") and NOT_RUN_RE.search(state["banner"]):
                 add("The notebook's own opening cell agrees with the prose and "
                     "not with its own outputs:")
                 add("")

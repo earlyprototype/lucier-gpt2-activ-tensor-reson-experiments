@@ -116,14 +116,15 @@ the graph *and the working tree*:
 
 **Why it exists:** because the two things worth acting on are the two things prose hides.
 
-The first is a claim the record has fallen behind. H4 is the only hypothesis in the graph with a
-`tests` edge and no verdict edge — and the notebook that edge points at,
-`experiments/gpt2_small/spectral_resonance.ipynb`, has executed output in 8 of its 14 cells, with
-cell 9 reading `NOT SUPPORTED … Mean |cos sim| 0.2387 … Heads > 0.9: 5 / 144`. FINDINGS.md,
-JOURNEY_MAP.md and the notebook's own status banner all still say "not run". The graph could not
-catch this on its own — it is parsed *from* those documents, so it faithfully reproduced their
+The first was a claim the record had fallen behind. H4 was, until 2026-07-31, the only hypothesis
+in the graph with a `tests` edge and no verdict edge, while the notebook that edge points at,
+`experiments/gpt2_small/spectral_resonance.ipynb`, carried executed output in 8 of its 14 cells,
+cell 9 reading `NOT SUPPORTED … Mean |cos sim| 0.2387 … Heads > 0.9: 5 / 144`, with FINDINGS.md,
+JOURNEY_MAP.md and the notebook's own status banner all still saying "not run". The operator's
+ruling in issue #54 settled the disposition and closed the gap. The graph could not have
+caught this on its own: it is parsed *from* those documents, so it faithfully reproduced their
 staleness. Only the cross-check against the filesystem catches it, which is why the classification
-is an overlay and not a graph property. Clicking the node quotes the cell.
+is an overlay and not a graph property, and this catch is why the check exists.
 
 The second is a shared blocker. `blocks` / `blocked-by` edges are drawn thick, dashed and purple,
 and a blocker the graph has no node of its own for — an issue number, an artefact named only in

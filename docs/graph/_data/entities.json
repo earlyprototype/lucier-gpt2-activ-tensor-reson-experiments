@@ -4,7 +4,7 @@
     "version": "1.0",
     "created": "2026-07-25",
     "last_updated": "2026-07-25",
-    "source_last_updated": "2026-07-23",
+    "source_last_updated": "2026-07-31",
     "title": "ATR Evidence Graph: hypotheses, findings, runs and self-corrections",
     "description": "The Activation Tensor Resonance series as an evidence graph: 17 principal findings, 16 key discoveries, 12 hypotheses, the concepts they run on and the questions the record leaves open, wired to the runs, models and artefacts that produced them, with every recorded correction, retirement and supersession carried as a signed edge and every stated blocker as a blocks / blocked-by edge.",
     "generator": "docs/graph/build_evidence_graph.py",
@@ -702,13 +702,15 @@
       "id": "h4-head-power-iteration",
       "label": "H4: Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector)",
       "type": "hypothesis",
-      "status": "untested",
-      "description": "Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector). Disposition: Untested: protocol scaffolded (experiments/gpt2_small/spectral_resonance.ipynb), not run.",
+      "status": "not-supported",
+      "description": "Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector). Disposition: Not supported as registered; superseded 2026-07-31 by the corrected-target rescore (run 16; TC ruling, #54): executed 2026-07-25 in the issue #25 artifact regeneration (spectral_resonance.ipynb; artifacts experiments/_DATA/EXP_009/009c_*.pt): 5/144 heads above 0.9 to the top singular vector (mean absolute cosine 0.2387, median 0.1614; the sixth head sits at 0.8973, so the count splits a near-tie). The registered target was the wrong object: the isolated loop is strictly linear (no LayerNorm, attention, or biases inside it), power iteration proper, whose limit is the dominant eigenvector of W_OV, not its top singular vector. Rescored against the eigenvector (run 16, experiments/gpt2_small/output_eigen_rescore/report.md, which retains the original scoring as its footnote): 87/144 heads carry a real dominant eigenvalue, of which 81 had settled by iteration 500 and every settled axis matches the dominant eigenvector (minimum agreement 0.9999999); the 6 still converging at 500 already sit at 0.97 to 0.9999 alignment to it; the other 57 heads carry a complex dominant pair and rotate as predicted, 55/57 inside the pair's own invariant plane (median in-plane fraction 1.0000; the two exceptions, L0.H1 at 0.476 and L6.H8 at 0.940, are named in the report). The registered passes are exactly the heads where eigenvector and singular vector coincide, led by L11.H8 (largest singular gap of all 144, 11.49; eigenvalue gap 17.25; negative dominant eigenvalue, modulus 86.7), the F14/F17 flip-axis head, here too a period-2 sign-flipper: two independent instruments agree on its direction-flipping structure. Chance is excluded under both the uniform 768-dimensional null (single-head probability of clearing 0.9 about 8e-279) and a null calibrated to the bulk's anisotropy (effective dimension 11.7; probability of at least 5 passes in 144 about 3e-14). The registered proposition was naive: it named the wrong spectral object, and a head in isolation idealises away the MLP, the layer's other eleven heads acting in concert, LayerNorm and attention; the rescore results stand as real artifacts on that hyper-constrained basis and claim nothing about heads in place. Both regeneration deviations (.detach(), .clone()) verified value-preserving inside run 16; the committed 009c artifacts reproduce from the raw weights within float32 precision.",
       "phase": "phase-4",
       "asserted": "2026-03-20",
       "retired": null,
       "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions",
-      "evidence": []
+      "evidence": [
+        "run-16-eigen-rescore"
+      ]
     },
     {
       "id": "concept-activation-patching",
@@ -1336,6 +1338,18 @@
       "doc_ref": "docs/FINDINGS.md#1-run-inventory"
     },
     {
+      "id": "run-16-eigen-rescore",
+      "label": "Run 16: Per-head spectral test, eigenvector rescore",
+      "type": "run",
+      "description": "Per-head spectral test, eigenvector rescore: analysis over 144 heads; stored 009b trajectories + raw weights, no forward passes, on gpt2-small; no forward passes, no ATR loop.",
+      "script": "experiments/gpt2_small/12_eigen_rescore.py",
+      "output_dir": "experiments/gpt2_small/output_eigen_rescore/",
+      "n": "144 heads; stored 009b trajectories + raw weights, no forward passes",
+      "date": "2026-07-31",
+      "phase": "phase-5",
+      "doc_ref": "docs/FINDINGS.md#1-run-inventory"
+    },
+    {
       "id": "run-2-cross-model-sweeps",
       "label": "Run 2: Cross-model sweeps",
       "type": "run",
@@ -1480,12 +1494,12 @@
     },
     {
       "id": "run-spectral-scaffold",
-      "label": "Spectral resonance scaffold (H4, not run)",
+      "label": "Spectral resonance protocol (H4, executed 2026-07-25)",
       "type": "run",
-      "description": "Pre-registered protocol for H4: per-head resonance against the top singular vector of W_OV. Scaffolded and retained as pre-registration, never executed.",
+      "description": "Pre-registered protocol for H4: per-head resonance against the top singular vector of W_OV. Executed end to end 2026-07-25 in the issue #25 artifact regeneration (5/144 heads above 0.9, NOT SUPPORTED as registered); superseded 2026-07-31 by the corrected-target rescore, run 16, per the operator ruling in issue #54.",
       "script": "experiments/gpt2_small/spectral_resonance.ipynb",
-      "n": "not run",
-      "date": null,
+      "n": "144 heads, executed 2026-07-25",
+      "date": "2026-07-25",
       "phase": "phase-4",
       "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions"
     },
@@ -4101,6 +4115,14 @@
       "asserted": "2026-03-20"
     },
     {
+      "from": "h4-head-power-iteration",
+      "to": "run-16-eigen-rescore",
+      "type": "produced-by",
+      "description": "H4 rests on Run 16: Per-head spectral test, eigenvector rescore (144 heads; stored 009b trajectories + raw weights, no forward passes).",
+      "weight": 4,
+      "asserted": "2026-07-31"
+    },
+    {
       "from": "disc-12-landscapes-model-specific",
       "to": "disc-3-reddit-2018-discourse",
       "type": "qualifies",
@@ -4655,6 +4677,14 @@
       "description": "Run 15: Suppression-head test for L11.H8 iterated the ATR loop on GPT-2 Small (124M) (144 heads; loop ablation; 12 sentences).",
       "weight": 2,
       "asserted": "2026-07-19"
+    },
+    {
+      "from": "run-16-eigen-rescore",
+      "to": "model-gpt2-small",
+      "type": "run-on",
+      "description": "Run 16: Per-head spectral test, eigenvector rescore analysed GPT-2 Small (124M) from its weights and committed artifacts (144 heads; stored 009b trajectories + raw weights, no forward passes).",
+      "weight": 2,
+      "asserted": "2026-07-31"
     },
     {
       "from": "run-2-cross-model-sweeps",
@@ -5246,7 +5276,7 @@
       "from": "run-spectral-scaffold",
       "to": "h4-head-power-iteration",
       "type": "tests",
-      "description": "The scaffolded protocol for H4: per-head resonance against the top singular vector of W_OV. Retained as pre-registration, never executed.",
+      "description": "The pre-registered protocol for H4: per-head resonance against the top singular vector of W_OV. Executed 2026-07-25 (issue #25 regeneration); superseded by the run-16 eigenvector rescore per the #54 ruling.",
       "weight": 4
     }
   ]

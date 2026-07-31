@@ -141,7 +141,7 @@ An **eigenvector** of a matrix is a direction the matrix does not rotate: it onl
 
 ATR is this algorithm with the matrix replaced by the full transformer forward pass, which is **nonlinear**: it contains softmax attention, GeLU activations, and LayerNorm, none of which are matrix multiplies. Nonlinear maps have no eigenvector guarantee, and richer possible behaviour: multiple coexisting attractors (GPT-2 Small's five), single global collapse (Medium's `D`), or refusal to settle (Pythia-410m). That variety across models is not a bug in the method; it is the finding. The phrase in the README, "a nonlinear analogue of power iteration," is precisely this relationship: same procedure, weaker guarantees, richer outcomes.
 
-One caution to carry: because the map is nonlinear, do not over-interpret any single attractor as "the dominant eigenvector of the model." The spectral comparison (`spectral_resonance.ipynb`, scaffolded but not run) is the project's designed test of how far the linear intuition transfers to the per-head weight matrices.
+One caution to carry: because the map is nonlinear, do not over-interpret any single attractor as "the dominant eigenvector of the model." The spectral comparison (`spectral_resonance.ipynb`, executed 2026-07-25 and rescored 2026-07-31) is the project's designed test of how far the linear intuition transfers to the per-head weight matrices, and its outcome is a working example of the eigenvector-versus-singular-vector distinction above: in the isolated per-head loop, which really is linear, every head that settled landed on its matrix's dominant eigenvector exactly (heads whose dominant eigenvalue is complex rotate instead, as the same mathematics predicts), while the registered prediction had named the top singular vector, a different direction for most heads (FINDINGS.md §3, H4; `../experiments/gpt2_small/output_eigen_rescore/report.md`).
 
 ### 3.4 Sensitivity, determinism, and why runs still agree
 
@@ -192,7 +192,7 @@ Three design moves in this project are standard experimental machinery, worth na
 | Limit cycle | Repeating orbit that never settles to a point | Pythia-410m candidate behaviour |
 | Regime | Which part of the landscape the dynamics explore, set by the input | "language-driven regime" |
 | Power iteration | Linear ancestor of ATR; converges to dominant eigenvector | the analogy, and its limits |
-| Eigenvector / eigenvalue | Direction a matrix only stretches / the stretch factor | spectral scaffold (H4) |
+| Eigenvector / eigenvalue | Direction a matrix only stretches / the stretch factor | spectral test and rescore (H4) |
 | PCA | Best low-dimensional shadow of high-dimensional data | trajectory plots |
 | Null model | Same procedure, cause removed | the noise baseline |
 

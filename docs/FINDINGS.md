@@ -82,6 +82,7 @@ cloud container, a different machine class from all prior runs, with `gpt2` and
 | 13 | Lag-k re-gate + engine `gate_lag` | gpt2-small | 3 states × 25 dense iters | `experiments/gpt2_small/output_lagk/` |
 | 14 | J-lens phase probe (both phases, pivot, flip axis) | gpt2-small | pilot lens × cycle states | `experiments/gpt2_small/output_jlens_phase/` |
 | 15 | Suppression-head test for L11.H8 | gpt2-small | 144 heads; loop ablation; 12 sentences | `experiments/gpt2_small/output_suppression/` |
+| 16 | Per-head spectral test, eigenvector rescore | gpt2-small | 144 heads; stored 009b trajectories + raw weights, no forward passes | `experiments/gpt2_small/output_eigen_rescore/` |
 | - | Tensor convergence diagnostic | all four | reads runs 1–2 | `experiments/cos_sim_diagnostic.ipynb` |
 | - | Readout confidence audit | gpt2-small | single-prompt demo | `experiments/output/readout_guardrails_gpt2_small.json` |
 | - | All-warm permutation test | gpt2-small (W_E) | 10,000 random 14-token sets | `experiments/gpt2_small/output_permutation/` |
@@ -686,7 +687,7 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
 | H1 | `prolet` is the dominant basin | **Supported, revised upward**: 43.2% at lock-in (was 35.2% at iter 100). Per-prompt category predictions remained poor (~25%); the structural claim stands, the predictive one does not. |
 | H2 | `Divine` is a genuine secondary basin | **Supported; the object is now resolved (2026-07-19)**: 27.2%, and unlike the other four it is not a fixed point but an exact period-2 limit cycle with a phase-invariant argmax (F2, F9, F10): a high-probability single token over a moving tensor, not a low-probability basin. |
 | H3 | Intermediate tokens reflect training-corpus topology | **Weakened further at close; coherence half upgraded 2026-07-19**: the all-warm cross-similarity matrix was permutation-tested and found to be an anisotropy artifact (99.9% of random 14-token sets are also all-positive; see caveat 4, resolved), and the corpus-causal reading had already failed cross-model (F3). The semantic-coherence observation itself, however, no longer stands as qualitative only: it now holds one level deeper than the token-level W_E neighbourhood, in the full readout distribution, with permutation support (coherence 0.41-0.47 vs 0.27, p = 0.001 under both nulls; F8). |
-| H4 | Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector) | **Untested**: protocol scaffolded (`experiments/gpt2_small/spectral_resonance.ipynb`), not run. |
+| H4 | Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector) | **Not supported as registered; superseded 2026-07-31 by the corrected-target rescore (run 16; TC ruling, #54)**: executed 2026-07-25 in the issue #25 artifact regeneration (`spectral_resonance.ipynb`; artifacts `experiments/_DATA/EXP_009/009c_*.pt`): 5/144 heads above 0.9 to the top singular vector (mean absolute cosine 0.2387, median 0.1614; the sixth head sits at 0.8973, so the count splits a near-tie). The registered target was the wrong object: the isolated loop is strictly linear (no LayerNorm, attention, or biases inside it), power iteration proper, whose limit is the dominant *eigenvector* of W_OV, not its top singular vector. Rescored against the eigenvector (run 16, `experiments/gpt2_small/output_eigen_rescore/report.md`, which retains the original scoring as its footnote): 87/144 heads carry a real dominant eigenvalue, of which 81 had settled by iteration 500 and **every settled axis matches the dominant eigenvector** (minimum agreement 0.9999999); the 6 still converging at 500 already sit at 0.97 to 0.9999 alignment to it; the other 57 heads carry a complex dominant pair and rotate as predicted, 55/57 inside the pair's own invariant plane (median in-plane fraction 1.0000; the two exceptions, L0.H1 at 0.476 and L6.H8 at 0.940, are named in the report). The registered passes are exactly the heads where eigenvector and singular vector coincide, led by L11.H8 (largest singular gap of all 144, 11.49; eigenvalue gap 17.25; negative dominant eigenvalue, modulus 86.7), the F14/F17 flip-axis head, here too a period-2 sign-flipper: two independent instruments agree on its direction-flipping structure. Chance is excluded under both the uniform 768-dimensional null (single-head probability of clearing 0.9 about 8e-279) and a null calibrated to the bulk's anisotropy (effective dimension 11.7; probability of at least 5 passes in 144 about 3e-14). The registered proposition was naive: it named the wrong spectral object, and a head in isolation idealises away the MLP, the layer's other eleven heads acting in concert, LayerNorm and attention; the rescore results stand as real artifacts on that hyper-constrained basis and claim nothing about heads in place. Both regeneration deviations (`.detach()`, `.clone()`) verified value-preserving inside run 16; the committed 009c artifacts reproduce from the raw weights within float32 precision. |
 | H-fingerprint | Basin profiles read training-data bias without data access | **Refuted as stated** (F3, F4). |
 | H-till | `till` is a slow transient | **Refuted** (F1: 19/19 stable). |
 | H-D1 | `Divine`'s late-stage motion lies mostly in readout-flattened directions | **Supported in a weakened, more precise form (2026-07-19)**: the motion is an exact period-2 cycle whose per-step readout response is 0.295 of the equal-norm random baseline and whose flip axis responds at 0.054, but the distribution visibly shifts (p(top-1) swings 0.505 to 0.225 each half-cycle) while the argmax stays fixed (F9, F10). |
@@ -941,7 +942,9 @@ cycling prompts and whether they share the F10 flip axis (unblocked: the prompt
 library is restored, issue #24; run queued); the shape-class-matched coherence null and
 its application to the 125-sweep (F12, caveat 10); the phase-aware J-lens full
 build (F11, issue #8); hook-window/depth dependence (caveat 6); gate cadence
-(caveat 5); H4.
+(caveat 5); the H4 rescore's residue (why a large minority of heads carry complex
+dominant eigenvalues, and whether the per-head spectral profiles predict anything
+about the full-stack loop; run 16).
 
 ## 6. Stage boundary: why the series closed with work unexecuted
 
@@ -957,8 +960,9 @@ three classes, deliberately:
 2. **Transferred to the next question.** The depth control (caveat 6), per-layer /
    per-head decomposition, the spectral test (H4), and readout upgrades do not test
    whether the result is real; they test *why the models differ*. That is the
-   successor project's question. Their scaffolds are retained, labelled not-run, as
-   pre-registration.
+   successor project's question. Their scaffolds were retained as pre-registration;
+   the spectral test has since run and been rescored (H4 disposition, run 16), the
+   others remain labelled not-run.
 3. **Declared debt.** One item remains open: finer convergence-gate cadence
    (caveat 5). It cannot overturn a principal finding: basin identities stand on
    the gate regardless of cadence. (The other declared item, the W_E permutation

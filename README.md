@@ -157,7 +157,7 @@ ATR never set out to be a technique at all. It began as a thought experiment, an
 │   ├── RESULTS_SUMMARY.md           ← run-by-run record of the validation series
 │   ├── gpt2_small/                  ← original 5-prompt piece, 125-prompt sweep,
 │   │                                   reproducibility gate, gated re-sweep,
-│   │                                   random-noise null model, spectral scaffold
+│   │                                   random-noise null model, spectral test + rescore
 │   ├── gpt2_medium/                 ← 125-prompt sweep (→ `D`)
 │   ├── pythia_160m/                 ← 125-prompt sweep (→ `questioned`)
 │   ├── pythia_410m/                 ← 125-prompt sweep + 1000-iter deep run
@@ -196,9 +196,10 @@ Lucier's apparatus against the transformer's and marks the five places the analo
 The selector carries a fourth entry, *Threads*, which is not a fourth graph but the evidence
 graph re-coloured — readiness in place of epistemic status, arrived at by reading the graph
 against the working tree. It answers a different question: not whether a claim is true but
-whether it can move, and what moving it would cost. Two things surface there that prose keeps
-hidden: a claim the record has fallen behind on — H4, whose notebook has been run and whose
-result was never written down — and a blocker gating several separate threads at once, drawn as
+whether it can move, and what moving it would cost. Two things surfaced there that prose keeps
+hidden. The first was a claim the record had fallen behind on: H4, whose notebook had been run
+and whose result went unwritten until the 2026-07-31 ruling in issue #54 settled the
+disposition. The second is a blocker gating several separate threads at once, drawn as
 one hub with an arm to each rather than as sentences eight findings apart.
 Serve the repository root and open `docs/graph/viewer.html`, or read
 [docs/graph/README.md](docs/graph/README.md) first.
@@ -216,7 +217,7 @@ Serve the repository root and open `docs/graph/viewer.html`, or read
 | [`01b_deep_convergence.ipynb`](experiments/pythia_410m/01b_deep_convergence.ipynb) | Pythia-410m to 1000 iterations | ✅ run |
 | [`cos_sim_diagnostic.ipynb`](experiments/cos_sim_diagnostic.ipynb) | Cross-model tensor convergence | ✅ run |
 | [`readout_guardrails.ipynb`](experiments/readout_guardrails.ipynb) | Readout confidence audit (single-prompt demo) | ✅ run |
-| [`spectral_resonance.ipynb`](experiments/gpt2_small/spectral_resonance.ipynb) | SVD-predicted per-head resonance (H4) | 🔬 scaffold, not run |
+| [`spectral_resonance.ipynb`](experiments/gpt2_small/spectral_resonance.ipynb) | SVD-predicted per-head resonance (H4); superseded by the eigenvector rescore ([report](experiments/gpt2_small/output_eigen_rescore/report.md)) | ✅ run |
 
 ## Running It Yourself
 

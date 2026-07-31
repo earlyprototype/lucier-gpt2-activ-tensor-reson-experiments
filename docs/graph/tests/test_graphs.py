@@ -755,10 +755,18 @@ def test_content_not_supported_claims_are_only_the_ones_audited(entities):
     """The 2026-07 status-vocabulary sweep read all 12 dispositions in
     FINDINGS.md section 3 and all 33 findings, and moved exactly one claim.
     If a builder adds another, that is a judgement call and belongs in this pin.
+
+    2026-07-31: H4 added, on the H-J1 precedent, after the operator's ruling
+    in issue #54. The registered claim (settled state matches the top singular
+    vector, cos > 0.9, most heads) failed at 5/144; the corrected-target
+    rescore (run 16) raised a different, largely successful claim, carried by
+    the disposition prose and the evidence edge, not by the one-word status.
+    See the HYP_META audit note in build_evidence_graph.py.
     """
     nulls = sorted(c["id"] for c in entities["claims"]
                    if c["status"] == "not-supported")
-    assert nulls == ["h-j1"], f"unaudited not-supported claims: {nulls}"
+    assert nulls == ["h-j1", "h4-head-power-iteration"], \
+        f"unaudited not-supported claims: {nulls}"
 
 
 def test_content_f11_is_qualified_because_a_null_finding_still_stands(entities):

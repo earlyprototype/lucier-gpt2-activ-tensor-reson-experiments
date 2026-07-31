@@ -13,7 +13,4 @@
 # force. Delete a line when its issue closes — the check failing again at that
 # point is it confirming the fix landed.
 
-A/experiments/gpt2_small/spectral_resonance.ipynb  # issue #54 — H4's scaffold carries executed output reading NOT SUPPORTED (mean |cos| 0.2387, 5/144 heads > 0.9) while FINDINGS, JOURNEY_MAP and README still call it not run. Whether an artifact-recovery run under ATR_PAUSE disposes of a pre-registered hypothesis is the operator's ruling.
-
-D/experiments/gpt2_small/spectral_resonance.ipynb  # issue #54 — the same notebook's own "Not yet run" banner sits above those executed cells. Fixing the banner is safe, but it should say the same thing the disposition ends up saying, so it waits on the same ruling.
 

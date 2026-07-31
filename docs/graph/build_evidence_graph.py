@@ -88,7 +88,7 @@ README_MD = os.path.join(REPO, "README.md")
 
 # Build stamp is a constant, not "today", so re-running is byte-identical.
 BUILD_DATE = "2026-07-25"
-SOURCE_LAST_UPDATED = "2026-07-23"  # JOURNEY_MAP.md header: post-close corrections
+SOURCE_LAST_UPDATED = "2026-07-31"  # FINDINGS.md H4 row: the #54 rescore ruling landed
 
 # Dates that appear throughout the record.
 D_SERIES_CLOSE = "2026-07-10"  # FINDINGS.md provenance; JOURNEY_MAP Phase 5
@@ -96,6 +96,8 @@ D_PERMUTATION = "2026-07-11"   # RESULTS_SUMMARY.md section 6; permutation_repor
 D_ACT_II_5 = "2026-07-19"      # FINDINGS.md scope note; confidence_report.md
 D_POST_CLOSE = "2026-07-23"    # JOURNEY_MAP.md header; bell_anatomy.md correction
 D_POS0 = "2026-07-28"          # FINDINGS.md H-pos0 row; GPT2_DEEP_DIVE.md section 2.5
+D_REGEN = "2026-07-25"         # REGENERATION_REPORT.md; spectral_resonance.ipynb execution
+D_RESCORE = "2026-07-31"       # FINDINGS.md H4 row; output_eigen_rescore/report.md; issue #54 ruling
 D_SUPERVISORY = "2026-03-20"   # JOURNEY_MAP Phase 4 heading
 D_EXPLORATORY = "2026-03-01"   # month anchor: FINDINGS "Original exploratory work: 2026-03"
 
@@ -554,6 +556,15 @@ HYP_ID = {
 #         semantic-coherence half was UPGRADED with permutation support ("coherence
 #         0.41-0.47 vs 0.27, p = 0.001 under both nulls; F8"). A claim that lost one
 #         half and strengthened the other is the textbook "qualified", not a null.
+#   H4    "Not supported as registered; superseded by the corrected-target rescore"
+#         -> not-supported, on the H-J1 precedent: the registered claim (settled
+#         state ~ TOP SINGULAR VECTOR, cos > 0.9, most heads) failed at 5/144.
+#         The rescore's finding (settled state = DOMINANT EIGENVECTOR for every
+#         settling head) is a different, corrected claim raised by run 16 under
+#         TC's #54 ruling, carried in the disposition prose and the run-16
+#         evidence edge, not by the one-word status. "refuted" would be wrong:
+#         the corrected claim is the registered idea aimed at the right object,
+#         and it largely succeeds.
 # The `asserted` dates below are NOT in the record: the documents date dispositions,
 # never the moment a hypothesis was raised. They are placements, not measurements;
 # see metadata.date_precision.
@@ -562,7 +573,7 @@ HYP_META = {
     "H1":            dict(status="supported", phase="phase-2", asserted=D_EXPLORATORY, retired=None),
     "H2":            dict(status="supported", phase="phase-2", asserted=D_EXPLORATORY, retired=None),
     "H3":            dict(status="qualified", phase="phase-2", asserted=D_EXPLORATORY, retired=None),
-    "H4":            dict(status="untested",  phase="phase-4", asserted=D_SUPERVISORY, retired=None),
+    "H4":            dict(status="not-supported", phase="phase-4", asserted=D_SUPERVISORY, retired=None),
     "H-fingerprint": dict(status="refuted",   phase="phase-4", asserted=D_SUPERVISORY, retired=D_SERIES_CLOSE),
     "H-till":        dict(status="refuted",   phase="phase-5", asserted=D_SERIES_CLOSE, retired=D_SERIES_CLOSE),
     "H-D1":          dict(status="supported", phase="phase-5", asserted=D_SERIES_CLOSE, retired=None),
@@ -584,7 +595,7 @@ HYP_EVIDENCE = {
     "H2": ["run-5-gated-resweep", "run-8-divine-motion-audit", "run-9-cycle-anatomy"],
     "H3": ["run-token-neighbourhood", "run-all-warm-permutation",
            "run-7-coherence-formalization"],
-    "H4": [],
+    "H4": ["run-16-eigen-rescore"],
     "H-fingerprint": ["run-2-cross-model-sweeps", "run-3-random-noise-null"],
     "H-till": ["run-5-gated-resweep"],
     "H-D1": ["run-8-divine-motion-audit", "run-9-cycle-anatomy"],
@@ -1212,10 +1223,15 @@ RUN_ID = {
     "13": "run-13-lagk-regate",
     "14": "run-14-jlens-phase-probe",
     "15": "run-15-suppression-test",
+    "16": "run-16-eigen-rescore",
     "Tensor convergence diagnostic": "run-cos-sim-diagnostic",
     "Readout confidence audit": "run-readout-guardrails",
     "All-warm permutation test": "run-all-warm-permutation",
 }
+
+# Runs that are analysis over committed artifacts and raw weights, with no
+# ATR loop executed. The generic run templates must not call these ATR runs.
+ANALYSIS_ONLY_RUNS = {"run-16-eigen-rescore"}
 
 RUN_SCRIPT = {
     "run-0-repeatability-gate": "experiments/gpt2_small/00_reproducibility_gate.ipynb",
@@ -1234,6 +1250,7 @@ RUN_SCRIPT = {
     "run-13-lagk-regate": "experiments/gpt2_small/09_lagk_gate.py",
     "run-14-jlens-phase-probe": "experiments/gpt2_small/10_jlens_phase.py",
     "run-15-suppression-test": "experiments/gpt2_small/11_suppression_test.py",
+    "run-16-eigen-rescore": "experiments/gpt2_small/12_eigen_rescore.py",
     "run-cos-sim-diagnostic": "experiments/cos_sim_diagnostic.ipynb",
     "run-readout-guardrails": "experiments/readout_guardrails.ipynb",
     "run-all-warm-permutation": "experiments/gpt2_small/02b_permutation_test.py",
@@ -1254,6 +1271,7 @@ RUN_OUTPUT_DIR = {
     "run-13-lagk-regate": "experiments/gpt2_small/output_lagk/",
     "run-14-jlens-phase-probe": "experiments/gpt2_small/output_jlens_phase/",
     "run-15-suppression-test": "experiments/gpt2_small/output_suppression/",
+    "run-16-eigen-rescore": "experiments/gpt2_small/output_eigen_rescore/",
     "run-readout-guardrails": "experiments/output/",
     "run-all-warm-permutation": "experiments/gpt2_small/output_permutation/",
 }
@@ -1278,6 +1296,7 @@ RUN_DATE = {
     "run-13-lagk-regate": D_ACT_II_5,
     "run-14-jlens-phase-probe": D_ACT_II_5,
     "run-15-suppression-test": D_ACT_II_5,
+    "run-16-eigen-rescore": D_RESCORE,
     "run-cos-sim-diagnostic": D_SERIES_CLOSE,
     "run-readout-guardrails": D_SERIES_CLOSE,
     "run-all-warm-permutation": D_PERMUTATION,
@@ -1329,7 +1348,10 @@ def parse_runs(findings_md: str):
             ("id", rid),
             ("label", label),
             ("type", "run"),
-            ("description", "%s ATR run over %s, on %s." % (
+            ("description", (
+                "%s: analysis over %s, on %s; no forward passes, no ATR loop."
+                if rid in ANALYSIS_ONLY_RUNS else
+                "%s ATR run over %s, on %s.") % (
                 name, demark(row["N"]), demark(row["Model(s)"]))),
         ])
         if RUN_SCRIPT.get(rid):
@@ -1383,14 +1405,16 @@ EXTRA_RUNS = [
     ]),
     OrderedDict([
         ("id", "run-spectral-scaffold"),
-        ("label", "Spectral resonance scaffold (H4, not run)"),
+        ("label", "Spectral resonance protocol (H4, executed 2026-07-25)"),
         ("type", "run"),
         ("description", ("Pre-registered protocol for H4: per-head resonance against the top "
-                         "singular vector of W_OV. Scaffolded and retained as pre-registration, "
-                         "never executed.")),
+                         "singular vector of W_OV. Executed end to end 2026-07-25 in the issue "
+                         "#25 artifact regeneration (5/144 heads above 0.9, NOT SUPPORTED as "
+                         "registered); superseded 2026-07-31 by the corrected-target rescore, "
+                         "run 16, per the operator ruling in issue #54.")),
         ("script", "experiments/gpt2_small/spectral_resonance.ipynb"),
-        ("n", "not run"),
-        ("date", None),
+        ("n", "144 heads, executed 2026-07-25"),
+        ("date", D_REGEN),
         ("phase", "phase-4"),
         ("doc_ref", "docs/FINDINGS.md#3-hypothesis-dispositions"),
     ]),
@@ -2181,8 +2205,9 @@ def curated_relationships():
             "The pre-registered null for the all-warm matrix: 10,000 random 14-token sets "
             "against the canonical 14.", 7),
         rel("run-spectral-scaffold", H4, "tests",
-            "The scaffolded protocol for H4: per-head resonance against the top singular vector "
-            "of W_OV. Retained as pre-registration, never executed.", 4),
+            "The pre-registered protocol for H4: per-head resonance against the top singular "
+            "vector of W_OV. Executed 2026-07-25 (issue #25 regeneration); superseded by the "
+            "run-16 eigenvector rescore per the #54 ruling.", 4),
         rel("run-6-full-distribution-confidence", H0, "tests",
             "Result 0 of the confidence audit is a replication check: same code, new machine "
             "class, mirror-sourced weights, three repeats.", 6),
@@ -2445,7 +2470,9 @@ def structural_relationships(claims, runs, run_models, sources):
         for mid in run_models.get(r["id"], []):
             R.append(rel(
                 r["id"], mid, "run-on",
-                "%s iterated the ATR loop on %s (%s)." % (
+                ("%s analysed %s from its weights and committed artifacts (%s)."
+                 if r["id"] in ANALYSIS_ONLY_RUNS else
+                 "%s iterated the ATR loop on %s (%s).") % (
                     r["label"], next(m["label"] for m in runs if m["id"] == mid),
                     r.get("n", "")),
                 2, r.get("date")))
