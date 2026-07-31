@@ -26,10 +26,10 @@ xₙ₊₁ = f(normalise(xₙ))                  # Re-inject normalised output
 normalise(x) = x · (‖x₀‖₂ / ‖x‖₂)        # Global L2 rescaling
 ```
 
-Convergence is assessed via cosine similarity between successive iterates:
+Convergence is assessed via cosine similarity between successive iterates. Precisely: the gate runs on the **mean-pooled** `[768]` vector (`cos_sim_mean`), with the last-position cosine reported alongside; no full-tensor `[T×768]` cosine is computed (at a position-collapsed state the three coincide):
 
 ```
-cos_sim(xₙ, xₙ₊₁) → 1.0   as   n → ∞
+cos_sim(mean(xₙ), mean(xₙ₊₁)) → 1.0   as   n → ∞
 ```
 
 ### Hook Mechanism
@@ -49,35 +49,37 @@ The prompt string is still passed to `model.run_with_cache()` on each iteration 
 
 ### Normalisation
 
-Without normalisation, the tensor norm grows exponentially (~1.5M by iteration 500), saturating nonlinearities and producing meaningless token predictions. L2 normalisation rescales the full `[T, d_model]` tensor to maintain the energy of the initial forward pass:
+Without normalisation, the tensor norm grows exponentially (~1.5M by iteration 500), saturating nonlinearities and producing meaningless token predictions. L2 normalisation rescales the full `[T, d_model]` tensor to the energy of the initial forward pass **before each injection**:
 
 ```
-‖xₙ‖₂ = ‖x₀‖₂   ∀ n
+‖normalise(xₙ)‖₂ = ‖x₀‖₂   ∀ n
 ```
 
-This makes the iterated map energy-conservative, bounding the dynamics within a fixed-radius manifold in ℝ^(T×768). Alternative normalisation strategies (per-position, per-dimension, LayerNorm-style) remain unexplored and may yield different attractor geometries.
+Note what is and is not conserved: only the *injected* tensor sits on the ‖x₀‖ shell. The recorded iterates xₙ are post-forward and carry the map's gain (settled at ~3.5–3.8× for the language runs, ~10× for the noise run; `experiments/contraction/RESULTS.md`, M5). The injected sequence is confined to a fixed-radius manifold in ℝ^(T×768); the map itself is not energy-conservative. Alternative normalisation strategies (per-position, per-dimension, LayerNorm-style) remain unexplored and may yield different attractor geometries; the engine exposes `renorm` variants and an `inject_hook_name` override for this ([ENGINE.md](ENGINE.md)).
 
 ### Snapshot Schedule
 
-Snapshots are recorded at a logarithmic schedule to capture both early-phase dynamics and deep convergence without redundant mid-range computation:
+Snapshots are recorded at a logarithmic schedule to capture both early-phase dynamics and deep convergence without redundant mid-range computation. The original five-prompt piece used:
 
 ```
 schedule = [0, 2, 3, 5, 10, 20, 50, 100, 250, 500]
 ```
 
+The 125-prompt Stage 1 sweep and the random baseline ran the truncated schedule `[0, 2, 3, 5, 10, 20, 50, 100]`; the gated re-sweep checks every 10 iterations past 100 to a 1000-iteration ceiling. Mixed-gap schedules bias step-difference estimators (`experiments/contraction/RESULTS.md`, M2 cross-check); new runs should keep gaps uniform.
+
 At each snapshot, the following are recorded:
 
-| Metric | Tensor Shape | Description |
+| Metric (snapshot key) | Tensor Shape | Description |
 |:---|:---|:---|
-| `resid_tensor` | `[T, 768]` | Full residual stream |
+| `tensor` | `[T, 768]` | Full residual stream |
 | `last_vector` | `[768]` | Residual at final token position |
 | `mean_vector` | `[768]` | Mean-pooled residual across positions |
 | `top_tokens` | top-5 | Decoded via `ln_final → W_U → softmax → topk` |
 | `all_position_tokens` | `[T]` | Per-position top-1 decoded token |
-| `cos_sim_last` | scalar | Cosine similarity to previous iterate (last position) |
-| `cos_sim_mean` | scalar | Cosine similarity to previous iterate (mean-pooled) |
+| `cosine_sim_last` | scalar | Cosine similarity to previous iterate (last position) |
+| `cosine_sim_mean` | scalar | Cosine similarity to previous iterate (mean-pooled) |
 | `position_similarity` | scalar | Mean pairwise cosine similarity across positions |
-| `tensor_norm` | scalar | L2 norm of full tensor |
+| `tensor_norm` | scalar | L2 norm of full tensor (pre-rescale) |
 
 Token decoding applies the final LayerNorm before unembedding:
 
@@ -117,7 +119,7 @@ Framework:       TransformerLens (Nanda & Bloom, 2022)
 | RNN fixed-point analysis | Maps attractor dynamics of recurrent systems | Transformers are feedforward; we impose recurrence via re-injection |
 | Singular value decomposition of W_OV | Identifies dominant directions of weight matrices | Static analysis; our method probes the *nonlinear* composite operator |
 
-A direct empirical comparison between the last two rows above, the per-head resonant state actually observed under iterative re-injection versus the dominant singular vector predicted by static SVD of `W_OV`, is scaffolded in `experiments/gpt2_small/spectral_resonance.ipynb`. It has not been run; see [FINDINGS.md](FINDINGS.md) (H4) and its Caveats section.
+A direct empirical comparison between the last two rows above, the per-head resonant state actually observed under iterative re-injection versus the dominant singular vector predicted by static SVD of `W_OV`, is scaffolded in `experiments/gpt2_small/spectral_resonance.ipynb`. The notebook was executed in the 2026-07-25 artifact regeneration (committed outputs: 5/144 heads above the 0.9 threshold, summary verdict NOT SUPPORTED; artifacts in `experiments/_DATA/EXP_009/`); whether that re-execution formally disposes of the pre-registered H4 awaits an operator ruling (issue #54). See [FINDINGS.md](FINDINGS.md) (H4) and its Caveats section.
 
 ## Repeatability
 

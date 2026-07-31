@@ -137,6 +137,16 @@ What remains unadjudicated is the *corpus percentile* measurement (665,600 ordin
 
 Three tiers. Tier 0 requires no ruling and no compute; Tier 1 is the STOP work plus its adjudications; Tier 2 is the post-gate experiment queue in order. Nothing else runs.
 
+> **Execution log (2026-07-31).** TC approved the plan and removed the pause gate ("we remove the
+> gate, that's my official position"), and delegated experiment ordering to this review. Executed the
+> same day, in this PR: the #89 → #87 chain merged to main and #100 closed; the README, FINDINGS
+> (F4/F5/F8 flags, caveats 18/18b, H-pos0 clause, prompt-library unblocking), JOURNEY_MAP, TECHNICAL,
+> SCALING, RESULTS_SUMMARY, PYTHIA review and PRIOR_WORK (#99) fixes; ATR_PAUSE.md rewritten as
+> lifted; the two resolved `.drift-allow` exemptions deleted. Still open in Tier 0: the two H4
+> rulings (#54, TC's call), and #48, which turns out to need the local-only Stage 1 archives and so
+> moves to the re-run work in Tier 2. Tier 1/Tier 2 below are now one continuous queue: the gate no
+> longer separates them.
+
 ### Tier 0: record repair (immediately; analysis-free; STOP-exempt as bookkeeping)
 
 1. **Land the correction chain: merge PR #89, then PR #87, then delete the branches.** Both are clean, analysis-only, checks passing. Close #100 (bot docstrings against a transient branch) unless it rebases trivially after the merges.
@@ -155,14 +165,14 @@ Three tiers. Tier 0 requires no ruling and no compute; Tier 1 is the STOP work p
 4. **M3 Jacobian spectrum at v̂\*** as the Part C replacement (§3.4): gated; queued for the moment the gate lifts.
 5. Writeup as new findings (F18+), with the pre-registered CE mapping (C3) and the §3.3 scope limits stated.
 
-**The one ruling Tier 1 needs from TC:** Part A requires single hooked forward passes at committed states. [ATR_PAUSE.md](ATR_PAUSE.md) blocks "new ATR experiments"; #98's scope note treats plain forward passes as outside that definition, but it is TC's definition, not ours, and there is precedent for silent drift here: PR #61's control regenerated trajectories with forward passes on four models during the pause and nobody flagged it. Two clean options: **(a) pass the gate first**, the recommended one, because #94 *is* the understanding the gate was built to demand, and writing the Part A code (ungated) is itself preparation for it; or **(b) rule single no-loop hooked passes as analysis.** What is not clean is agents deciding this severally, which is what has already started happening.
+**The gate ruling: RESOLVED (2026-07-31).** TC removed the pause outright ("we remove the gate, that's my official position"); [ATR_PAUSE.md](ATR_PAUSE.md) is rewritten as lifted. Nothing in Tier 1 or Tier 2 is blocked by anything except its position in the queue below, whose ordering TC has delegated to this review.
 
-### Tier 2: post-gate experiment queue (in order; nothing jumps it)
+### Tier 2: the experiment queue (in order; nothing jumps it)
 
 1. **Matched-ν noise baseline re-run** (repairs F4 and every inherited noise control; makes #98's relocated anomaly decidable), under the standing archive spec below, with gated classification at lock-in, full lag table, per-position per-iteration float64 archives. Closes the #97 loop and the M2 gap in one run.
 2. **The ν-sweep**: one experiment, currently filed twice (#27 E1 ≡ #91 E4; CE11's natural-energy control on Small is its ν → natural endpoint). Decides whether basin identity depends on the arbitrary rescale target, the live confound under every basin-identity claim.
 3. **M3/M4** if not already run under Tier 1.
-4. **#17 basin geometry**: the ATR_PAUSE-signposted experiment, now fourth rather than first because items 1 and 2 protect existing published claims while #17 extends them. TC should confirm this reordering, since ATR_PAUSE names #17 explicitly.
+4. **#17 basin geometry**: fourth rather than first because items 1 and 2 protect existing published claims while #17 extends them. (This reordering is now settled: the pause document that named #17 as next is lifted, and TC delegated queue order to this review.)
 5. Then, re-motivated by what Part A finds: #72 (distribution-level landscape), #84 Arm A (depth × iteration grid; its Arm B is ungated any time), #8 (J-lens full build), #76 (SAE decomposition, fidelity gate first), the H-pos0 n = 1 run, and the 33 unaudited `Divine` prompts.
 6. **Cross-model track (#73, #74, #77, #78, the Pythia-410m lag re-gate) stays parked**: TC's explicit ruling (#91 comment) that generalisation is a different question from mechanism, and mechanism is the live one. The Pythia re-gate is flagged as the one parked item protecting an already-published claim (F3's fourth cell); it comes off the shelf first when this track reopens.
 
@@ -174,7 +184,7 @@ Three tiers. Tier 0 requires no ruling and no compute; Tier 1 is the STOP work p
 4. **Identifiers via the board registry only** (discussion #53); descriptive directory names preferred; `EXP_011` remains unconfirmed.
 5. **Record moves with the claim:** any PR that changes a finding's status updates FINDINGS + README + the knowledge graph in the same PR; `check_record_drift.py` gates it.
 6. **Corrections land before dependent work starts.** The #85 → #87 → #89 chain sat unmerged while three issues (#91, #94, #97) built on its numbers; merges have also outrun reviews twice (#56, #58), both needing follow-up correction PRs. One branch per workstream (the knowledge-graph branch carried six unrelated PRs).
-7. **STOP semantics (#94):** the STOP governs *new analysis and experiment work*; it does not forbid Tier 0 record repair, and it does not override the pause gate. TC should edit #94's body to link this section, so the next agent does not have to infer it.
+7. **STOP semantics (#94):** the STOP governs *new analysis and experiment work*; it does not forbid Tier 0 record repair. (The pause gate it previously deferred to was lifted 2026-07-31.) TC should edit #94's body to link this section, so the next agent does not have to infer it.
 8. **Cross-model claims out of scope** until the mechanism phase concludes (TC's ruling, #91).
 9. **Session working agreements bind agents too.** SESSION_03's standing rules (no em dashes anywhere in the repo; no decorative metaphors; grep before committing) were enforced by dedicated PRs and then ignored by later agent-authored docs, this review's own first draft included. Read `docs/sessions/` before writing.
 
@@ -195,7 +205,7 @@ Three tiers. Tier 0 requires no ruling and no compute; Tier 1 is the STOP work p
 | 26 | Dynamical-systems positioning | Absorb into #28 register; no separate work item. |
 | 27 | Normalisation as absorption | E1 consolidated into the single ν-sweep (T2-2); the "inert" half already resolved via caveat 7. |
 | 28 | Open-questions register | Update in T0-4 to fold in the wave. |
-| 48 | Truncated dissolution tables | **T0-3. Close this week.** |
+| 48 | Truncated dissolution tables | Re-disposed 2026-07-31: regenerating the tables needs the gitignored, local-only Stage 1 archives, so this is not a doc fix; it rides with the Tier 2 re-run work. |
 | 51 | Cross-repo knowledge graph | Park; infrastructure, post-mechanism. |
 | 54 | H4 record contradiction | **T0-2. TC's two rulings, then close.** |
 | 55 | README vs FINDINGS permutation drift | **T0-3. Close this week.** (Verified still true on main today; fix `.drift-allow` with it.) |

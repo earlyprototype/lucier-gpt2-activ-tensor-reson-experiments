@@ -84,7 +84,7 @@
 | H0 | Results are deterministic | Repeatability supported | EXP_009d0: N=2 same-machine runs produce identical terminal basins. Independent re-implementation pending. |
 | H1 | `prolet` is the dominant basin | Supported, revised upward | 43.2% at convergence (gated re-sweep); was 35.2% at iter 100. `Anarch` was over-counted pre-convergence. Per-prompt prediction remained poor (~25%). |
 | H2 | `Divine` is a genuine secondary basin | Supported with qualification | 27.2%; fails the lag-1 gate by construction: an exact period-2 limit cycle, argmax stable in both phases (FINDINGS.md F9); converged under a lag-2 gate for the audited trajectory (F15). |
-| H3 | Intermediate tokens reflect training corpus topology | Partially supported; generality refuted | Semantic clustering in W_E holds (permutation test pending). The corpus-causal reading failed cross-model: GPT-2 Medium, same corpus, no semantic basins (FINDINGS.md F3). Null model run: basins are regime-specific (F4). |
+| H3 | Intermediate tokens reflect training corpus topology | Weakened at close; coherence half moved one level down | The permutation test was run and came back **negative** (2026-07-11): the all-warm W_E matrix is embedding-space anisotropy, not a special subspace (Discoveries 9–10 above; FINDINGS caveat 4). The corpus-causal reading failed cross-model: GPT-2 Medium, same corpus, no semantic basins (FINDINGS.md F3). Null model run: basins are regime-specific (F4, now confounded pending re-run, FINDINGS caveat 18). The distribution-level coherence replacement (F8) is itself under challenge (FINDINGS caveat 18b). |
 | H4 | Per-head resonance ≈ SVD dominant singular vector | Untested | Scaffold only: `experiments/gpt2_small/spectral_resonance.ipynb` |
 | H-fingerprint | Basin profiles read training bias from any model | **Refuted** | FINDINGS.md F3, F4 |
 
@@ -134,7 +134,7 @@ Canonical dispositions with full evidence: [FINDINGS.md](FINDINGS.md) §3.
 | **All-warm matrix** | Cross-similarity matrix with no negative values: indicates compact attractor subspace | Session 02 |
 | **Eigenvoice** | Metaphor (art register): the model's "native voice" under iteration. The reporting-register correction: the voice depends on what drove it (FINDINGS.md F4) | ISOMORPHISM.md |
 | **Q-vector dichotomy** | Slonski's finding: token Q-vectors polarise into 2 groups at cosine similarity ≈ -1 | Session 01 |
-| **Glitch token** | Anomalous BPE tokens with unusual embedding properties (e.g., SolidGoldMagworthy), ruled out for our basins | Session 01 |
+| **Glitch token** | Anomalous BPE tokens with unusual embedding properties (the SolidGoldMagikarp family). Ruled out for the basin *identities* (Session 01), then ruled back **in** for the `Divine` object: the cycle's phase-B pole aligns with the under-trained token core at cos +0.596, p < 0.001 (FINDINGS F10, F13) | Session 01; F13 (2026-07-19) |
 | **Bias profile** | *Retired term.* Originally: basin distribution as a fingerprint of training data themes, refuted at series close (FINDINGS.md F3) | Session 02 |
 
 ---

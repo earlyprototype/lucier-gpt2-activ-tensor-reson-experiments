@@ -109,6 +109,17 @@ negative sign at a fixed point produces oscillation around it. Finding 4 is that
 configuration: a near-fixed point whose one unstable direction yields a stable 2-cycle), localised to a named component, which no DEQ work
 does.
 
+**Unrolled iterative estimation: the setup's conceptual ancestor.** Greff, Srivastava, Schmidhuber, *Highway and Residual Networks
+learn Unrolled Iterative Estimation* (ICLR 2017, arXiv 1612.07771)\* [peer-reviewed], with Jastrzebski et al., *Residual Connections
+Encourage Iterative Inference* (ICLR 2018, arXiv 1710.04773)\* [peer-reviewed]: the canonical statement that a residual stack already
+*is* an iterated map refining a single representation. ATR closes an outer loop around a process this line describes as an inner one;
+that framing is the closest conceptual ancestor of the whole setup and was missing from this review until 2026-07-31 (issue #99).
+Architecturally nearest: Fan, Lavril, Grave, Joulin, *Addressing Some Limitations of Transformers with Feedback Memory* (arXiv
+2002.09402\* [preprint]) literally feeds merged higher-layer representations back to lower layers, during training; further out,
+weight-tied depth recurrence (Dehghani et al., *Universal Transformers*, ICLR 2019\* [peer-reviewed]; Giannou et al., *Looped
+Transformers as Programmable Computers*, ICML 2023\* [peer-reviewed]). None closes the output-to-input loop on a frozen pretrained
+model, and none maps basins; the seven scoped novelty claims below survive (checked against these additions, issue #99).
+
 **Marcus, Westervelt, Dynamics of Iterated-Map Neural Networks (Phys Rev A 1989).**\* [peer-reviewed]
 https://neuron.eng.wayne.edu/tarek/MITbook/ref/refs.html
 The classical anchor for finding 3: in discrete-time parallel-update neural networks, when a fixed point destabilises, the generic new
@@ -131,8 +142,9 @@ contradicting it, and the existence of non-collapsing parameterisations is consi
 collapse is not to one global point. The paper also contains the record's nearest in-paper precedent for ATR's procedure: Section 4.2 runs
 a single transformer layer recurrently at inference on a 2D toy task, feeding its output back as its next input; without skips or MLP the
 trajectories collapse to a point, and adding either stops or drastically slows the collapse (Fig. 3, pp. 9-10). Geshkovski, Letrouit,
-Polyanskiy, Rigollet [status unverified] model tokens as interacting particles that cluster as depth grows, the final configuration set by
-the input\*. The oversmoothing line anticipates finding 2 and supports finding 1; none of it describes an unplanned oscillation coexisting
+Polyanskiy, Rigollet (*The Emergence of Clusters in Self-Attention Dynamics*, NeurIPS 2023, arXiv 2305.05465\* [peer-reviewed]; companion
+*A Mathematical Perspective on Transformers*, arXiv 2312.10794\* [preprint]) model tokens as interacting particles that cluster as depth grows, the final configuration set by
+the input\*. Scope caveat: the results are for idealised pure self-attention, the same restriction as Dong et al. The oversmoothing line anticipates finding 2 and supports finding 1; none of it describes an unplanned oscillation coexisting
 with position-uniform states.
 
 **Within-forward-pass attractor and orbit vocabulary.** Two frozen-model programs apply dynamical language to the layer-indexed trajectory
@@ -283,7 +295,7 @@ states that falsification as a measured GPT-2 result, so it stands as a citable 
 in embedding space; GlitchMiner (arXiv 2410.15052)\* [preprint, unreviewed] and AnomaLLMy (arXiv 2406.19840)\* [preprint, unreviewed] detect via predictive entropy and API confidence; Secret
 Dictionary (arXiv 2605.22005)\* [preprint, unreviewed] and UTF fingerprinting (Cai, Yu, Shao, Wu, arXiv 2410.12318) [preprint, unreviewed]
 detect from weight geometry alone, the latter reading only the unembedding matrix against known-unused references (Sec. 2.1, p. 2) and then
-using the found tokens as fingerprint triggers precisely because they are rarely encountered. Supporting geometry: Mu and
+using the found tokens as fingerprint triggers precisely because they are rarely encountered. Supporting geometry: Mu, Bhat and
 Viswanath, All-but-the-Top
 (ICLR 2018, arXiv 1702.01417)\* [peer-reviewed] established a dominant frequency-linked, mean-anchored direction in embedding
 spaces, the geometry the flip axis d is a dynamical expression of; Watkins, Mapping the Semantic Void\* [community post, unreviewed], probed the mean-embedding
@@ -316,7 +328,7 @@ high probability (Sec. 4.3, p. 7), so the loop attractor is a property of the le
 (NeurIPS 2022, arXiv 2206.02369)\* [peer-reviewed] quantified the sentence-level version: the more a sentence appears in context, the
 higher the probability of producing it again.
 
-**Model collapse.** Shumailov et al. (Nature 2024, arXiv 2305.17493) [peer-reviewed]: training generation n+1 on generation n's output
+**Model collapse.** Shumailov et al. (two distinct papers: *AI models collapse when trained on recursively generated data*, Nature 631:755-759, 2024 [peer-reviewed], and the earlier *The Curse of Recursion*, arXiv 2305.17493 [preprint]): training generation n+1 on generation n's output
 loses distribution tails first, then collapses variance; the paper's primary cause is statistical approximation error from finite
 sampling, which disappears as the number of samples tends to infinity (Sec. 3.1, p. 4). Alemohammad et al. (ICLR 2024, arXiv 2307.01850)\*
 [peer-reviewed] and Dohmatob et al. (ICML 2024, arXiv 2402.07043)\* [peer-reviewed]

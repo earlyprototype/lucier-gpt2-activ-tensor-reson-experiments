@@ -32,8 +32,15 @@ another to about **two units of float32 precision**, and stays there over 1000 i
 scale at which float32 arithmetic operates.
 
 **Scope.** The measurement bounds a structured disagreement between positions to below the arithmetic
-scale. It does not establish that none exists below that scale; a float32 measurement cannot. A
-higher-precision run is required to determine it.
+scale. It does not establish that none exists below that scale; a float32 measurement cannot.
+*(Resolved analytically, 2026-07-31: no higher-precision run is needed for the exactness question.
+Issue #91, independently confirmed twice, shows row-uniformity is an exactly invariant subspace of
+the map: identical rows give identical queries, keys and values, attention returns the shared vector
+under any weights, and LayerNorm, the MLP and the residual add are per-position. The injection
+overwrites `wpe`, the model's only per-position parameter. So at a collapsed state the residual
+measured here is float rounding inside an invariant subspace, by construction. What remains
+empirical is the convergence INTO that subspace and its rate, which is M2, and which these archives
+cannot answer.)*
 
 **M2.** M2 asked for a decay curve across iterations.
 
@@ -211,9 +218,10 @@ coordinates carry ~1% of the residual energy, and so ~1% of the reported 1 − s
 coordinates carrying the residual, agreement is at the few-ε level.
 
 **M1 conclusion.** The residual between positions is the size of float32 arithmetic noise. This bounds
-a structured disagreement to below that scale, and it holds steady over 1000 iterations. It does not
-establish that no structure exists below the arithmetic scale; a float32 measurement cannot. A
-higher-precision run is required.
+a structured disagreement to below that scale, and it holds steady over 1000 iterations. *(Superseded
+2026-07-31: the exactness question has an analytic answer and needs no higher-precision run; see the
+Scope note above and issue #91. The numbers in this section stand as the consistency check that the
+archives sit at the float32 floor of an exactly invariant subspace.)*
 
 **`Control_noise` is the outlier on all three measures**, which are distinct quantities:
 
@@ -625,10 +633,11 @@ but does not, because the target is frozen at iteration 0. The scalar does not d
 fixed-point condition, and it enters through the residual path rather than through LayerNorm, which is
 exactly scale-invariant. M5 required neither a forward pass nor an engine change.
 
-**Bounded, not determined.** Whether the position collapse is exactly exact. The typical coordinate
-agrees to ~2 float32 ε, the scale of arithmetic noise, which bounds a structured disagreement to below
-that scale. A float32 measurement cannot establish the absence of structure below float32's own noise.
-A higher-precision run is required.
+**Settled analytically (2026-07-31), previously "bounded, not determined."** Whether the position
+collapse is exactly exact: yes, by architecture. Row-uniformity is an exactly invariant subspace of
+the map (issue #91, twice confirmed), so the ~2 float32 ε residual measured here is rounding inside
+that subspace, and no higher-precision run can add anything to the exactness question. The empirical
+residue is M2: how fast trajectories enter the subspace, which no committed archive can answer.
 
 **Open.** `Control_noise` is the outlier on all three measures: RMS scale *d* = 2.66 ε against
 0.74–1.30 for the other seven, per-coordinate median 3.38 ε against 1.69–1.90, raw deviation 1.01e−13
@@ -641,5 +650,6 @@ is insufficient; extending it requires a new run.
 **Open.** How *c_n* reaches its constant. No snapshot samples iterations 1–99 in the one archive
 retaining enough to compute it. The engine records the quantity; the saving script did not retain it.
 
-**Gated.** Extending pythia-410m and any float64 confirmation require forward passes and are blocked
-by [`docs/ATR_PAUSE.md`](../../docs/ATR_PAUSE.md). No other item here is.
+**Queue note (updated 2026-07-31).** The pause that stood in `docs/ATR_PAUSE.md` was lifted by
+operator ruling; the float64 confirmation run is withdrawn as unnecessary (see above), and the
+pythia-410m extension is queued with the cross-model track in `docs/ALIGNMENT_REVIEW.md` §5.

@@ -42,9 +42,12 @@ The plan is accurate on intent but stale on some mechanics. What differed:
      **columnar** form (dict of per-iteration arrays), but the notebook read it as
      a list of per-iteration snapshot dicts with a full `tensor` key. Added a
      columnar→snapshots adapter at load; `seq_len` derived from the per-position
-     token list, scale proxy from `mean_norms` (absolute norm is scale-invariant
-     under layer-0 LayerNorm, the analysis doc's own §1.1, so basin findings are
-     unaffected).
+     token list, scale proxy from `mean_norms`. *(The parenthetical justification
+     that previously stood here — "absolute norm is scale-invariant under layer-0
+     LayerNorm, so basin findings are unaffected" — is withdrawn: caveat 7 as
+     amended shows the residual path bypasses that LayerNorm and the map is not
+     scale-invariant. The substitution is in fact a ~1/√T calibration error and
+     confounds the basin-count comparison: FINDINGS caveat 18, issue #97.)*
 
 5. **Notebook 4 reduced to 8 prompts (CPU time).** The notebook's own 25-prompt ×
    1000-iteration sweep exceeded the 2-hour nbconvert cell timeout on this CPU host
@@ -178,10 +181,13 @@ from arbitrary tensors. ATR is reading the resonant modes of *the model as drive
 language-shaped input*, not a universal fixed-point set of the weights.
 
 **Open questions:** The scale proxy (mean-vector norm) substitutes for the unstored full-
-tensor Frobenius norm; harmless here by LayerNorm scale-invariance, but a re-save of
-stage-1 with the full tensor would let the calibration be exact. The dominant random
-basin `―` (em-dash, 64%) is itself worth a note: noise has its own strong attractor,
-just a non-semantic one.
+tensor Frobenius norm. *(Corrected 2026-07-31: this substitution is **not** harmless. The
+"LayerNorm scale-invariance" dismissal that stood here was withdrawn with caveat 7; the
+proxy put the noise arm at ~1/√T of the language arms' injection scale, in a 10× gain
+regime, and the basin-count comparison is confounded until a matched-ν re-run: FINDINGS
+caveat 18, issue #97.)* The dominant random basin `―` (horizontal bar, 64%) remains worth
+a note: noise has its own strong attractor, just a non-semantic one — subject to the same
+caveat.
 
 ---
 
@@ -351,10 +357,13 @@ Four independent lines of evidence converge:
 **Bottom line for the original question.** GPT-2 Medium's single `D` basin is a *real* tensor
 attractor. Pythia-410m's fragmentation is *genuine structural non-convergence* rooted in the
 model (depth/width/corpus geometry), **not** an avoidable distortion of the ATR apparatus. The
-readout projection remains a real but secondary source of token-level jitter; the normalisation
-step is confirmed irrelevant (LayerNorm scale-invariance, used here in Notebook 3's
-calibration). The four models genuinely do not share one failure mode: landscapes differ with
-architecture and data, exactly as the analysis doc's "bigger picture" anticipated.
+readout projection remains a real but secondary source of token-level jitter. *(The clause
+"the normalisation step is confirmed irrelevant (LayerNorm scale-invariance, used here in
+Notebook 3's calibration)" is withdrawn, 2026-07-31: caveat 7 as amended shows the map is not
+scale-invariant, and Notebook 3's calibration use of that reasoning is precisely where the
+caveat-18 confound entered.)* The four models genuinely do not share one failure mode:
+landscapes differ with architecture and data, exactly as the analysis doc's "bigger picture"
+anticipated.
 
 **Confidence:** high for the qualitative direction (four independent controls agree); moderate
 on Pythia-410m specifics, since Control 3 ran on an 8-prompt CPU subset. The cleanest

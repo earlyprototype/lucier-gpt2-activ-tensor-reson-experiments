@@ -1,52 +1,27 @@
-# ATR work: paused pending an understanding gate
+# ATR work: the pause is lifted
 
-## Status: PAUSED
+## Status: LIFTED (2026-07-31, operator ruling)
 
-ATR execution is on hold. No new ATR experiments run, and no session resumes ATR
-work, until the gate below is passed. Analysis already committed stands. This
-pause governs what happens next, not what exists.
+The understanding gate that stood here was removed by TC's explicit ruling on
+2026-07-31, recorded during the alignment review (PR #103): "we remove the
+gate, that's my official position."
 
-## Why
+No experiment is blocked by this document any more. Work is sequenced instead
+by the experiment queue in [ALIGNMENT_REVIEW.md](ALIGNMENT_REVIEW.md) §5, whose
+ordering TC has delegated to the review process. Anything in the record or the
+issues that says "gated by ATR_PAUSE" or "blocked by the pause" should be read
+as: queued in that §5 order, nothing more.
 
-The investigation has moved faster than a working grasp of the dynamical-systems
-basis it rests on. Work resumes only once that grasp is demonstrated, so that
-direction is driven by understanding rather than momentum. This is a deliberate,
-operator-set condition.
+## What this file was
 
-## The gate (re-entry condition)
+From 2026-07-25 to 2026-07-31 this file held an operator-set pause: no new ATR
+experiments until a cold-writeup-plus-live-prediction understanding gate was
+passed. The full original text is in git history (`git log -- docs/ATR_PAUSE.md`).
+The file is kept, in this lifted form, because committed documents and open
+issues link to it by name.
 
-Two parts, both done without the primers and findings documents open or consulted.
-
-1. Cold writeup, one page, in the author's own words:
-   - What ATR does mechanically, step by step.
-   - Why: the question it asks, and why iterating a model on its own activations
-     is a way to ask it.
-   - How we know what we know, and inside that a clear line between what is
-     established and what is inferred or speculative.
-
-   The established-versus-speculative split is the load-bearing part. It is the
-   discrimination that separates understanding the work from restating its
-   documents.
-
-2. Prediction, cold:
-   - Three short "what would happen if" questions, reasoned through live rather
-     than recalled. They are posed at gate time so they cannot be pre-studied.
-     Prediction is the part that cannot be faked by memorising phrasing.
-
-Examiner stance: adversarial, not agreeable. The examiner's job is to find the
-seam, the memorised phrase standing in for a concept, and the place the
-established-or-speculative line is drawn wrong. Passing is holding the whole
-account without reaching for a primer, with the split sound.
-
-Sequencing: the gate follows the dynamical-systems fundamentals catch-up,
-because ATR's why and how are expressed in that vocabulary (attractor, basin,
-limit cycle, period-doubling).
-
-## Next step, signposted
-
-Held for when the gate is passed, so it survives the pause:
-
-Basin geometry (issue #17). Take each converged attractor and measure how deep
-its basin is and how steep the walls, by the reverse-ATR move of injecting text
-into a settled loop and measuring the dose needed to knock it out of the basin.
-This is the next experiment. It does not start until the gate is passed.
+The gate's purpose (direction driven by understanding rather than momentum) is
+carried forward by other means: the precondition-and-controls protocol for the
+fixed-point work (ALIGNMENT_REVIEW.md §3.2), and the standing rules in §5 there
+(every number script-generated; archive spec; corrections land before dependent
+work).
