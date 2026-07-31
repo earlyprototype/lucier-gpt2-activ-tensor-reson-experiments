@@ -1,9 +1,20 @@
 """M5 (#71): the per-iteration rescale factor c_n -- from committed data.
 
 M5 is filed `GATED` `EXPERIMENT` on the grounds that the ratio is "currently
-never recorded" and needs one line added to the loop. It does need that line for
-full per-iteration coverage. But it is *partly recoverable now*, because of the
-order of operations in the loop (atr_engine.py:211-216):
+never recorded". That is not true of the engine: `atr_engine.py` stores
+`tensor_norm` in every snapshot including iteration 0, so
+
+    c_{n+1} = snapshots[0]["tensor_norm"] / snapshots[n]["tensor_norm"]
+
+is available directly from any run whose snapshots were saved intact. No engine
+change and no forward pass is needed.
+
+What is missing is that two experiment scripts discarded those fields at save
+time -- `05_divine_motion.py:118` reimplements the snapshot and keeps 7 of the
+engine's 19 fields; `sink_geometry/02_masking_control.py:86-88` keeps only the
+per-position mean. This script therefore reconstructs c from what those slimmed
+archives did retain, which works because of the order of operations in the loop
+(atr_engine.py:211-216):
 
     for i in 1..max_iter:
         current_norm = ||current_tensor||          # PRE-rescale
@@ -109,14 +120,26 @@ def settled_values(pairs):
 
 
 def trajectory(pairs):
-    """c_n across the run.
+    """c across the run.
+
+    Indices matter here and are easy to get wrong. A snapshot recorded at
+    iteration n holds the state AFTER n forward passes and BEFORE the rescale
+    that precedes pass n+1, so the value it yields is c_{n+1}, not c_n. The
+    labels below say so: a snapshot at iteration 0 is reported as c_1.
 
     Only the post-collapse values are exact: before collapse the positions are
     not parallel, so reconstructing ||tensor|| from `last_norm` overestimates or
-    underestimates it. Iteration 0 is shown for context and marked, not used.
+    underestimates it. The first is shown for context and marked, not used.
     """
-    print("Step 3 -- does c_n vary, or settle to a constant?")
-    print("  (iteration 0 is pre-collapse, so its value is an artefact of the")
+    print("Step 3 -- does c vary, or settle to a constant?")
+    print("  WARNING: this reconstruction cannot see a period-2 cycle. The snapshot")
+    print("  schedule steps by 10, which is even, so every sample lands on one phase.")
+    print("  Divine_Syntactic is such a cycle (F9/F10): its c alternates")
+    print("  0.288044 / 0.303536 and the near-zero spread printed below for it is an")
+    print("  aliasing artefact, not stability. Check snapshots' cosine_sim_last")
+    print("  (0.684912 for a 2-cycle, 1.0 for a fixed point) before trusting a row.")
+    print("  (a snapshot at iteration n gives c_{n+1}, labelled accordingly;")
+    print("   c_1 comes from the pre-collapse state, so it is an artefact of the")
     print("   reconstruction and is marked * rather than trusted)")
     print()
     for label, state, snaps in pairs:
@@ -124,7 +147,7 @@ def trajectory(pairs):
         initial = state["initial_norm"]
         print(f"  {label}  (seq_len={seq_len}, initial_norm={initial:.2f})")
         values = [
-            (s["iteration"], initial / (math.sqrt(seq_len) * s["last_norm"]))
+            (s["iteration"] + 1, initial / (math.sqrt(seq_len) * s["last_norm"]))
             for s in snaps
         ]
         shown = values[:4] + [None] + values[-3:]
@@ -133,12 +156,12 @@ def trajectory(pairs):
             if v is None:
                 cells.append("...")
             else:
-                cells.append(f"n={v[0]}:{v[1]:.4f}" + ("*" if v[0] == 0 else ""))
+                cells.append(f"c_{v[0]}={v[1]:.4f}" + ("*" if v[0] == 1 else ""))
         print("    " + "  ".join(cells))
-        settled = [v for n, v in values if n >= 100]
+        settled = [v for n, v in values if n >= 101]
         if settled:
             print(
-                f"    from n=100 on: min {min(settled):.4f}  max {max(settled):.4f}  "
+                f"    from c_101 on: min {min(settled):.4f}  max {max(settled):.4f}  "
                 f"spread {max(settled) - min(settled):.1e}"
             )
     print()
@@ -154,9 +177,10 @@ def main():
     check_identity(pairs)
     settled_values(pairs)
     trajectory(pairs)
-    print("What this does NOT cover, and still needs the one-line change:")
-    print("  * iterations 1-99, which no snapshot samples, so the approach of c_n")
-    print("    to its settled value is unobserved")
+    print("What this does NOT cover -- all limits of these archives, not of the")
+    print("engine, which recorded every one of these and had it thrown away:")
+    print("  * iterations 1-99, which 05_divine_motion.py's schedule does not sample,")
+    print("    so the approach of c_n to its settled value is unobserved")
     print("  * any run whose seq_len or initial_norm was not archived")
     print("  * the pre-collapse regime, where the reconstruction is not exact")
 
