@@ -53,10 +53,10 @@
   "counts": {
     "answered_but_unrecorded": 1,
     "answered_on_disk_unrecorded": 0,
-    "blockers": 11,
+    "blockers": 7,
     "shared_blockers": 2,
-    "open_threads": 23,
-    "low_hanging_fruit": 23,
+    "open_threads": 19,
+    "low_hanging_fruit": 19,
     "frontier": 16,
     "thin_concepts": 3,
     "silent_claims": 32,
@@ -150,19 +150,9 @@
             "F15 demonstrates the lag-k gate for one trajectory and records the rest as outstanding: \"The other 33 period-2 prompts remain blocked on the prompt library (issue #9);",
             "JOURNEY_MAP section 7 gives the same next step: \"Re-gate the other 33 prompts (blocked on issue #9)\"."
           ]
-        },
-        {
-          "claim": "q-prompt-library",
-          "label": "Q: Is the 125-prompt library restored (issue #9)?",
-          "type": "question",
-          "status": "retired",
-          "doc_ref": "docs/FINDINGS.md#caveats",
-          "quotes": [
-            "Caveats 11 and 14 both filed the same gate in the same three words, \"prompt library pending, issue #9\", and FINDINGS section 5 named it as the blocker on two separate directions at once: the re-gate of the 34 cycling prompts and the flip-axis generality question."
-          ]
         }
       ],
-      "gate_count": 5,
+      "gate_count": 4,
       "still_holds": false,
       "resolution_evidence_kind": "in-record",
       "resolution": {
@@ -342,140 +332,6 @@
                 "file": "docs/FINDINGS.md",
                 "line": 694,
                 "text": "| H-J1 | `prolet` sits inside the verbalizable (J-lens) subspace, `Divine` outside | **Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)**: the point estimate runs slightly the other way at pilot confidence (`Divine` at least as lens-ex"
-              }
-            ]
-          }
-        ],
-        "evidence": null,
-        "contrary_prose": [],
-        "guessed_only": []
-      }
-    },
-    {
-      "key": "issue-24",
-      "label": "issue #24",
-      "kind": "artefact",
-      "issues": [
-        "24"
-      ],
-      "artefact_phrases": [],
-      "gates": [
-        {
-          "claim": "q-prompt-library",
-          "label": "Q: Is the 125-prompt library restored (issue #9)?",
-          "type": "question",
-          "status": "retired",
-          "doc_ref": "docs/FINDINGS.md#caveats",
-          "quotes": [
-            "prompt_library.py is restored on main (issue #24, provenance-flagged full restoration), the record's blocked-on language is lifted (PR #103), and the two formerly gated threads are queued in ALIGNMENT_REVIEW.md section 5."
-          ]
-        }
-      ],
-      "gate_count": 1,
-      "still_holds": null,
-      "resolution_evidence_kind": null,
-      "resolution": {
-        "holds": null,
-        "resolution_evidence": [
-          {
-            "file": null,
-            "line": null,
-            "kind": "verdict",
-            "text": "the blocker is recorded only as an issue number, which names no file; the working tree cannot settle it and this report does not guess"
-          }
-        ],
-        "checked": [],
-        "found": [],
-        "issue_prose": [
-          {
-            "issue": "24",
-            "mentions": [
-              {
-                "file": "README.md",
-                "line": 241,
-                "text": "> **Note on `prompt_library.py`:** the 125-prompt sweep notebooks (`01_*`), `gated_resweep.py` and the Pythia-410m deep run import `prompt_library.py`. The file is a provenance-flagged reconstruction (issue #24): all 125 prompts were recovered verbatim from co"
-              },
-              {
-                "file": "docs/FINDINGS.md",
-                "line": 143,
-                "text": "33-prompt re-run; the prompt library is restored, issue #24). Second, the readout: the top-1 token is indeed"
-              },
-              {
-                "file": "docs/FINDINGS.md",
-                "line": 470,
-                "text": "`Divine` prompts share this flip axis (the prompt library is restored, issue #24;"
-              },
-              {
-                "file": "docs/FINDINGS.md",
-                "line": 557,
-                "text": "issue #24; caveat 14). Reports live beside their outputs: `output_glitch/glitch_alignment.md`,"
-              }
-            ]
-          }
-        ],
-        "evidence": null,
-        "contrary_prose": [],
-        "guessed_only": []
-      }
-    },
-    {
-      "key": "issue-25",
-      "label": "issue #25",
-      "kind": "artefact",
-      "issues": [
-        "25"
-      ],
-      "artefact_phrases": [],
-      "gates": [
-        {
-          "claim": "h4-head-power-iteration",
-          "label": "H4: Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector)",
-          "type": "hypothesis",
-          "status": "not-supported",
-          "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions",
-          "quotes": [
-            "TC ruling, #54): executed 2026-07-25 in the issue #25 artifact regeneration (spectral_resonance.ipynb;"
-          ]
-        }
-      ],
-      "gate_count": 1,
-      "still_holds": null,
-      "resolution_evidence_kind": null,
-      "resolution": {
-        "holds": null,
-        "resolution_evidence": [
-          {
-            "file": null,
-            "line": null,
-            "kind": "verdict",
-            "text": "the blocker is recorded only as an issue number, which names no file; the working tree cannot settle it and this report does not guess"
-          }
-        ],
-        "checked": [],
-        "found": [],
-        "issue_prose": [
-          {
-            "issue": "25",
-            "mentions": [
-              {
-                "file": "experiments/gpt2_small/output_head_loop_regen/REGENERATION_REPORT.md",
-                "line": 6,
-                "text": "(issue #25, both halves):"
-              },
-              {
-                "file": "experiments/gpt2_small/output_head_loop_regen/REGENERATION_REPORT.md",
-                "line": 146,
-                "text": "deferred to a tracked follow-up re-run (issue #25)."
-              },
-              {
-                "file": "docs/FINDINGS.md",
-                "line": 690,
-                "text": "| H4 | Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector) | **Not supported as registered; superseded 2026-07-31 by the corrected-target rescore (run 16; TC ruling, #54)**: executed 2026-07-25 in the issue #25 artifact regen"
-              },
-              {
-                "file": "docs/JOURNEY_MAP.md",
-                "line": 88,
-                "text": "| H4 | Per-head resonance ≈ SVD dominant singular vector | Not supported as registered; superseded by the eigenvector rescore (2026-07-31, TC ruling in #54) | Executed 2026-07-25 (`spectral_resonance.ipynb`, issue #25 regeneration): 5/144 heads above 0.9. The "
               }
             ]
           }
@@ -679,102 +535,6 @@
           "artefact.json",
           "artefact.pt",
           "artefact.md"
-        ],
-        "found": [],
-        "issue_prose": [],
-        "evidence": null,
-        "contrary_prose": [],
-        "guessed_only": []
-      }
-    },
-    {
-      "key": "phrase-re-derivation-layernorm-ignores",
-      "label": "re-derivation — LayerNorm ignores a global rescale but the residual path around it does not",
-      "kind": "unresolvable-phrase",
-      "issues": [],
-      "artefact_phrases": [
-        "re-derivation — LayerNorm ignores a global rescale but the residual path around it does not"
-      ],
-      "gates": [
-        {
-          "claim": "disc-16-differences-intrinsic",
-          "label": "Discovery 16: Cross-model differences are intrinsic dynamics, not apparatus",
-          "type": "finding",
-          "status": "supported",
-          "doc_ref": "docs/JOURNEY_MAP.md#2-key-discoveries-chronological",
-          "quotes": [
-            "Amended 2026-07-28: the inertness half is withdrawn pending re-derivation — LayerNorm ignores a global rescale but the residual path around it does not, so the block is not invariant (FINDINGS caveat 7;"
-          ]
-        }
-      ],
-      "gate_count": 1,
-      "still_holds": null,
-      "resolution_evidence_kind": null,
-      "resolution": {
-        "holds": null,
-        "resolution_evidence": [
-          {
-            "file": null,
-            "line": null,
-            "kind": "verdict",
-            "text": "the blocker is a phrase with no filename this tool can responsibly look for; not checked"
-          }
-        ],
-        "checked": [
-          "re_derivation_layernorm.py",
-          "re_derivation_layernorm.json",
-          "re_derivation_layernorm.pt",
-          "re_derivation_layernorm.md",
-          "re_derivation.py",
-          "re_derivation.json",
-          "re_derivation.pt",
-          "re_derivation.md"
-        ],
-        "found": [],
-        "issue_prose": [],
-        "evidence": null,
-        "contrary_prose": [],
-        "guessed_only": []
-      }
-    },
-    {
-      "key": "phrase-re-gate",
-      "label": "re-gate",
-      "kind": "unresolvable-phrase",
-      "issues": [],
-      "artefact_phrases": [
-        "re-gate"
-      ],
-      "gates": [
-        {
-          "claim": "f2-divine-readout-stable",
-          "label": "F2: The Divine basin is readout-stable over a never-settling tensor",
-          "type": "finding",
-          "status": "corrected",
-          "doc_ref": "docs/FINDINGS.md#f2-the-divine-basin-is-readout-stable-over-a-never-settling-tensor",
-          "quotes": [
-            "Resolved 2026-07-19 as an exact period-2 limit cycle, so \"never converge\" over-claims and should read \"cycle, pending re-gate\"."
-          ]
-        }
-      ],
-      "gate_count": 1,
-      "still_holds": null,
-      "resolution_evidence_kind": null,
-      "resolution": {
-        "holds": null,
-        "resolution_evidence": [
-          {
-            "file": null,
-            "line": null,
-            "kind": "verdict",
-            "text": "the blocker is a phrase with no filename this tool can responsibly look for; not checked"
-          }
-        ],
-        "checked": [
-          "re_gate.py",
-          "re_gate.json",
-          "re_gate.pt",
-          "re_gate.md"
         ],
         "found": [],
         "issue_prose": [],
@@ -1029,89 +789,6 @@
       "verdict": "newly-unblocked",
       "reason": "the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's",
       "rank_tier": 1
-    },
-    {
-      "claim": "disc-16-differences-intrinsic",
-      "label": "Discovery 16: Cross-model differences are intrinsic dynamics, not apparatus",
-      "type": "finding",
-      "status": "supported",
-      "asserted": "2026-07-10",
-      "doc_ref": "docs/JOURNEY_MAP.md#2-key-discoveries-chronological",
-      "description": "Cross-model differences are intrinsic dynamics, not apparatus. Recorded from Diagnostics (2026-07); evidence: cos_sim_mean verdicts are tensor-level; normalisation inert up to LayerNorm's epsilon term. Amended 2026-07-28: the inertness half is withdrawn pending re-derivation — LayerNorm ignores a global rescale but the residual path around it does not, so the block is not invariant (FINDINGS caveat 7; experiments/preln_rescale_check.py). The tensor-level half is unaffected, and §1.1's separate ruling that the rescale preserves the mix — and so is not the Pythia-410m fragmentation source — still stands.",
-      "pending_language": [
-        "pending"
-      ],
-      "blockers": [
-        {
-          "key": "phrase-re-derivation-layernorm-ignores",
-          "label": "re-derivation — LayerNorm ignores a global rescale but the residual path around it does not",
-          "still_holds": null
-        }
-      ],
-      "runs": [
-        "run-cos-sim-diagnostic"
-      ],
-      "evidence": [
-        {
-          "run": "run-cos-sim-diagnostic",
-          "run_label": "Tensor convergence diagnostic",
-          "graph_says": "reads runs 1–2",
-          "date": "2026-07-10",
-          "script": "experiments/cos_sim_diagnostic.ipynb",
-          "script_exists": true,
-          "script_state": {
-            "kind": "notebook",
-            "readable": true,
-            "cells_total": 7,
-            "code_cells": 5,
-            "cells_with_outputs": 5,
-            "executed": true,
-            "verdict_quotes": [],
-            "banner": "# Diagnostic: cos_sim_mean Convergence Across Models Extracts `cos_sim_mean` data from existing notebook cell outputs (no model loading required). Tests whether Pythia-410m's token fragmentation is a **readout artefact** (dynamics converge but vocabulary can't name the attractor) or **genuine non-convergence** (dynamics are chaotic). See `docs/SCALING_ARTEFACT_ANALYSIS.md` for context.",
-            "saves": [],
-            "loads": []
-          },
-          "output_dir": null,
-          "output_dir_exists": null,
-          "output_dir_files": [],
-          "declared_inputs": [],
-          "missing_inputs": [],
-          "saved_artefacts": [],
-          "missing_local_modules": [],
-          "graph_artefacts": []
-        },
-        {
-          "run": null,
-          "run_label": "(named in the record, no run node)",
-          "graph_says": null,
-          "date": null,
-          "script": "experiments/preln_rescale_check.py",
-          "script_exists": true,
-          "script_state": {
-            "kind": "script",
-            "readable": true,
-            "cells_total": null,
-            "code_cells": null,
-            "cells_with_outputs": null,
-            "executed": null,
-            "verdict_quotes": [],
-            "banner": null,
-            "saves": [],
-            "loads": []
-          },
-          "output_dir": null,
-          "output_dir_exists": null,
-          "output_dir_files": [],
-          "declared_inputs": [],
-          "missing_inputs": [],
-          "saved_artefacts": [],
-          "missing_local_modules": [],
-          "graph_artefacts": []
-        }
-      ],
-      "verdict": "answerable-from-disk",
-      "reason": "experiments/preln_rescale_check.py exists, every input it declares is present in the tree, and it has not been executed",
-      "rank_tier": 2
     },
     {
       "claim": "q-tmix-llm",
@@ -1817,172 +1494,6 @@
       "rank_tier": 4
     },
     {
-      "claim": "h4-head-power-iteration",
-      "label": "H4: Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector)",
-      "type": "hypothesis",
-      "status": "not-supported",
-      "asserted": "2026-03-20",
-      "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions",
-      "description": "Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector). Disposition: Not supported as registered; superseded 2026-07-31 by the corrected-target rescore (run 16; TC ruling, #54): executed 2026-07-25 in the issue #25 artifact regeneration (spectral_resonance.ipynb; artifacts experiments/_DATA/EXP_009/009c_*.pt): 5/144 heads above 0.9 to the top singular vector (mean absolute cosine 0.2387, median 0.1614; the sixth head sits at 0.8973, so the count splits a near-tie). The registered target was the wrong object: the isolated loop is strictly linear (no LayerNorm, attention, or biases inside it), power iteration proper, whose limit is the dominant eigenvector of W_OV, not its top singular vector. Rescored against the eigenvector (run 16, experiments/gpt2_small/output_eigen_rescore/report.md, which retains the original scoring as its footnote): 87/144 heads carry a real dominant eigenvalue, of which 81 had settled by iteration 500 and every settled axis matches the dominant eigenvector (minimum agreement 0.9999999); the 6 still converging at 500 already sit at 0.97 to 0.9999 alignment to it; the other 57 heads carry a complex dominant pair and rotate as predicted, 55/57 inside the pair's own invariant plane (median in-plane fraction 1.0000; the two exceptions, L0.H1 at 0.476 and L6.H8 at 0.940, are named in the report). The registered passes are exactly the heads where eigenvector and singular vector coincide, led by L11.H8 (largest singular gap of all 144, 11.49; eigenvalue gap 17.25; negative dominant eigenvalue, modulus 86.7), the F14/F17 flip-axis head, here too a period-2 sign-flipper: two independent instruments agree on its direction-flipping structure. Chance is excluded under both the uniform 768-dimensional null (single-head probability of clearing 0.9 about 8e-279) and a null calibrated to the bulk's anisotropy (effective dimension 11.7; probability of at least 5 passes in 144 about 3e-14). The registered proposition was naive: it named the wrong spectral object, and a head in isolation idealises away the MLP, the layer's other eleven heads acting in concert, LayerNorm and attention; the rescore results stand as real artifacts on that hyper-constrained basis and claim nothing about heads in place. Both regeneration deviations (.detach(), .clone()) verified value-preserving inside run 16; the committed 009c artifacts reproduce from the raw weights within float32 precision.",
-      "pending_language": [
-        "issue #25"
-      ],
-      "blockers": [
-        {
-          "key": "issue-25",
-          "label": "issue #25",
-          "still_holds": null
-        }
-      ],
-      "runs": [
-        "run-16-eigen-rescore",
-        "run-spectral-scaffold"
-      ],
-      "evidence": [
-        {
-          "run": "run-16-eigen-rescore",
-          "run_label": "Run 16: Per-head spectral test, eigenvector rescore",
-          "graph_says": "144 heads; stored 009b trajectories + raw weights, no forward passes",
-          "date": "2026-07-31",
-          "script": "experiments/gpt2_small/12_eigen_rescore.py",
-          "script_exists": true,
-          "script_state": {
-            "kind": "script",
-            "readable": true,
-            "cells_total": null,
-            "code_cells": null,
-            "cells_with_outputs": null,
-            "executed": null,
-            "verdict_quotes": [],
-            "banner": null,
-            "saves": [],
-            "loads": [
-              "009bFIX_head_loop_results.pt",
-              "009c_spectral_data.pt",
-              "009c_validation_grid.pt",
-              "report.md",
-              "results.json"
-            ]
-          },
-          "output_dir": "experiments/gpt2_small/output_eigen_rescore/",
-          "output_dir_exists": true,
-          "output_dir_files": [
-            "experiments/gpt2_small/output_eigen_rescore/report.md",
-            "experiments/gpt2_small/output_eigen_rescore/results.json"
-          ],
-          "declared_inputs": [
-            {
-              "name": "009bFIX_head_loop_results.pt",
-              "found": [
-                "experiments/_DATA/EXP_009/009bFIX_head_loop_results.pt"
-              ]
-            },
-            {
-              "name": "009c_spectral_data.pt",
-              "found": [
-                "experiments/_DATA/EXP_009/009c_spectral_data.pt"
-              ]
-            },
-            {
-              "name": "009c_validation_grid.pt",
-              "found": [
-                "experiments/_DATA/EXP_009/009c_validation_grid.pt"
-              ]
-            },
-            {
-              "name": "report.md",
-              "found": [
-                "experiments/gpt2_small/output_eigen_rescore/report.md"
-              ]
-            },
-            {
-              "name": "results.json",
-              "found": [
-                "experiments/gpt2_small/output_eigen_rescore/results.json"
-              ]
-            }
-          ],
-          "missing_inputs": [],
-          "saved_artefacts": [],
-          "missing_local_modules": [],
-          "graph_artefacts": []
-        },
-        {
-          "run": "run-spectral-scaffold",
-          "run_label": "Spectral resonance protocol (H4, executed 2026-07-25)",
-          "graph_says": "144 heads, executed 2026-07-25",
-          "date": "2026-07-25",
-          "script": "experiments/gpt2_small/spectral_resonance.ipynb",
-          "script_exists": true,
-          "script_state": {
-            "kind": "notebook",
-            "readable": true,
-            "cells_total": 14,
-            "code_cells": 8,
-            "cells_with_outputs": 8,
-            "executed": true,
-            "verdict_quotes": [
-              {
-                "cell": 9,
-                "lines": [
-                  "==================================================",
-                  "VALIDATION SUMMARY",
-                  "==================================================",
-                  "Mean |cos sim|:   0.2387",
-                  "Median |cos sim|: 0.1614",
-                  "Heads > 0.9:      5 / 144",
-                  "Heads > 0.95:     2 / 144",
-                  "NOT SUPPORTED: loop dynamics are dominated by nonlinear effects for most heads.",
-                  "  Per-head resonant state cannot be reduced to the static OV eigensystem alone."
-                ]
-              }
-            ],
-            "banner": "# EXP_009c: The Lucier Resonance — \"The Spectrum\" ## Status **Executed 2026-07-25**, end to end, during the issue #25 artifact regeneration (26 s CPU; committed artifacts `../_DATA/EXP_009/009c_spectral_data.pt` and `009c_validation_grid.pt`; run record in `output_head_loop_regen/REGENERATION_REPORT.md`). Cell 9's printed verdict, NOT SUPPORTED at 5/144 heads above 0.9, stands for the hypothesis a",
-            "saves": [
-              "009c_spectral_data.pt",
-              "009c_validation_grid.pt"
-            ],
-            "loads": [
-              "009bFIX_head_loop_results.pt"
-            ]
-          },
-          "output_dir": null,
-          "output_dir_exists": null,
-          "output_dir_files": [],
-          "declared_inputs": [
-            {
-              "name": "009bFIX_head_loop_results.pt",
-              "found": [
-                "experiments/_DATA/EXP_009/009bFIX_head_loop_results.pt"
-              ]
-            }
-          ],
-          "missing_inputs": [],
-          "saved_artefacts": [
-            {
-              "name": "009c_spectral_data.pt",
-              "found": [
-                "experiments/_DATA/EXP_009/009c_spectral_data.pt"
-              ],
-              "size": 1124241
-            },
-            {
-              "name": "009c_validation_grid.pt",
-              "found": [
-                "experiments/_DATA/EXP_009/009c_validation_grid.pt"
-              ],
-              "size": 3067
-            }
-          ],
-          "missing_local_modules": [],
-          "graph_artefacts": []
-        }
-      ],
-      "verdict": "still-blocked",
-      "reason": "the record calls this blocked on issue #25; an issue number names no file, so the working tree cannot say whether it has been resolved and this report does not guess",
-      "rank_tier": 4
-    },
-    {
       "claim": "q-jlens-full-build",
       "label": "Q: What does the phase-aware full J-lens build show (issue #8)?",
       "type": "question",
@@ -2005,37 +1516,6 @@
       "evidence": [],
       "verdict": "still-blocked",
       "reason": "the record calls this blocked on issue #8; an issue number names no file, so the working tree cannot say whether it has been resolved and this report does not guess",
-      "rank_tier": 4
-    },
-    {
-      "claim": "q-prompt-library",
-      "label": "Q: Is the 125-prompt library restored (issue #9)?",
-      "type": "question",
-      "status": "retired",
-      "asserted": "2026-07-19",
-      "doc_ref": "docs/FINDINGS.md#caveats",
-      "description": "Caveats 11 and 14 both filed the same gate in the same three words, \"prompt library pending, issue #9\", and FINDINGS section 5 named it as the blocker on two separate directions at once: the re-gate of the 34 cycling prompts and the flip-axis generality question. This node was a restoration task rather than a question about the model; it is in the graph so that the two threads it gated point at one blocker instead of repeating one sentence in two descriptions, where nothing can pair them. Answered 2026-07-31: yes. prompt_library.py is restored on main (issue #24, provenance-flagged full restoration), the record's blocked-on language is lifted (PR #103), and the two formerly gated threads are queued in ALIGNMENT_REVIEW.md section 5.",
-      "pending_language": [
-        "issue #24",
-        "issue #9",
-        "pending"
-      ],
-      "blockers": [
-        {
-          "key": "issue-9",
-          "label": "prompt library (issue #9)",
-          "still_holds": false
-        },
-        {
-          "key": "issue-24",
-          "label": "issue #24",
-          "still_holds": null
-        }
-      ],
-      "runs": [],
-      "evidence": [],
-      "verdict": "still-blocked",
-      "reason": "the record calls this blocked on issue #24; an issue number names no file, so the working tree cannot say whether it has been resolved and this report does not guess",
       "rank_tier": 4
     },
     {
@@ -2074,214 +1554,6 @@
       "evidence": [],
       "verdict": "cannot-determine",
       "reason": "nothing in the graph or the tree ties this thread to a script, run or artefact",
-      "rank_tier": 5
-    },
-    {
-      "claim": "f2-divine-readout-stable",
-      "label": "F2: The Divine basin is readout-stable over a never-settling tensor",
-      "type": "finding",
-      "status": "corrected",
-      "asserted": "2026-07-10",
-      "doc_ref": "docs/FINDINGS.md#f2-the-divine-basin-is-readout-stable-over-a-never-settling-tensor",
-      "description": "The 34 prompts that never pass the lag-1 convergence gate are exactly the 34 Divine prompts: a stable top-1 readout over a tensor that keeps moving, the series' clearest dissociation of dynamics from decoding. Resolved 2026-07-19 as an exact period-2 limit cycle, so \"never converge\" over-claims and should read \"cycle, pending re-gate\".",
-      "pending_language": [
-        "pending"
-      ],
-      "blockers": [
-        {
-          "key": "phrase-re-gate",
-          "label": "re-gate",
-          "still_holds": null
-        }
-      ],
-      "runs": [
-        "run-1-attractor-dominance",
-        "run-5-gated-resweep"
-      ],
-      "evidence": [
-        {
-          "run": "run-1-attractor-dominance",
-          "run_label": "Run 1: Attractor dominance sweep",
-          "graph_says": "125 prompts, ≤100 iters",
-          "date": "2026-03-01",
-          "script": "experiments/gpt2_small/01_attractor_dominance.ipynb",
-          "script_exists": true,
-          "script_state": {
-            "kind": "notebook",
-            "readable": true,
-            "cells_total": 19,
-            "code_cells": 12,
-            "cells_with_outputs": 12,
-            "executed": true,
-            "verdict_quotes": [],
-            "banner": "# EXP_009d1: Attractor Dominance, Basin Mapping & Pathway Analysis ## Depends On **Stage 0 (Reproducibility Gate) must PASS before running this notebook.** ## Hypotheses Under Test ### H1: Attractor Dominance The `prolet` attractor is the dominant basin of GPT-2 Small's weight geometry. It should capture the majority of a diverse prompt set, regardless of input register, topic, or complexity. ### ",
-            "saves": [
-              "basin_distribution.png",
-              "convergence_matrix.png",
-              "stage1_config.pt",
-              "stage1_results.pt",
-              "topology_3d.png"
-            ],
-            "loads": [
-              "config.md",
-              "dissolution_pathways.md",
-              "dissolution_sentences.md",
-              "hypothesis_assessment.md"
-            ]
-          },
-          "output_dir": "experiments/gpt2_small/output/",
-          "output_dir_exists": true,
-          "output_dir_files": [
-            "experiments/gpt2_small/output/basin_distribution.png",
-            "experiments/gpt2_small/output/config.md",
-            "experiments/gpt2_small/output/convergence_matrix.png",
-            "experiments/gpt2_small/output/dissolution_pathways.md",
-            "experiments/gpt2_small/output/dissolution_sentences.md",
-            "experiments/gpt2_small/output/hypothesis_assessment.md",
-            "experiments/gpt2_small/output/topology_3d.png"
-          ],
-          "declared_inputs": [
-            {
-              "name": "config.md",
-              "found": [
-                "experiments/gpt2_medium/output/config.md",
-                "experiments/gpt2_small/output/config.md",
-                "experiments/pythia_160m/output/config.md"
-              ]
-            },
-            {
-              "name": "dissolution_pathways.md",
-              "found": [
-                "experiments/gpt2_medium/output/dissolution_pathways.md",
-                "experiments/gpt2_small/output/dissolution_pathways.md",
-                "experiments/pythia_160m/output/dissolution_pathways.md"
-              ]
-            },
-            {
-              "name": "dissolution_sentences.md",
-              "found": [
-                "experiments/gpt2_medium/output/dissolution_sentences.md",
-                "experiments/gpt2_small/output/dissolution_sentences.md",
-                "experiments/pythia_160m/output/dissolution_sentences.md"
-              ]
-            },
-            {
-              "name": "hypothesis_assessment.md",
-              "found": [
-                "experiments/gpt2_medium/output/hypothesis_assessment.md",
-                "experiments/gpt2_small/output/hypothesis_assessment.md",
-                "experiments/pythia_160m/output/hypothesis_assessment.md"
-              ]
-            }
-          ],
-          "missing_inputs": [],
-          "saved_artefacts": [
-            {
-              "name": "basin_distribution.png",
-              "found": [
-                "experiments/gpt2_medium/output/basin_distribution.png",
-                "experiments/gpt2_small/output/basin_distribution.png",
-                "experiments/pythia_160m/output/basin_distribution.png"
-              ],
-              "size": 90691
-            },
-            {
-              "name": "convergence_matrix.png",
-              "found": [
-                "experiments/gpt2_medium/output/convergence_matrix.png",
-                "experiments/gpt2_small/output/convergence_matrix.png",
-                "experiments/pythia_160m/output/convergence_matrix.png"
-              ],
-              "size": 514127
-            },
-            {
-              "name": "stage1_config.pt",
-              "found": [],
-              "size": null
-            },
-            {
-              "name": "stage1_results.pt",
-              "found": [],
-              "size": null
-            },
-            {
-              "name": "topology_3d.png",
-              "found": [
-                "experiments/gpt2_medium/output/topology_3d.png",
-                "experiments/gpt2_small/output/topology_3d.png",
-                "experiments/pythia_160m/output/topology_3d.png"
-              ],
-              "size": 1022346
-            }
-          ],
-          "missing_local_modules": [],
-          "graph_artefacts": [
-            {
-              "id": "art-basin-distribution-small",
-              "path": "experiments/gpt2_small/output/basin_distribution.png",
-              "exists": true
-            },
-            {
-              "id": "art-convergence-matrix-small",
-              "path": "experiments/gpt2_small/output/convergence_matrix.png",
-              "exists": true
-            },
-            {
-              "id": "art-dissolution-pathways-small",
-              "path": "experiments/gpt2_small/output/dissolution_pathways.md",
-              "exists": true
-            },
-            {
-              "id": "art-stage1-hypothesis-assessment",
-              "path": "experiments/gpt2_small/output/hypothesis_assessment.md",
-              "exists": true
-            },
-            {
-              "id": "art-topology-3d-small",
-              "path": "experiments/gpt2_small/output/topology_3d.png",
-              "exists": true
-            }
-          ]
-        },
-        {
-          "run": "run-5-gated-resweep",
-          "run_label": "Run 5: Convergence-gated re-sweep",
-          "graph_says": "125 prompts, gate cos>0.999×3, ≤1000 iters",
-          "date": "2026-07-10",
-          "script": "experiments/gpt2_small/gated_resweep.py",
-          "script_exists": true,
-          "script_state": {
-            "kind": "script",
-            "readable": true,
-            "cells_total": null,
-            "code_cells": null,
-            "cells_with_outputs": null,
-            "executed": null,
-            "verdict_quotes": [],
-            "banner": null,
-            "saves": [],
-            "loads": []
-          },
-          "output_dir": "experiments/gpt2_small/output_gated/",
-          "output_dir_exists": true,
-          "output_dir_files": [
-            "experiments/gpt2_small/output_gated/gated_report.md"
-          ],
-          "declared_inputs": [],
-          "missing_inputs": [],
-          "saved_artefacts": [],
-          "missing_local_modules": [],
-          "graph_artefacts": [
-            {
-              "id": "art-gated-report",
-              "path": "experiments/gpt2_small/output_gated/gated_report.md",
-              "exists": true
-            }
-          ]
-        }
-      ],
-      "verdict": "cannot-determine",
-      "reason": "the pending language here (pending) is tied to no script, run or artefact this tool can find, so no disk verdict is available",
       "rank_tier": 5
     }
   ],
@@ -2345,22 +1617,6 @@
     {
       "rank_tier": 2,
       "tier_name": "answerable-from-disk",
-      "claim": "disc-16-differences-intrinsic",
-      "label": "Discovery 16: Cross-model differences are intrinsic dynamics, not apparatus",
-      "status": "supported",
-      "reason": "experiments/preln_rescale_check.py exists, every input it declares is present in the tree, and it has not been executed",
-      "quoted_result": null,
-      "doc_ref": "docs/JOURNEY_MAP.md#2-key-discoveries-chronological",
-      "cheap": true,
-      "scripts": [
-        "experiments/cos_sim_diagnostic.ipynb",
-        "experiments/preln_rescale_check.py"
-      ],
-      "rank": 5
-    },
-    {
-      "rank_tier": 2,
-      "tier_name": "answerable-from-disk",
       "claim": "q-tmix-llm",
       "label": "Q: What is T_mix_LLM for each basin?",
       "status": "open",
@@ -2369,7 +1625,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
       "cheap": true,
       "scripts": [],
-      "rank": 6
+      "rank": 5
     },
     {
       "rank_tier": 3,
@@ -2382,7 +1638,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#4-adjacent-science--mathematics",
       "cheap": false,
       "scripts": [],
-      "rank": 7
+      "rank": 6
     },
     {
       "rank_tier": 3,
@@ -2398,7 +1654,7 @@
         "experiments/gpt2_small/01_attractor_dominance.ipynb",
         "experiments/gpt2_small/gated_resweep.py"
       ],
-      "rank": 8
+      "rank": 7
     },
     {
       "rank_tier": 3,
@@ -2411,7 +1667,7 @@
       "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions",
       "cheap": false,
       "scripts": [],
-      "rank": 9
+      "rank": 8
     },
     {
       "rank_tier": 3,
@@ -2427,7 +1683,7 @@
         "experiments/gpt2_small/00_reproducibility_gate.ipynb",
         "experiments/gpt2_small/04_readout_confidence.py"
       ],
-      "rank": 10
+      "rank": 9
     },
     {
       "rank_tier": 3,
@@ -2440,7 +1696,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
       "cheap": false,
       "scripts": [],
-      "rank": 11
+      "rank": 10
     },
     {
       "rank_tier": 3,
@@ -2453,7 +1709,7 @@
       "doc_ref": "docs/FINDINGS.md#caveats",
       "cheap": false,
       "scripts": [],
-      "rank": 12
+      "rank": 11
     },
     {
       "rank_tier": 3,
@@ -2466,7 +1722,7 @@
       "doc_ref": "docs/FINDINGS.md#caveats",
       "cheap": false,
       "scripts": [],
-      "rank": 13
+      "rank": 12
     },
     {
       "rank_tier": 3,
@@ -2479,7 +1735,7 @@
       "doc_ref": "docs/FINDINGS.md#caveats",
       "cheap": false,
       "scripts": [],
-      "rank": 14
+      "rank": 13
     },
     {
       "rank_tier": 3,
@@ -2492,7 +1748,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
       "cheap": false,
       "scripts": [],
-      "rank": 15
+      "rank": 14
     },
     {
       "rank_tier": 3,
@@ -2505,7 +1761,7 @@
       "doc_ref": "docs/JOURNEY_MAP.md#7-open-questions",
       "cheap": false,
       "scripts": [],
-      "rank": 16
+      "rank": 15
     },
     {
       "rank_tier": 4,
@@ -2521,23 +1777,7 @@
         "experiments/gpt2_small/05_jlens_pilot.py",
         "experiments/gpt2_small/10_jlens_phase.py"
       ],
-      "rank": 17
-    },
-    {
-      "rank_tier": 4,
-      "tier_name": "still-blocked",
-      "claim": "h4-head-power-iteration",
-      "label": "H4: Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector)",
-      "status": "not-supported",
-      "reason": "the record calls this blocked on issue #25; an issue number names no file, so the working tree cannot say whether it has been resolved and this report does not guess",
-      "quoted_result": null,
-      "doc_ref": "docs/FINDINGS.md#3-hypothesis-dispositions",
-      "cheap": false,
-      "scripts": [
-        "experiments/gpt2_small/12_eigen_rescore.py",
-        "experiments/gpt2_small/spectral_resonance.ipynb"
-      ],
-      "rank": 18
+      "rank": 16
     },
     {
       "rank_tier": 4,
@@ -2550,20 +1790,7 @@
       "doc_ref": "docs/FINDINGS.md#f11-j-lens-pilot-the-prolet-insidedivine-outside-prediction-did-not-hold-the-boundary-that-appeared-is-language-vs-noise",
       "cheap": false,
       "scripts": [],
-      "rank": 19
-    },
-    {
-      "rank_tier": 4,
-      "tier_name": "still-blocked",
-      "claim": "q-prompt-library",
-      "label": "Q: Is the 125-prompt library restored (issue #9)?",
-      "status": "retired",
-      "reason": "the record calls this blocked on issue #24; an issue number names no file, so the working tree cannot say whether it has been resolved and this report does not guess",
-      "quoted_result": null,
-      "doc_ref": "docs/FINDINGS.md#caveats",
-      "cheap": false,
-      "scripts": [],
-      "rank": 20
+      "rank": 17
     },
     {
       "rank_tier": 5,
@@ -2576,7 +1803,7 @@
       "doc_ref": "docs/FINDINGS.md#f8-the-prolet-basin-is-a-coherent-cluster-of-related-tokens-not-a-single-token-permutation-tested",
       "cheap": false,
       "scripts": [],
-      "rank": 21
+      "rank": 18
     },
     {
       "rank_tier": 5,
@@ -2589,23 +1816,7 @@
       "doc_ref": "docs/FINDINGS.md#f11-j-lens-pilot-the-prolet-insidedivine-outside-prediction-did-not-hold-the-boundary-that-appeared-is-language-vs-noise",
       "cheap": false,
       "scripts": [],
-      "rank": 22
-    },
-    {
-      "rank_tier": 5,
-      "tier_name": "cannot-determine",
-      "claim": "f2-divine-readout-stable",
-      "label": "F2: The Divine basin is readout-stable over a never-settling tensor",
-      "status": "corrected",
-      "reason": "the pending language here (pending) is tied to no script, run or artefact this tool can find, so no disk verdict is available",
-      "quoted_result": null,
-      "doc_ref": "docs/FINDINGS.md#f2-the-divine-basin-is-readout-stable-over-a-never-settling-tensor",
-      "cheap": false,
-      "scripts": [
-        "experiments/gpt2_small/01_attractor_dominance.ipynb",
-        "experiments/gpt2_small/gated_resweep.py"
-      ],
-      "rank": 23
+      "rank": 19
     }
   ],
   "frontier": [
@@ -3368,89 +2579,20 @@
         "produced_by_script": [
           "experiments/noise_rerun/01_matched_nu_noise_baseline.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": []
       },
       {
         "path": "experiments/noise_rerun/output/results.pt",
-        "size": 1649959,
+        "size": 2099607,
         "kind": "data",
         "classification": "orphan-directory",
         "directory": "experiments/noise_rerun/output",
         "produced_by_script": [
-          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
-          "experiments/gpt2_medium/02_token_neighbourhood.ipynb",
-          "experiments/gpt2_small/00_reproducibility_gate.ipynb",
-          "experiments/gpt2_small/01_attractor_dominance.ipynb",
-          "experiments/gpt2_small/02_token_neighbourhood.ipynb",
-          "experiments/gpt2_small/03_random_baseline.ipynb",
-          "experiments/gpt2_small/gated_resweep.py",
-          "experiments/gpt2_small/head_resonance.ipynb",
-          "experiments/gpt2_small/layer_resonance.ipynb",
-          "experiments/gpt2_small/lucier_total_resonance.ipynb",
-          "experiments/gpt2_small/spectral_resonance.ipynb",
-          "experiments/noise_rerun/01_matched_nu_noise_baseline.py",
-          "experiments/pythia_160m/01_attractor_dominance.ipynb",
-          "experiments/pythia_160m/02_token_neighbourhood.ipynb",
-          "experiments/pythia_410m/01_attractor_dominance.ipynb",
-          "experiments/pythia_410m/01b_deep_convergence.ipynb",
-          "experiments/pythia_410m/02_token_neighbourhood.ipynb"
+          "experiments/noise_rerun/01_matched_nu_noise_baseline.py"
         ],
-        "producer_run_nodes": [
-          {
-            "run": "run-2-cross-model-sweeps",
-            "graph_says": "125 prompts each",
-            "date": "2026-07-10",
-            "label": "Run 2: Cross-model sweeps"
-          },
-          {
-            "run": "run-0-repeatability-gate",
-            "graph_says": "5 prompts × 2 runs",
-            "date": "2026-03-01",
-            "label": "Run 0: Repeatability gate"
-          },
-          {
-            "run": "run-1-attractor-dominance",
-            "graph_says": "125 prompts, ≤100 iters",
-            "date": "2026-03-01",
-            "label": "Run 1: Attractor dominance sweep"
-          },
-          {
-            "run": "run-token-neighbourhood",
-            "graph_says": "14 tokens (5 basins + 9 waypoints) in W_E",
-            "date": "2026-03-20",
-            "label": "Priority Analysis 01: embedding neighbourhood test"
-          },
-          {
-            "run": "run-3-random-noise-null",
-            "graph_says": "125 Gaussian tensors (seed 42)",
-            "date": "2026-07-10",
-            "label": "Run 3: Random-noise null model"
-          },
-          {
-            "run": "run-5-gated-resweep",
-            "graph_says": "125 prompts, gate cos>0.999×3, ≤1000 iters",
-            "date": "2026-07-10",
-            "label": "Run 5: Convergence-gated re-sweep"
-          },
-          {
-            "run": "run-original-piece",
-            "graph_says": "5 prompts x 500 iterations",
-            "date": "2026-03-01",
-            "label": "EXP_009aFIX: the original five-prompt piece"
-          },
-          {
-            "run": "run-spectral-scaffold",
-            "graph_says": "144 heads, executed 2026-07-25",
-            "date": "2026-07-25",
-            "label": "Spectral resonance protocol (H4, executed 2026-07-25)"
-          },
-          {
-            "run": "run-4-deep-convergence",
-            "graph_says": "8-prompt subset, 1000 iters",
-            "date": "2026-07-10",
-            "label": "Run 4: Deep convergence"
-          }
-        ]
+        "producer_resolution": "path-tied",
+        "producer_run_nodes": []
       },
       {
         "path": "experiments/sink_geometry/output/masking_control.json",
@@ -3461,6 +2603,7 @@
         "produced_by_script": [
           "experiments/sink_geometry/02_masking_control.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": []
       },
       {
@@ -3469,7 +2612,10 @@
         "kind": "data",
         "classification": "orphan-directory",
         "directory": "experiments/sink_geometry/output",
-        "produced_by_script": [],
+        "produced_by_script": [
+          "experiments/sink_geometry/01_sink_profile.py"
+        ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": []
       },
       {
@@ -3481,6 +2627,7 @@
         "produced_by_script": [
           "experiments/sink_geometry/02_masking_control.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": []
       },
       {
@@ -3492,6 +2639,7 @@
         "produced_by_script": [
           "experiments/gpt2_small/spectral_resonance.ipynb"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-spectral-scaffold",
@@ -3507,9 +2655,8 @@
         "kind": "data",
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/_DATA/EXP_009",
-        "produced_by_script": [
-          "experiments/gpt2_small/head_resonance.ipynb"
-        ],
+        "produced_by_script": [],
+        "producer_resolution": "unresolved",
         "producer_run_nodes": []
       },
       {
@@ -3518,18 +2665,9 @@
         "kind": "data",
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/_DATA/EXP_009",
-        "produced_by_script": [
-          "experiments/gpt2_small/head_resonance.ipynb",
-          "experiments/gpt2_small/spectral_resonance.ipynb"
-        ],
-        "producer_run_nodes": [
-          {
-            "run": "run-spectral-scaffold",
-            "graph_says": "144 heads, executed 2026-07-25",
-            "date": "2026-07-25",
-            "label": "Spectral resonance protocol (H4, executed 2026-07-25)"
-          }
-        ]
+        "produced_by_script": [],
+        "producer_resolution": "unresolved",
+        "producer_run_nodes": []
       },
       {
         "path": "experiments/_DATA/EXP_009/009c_spectral_data.pt",
@@ -3537,17 +2675,9 @@
         "kind": "data",
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/_DATA/EXP_009",
-        "produced_by_script": [
-          "experiments/gpt2_small/spectral_resonance.ipynb"
-        ],
-        "producer_run_nodes": [
-          {
-            "run": "run-spectral-scaffold",
-            "graph_says": "144 heads, executed 2026-07-25",
-            "date": "2026-07-25",
-            "label": "Spectral resonance protocol (H4, executed 2026-07-25)"
-          }
-        ]
+        "produced_by_script": [],
+        "producer_resolution": "unresolved",
+        "producer_run_nodes": []
       },
       {
         "path": "experiments/_DATA/EXP_009/009c_validation_grid.pt",
@@ -3555,17 +2685,9 @@
         "kind": "data",
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/_DATA/EXP_009",
-        "produced_by_script": [
-          "experiments/gpt2_small/spectral_resonance.ipynb"
-        ],
-        "producer_run_nodes": [
-          {
-            "run": "run-spectral-scaffold",
-            "graph_says": "144 heads, executed 2026-07-25",
-            "date": "2026-07-25",
-            "label": "Spectral resonance protocol (H4, executed 2026-07-25)"
-          }
-        ]
+        "produced_by_script": [],
+        "producer_resolution": "unresolved",
+        "producer_run_nodes": []
       },
       {
         "path": "experiments/gpt2_small/output_confidence/chordness.json",
@@ -3574,6 +2696,7 @@
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/gpt2_small/output_confidence",
         "produced_by_script": [],
+        "producer_resolution": "unresolved",
         "producer_run_nodes": []
       },
       {
@@ -3583,6 +2706,7 @@
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/gpt2_small/output_confidence",
         "produced_by_script": [],
+        "producer_resolution": "unresolved",
         "producer_run_nodes": []
       },
       {
@@ -3594,6 +2718,7 @@
         "produced_by_script": [
           "experiments/gpt2_small/04_readout_confidence.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-6-full-distribution-confidence",
@@ -3614,6 +2739,7 @@
           "experiments/gpt2_small/05_jlens_pilot.py",
           "experiments/gpt2_small/10_jlens_phase.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-6-full-distribution-confidence",
@@ -3647,6 +2773,7 @@
           "experiments/gpt2_small/09_lagk_gate.py",
           "experiments/gpt2_small/10_jlens_phase.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-9-cycle-anatomy",
@@ -3683,6 +2810,7 @@
         "produced_by_script": [
           "experiments/gpt2_small/05_divine_motion.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-8-divine-motion-audit",
@@ -3701,6 +2829,7 @@
         "produced_by_script": [
           "experiments/gpt2_small/05_divine_motion.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-8-divine-motion-audit",
@@ -3717,6 +2846,7 @@
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/gpt2_small/output_divine_motion",
         "produced_by_script": [],
+        "producer_resolution": "unresolved",
         "producer_run_nodes": []
       },
       {
@@ -3726,6 +2856,7 @@
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/gpt2_small/output_divine_motion",
         "produced_by_script": [],
+        "producer_resolution": "unresolved",
         "producer_run_nodes": []
       },
       {
@@ -3735,6 +2866,7 @@
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/gpt2_small/output_divine_motion",
         "produced_by_script": [],
+        "producer_resolution": "unresolved",
         "producer_run_nodes": []
       },
       {
@@ -3750,6 +2882,7 @@
           "experiments/gpt2_small/10_jlens_phase.py",
           "experiments/gpt2_small/11_suppression_test.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-9-cycle-anatomy",
@@ -3792,6 +2925,7 @@
         "produced_by_script": [
           "experiments/gpt2_small/10_jlens_phase.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-14-jlens-phase-probe",
@@ -3808,65 +2942,25 @@
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/gpt2_small/output_divine_motion",
         "produced_by_script": [],
+        "producer_resolution": "unresolved",
         "producer_run_nodes": []
       },
       {
         "path": "experiments/gpt2_small/output_eigen_rescore/results.json",
-        "size": 84359,
+        "size": 84404,
         "kind": "data",
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/gpt2_small/output_eigen_rescore",
         "produced_by_script": [
-          "experiments/gpt2_small/02b_permutation_test.py",
-          "experiments/gpt2_small/04_readout_confidence.py",
-          "experiments/gpt2_small/05_divine_motion.py",
-          "experiments/gpt2_small/05_jlens_pilot.py",
-          "experiments/gpt2_small/09_lagk_gate.py",
-          "experiments/gpt2_small/10_jlens_phase.py",
-          "experiments/gpt2_small/11_suppression_test.py"
+          "experiments/gpt2_small/12_eigen_rescore.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
-            "run": "run-all-warm-permutation",
-            "graph_says": "10,000 random 14-token sets",
-            "date": "2026-07-11",
-            "label": "All-warm permutation test"
-          },
-          {
-            "run": "run-6-full-distribution-confidence",
-            "graph_says": "5 prompts × 500 iters + 15 noise trials",
-            "date": "2026-07-19",
-            "label": "Run 6: Full-distribution confidence audit"
-          },
-          {
-            "run": "run-8-divine-motion-audit",
-            "graph_says": "3 trajectories × 1000 iters, +20 lag-1 iters",
-            "date": "2026-07-19",
-            "label": "Run 8: Divine motion audit (lag-10 + lag-1 probe)"
-          },
-          {
-            "run": "run-10-jlens-pilot",
-            "graph_says": "193-token lens × 30 prompts; 8 states probed",
-            "date": "2026-07-19",
-            "label": "Run 10: J-lens pilot (restricted)"
-          },
-          {
-            "run": "run-13-lagk-regate",
-            "graph_says": "3 states × 25 dense iters",
-            "date": "2026-07-19",
-            "label": "Run 13: Lag-k re-gate + engine gate_lag"
-          },
-          {
-            "run": "run-14-jlens-phase-probe",
-            "graph_says": "pilot lens × cycle states",
-            "date": "2026-07-19",
-            "label": "Run 14: J-lens phase probe (both phases, pivot, flip axis)"
-          },
-          {
-            "run": "run-15-suppression-test",
-            "graph_says": "144 heads; loop ablation; 12 sentences",
-            "date": "2026-07-19",
-            "label": "Run 15: Suppression-head test for L11.H8"
+            "run": "run-16-eigen-rescore",
+            "graph_says": "144 heads; stored 009b trajectories + raw weights, no forward passes",
+            "date": "2026-07-31",
+            "label": "Run 16: Per-head spectral test, eigenvector rescore"
           }
         ]
       },
@@ -3879,6 +2973,7 @@
         "produced_by_script": [
           "experiments/gpt2_small/07_glitch_alignment.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-11-glitch-alignment",
@@ -3899,6 +2994,7 @@
           "experiments/gpt2_small/10_jlens_phase.py",
           "experiments/gpt2_small/11_suppression_test.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-12-flip-axis-eigenvalue",
@@ -3929,6 +3025,7 @@
         "produced_by_script": [
           "experiments/gpt2_small/10_jlens_phase.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-14-jlens-phase-probe",
@@ -3947,6 +3044,7 @@
         "produced_by_script": [
           "experiments/gpt2_small/10_jlens_phase.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-14-jlens-phase-probe",
@@ -3966,6 +3064,7 @@
           "experiments/gpt2_small/05_jlens_pilot.py",
           "experiments/gpt2_small/10_jlens_phase.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-10-jlens-pilot",
@@ -3991,6 +3090,7 @@
           "experiments/gpt2_small/05_jlens_pilot.py",
           "experiments/gpt2_small/10_jlens_phase.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-10-jlens-pilot",
@@ -4015,6 +3115,7 @@
         "produced_by_script": [
           "experiments/gpt2_small/09_lagk_gate.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-13-lagk-regate",
@@ -4033,6 +3134,7 @@
         "produced_by_script": [
           "experiments/gpt2_small/02b_permutation_test.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-all-warm-permutation",
@@ -4050,14 +3152,9 @@
         "directory": "experiments/gpt2_small/output_random_baseline",
         "produced_by_script": [
           "experiments/gpt2_small/03_random_baseline.ipynb",
-          "experiments/gpt2_small/04_readout_confidence.py",
-          "experiments/gpt2_small/05_divine_motion.py",
-          "experiments/gpt2_small/07_glitch_alignment.py",
-          "experiments/gpt2_small/08_hinge_eigenvalue.py",
-          "experiments/gpt2_small/09_lagk_gate.py",
-          "experiments/gpt2_small/11_suppression_test.py",
-          "experiments/pythia_160m/01_attractor_dominance.ipynb"
+          "experiments/gpt2_small/04_readout_confidence.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-3-random-noise-null",
@@ -4070,36 +3167,6 @@
             "graph_says": "5 prompts × 500 iters + 15 noise trials",
             "date": "2026-07-19",
             "label": "Run 6: Full-distribution confidence audit"
-          },
-          {
-            "run": "run-8-divine-motion-audit",
-            "graph_says": "3 trajectories × 1000 iters, +20 lag-1 iters",
-            "date": "2026-07-19",
-            "label": "Run 8: Divine motion audit (lag-10 + lag-1 probe)"
-          },
-          {
-            "run": "run-11-glitch-alignment",
-            "graph_says": "1 Divine trajectory",
-            "date": "2026-07-19",
-            "label": "Run 11: Glitch alignment (flip axis vs anomalous-token cluster)"
-          },
-          {
-            "run": "run-12-flip-axis-eigenvalue",
-            "graph_says": "1 Divine trajectory (jvp + finite diff)",
-            "date": "2026-07-19",
-            "label": "Run 12: Flip-axis eigenvalue + per-block/head localisation"
-          },
-          {
-            "run": "run-13-lagk-regate",
-            "graph_says": "3 states × 25 dense iters",
-            "date": "2026-07-19",
-            "label": "Run 13: Lag-k re-gate + engine gate_lag"
-          },
-          {
-            "run": "run-15-suppression-test",
-            "graph_says": "144 heads; loop ablation; 12 sentences",
-            "date": "2026-07-19",
-            "label": "Run 15: Suppression-head test for L11.H8"
           }
         ]
       },
@@ -4112,6 +3179,7 @@
         "produced_by_script": [
           "experiments/gpt2_small/11_suppression_test.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-15-suppression-test",
@@ -4128,30 +3196,15 @@
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/gpt2_medium/output",
         "produced_by_script": [
-          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
-          "experiments/gpt2_small/01_attractor_dominance.ipynb",
-          "experiments/pythia_160m/01_attractor_dominance.ipynb",
-          "experiments/pythia_410m/01_attractor_dominance.ipynb",
-          "experiments/pythia_410m/01b_deep_convergence.ipynb"
+          "experiments/gpt2_medium/01_attractor_dominance.ipynb"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-2-cross-model-sweeps",
             "graph_says": "125 prompts each",
             "date": "2026-07-10",
             "label": "Run 2: Cross-model sweeps"
-          },
-          {
-            "run": "run-1-attractor-dominance",
-            "graph_says": "125 prompts, ≤100 iters",
-            "date": "2026-03-01",
-            "label": "Run 1: Attractor dominance sweep"
-          },
-          {
-            "run": "run-4-deep-convergence",
-            "graph_says": "8-prompt subset, 1000 iters",
-            "date": "2026-07-10",
-            "label": "Run 4: Deep convergence"
           }
         ]
       },
@@ -4162,23 +3215,15 @@
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/gpt2_medium/output",
         "produced_by_script": [
-          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
-          "experiments/gpt2_small/01_attractor_dominance.ipynb",
-          "experiments/pythia_160m/01_attractor_dominance.ipynb",
-          "experiments/pythia_410m/01_attractor_dominance.ipynb"
+          "experiments/gpt2_medium/01_attractor_dominance.ipynb"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-2-cross-model-sweeps",
             "graph_says": "125 prompts each",
             "date": "2026-07-10",
             "label": "Run 2: Cross-model sweeps"
-          },
-          {
-            "run": "run-1-attractor-dominance",
-            "graph_says": "125 prompts, ≤100 iters",
-            "date": "2026-03-01",
-            "label": "Run 1: Attractor dominance sweep"
           }
         ]
       },
@@ -4189,30 +3234,15 @@
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/gpt2_small/output",
         "produced_by_script": [
-          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
-          "experiments/gpt2_small/01_attractor_dominance.ipynb",
-          "experiments/pythia_160m/01_attractor_dominance.ipynb",
-          "experiments/pythia_410m/01_attractor_dominance.ipynb",
-          "experiments/pythia_410m/01b_deep_convergence.ipynb"
+          "experiments/gpt2_small/01_attractor_dominance.ipynb"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
-          {
-            "run": "run-2-cross-model-sweeps",
-            "graph_says": "125 prompts each",
-            "date": "2026-07-10",
-            "label": "Run 2: Cross-model sweeps"
-          },
           {
             "run": "run-1-attractor-dominance",
             "graph_says": "125 prompts, ≤100 iters",
             "date": "2026-03-01",
             "label": "Run 1: Attractor dominance sweep"
-          },
-          {
-            "run": "run-4-deep-convergence",
-            "graph_says": "8-prompt subset, 1000 iters",
-            "date": "2026-07-10",
-            "label": "Run 4: Deep convergence"
           }
         ]
       },
@@ -4223,18 +3253,10 @@
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/gpt2_small/output",
         "produced_by_script": [
-          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
-          "experiments/gpt2_small/01_attractor_dominance.ipynb",
-          "experiments/pythia_160m/01_attractor_dominance.ipynb",
-          "experiments/pythia_410m/01_attractor_dominance.ipynb"
+          "experiments/gpt2_small/01_attractor_dominance.ipynb"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
-          {
-            "run": "run-2-cross-model-sweeps",
-            "graph_says": "125 prompts each",
-            "date": "2026-07-10",
-            "label": "Run 2: Cross-model sweeps"
-          },
           {
             "run": "run-1-attractor-dominance",
             "graph_says": "125 prompts, ≤100 iters",
@@ -4252,6 +3274,7 @@
         "produced_by_script": [
           "experiments/gpt2_small/05_divine_motion.py"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-8-divine-motion-audit",
@@ -4270,6 +3293,7 @@
         "produced_by_script": [
           "experiments/gpt2_small/03_random_baseline.ipynb"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
           {
             "run": "run-3-random-noise-null",
@@ -4286,32 +3310,10 @@
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/pythia_160m/output",
         "produced_by_script": [
-          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
-          "experiments/gpt2_small/01_attractor_dominance.ipynb",
-          "experiments/pythia_160m/01_attractor_dominance.ipynb",
-          "experiments/pythia_410m/01_attractor_dominance.ipynb",
-          "experiments/pythia_410m/01b_deep_convergence.ipynb"
+          "experiments/pythia_160m/01_attractor_dominance.ipynb"
         ],
-        "producer_run_nodes": [
-          {
-            "run": "run-2-cross-model-sweeps",
-            "graph_says": "125 prompts each",
-            "date": "2026-07-10",
-            "label": "Run 2: Cross-model sweeps"
-          },
-          {
-            "run": "run-1-attractor-dominance",
-            "graph_says": "125 prompts, ≤100 iters",
-            "date": "2026-03-01",
-            "label": "Run 1: Attractor dominance sweep"
-          },
-          {
-            "run": "run-4-deep-convergence",
-            "graph_says": "8-prompt subset, 1000 iters",
-            "date": "2026-07-10",
-            "label": "Run 4: Deep convergence"
-          }
-        ]
+        "producer_resolution": "path-tied",
+        "producer_run_nodes": []
       },
       {
         "path": "experiments/pythia_160m/output/dissolution_sentences.md",
@@ -4320,25 +3322,10 @@
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/pythia_160m/output",
         "produced_by_script": [
-          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
-          "experiments/gpt2_small/01_attractor_dominance.ipynb",
-          "experiments/pythia_160m/01_attractor_dominance.ipynb",
-          "experiments/pythia_410m/01_attractor_dominance.ipynb"
+          "experiments/pythia_160m/01_attractor_dominance.ipynb"
         ],
-        "producer_run_nodes": [
-          {
-            "run": "run-2-cross-model-sweeps",
-            "graph_says": "125 prompts each",
-            "date": "2026-07-10",
-            "label": "Run 2: Cross-model sweeps"
-          },
-          {
-            "run": "run-1-attractor-dominance",
-            "graph_says": "125 prompts, ≤100 iters",
-            "date": "2026-03-01",
-            "label": "Run 1: Attractor dominance sweep"
-          }
-        ]
+        "producer_resolution": "path-tied",
+        "producer_run_nodes": []
       },
       {
         "path": "experiments/pythia_410m/output/config.md",
@@ -4347,25 +3334,11 @@
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/pythia_410m/output",
         "produced_by_script": [
-          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
-          "experiments/gpt2_small/01_attractor_dominance.ipynb",
-          "experiments/pythia_160m/01_attractor_dominance.ipynb",
           "experiments/pythia_410m/01_attractor_dominance.ipynb",
           "experiments/pythia_410m/01b_deep_convergence.ipynb"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
-          {
-            "run": "run-2-cross-model-sweeps",
-            "graph_says": "125 prompts each",
-            "date": "2026-07-10",
-            "label": "Run 2: Cross-model sweeps"
-          },
-          {
-            "run": "run-1-attractor-dominance",
-            "graph_says": "125 prompts, ≤100 iters",
-            "date": "2026-03-01",
-            "label": "Run 1: Attractor dominance sweep"
-          },
           {
             "run": "run-4-deep-convergence",
             "graph_says": "8-prompt subset, 1000 iters",
@@ -4381,25 +3354,10 @@
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/pythia_410m/output",
         "produced_by_script": [
-          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
-          "experiments/gpt2_small/01_attractor_dominance.ipynb",
-          "experiments/pythia_160m/01_attractor_dominance.ipynb",
           "experiments/pythia_410m/01_attractor_dominance.ipynb"
         ],
-        "producer_run_nodes": [
-          {
-            "run": "run-2-cross-model-sweeps",
-            "graph_says": "125 prompts each",
-            "date": "2026-07-10",
-            "label": "Run 2: Cross-model sweeps"
-          },
-          {
-            "run": "run-1-attractor-dominance",
-            "graph_says": "125 prompts, ≤100 iters",
-            "date": "2026-03-01",
-            "label": "Run 1: Attractor dominance sweep"
-          }
-        ]
+        "producer_resolution": "path-tied",
+        "producer_run_nodes": []
       },
       {
         "path": "experiments/pythia_410m/output_deep/config.md",
@@ -4408,25 +3366,10 @@
         "classification": "sidecar-of-a-known-output-dir",
         "directory": "experiments/pythia_410m/output_deep",
         "produced_by_script": [
-          "experiments/gpt2_medium/01_attractor_dominance.ipynb",
-          "experiments/gpt2_small/01_attractor_dominance.ipynb",
-          "experiments/pythia_160m/01_attractor_dominance.ipynb",
-          "experiments/pythia_410m/01_attractor_dominance.ipynb",
           "experiments/pythia_410m/01b_deep_convergence.ipynb"
         ],
+        "producer_resolution": "path-tied",
         "producer_run_nodes": [
-          {
-            "run": "run-2-cross-model-sweeps",
-            "graph_says": "125 prompts each",
-            "date": "2026-07-10",
-            "label": "Run 2: Cross-model sweeps"
-          },
-          {
-            "run": "run-1-attractor-dominance",
-            "graph_says": "125 prompts, ≤100 iters",
-            "date": "2026-03-01",
-            "label": "Run 1: Attractor dominance sweep"
-          },
           {
             "run": "run-4-deep-convergence",
             "graph_says": "8-prompt subset, 1000 iters",

@@ -769,6 +769,29 @@ def test_content_not_supported_claims_are_only_the_ones_audited(entities):
         f"unaudited not-supported claims: {nulls}"
 
 
+def test_content_h4_run16_evidence_is_a_structural_relation(entities):
+    """The #54 ruling's evidence is a graph relation, not just status prose.
+
+    H4's corrected-target rescore must be wired in as an edge so a
+    regeneration cannot depend on the one-word status alone: H4 rests on
+    run-16 via `produced-by`, while the superseded scaffold keeps its
+    historical `tests` edge, distinguishable by run id.
+    """
+    rels = entities["relationships"]
+    assert any(
+        r["from"] == "h4-head-power-iteration"
+        and r["to"] == "run-16-eigen-rescore"
+        and r["type"] == "produced-by"
+        for r in rels
+    ), "H4 -> run-16 produced-by evidence edge is missing"
+    assert any(
+        r["from"] == "run-spectral-scaffold"
+        and r["to"] == "h4-head-power-iteration"
+        and r["type"] == "tests"
+        for r in rels
+    ), "the superseded scaffold's historical tests edge is missing"
+
+
 def test_content_f11_is_qualified_because_a_null_finding_still_stands(entities):
     """F11 records a null, but the *finding* is not "not-supported".
 

@@ -61,6 +61,10 @@ from pathlib import Path
 import numpy as np
 import torch
 
+# requirements.txt declares numpy>=1.24; np.trapezoid arrived in numpy 2.0
+# and np.trapz left in numpy 2.4, so neither name spans the declared range.
+_trapezoid = getattr(np, "trapezoid", None) or getattr(np, "trapz")
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA = REPO_ROOT / "experiments" / "_DATA" / "EXP_009"
 OUT_DIR = Path(__file__).resolve().parent / "output_eigen_rescore"
@@ -99,8 +103,8 @@ def null_tail(x, d):
     logf = ((d - 3) / 2.0) * np.log1p(-c * c)
     logf -= logf.max()
     f = np.exp(logf)
-    total = np.trapezoid(f, c)
-    tail = np.trapezoid(f[c >= x], c[c >= x])
+    total = _trapezoid(f, c)
+    tail = _trapezoid(f[c >= x], c[c >= x])
     return float(tail / total)
 
 
@@ -156,6 +160,7 @@ def compute():
     max_grid_dev = 0.0
     max_sv_dev = 0.0
     max_vh0_dev = 0.0
+    max_sigma1 = 0.0
     detach_inert = True
     for L in range(N_LAYERS):
         for H in range(N_HEADS):
@@ -171,8 +176,9 @@ def compute():
             # Deviation 2 (.clone() at STEP 5) and artifact reproduction:
             # fresh SVD must match the committed singular values and committed
             # dominant vector (up to sign), within float32 arithmetic.
-            U, S, Vh = torch.linalg.svd(M)
+            _U, S, Vh = torch.linalg.svd(M)
             sv_committed = np.asarray(spec[key]["singular_values"], dtype=np.float64)
+            max_sigma1 = max(max_sigma1, float(sv_committed[0]))
             max_sv_dev = max(max_sv_dev, float(
                 np.max(np.abs(S.numpy() - sv_committed))))
             vh0 = Vh[0]
@@ -230,6 +236,7 @@ def compute():
 
     verification = {
         "committed_artifact_precision": "float32 (notebook STEP 3 `.float()`)",
+        "max_singular_value": max_sigma1,
         "detach_value_preserving": detach_inert,
         "max_abs_dev_singular_values": max_sv_dev,
         "sv_abs_tolerance": SV_ABS_TOL,
@@ -412,7 +419,7 @@ def write_report(s, v, rows):
         f" **{tc['settled_by_500']} had settled by iteration 500**"
         f" ({tc['fixed-point']} steady fixed points, {tc['sign-flip']}"
         " period-2 sign-flippers), and **every settled axis matches the"
-        f" head's dominant eigenvector**: minimum agreement {es['min']:.7f},"
+        f" iterated operator's dominant eigenvector**: minimum agreement {es['min']:.7f},"
         f" median {es['median']:.7f}, {es['n_above_0.99']}/{es['n']} above"
         " 0.99.",
         f"- The remaining {tc['slow-converging']} predicted-axis heads were"
@@ -503,8 +510,9 @@ def write_report(s, v, rows):
         "The committed 009c artifacts were computed by the notebook in",
         "float32; this script recomputes everything in float64 from the raw",
         "weights, so agreement is bounded by float32 arithmetic on these",
-        "magnitudes (singular values reach 334.87, where float32 resolution",
-        "alone is about 4e-5).",
+        f"magnitudes (singular values reach {v['max_singular_value']:.2f},"
+        f" where float32 resolution alone is about"
+        f" {v['max_singular_value'] * 1.19e-7:.0e}).",
         "",
         f"- `.detach()` at STEP 3 is value-preserving: verified"
         f" `torch.equal(W.detach(), W)` for all {s['n_heads']} heads:"
@@ -559,6 +567,11 @@ def main():
                 "float32 (notebook STEP 3 `.float()`)",
             "sv_abs_tolerance": SV_ABS_TOL, "vec_tolerance": VEC_TOL,
             "grid_tolerance": GRID_TOL})
+        if "max_singular_value" not in verification:
+            # Derivable from the committed artifacts without the model.
+            spec = torch.load(DATA / "009c_spectral_data.pt", weights_only=False)
+            verification["max_singular_value"] = max(
+                float(np.asarray(v["singular_values"])[0]) for v in spec.values())
         verification["all_reproduced"] = bool(
             verification["detach_value_preserving"]
             and verification["max_abs_dev_singular_values"] < SV_ABS_TOL

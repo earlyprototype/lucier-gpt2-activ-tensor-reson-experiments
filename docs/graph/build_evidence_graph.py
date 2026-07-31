@@ -584,8 +584,9 @@ HYP_META = {
     # H-pos0 is the first hypothesis on the record derived from the architecture
     # rather than from a run, so it carries no evidence edges: the causal-mask
     # argument is deductive, and the sequence-length-1 test that would make it
-    # empirical has not been run (and needs an engine change first). "untested"
-    # is the same status H4 carries for the same reason.
+    # empirical has not been run (and needs an engine change first). H4 carried
+    # "untested" for the same reason until run 16 gave it evidence and the #54
+    # ruling moved it to "not-supported"; H-pos0 has no such run yet.
     "H-pos0":        dict(status="untested",  phase="phase-5", asserted=D_POS0, retired=None),
 }
 

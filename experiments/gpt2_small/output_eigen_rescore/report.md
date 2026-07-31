@@ -25,7 +25,7 @@ basis, and claim nothing about heads as they operate in place.
 ## Headline: scored against the dominant eigenvector
 
 - The weights sort the 144 heads into **87 with a real dominant eigenvalue** (a predicted fixed axis: preserved each step if the eigenvalue is positive, flipped if negative) and **57 with a complex dominant pair** (a predicted rotation, never settling on an axis).
-- Of the 87 predicted-axis heads, **81 had settled by iteration 500** (52 steady fixed points, 29 period-2 sign-flippers), and **every settled axis matches the head's dominant eigenvector**: minimum agreement 0.9999999, median 1.0000000, 81/81 above 0.99.
+- Of the 87 predicted-axis heads, **81 had settled by iteration 500** (52 steady fixed points, 29 period-2 sign-flippers), and **every settled axis matches the iterated operator's dominant eigenvector**: minimum agreement 0.9999999, median 1.0000000, 81/81 above 0.99.
 - The remaining 6 predicted-axis heads were still converging at iteration 500: their axis was still drifting across the 250-to-500 span, though nearly all were already stable step to step. Their alignment to the predicted eigenvector at iteration 500: {'L10_H11': 0.9719, 'L11_H10': 0.9999, 'L1_H3': 0.9999, 'L2_H9': 0.9997, 'L5_H11': 0.9991, 'L8_H10': 0.9998}.
 - 57 heads carry a complex dominant pair, and none of them settled on an axis, matching the prediction; 55/57 rotate inside the eigenvalue pair's own invariant 2-plane (in-plane fraction above 0.99; median 1.0000). The exceptions, with their in-plane fractions: {'L0_H1': 0.4761, 'L6_H8': 0.9399}.
 - Cross-checks, reported not assumed: complex-eigenvalue heads whose trajectory nonetheless settled: none; fixed points with a negative eigenvalue: none; sign-flippers with a positive one: none.
@@ -83,8 +83,7 @@ direction-flipping structure.
 The committed 009c artifacts were computed by the notebook in
 float32; this script recomputes everything in float64 from the raw
 weights, so agreement is bounded by float32 arithmetic on these
-magnitudes (singular values reach 334.87, where float32 resolution
-alone is about 4e-5).
+magnitudes (singular values reach 334.87, where float32 resolution alone is about 4e-05).
 
 - `.detach()` at STEP 3 is value-preserving: verified `torch.equal(W.detach(), W)` for all 144 heads: True.
 - Committed singular values reproduce to 2.6e-04 absolute (tolerance 1e-03); committed dominant vectors (up to sign) to 1.4e-05 (tolerance 1e-04). The `.clone()` at STEP 5
