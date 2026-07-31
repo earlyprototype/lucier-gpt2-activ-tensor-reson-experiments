@@ -290,7 +290,8 @@ def run_atr_loop(model, prompt, layer_start, layer_end, max_iter, schedule, verb
 def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
                   threshold=0.999, patience=3, check_every=10, check_start=100,
                   verbose=False, gate_lag=1, capture_terminal=False,
-                  inject_hook_name=None, renorm="seed_j", prepend_bos=None):
+                  inject_hook_name=None, renorm="seed_j", prepend_bos=None,
+                  seed_tensor=None, record_metrics=False):
     """Convergence-gated ATR loop (early-stop variant of run_atr_loop).
 
     Iterates the full-tensor re-injection until the tensor stops moving, then
@@ -328,6 +329,25 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
     takes verbatim: that is the exact-sequence path, and it is incompatible with
     ``prepend_bos`` (see ``_bos_kwargs``).
 
+    ``seed_tensor`` (default None) seeds the loop from an arbitrary [pos, d_model]
+    tensor instead of a prompt's activations: iteration 0 IS the seed, and the
+    rescale target is the seed's own Frobenius norm. ``prompt`` then supplies only
+    the token scaffold the forward graph needs (pass None to auto-build an
+    end-of-text scaffold of matching length); its activations never enter the
+    loop, because the injection hook overwrites them from iteration 1. This is
+    the engine path for noise-baseline arms (issue #97's repair): calibrating
+    the seed's FROBENIUS norm to a real run's Frobenius norm makes the two arms
+    dynamically comparable, which the original notebook's inline loop got wrong
+    by ~1/sqrt(pos). Requires ``renorm="seed_j"`` (a natural_i noise arm has no
+    defined natural norm without a content prompt).
+
+    ``record_metrics`` (default False) records per-iteration scalars, appended
+    to the return dict as ``metrics``: a list of
+    ``{iteration, position_similarity_f64, tensor_norm, cos_sim_mean_lag1}``.
+    position_similarity is computed in float64 (the M1/M2 lesson: float32
+    accumulation is the same size as the quantity near collapse). Scalars only,
+    so a gated 1000-iteration run stays forward-pass-bound.
+
     Lean by design (one readout decode, at the end) so a 125-prompt x 1000-iter
     sweep stays forward-pass-bound.
 
@@ -348,6 +368,21 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
             "for the lagged comparison to be well-formed")
     if renorm not in ("seed_j", "natural_i"):
         raise ValueError(f"renorm must be 'seed_j' or 'natural_i', got {renorm!r}")
+    if seed_tensor is not None:
+        if renorm != "seed_j":
+            raise ValueError(
+                "seed_tensor requires renorm='seed_j': an arbitrary tensor has "
+                "no content prompt to define a natural injection-site norm")
+        if seed_tensor.dim() != 2 or seed_tensor.shape[-1] != model.cfg.d_model:
+            raise ValueError(
+                f"seed_tensor must be [pos, d_model={model.cfg.d_model}], "
+                f"got {tuple(seed_tensor.shape)}")
+        if prompt is None:
+            # Token scaffold only: content is irrelevant (overwritten from
+            # iteration 1), length must match so the graph has the right shape.
+            prompt = torch.full(
+                (1, seed_tensor.shape[0]), model.tokenizer.eos_token_id,
+                dtype=torch.long)
     bos_kwargs = _bos_kwargs(prompt, prepend_bos)
     hook_point_read = f"blocks.{layer_end}.hook_resid_post"
     hook_point_write = inject_hook_name or f"blocks.{layer_start}.hook_resid_pre"
@@ -360,16 +395,23 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
     natural_pre_name = hook_point_write
     cache_names = {hook_point_read} | ({natural_pre_name} if renorm == "natural_i" else set())
 
-    with torch.no_grad():
-        _, cache = model.run_with_cache(
-            prompt, names_filter=lambda n: n in cache_names, **bos_kwargs
-        )
-    current_tensor = cache[hook_point_read][0].clone()
-    initial_norm = current_tensor.norm().item()
-    if renorm == "natural_i":
-        target_norm = cache[natural_pre_name][0].norm().item()
-    else:
+    if seed_tensor is not None:
+        current_tensor = seed_tensor.detach().clone().to(
+            next(model.parameters()).device)
+        initial_norm = current_tensor.norm().item()
         target_norm = initial_norm
+    else:
+        with torch.no_grad():
+            _, cache = model.run_with_cache(
+                prompt, names_filter=lambda n: n in cache_names, **bos_kwargs
+            )
+        current_tensor = cache[hook_point_read][0].clone()
+        initial_norm = current_tensor.norm().item()
+        if renorm == "natural_i":
+            target_norm = cache[natural_pre_name][0].norm().item()
+        else:
+            target_norm = initial_norm
+    metrics = [] if record_metrics else None
     # Oldest-first buffer of the last gate_lag mean vectors: entry 0 is the
     # iterate gate_lag steps back once i >= gate_lag.
     mean_history = [current_tensor.mean(dim=0).clone()]
@@ -402,6 +444,26 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
 
         current_tensor = cache[hook_point_read][0].clone()
         mean_vec = current_tensor.mean(dim=0).clone()
+        if record_metrics:
+            t64 = current_tensor.to(torch.float64)
+            row_norms = t64.norm(dim=1, keepdim=True).clamp(min=1e-12)
+            unit = t64 / row_norms
+            sim = unit @ unit.T
+            n_pos = unit.shape[0]
+            if n_pos > 1:
+                off_diag = sim[~torch.eye(n_pos, dtype=torch.bool,
+                                          device=sim.device)]
+                pos_sim_f64 = off_diag.mean().item()
+            else:
+                pos_sim_f64 = float("nan")
+            metrics.append({
+                "iteration": i,
+                "position_similarity_f64": pos_sim_f64,
+                "tensor_norm": current_tensor.norm().item(),
+                "cos_sim_mean_lag1": F.cosine_similarity(
+                    mean_vec.unsqueeze(0),
+                    mean_history[-1].unsqueeze(0)).item(),
+            })
         if capture_terminal:
             recent_means.append(mean_vec)
             if len(recent_means) > 9:
@@ -440,7 +502,10 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
         "renorm": renorm,
         "target_norm": target_norm,
         "seed_norm_at_j": initial_norm,
+        "seed": "tensor" if seed_tensor is not None else "prompt",
     }
+    if record_metrics:
+        out["metrics"] = metrics
     if capture_terminal:
         out["terminal_mean_vec"] = current_tensor.mean(dim=0).clone()
         out["terminal_last_vec"] = last_vec

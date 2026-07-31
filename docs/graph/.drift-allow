@@ -17,6 +17,3 @@ A/experiments/gpt2_small/spectral_resonance.ipynb  # issue #54 — H4's scaffold
 
 D/experiments/gpt2_small/spectral_resonance.ipynb  # issue #54 — the same notebook's own "Not yet run" banner sits above those executed cells. Fixing the banner is safe, but it should say the same thing the disposition ends up saying, so it waits on the same ruling.
 
-A/w-e-permutation-test  # issue #55 — README:249 lists the W_E permutation test among the headline caveats as "not yet run"; FINDINGS:651 records it RESOLVED (2026-07-11, negative) and output_permutation/ holds the artefacts. The README caveat list is the stale side.
-
-E/q-prompt-library  # issue #9 (closed) — prompt_library.py is restored, so the blocker is gone, but the record still parks q-flip-axis-generality and q-lag2-regate-33 behind it. Lifting the "blocked on" language is a record edit, and the newly-unblocked work is a scheduling decision, neither of which CI should force.

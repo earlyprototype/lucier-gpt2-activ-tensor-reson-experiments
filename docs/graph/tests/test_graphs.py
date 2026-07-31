@@ -878,9 +878,20 @@ def test_every_question_uses_the_question_status_slice(entities):
 
 
 def test_every_open_question_is_actually_open(entities):
-    """All 12 stand open at the close; none has been answered since."""
-    assert all(claim["status"] == "open" for claim in _questions(entities))
-    assert all(claim.get("retired") is None for claim in _questions(entities))
+    """11 of the 12 stand open; q-prompt-library was answered 2026-07-31.
+
+    The library was restored on main (issue #24), the record's "blocked on"
+    language was lifted (PR #103), and the node is retired with the date -- the
+    fact that it was once open survives, which is the point of the type.
+    """
+    answered = {"q-prompt-library": "2026-07-31"}
+    for claim in _questions(entities):
+        if claim["id"] in answered:
+            assert claim["status"] == "retired", claim["id"]
+            assert claim.get("retired") == answered[claim["id"]], claim["id"]
+        else:
+            assert claim["status"] == "open", claim["id"]
+            assert claim.get("retired") is None, claim["id"]
 
 
 def test_open_is_no_longer_a_dead_work_signal(entities):
@@ -899,7 +910,9 @@ def test_open_is_no_longer_a_dead_work_signal(entities):
         f"unexpected types carrying status `open`: {sorted(types)}"
     )
     work = [c for c in open_claims if c["type"] == "question"]
-    assert len(work) == len(EXPECTED_QUESTIONS)
+    # One question (q-prompt-library) is answered and retired (2026-07-31),
+    # so the live work queue is one shorter than the pinned census.
+    assert len(work) == len(EXPECTED_QUESTIONS) - 1
 
 
 def test_every_question_quotes_the_record(entities):
@@ -951,9 +964,24 @@ def test_the_prompt_library_is_a_shared_blocker(entities):
         for rel in entities["relationships"]
         if rel["type"] == "blocked-by" and rel["to"] == "q-prompt-library"
     }
-    assert blocked == {"q-flip-axis-generality", "q-lag2-regate-33"}, (
-        f"issue #9 should gate exactly the two threads the record blocks on it, "
-        f"got {sorted(blocked)}"
+    # Resolved 2026-07-31: the library is restored (issue #24), so no thread is
+    # blocked on it any more. The two former blocked-by edges survive as
+    # relates-to edges carrying their history, so the pairing the docstring
+    # describes is still visible in the graph.
+    assert blocked == set(), (
+        f"the prompt-library blocker was resolved 2026-07-31; nothing should "
+        f"still be blocked-by it, got {sorted(blocked)}"
+    )
+    formerly = {
+        rel["from"]
+        for rel in entities["relationships"]
+        if rel["type"] == "relates-to"
+        and rel["to"] == "q-prompt-library"
+        and "Formerly blocked-by" in (rel.get("description") or "")
+    }
+    assert formerly == {"q-flip-axis-generality", "q-lag2-regate-33"}, (
+        f"the two formerly gated threads should keep their history edges, "
+        f"got {sorted(formerly)}"
     )
 
 

@@ -432,9 +432,11 @@ nuisance.
 
 The forward-looking item: entropy neurons act **through the residual-stream norm**, via the final
 LayerNorm scale. ATR's per-iteration L2 rescale sets that norm by fiat every iteration.
-`SCALING_ARTEFACT_ANALYSIS.md` §1.1 rules the rescale inert for the *forward map* — correctly, since
-layer 0 applies LayerNorm — but the entropy-neuron channel operates at the *other* end of the
-stack, after `ln_final`, where no such invariance argument applies. Whether the rescale interacts
+`SCALING_ARTEFACT_ANALYSIS.md` §1.1 originally ruled the rescale inert for the *forward map*; that
+ruling has since been withdrawn (the residual path bypasses layer 0's LayerNorm, so the map is not
+scale-invariant: FINDINGS caveat 7 as amended 2026-07-28), which makes this channel *more* live,
+not less; and the entropy-neuron channel additionally operates at the *other* end of the
+stack, through `ln_final`, where no invariance argument ever applied. Whether the rescale interacts
 with confidence readout at the terminal LayerNorm is a distinct question from the one §1.1
 answers, and it is cheap to check: log pre-rescale residual norm per iteration alongside margin and
 entropy.

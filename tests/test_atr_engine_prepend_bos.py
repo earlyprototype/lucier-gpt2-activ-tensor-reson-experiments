@@ -90,19 +90,37 @@ def _run_with_cache_calls(node):
     ]
 
 
+# Strict additions after the historical prefix, in order. #75 appended
+# prepend_bos to both functions; the alignment-review noise re-run (issue #97's
+# repair, PR #103) appended seed_tensor and record_metrics to run_atr_gated
+# only, under the one-engine standing rule (ALIGNMENT_REVIEW.md section 5) --
+# the alternative was a seventh inline copy of the loop, and the sixth copy is
+# where the #97 calibration bug lived. Same contract as before: names, order,
+# defaults, appended at the end, nothing existing moved.
+SANCTIONED_ADDITIONS = {
+    "run_atr_loop": [("prepend_bos", None)],
+    "run_atr_gated": [
+        ("prepend_bos", None), ("seed_tensor", None), ("record_metrics", False),
+    ],
+}
+
+
 @pytest.mark.parametrize("name", sorted(HISTORICAL_SIGNATURES))
-def test_prepend_bos_is_appended_and_defaults_to_none(name):
+def test_additions_are_appended_with_safe_defaults(name):
     params = _params(_function(name))
-    assert params[-1] == ("prepend_bos", None), (
-        f"{name} must take prepend_bos as its LAST parameter, defaulting to "
-        "None ('use the model's own cfg.default_prepend_bos')"
+    added = SANCTIONED_ADDITIONS[name]
+    assert params[-len(added):] == added, (
+        f"{name} must carry exactly the sanctioned additions "
+        f"{[a[0] for a in added]}, in order, at the END of its signature, "
+        "each defaulting to its do-nothing value"
     )
 
 
 @pytest.mark.parametrize("name", sorted(HISTORICAL_SIGNATURES))
 def test_nothing_existing_moved(name):
     params = _params(_function(name))
-    assert params[:-1] == HISTORICAL_SIGNATURES[name]
+    n_added = len(SANCTIONED_ADDITIONS[name])
+    assert params[:-n_added] == HISTORICAL_SIGNATURES[name]
 
 
 @pytest.mark.parametrize("name", sorted(EXPECTED_RUN_WITH_CACHE_CALLS))

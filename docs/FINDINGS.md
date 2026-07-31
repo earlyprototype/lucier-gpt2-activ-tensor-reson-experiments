@@ -28,7 +28,8 @@ sampled only even iterations (aliasing), its argmax fixed across both phases.
 And the coherence lives one level deeper than previously measured: the settled
 basins decode as coherent clusters of related tokens, not single tokens (top-10 readout tokens with mean pairwise
 embedding cosine 0.41-0.47 against a 0.27 random baseline, p = 0.001 under
-uniform and frequency-matched permutation nulls), while the winning token
+uniform and frequency-matched permutation nulls; that null's evidential value
+is now under challenge, caveat 18b), while the winning token
 itself carries only 6-9% of the probability mass. A mechanism series (F13-F17)
 then traced the cycle to its cause: a single overshooting eigenvalue (-4.3 at the
 pivot) executed almost entirely by one attention head, L11.H8, along a flip axis
@@ -138,7 +139,7 @@ threshold. "34 prompts never converge" therefore over-claims; the accurate
 statement is that these 34 prompts cycle, pending re-gate (a lag-2 gate, a one-line
 engine change, would likely classify them as converged; period-2 is demonstrated
 for the one audited trajectory, and whether all 34 share it awaits the
-prompt-library restoration). Second, the readout: the top-1 token is indeed
+33-prompt re-run; the prompt library is restored, issue #24). Second, the readout: the top-1 token is indeed
 stable, in both phases of the cycle, but the distribution beneath it shifts with
 the cycle (KL about 0.25 nats per half-cycle, F9); every earlier snapshot recorded
 phase A only.
@@ -159,14 +160,28 @@ phenomenon is, on current evidence, specific to GPT-2 Small within this set.
 
 ### F4: The five basins belong to the language-driven regime, not the weights in general (null model)
 
-125 random Gaussian tensors (norm- and length-calibrated to the real runs) iterated
+*Status: provisional pending the matched-ν, gated re-run (caveat 18); the heading
+states the original reading, not a settled result.*
+
+125 random Gaussian tensors (intended as norm- and length-calibrated to the real
+runs; the calibration error is documented below) iterated
 through GPT-2 Small converge (position collapse → 1.0000) but into **18 basins**,
+counted at iteration 100 before convergence,
 dominated by the em-dash token `―` (64%), with ~zero identity overlap with the real
 five (1/125 trials reached `prolet`). Bootstrap on the random basin count: 14.1,
 95% CI [11, 17]; the real count (5) falls **below** the CI. Real language funnels
 into *fewer* attractors than noise, and semantically coherent ones. ATR therefore
 reads the model *as driven by language-shaped input*; the basins are not universal
 fixed points of the weight geometry.
+
+> **Confounded (2026-07-31, verified; issue #97; caveat 18).** The random arm was
+> calibrated with the mean-vector norm (397.18) applied as the Frobenius target, so
+> it ran at ~1/√T of the language arms' injection scale (loop gain 10.1× against
+> 3.5×), and its 18-basin count was read at iteration 100 unconverged (cosine
+> 0.9256) while the language count is at lock-in. Either confound alone could
+> produce the 5-vs-18 gap. "Norm- and length-calibrated" above is therefore wrong
+> as stated. The direction of the finding may survive; the numbers do not, until
+> the matched-ν, gated re-run lands. Downstream inheritance in caveat 18.
 
 ### F5: The cross-model differences are intrinsic, not apparatus artefacts
 
@@ -176,9 +191,16 @@ fixed points of the weight geometry.
 
 Three attribution results ([SCALING_ARTEFACT_ANALYSIS.md](SCALING_ARTEFACT_ANALYSIS.md)):
 
-1. **Normalisation exonerated:** the global L2 rescale is effectively invisible to
-   the forward pass (layer-0 LayerNorm scale-invariance, exact only up to
-   LayerNorm's epsilon term and floating-point precision).
+1. **Normalisation exonerated** *(superseded in its stated form, 2026-07-31)*:
+   originally "the global L2 rescale is effectively invisible to the forward pass
+   (layer-0 LayerNorm scale-invariance)." Caveat 7 as amended 2026-07-28 withdraws
+   that inference: LayerNorm is scale-invariant but the residual path bypasses it,
+   so the map is demonstrably not scale-invariant (cos(F(2x), F(x)) = 0.936 over 12
+   blocks). What §1.1 *does* still establish stands: the scalar preserves the mix
+   exactly, so the rescale is ruled out as a direction-scrambling artefact at the
+   injection step, which was the mechanism this result was interrogating. Whether
+   the ν convention itself shapes the landscape (a scale-sensitivity question,
+   not a mix question) is open pending the ν-sweep (ALIGNMENT_REVIEW.md §5).
 2. **Convergence verdicts are tensor-level:** `cos_sim_mean` never passes through
    token decoding, so Medium/160m saturation and 410m non-convergence are properties
    of the dynamics, not the readout.
@@ -275,6 +297,10 @@ distribution (k = 10 unless stated); a probability-weighted variant weights each
 token pair by its probability mass. High coherence means the head of the
 distribution is one cluster in embedding space rather than a grab-bag.
 
+*Status: under challenge (caveat 18b); the permutation result below is reported as
+measured, and its evidential weight awaits the #98 adjudication. Note also the
+effective sample: the "four" states are two distinct vectors (duplicate pairs).*
+
 Under the `prolet` argmax the whole head of the distribution is one lexical field
 (Semantic prompt shown; the other three near-identical): `prolet` .086,
 `bourgeois` .066, `Anarch` .060, `comrade` .044, `Marx` .041, `proletarian` .036,
@@ -306,7 +332,9 @@ top-10, embedding norm being the standard offline proxy for token frequency).
   `Hindu`, `Bombay`, `Hindus`, `Shiv`, at full prolet strength), and trial 12
   (the horizontal-bar token `―`, U+2015, called the em-dash token in F4; 0.313,
   p = 0.005). Noise can stumble into a real semantic well; it rarely does, while
-  the settling language states always did (4/4).
+  the settling language states always did (4/4 as archived; effectively 2
+  distinct vectors, caveat 18b). The noise trials additionally inherit the
+  caveat-18 mis-calibration.
 
 Coherence therefore separates the families as a strong statistical regularity,
 not a perfect classifier. One structural surprise: `Anarch`, a separate basin in
@@ -321,6 +349,18 @@ its quantitative support having been withdrawn as an anisotropy artifact (caveat
 4). The claim now holds one level deeper, in the readout distribution itself,
 with permutation support. Record: `confidence_report.md` Result 2,
 `chordness_formal.md`.
+
+> **Under challenge (2026-07-31; issue #98; caveat 18b).** The nulls above draw
+> random token sets; measured against what GPT-2 actually emits, the 0.27 null is
+> claimed to sit at the 2.6th percentile of ordinary outputs and `prolet` at the
+> 78th: arithmetic correct, evidence empty. The underlying mechanism (coherence@10
+> measures anisotropic-cone position, not meaning: a random multiple of one token
+> embedding scores at `prolet`'s level) has been reproduced independently twice.
+> The corpus-percentile figures await committed code before this finding is
+> amended (adjudication protocol: `ALIGNMENT_REVIEW.md` §4.2). Two subsidiary
+> corrections regardless of outcome: the four `prolet` states are effectively
+> **two** distinct vectors (two duplicate pairs in the archive; caveat 13 already
+> concedes this), and the noise leg inherits the caveat-18 mis-calibration.
 
 ### F9: The `Divine` anomaly resolved: an exact period-2 limit cycle, hidden by aliasing
 
@@ -426,8 +466,8 @@ game-vocabulary pole and the glitch-token pole, with the swing itself almost
 entirely invisible to the vocabulary projection; the stable `Divine` argmax is
 the shadow of the shared pivot M. The glitch-token identification is by
 inspection against published lists, not a systematic test. Open: whether all 34
-`Divine` prompts share this flip axis (blocked on the prompt-library restoration,
-issue #9). Record: `bell_anatomy.md`.
+`Divine` prompts share this flip axis (the prompt library is restored, issue #24;
+the 33-prompt run is queued). Record: `bell_anatomy.md`.
 
 ### F11: J-lens pilot: the prolet-inside/Divine-outside prediction did not hold; the boundary that appeared is language-vs-noise
 
@@ -512,8 +552,8 @@ two phases and the flip axis sit relative to the J-lens subspace (F16), and
 whether the head that drives the cycle belongs to the copy-suppression class
 (F17). All five follow the one audited `Divine` trajectory (the Syntactic prompt)
 from the committed iteration-1000 checkpoint; whether the other 33 period-2
-prompts share the structure is blocked on the prompt library (issue #9, caveat
-14). Reports live beside their outputs: `output_glitch/glitch_alignment.md`,
+prompts share the structure awaits the 33-prompt run (prompt library restored,
+issue #24; caveat 14). Reports live beside their outputs: `output_glitch/glitch_alignment.md`,
 `output_hinge_eigen/hinge_eigenvalue.md`, `output_lagk/lagk_report.md`,
 `output_jlens_phase/jlens_phase.md`, `output_suppression/suppression_report.md`.*
 
@@ -588,8 +628,8 @@ table on a short dense continuation and gates each state at its smallest passing
 lag, rather than swapping one fixed lag for another. Second, the lag-k gate
 corrects cycle aliasing but not threshold-blindness to slow drift: the
 still-drifting noise control nominally clears 0.999 at every lag in this
-decelerated late window. The other 33 period-2 prompts remain blocked on the
-prompt library (issue #9); one, the Syntactic prompt, is now re-gated as
+decelerated late window. The other 33 period-2 prompts await their run (prompt
+library restored, issue #24); one, the Syntactic prompt, is now re-gated as
 converged. Record: `lagk_report.md`.
 
 ### F16: Phase-aware J-lens: the phases straddle the `prolet` level, the pivot is the most lens-expressible state probed, and the physical flip axis is almost entirely outside the lens
@@ -653,7 +693,7 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
 | H-J1 | `prolet` sits inside the verbalizable (J-lens) subspace, `Divine` outside | **Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)**: the point estimate runs slightly the other way at pilot confidence (`Divine` at least as lens-expressible as `prolet`), and the boundary that appears is language-vs-noise (F11). The phase-aware re-probe (F16) splits it: the reversal holds for phase A, strengthens at the pivot M (most lens-expressible), and reverses for phase B (below `prolet` at every layer); the physical flip axis is almost entirely outside the lens (span 0.013 vs 0.252 chance at L11). Full build still pending (issue #8). |
 | H-glitch | The `Divine` flip axis aligns with the anomalous-token (SolidGoldMagikarp) cluster | **Supported as a structural alignment (2026-07-19, F13)**: cos(-d, under-trained core) = +0.60, p < 0.001 under random and norm-matched nulls; the swing runs between the most-trained (function-word) corner and the least-trained (glitch) corner. A strong tilt (0.46-0.60), not an identity. |
 | H-flip | The flip axis carries an effective eigenvalue near -1, localisable to a block | **Refined (2026-07-19, F14)**: real, direction-specific, and localised (one direction; one head, L11.H8, does 99%), but the pivot eigenvalue is -4.3 (overshooting), not -1; a period-doubling configuration (composed-cycle multiplier +0.10). The literal -1 was a frame-mix artifact of the committed axis. |
-| H-pos0 | The shared attractor is a fixed point of the **single-position** map at position 0 | **Registered, untested (2026-07-28)**: under the causal mask, attention at position 0 attends only to position 0 (its softmax row has one unmasked entry, so the weight is exactly 1), and LayerNorm, the MLP and the residual add are all per-position. Position 0's forward map is therefore a function of position 0's input alone — architectural, not empirical. The ATR loop qualifies this: the rescale uses the whole-tensor Frobenius norm, so position 0 is coupled to the rest of the sequence through **one scalar per iteration**, *c_n*. At a settled state ‖xⁿ‖ is constant. #75 inferred *c_n* = 1 from that and concluded the shared vector must satisfy *x\** = *F₀*(*x\**). **That step is wrong and the corrected form is *x\** = *c*·*x\** + *g₀*(LN(*x\**)) with *c* = 0.288, 0.099, 0.266 measured** ([contraction/RESULTS.md](../experiments/contraction/RESULTS.md), M5). Constant and equal-to-one are different claims: *c* = ν/λ is the seed norm over the norm one forward pass returns, so it is 1 only at unit gain, and measured gain is 3.5–10×. It would be 1 if the loop rescaled to the previous iteration's norm, but the target is frozen at iteration 0 (`atr_engine.py:176`). The conclusion this clause was supporting — pinning an attractor of a map on ℝ^(T×768) inside the fixed-point set of a map on ℝ⁷⁶⁸ — **survives**, because the rescaled map is still a map on ℝ⁷⁶⁸; only the form of the fixed-point equation changes. Same argument makes the `Divine` cycle a period-2 orbit of *F₀*, consistent with F14 localising it to one head that, at position 0, can only attend to position 0. **Test:** ATR at sequence length 1 (requires `prepend_bos=False` or a token-ID path, which the engine does not expose), seeded at `<\|endoftext\|>` to match the sweep's position 0. Predicts the same terminal basin. Predicts terminal state only, not trajectory: off the fixed point *c_n* differs between the two runs. **Falsifiers:** position collapse is approximate rather than exact (0.9999 and 1.0000 are different claims and the archived 4-dp reporting cannot separate them), or the attractor is sustained by the *c_n* coupling. Rationale: [GPT2_DEEP_DIVE.md](GPT2_DEEP_DIVE.md) §2.5. **Conditional on caveat 7.** |
+| H-pos0 | The shared attractor is a fixed point of the **single-position** map at position 0 | **Registered, untested (2026-07-28)**: under the causal mask, attention at position 0 attends only to position 0 (its softmax row has one unmasked entry, so the weight is exactly 1), and LayerNorm, the MLP and the residual add are all per-position. Position 0's forward map is therefore a function of position 0's input alone — architectural, not empirical. The ATR loop qualifies this: the rescale uses the whole-tensor Frobenius norm, so position 0 is coupled to the rest of the sequence through **one scalar per iteration**, *c_n*. At a settled state ‖xⁿ‖ is constant. #75 inferred *c_n* = 1 from that and concluded the shared vector must satisfy *x\** = *F₀*(*x\**). **That step is wrong and the corrected form is *x\** = *c*·*x\** + *g₀*(LN(*x\**)) with *c* = 0.288, 0.099, 0.266 measured** ([contraction/RESULTS.md](../experiments/contraction/RESULTS.md), M5). Constant and equal-to-one are different claims: *c* = ν/λ is the seed norm over the norm one forward pass returns, so it is 1 only at unit gain, and measured gain is 3.5–10×. It would be 1 if the loop rescaled to the previous iteration's norm, but the target is frozen at iteration 0 (`atr_engine.py:176`). The conclusion this clause was supporting — pinning an attractor of a map on ℝ^(T×768) inside the fixed-point set of a map on ℝ⁷⁶⁸ — **survives**, because the rescaled map is still a map on ℝ⁷⁶⁸; only the form of the fixed-point equation changes. Same argument makes the `Divine` cycle a period-2 orbit of *F₀*, consistent with F14 localising it to one head that, at position 0, can only attend to position 0. **Test:** ATR at sequence length 1 (the engine now exposes both `prepend_bos=False` and a token-ID path; PR #82, tests in `tests/test_atr_engine_prepend_bos.py`), seeded at `<\|endoftext\|>` to match the sweep's position 0. Predicts the same terminal basin. Predicts terminal state only, not trajectory: off the fixed point *c_n* differs between the two runs. **Falsifiers:** position collapse is approximate rather than exact (0.9999 and 1.0000 are different claims and the archived 4-dp reporting cannot separate them), or the attractor is sustained by the *c_n* coupling. Rationale: [GPT2_DEEP_DIVE.md](GPT2_DEEP_DIVE.md) §2.5. **Conditional on caveat 7.** |
 | H-supp | L11.H8 is a copy-suppression head whose one-shot negative correction the loop recycles | **Refuted with the opposite sign (2026-07-19, F17)**: L11.H8 inverts the flip axis (rank 1 of 144) and is load-bearing (ablation collapses the cycle), but on ordinary text it raises the attended token's logit at 91% of positions (a copy promoter), where the documented L10.H7 suppressor lowers it. The learned-function reading is unsupported; the structural-accident reading is strengthened. |
 
 ## 4. Caveats {#caveats}
@@ -697,8 +737,10 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
    *c* ≈ 1, which is precisely when the rescale is not doing anything; §1.1
    itself notes norms would otherwise reach ~1.5 × 10⁶ by iteration 500, so *c*
    is far from 1 in practice. What §1.1 *does* establish stands: the scalar
-   preserves the mix exactly, and so is ruled out as the source of the
-   Pythia-410m fragmentation, which was the question it was answering.
+   preserves the mix exactly, and so is ruled out as a direction-scrambling
+   artefact at the injection step, which was the mechanism in question. Whether
+   the ν convention itself shapes the landscape is a separate, open
+   scale-sensitivity question (ν-sweep, ALIGNMENT_REVIEW.md §5).
 
    This is load-bearing for H-pos0. If the rescale were inert, position 0's
    trajectory would be **exactly** autonomous and the fixed-point constraint
@@ -745,7 +787,7 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
     trials, so the 3/15 boundary-case rate carries a wide interval; one `Divine`
     trajectory from one prompt, with period-2 exactness verified over 20
     iterations at iteration 1000; whether all 34 `Divine` prompts share the F10
-    flip axis is untested (prompt library pending, issue #9).
+    flip axis is untested (prompt library restored, issue #24; run queued).
 12. **Even-iteration aliasing in the archive.** From lock-in onward, every
     snapshot recorded before the lag-1 probe fell on even iterations, so all
     archived `Divine` distributions are phase A only (F9). Any schedule that
@@ -761,7 +803,7 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
     iteration-1000 checkpoint, with derivatives evaluated at one point per state.
     Whether the other 33 period-2 prompts share the flip axis, the flip head
     (L11.H8), the eigenvalue, and the anomalous-token alignment is untested
-    (prompt library pending, issue #9).
+    (prompt library restored, issue #24; run queued).
 15. **Frame mixing in the committed flip axis.** `06_bell_anatomy.py` built its
     flip axis by subtracting shell-frame `B` from raw-frame `A`, so the committed
     axis is about 83% radial (pivot-aligned). The physical on-shell axis `d_sym`
@@ -833,6 +875,39 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
     Raised by `agent:pythia-review` (peer board, discussion #59), verified
     against the TransformerLens source and by execution; literature context in
     [GPT2_DEEP_DIVE.md](GPT2_DEEP_DIVE.md) §5.4.
+18. **The random-noise arm ran at the wrong injection scale, and every noise
+    comparison inherits it (2026-07-31; issue #97, twice verified).**
+    `03_random_baseline.ipynb` calibrated its Frobenius rescale target from the
+    language runs' *mean-vector* norms (397.18), a per-position-scale statistic:
+    the notebook's own cell-0 spec says "match the mean Frobenius norm," and the
+    original code did, before the columnar-adapter commit substituted the proxy.
+    Language arms ran at ν ≈ 1393–1468; the noise arm at 397, i.e. ~1/√T of the
+    matched scale, in a 10.1× gain regime against the language arms' ~3.5×. A
+    second, independent confound: the 18-basin count was read at iteration 100
+    unconverged (cosine 0.9256) while the 5-basin count is at gated lock-in.
+    The constant was then hardcoded downstream, so the confound is not confined
+    to F4: `04_readout_confidence.py:153` (F7's noise clause, F8's noise leg),
+    `05_divine_motion.py:96` (F9's noise bracket, the invisibility-ratio 1.12
+    control, the 10.12× gain figure), `05_jlens_pilot.py:294` and
+    `10_jlens_phase.py:186` (F11's and F16's language-vs-noise boundary). Not
+    affected: F8's core `prolet` coherence numbers (vocabulary-permutation
+    nulls, ν-independent) and the F13–F17 mechanism series (consumes
+    `state_divine.pt` only). Repair: the matched-ν, gated, archive-spec noise
+    re-run, first in the experiment queue (`ALIGNMENT_REVIEW.md` §5).
+18b. **F8's null is under challenge (2026-07-31; issue #98).** The coherence
+    statistic measures anisotropic-cone position, not meaning: a random multiple
+    of one arbitrary token embedding decodes at `prolet`'s coherence level with
+    zero semantic content (mechanism reproduced independently twice, once from
+    raw HF weights with separate provenance). The claimed corpus percentiles
+    (`prolet` at the 78th percentile of 665,600 ordinary GPT-2 outputs; the
+    0.27 null at the 2.6th) are plausible and self-validated against committed
+    figures but exist only as issue prose; F8 is not amended until that
+    pipeline is committed and independently re-run (`ALIGNMENT_REVIEW.md`
+    §4.2). Whichever way it lands: the effective `prolet` sample is 2 distinct
+    vectors, not 4 (two duplicate pairs in the archive, cf. caveat 13), and any
+    "the noise attractors are the real anomaly" reading waits on caveat 18's
+    re-run, because the noise states carrying that anomaly were produced under
+    the mis-calibration.
 
 ## 5. What ATR is, after this series
 
@@ -856,14 +931,14 @@ the most-trained and least-trained token directions (F13) and lies almost
 entirely outside both the readout and the J-lens (F16); the head is load-bearing
 for the cycle but is a copy promoter, not a copy-suppression head (F17); and the
 convergence gate now takes a `gate_lag` parameter that recognises the cycle (F15,
-demonstrated for the one audited trajectory, the other 33 pending issue #9). What
+demonstrated for the one audited trajectory, the other 33 queued; library restored, issue #24). What
 is now most open on the `Divine` object is whether those other 33 period-2 prompts
 share this structure. The larger anomaly (why GPT-2 Small alone) is unchanged.
 
 Open directions, in rough order of leverage: why GPT-2 Small (the anomaly, now
 with low-probability coherent clusters as the thing to explain); the lag-2 re-gate of the 34
-cycling prompts and whether they share the F10 flip axis (blocked in part on the
-prompt-library restoration, issue #9); the shape-class-matched coherence null and
+cycling prompts and whether they share the F10 flip axis (unblocked: the prompt
+library is restored, issue #24; run queued); the shape-class-matched coherence null and
 its application to the 125-sweep (F12, caveat 10); the phase-aware J-lens full
 build (F11, issue #8); hook-window/depth dependence (caveat 6); gate cadence
 (caveat 5); H4.

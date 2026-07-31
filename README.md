@@ -20,11 +20,11 @@ NOTE: What started as a moment of curiosity turned up a rather unexpected result
 
 *For readers who want the results before the piece. The full record, every number and every caveat: [FINDINGS.md](docs/FINDINGS.md).*
 
-- GPT-2 Small resolves 125 language prompts into **five attractor basins**, classified at convergence: `prolet` 43.2%, `Divine` 27.2%, `till` 15.2%, `Anarch` 13.6%, `solidarity` 0.8% — four of the five semantically coherent in embedding space.
+- GPT-2 Small resolves 125 language prompts into **five attractor basins**, classified at convergence: `prolet` 43.2%, `Divine` 27.2%, `till` 15.2%, `Anarch` 13.6%, `solidarity` 0.8% — four of the five semantically coherent in embedding space (the statistical form of that coherence claim is under re-examination: [FINDINGS.md caveat 18b](docs/FINDINGS.md#caveats), issue #98).
 - The founding hypothesis — basins as a **thematic fingerprint of the training corpus**, readable from any model — was **refuted by its own validation programme**: GPT-2 Medium, trained on the *same* corpus, collapses every prompt to the single token `D`; Pythia-160m funnels into `questioned`; Pythia-410m never consolidates at all.
-- A null control relocated the basins: **pure noise converges into 18 non-semantic attractors** with no overlap with the real five. The basins belong to the *language-driven regime* of the model, not to the weights in general.
-- The 34 prompts that never converge are exactly the 34 `Divine` prompts — a **stable readout over a never-settling tensor**, the study's sharpest dissociation of dynamics from decoding.
-- What survives the refutation: a cheap, training-free **probe of iterated-dynamics regimes** that cleanly separates four models into four qualitatively different landscapes — and one open anomaly: *why GPT-2 Small alone resolves language into semantic basins.*
+- A null control appeared to relocate the basins: pure noise produced **18 non-semantic attractors, observed at iteration 100**, with no overlap with the real five, suggesting the basins belong to the *language-driven regime* of the model rather than the weights in general. This result is **provisional**: the noise arm ran at ~1/√T of the intended injection norm and was counted before convergence, so the basin-count comparison is confounded until the corrected re-run lands ([FINDINGS.md caveat 18](docs/FINDINGS.md#caveats), issue #97).
+- The 34 prompts that never pass the lag-1 convergence gate are exactly the 34 `Divine` prompts. The one audited trajectory is resolved as an exact **period-2 limit cycle**: the tensor alternates between two states forever while the decoded word never changes, and a lag-2 gate classifies it as converged; whether the other 33 share the cycle is queued ([FINDINGS.md](docs/FINDINGS.md), F9, F15, caveat 14).
+- What survives the refutation: a cheap, training-free **probe of iterated-dynamics regimes** that cleanly separates four models into four qualitatively different landscapes, and one open anomaly, now sharpened: *why GPT-2 Small alone sends most language prompts to a single, input-independent internal state.*
 
 ---
 
@@ -127,9 +127,9 @@ The same operation, four models, 125 prompts each:
 
 The fingerprint hypothesis does not survive this table. GPT-2 Medium heard the same Reddit as GPT-2 Small; its body without organs just says `D`.
 
-And a control that should unsettle any remaining certainty: iterate **pure noise** — no prompt at all — through GPT-2 Small, and it converges too, but into *eighteen* scattered punctuation basins, none of them the five. Real language funnels into **fewer** attractors than noise, and semantic ones. Whatever the five basins are, they are not universal properties of the weights. They belong to the region of activation space that *language-shaped input* occupies. The room only sings like that when a voice has been in it.
+And a control that should unsettle any remaining certainty: iterate **pure noise** — no prompt at all — through GPT-2 Small. The initial count recorded *eighteen* scattered punctuation basins at iteration 100, none of them the five; positions collapsed, but cosine convergence was not established, so the count is provisional. On that provisional count, real language funnelled into **fewer** attractors than noise, and semantic ones. Whatever the five basins are, they are not universal properties of the weights. They belong to the region of activation space that *language-shaped input* occupies. The room only sings like that when a voice has been in it. *(A 2026-07-31 audit found this control ran at roughly a third of the intended injection energy and was counted before it had settled, so the 5-versus-18 comparison is confounded until the corrected re-run lands: [FINDINGS.md caveat 18](docs/FINDINGS.md#caveats), issue #97.)*
 
-One more image from the far side of the study. The 34 prompts that never pass the convergence gate are exactly the 34 `Divine` prompts: a tensor that never stops moving, decoding to the same word forever. A room that will not settle, saying *Divine, Divine, Divine*.
+One more image from the far side of the study. The 34 prompts that never pass the lag-1 convergence gate are exactly the 34 `Divine` prompts: a tensor caught in an exact two-step oscillation, decoding to the same word in both phases forever. Not a room that will not settle: a room ringing between two configurations, saying *Divine, Divine, Divine*. (Resolved in [FINDINGS.md](docs/FINDINGS.md) F9; the re-gate that recognises the cycle is F15.)
 
 The full record of Acts I and II — every run, every number, every hypothesis disposition including the refuted ones — is in [FINDINGS.md](docs/FINDINGS.md).
 
@@ -257,7 +257,7 @@ If this project is useful in your research or writing, please cite it:
 
 ## Caveats
 
-The honest list — sample sizes, pending statistics, what "reproducible" does and doesn't mean here — is maintained in one place: [FINDINGS.md § Caveats](docs/FINDINGS.md#caveats). Headline items: single-seed sweeps, N=2 same-machine repeatability, the deep-convergence run used an 8-prompt subset, and the W_E permutation test is designed but not yet run.
+The honest list — sample sizes, pending statistics, what "reproducible" does and doesn't mean here — is maintained in one place: [FINDINGS.md § Caveats](docs/FINDINGS.md#caveats). Headline items: single-seed sweeps, N=2 same-machine repeatability, the deep-convergence run used an 8-prompt subset, the W_E permutation test resolved **negative** (the all-warm matrix is an anisotropy artifact; caveat 4), and the random-noise control is confounded pending a corrected re-run (caveat 18).
 
 ## References
 

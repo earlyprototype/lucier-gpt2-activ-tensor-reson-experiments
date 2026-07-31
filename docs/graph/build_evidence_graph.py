@@ -1064,15 +1064,18 @@ QUESTIONS = [
         id="q-prompt-library",
         label="Q: Is the 125-prompt library restored (issue #9)?",
         asserted=D_ACT_II_5, doc_ref=A_CAVEATS,
+        status="retired", retired="2026-07-31",
         description=(
-            "Caveats 11 and 14 both file the same gate in the same three words, \"prompt "
-            "library pending, issue #9\", and FINDINGS section 5 names it as the blocker "
+            "Caveats 11 and 14 both filed the same gate in the same three words, \"prompt "
+            "library pending, issue #9\", and FINDINGS section 5 named it as the blocker "
             "on two separate directions at once: the re-gate of the 34 cycling prompts "
-            "and the flip-axis generality question are \"blocked in part on the "
-            "prompt-library restoration, issue #9\". This node is a restoration task "
+            "and the flip-axis generality question. This node was a restoration task "
             "rather than a question about the model; it is in the graph so that the two "
-            "threads it gates point at one blocker instead of repeating one sentence in "
-            "two descriptions, where nothing can pair them.")),
+            "threads it gated point at one blocker instead of repeating one sentence in "
+            "two descriptions, where nothing can pair them. Answered 2026-07-31: yes. "
+            "prompt_library.py is restored on main (issue #24, provenance-flagged full "
+            "restoration), the record's blocked-on language is lifted (PR #103), and the "
+            "two formerly gated threads are queued in ALIGNMENT_REVIEW.md section 5.")),
     dict(
         id="q-jlens-full-build",
         label="Q: What does the phase-aware full J-lens build show (issue #8)?",
@@ -1169,15 +1172,17 @@ def questions():
             ("id", q["id"]),
             ("label", q["label"]),
             ("type", "question"),
-            # Every question is `open`: the status finally means work rather than
-            # "a concept with no epistemic verdict".  An answered question would
-            # take `retired` plus a `retires` edge from whatever answered it, so
-            # the answer stays a followable node rather than a status word.
-            ("status", "open"),
+            # A question is `open` while it stands: the status finally means work
+            # rather than "a concept with no epistemic verdict".  An answered
+            # question takes `retired` plus a `retires` edge from whatever
+            # answered it, so the answer stays a followable node rather than a
+            # status word.  q-prompt-library is the first to take that path
+            # (answered 2026-07-31: the library is restored, issue #24).
+            ("status", q.get("status", "open")),
             ("description", q["description"]),
             ("phase", "phase-5"),
             ("asserted", q["asserted"]),
-            ("retired", None),
+            ("retired", q.get("retired")),
             ("doc_ref", q["doc_ref"]),
         ]))
     ids = [q["id"] for q in out]
@@ -1532,6 +1537,11 @@ ARTEFACTS = [
      "experiments/gpt2_small/output_gated/gated_report.md",
      "91/125 lock in, all at iteration 120; the 34 non-convergers are exactly the Divine "
      "prompts; basin shares at lock-in.", "run-5-gated-resweep"),
+    ("art-prompt-library", "The restored 125-prompt library",
+     "prompt_library.py",
+     "Provenance-flagged full restoration of the original 125 prompts (issue #24): "
+     "every entry recovered verbatim from committed records, zero re-authored "
+     "prompts, per-prompt provenance flags in the module's PROVENANCE dict.", None),
     ("art-random-baseline-report", "Random-baseline (null model) report",
      "experiments/gpt2_small/output_random_baseline/random_baseline_report.md",
      "125 Gaussian trials, seed 42: 18 basins, bootstrap count 14.1 with 95% CI [11, 17].",
@@ -2281,15 +2291,27 @@ def question_relationships():
     # This is the pairing that prose cannot show.  F10 and F15 sit in different
     # sections and never mention each other, yet they are one artefact away from
     # both moving.
+    # Resolved 2026-07-31: the library is restored (issue #24), so the two
+    # blocked-by edges become relates-to edges that keep the pairing and its
+    # history visible, and the artefact that answered the question carries a
+    # retires edge into it.
     R += [
-        rel("q-flip-axis-generality", "q-prompt-library", "blocked-by",
-            "F10's own words: the flip-axis generality question is \"blocked on the "
-            "prompt-library restoration, issue #9\", repeated in caveats 11 and 14 as "
-            "\"prompt library pending, issue #9\".", 8, D_ACT_II_5),
-        rel("q-lag2-regate-33", "q-prompt-library", "blocked-by",
-            "F15's own words: \"The other 33 period-2 prompts remain blocked on the "
-            "prompt library (issue #9)\", and JOURNEY_MAP section 7 gives the next step "
-            "as \"Re-gate the other 33 prompts (blocked on issue #9)\".", 8, D_ACT_II_5),
+        rel("q-flip-axis-generality", "q-prompt-library", "relates-to",
+            "Formerly blocked-by: F10's own words were that the flip-axis generality "
+            "question is \"blocked on the prompt-library restoration, issue #9\", "
+            "repeated in caveats 11 and 14. Blocker cleared 2026-07-31: the library is "
+            "restored (issue #24) and the 34-prompt run is queued in ALIGNMENT_REVIEW.md "
+            "section 5.", 8, "2026-07-31"),
+        rel("q-lag2-regate-33", "q-prompt-library", "relates-to",
+            "Formerly blocked-by: F15's own words were \"The other 33 period-2 prompts "
+            "remain blocked on the prompt library (issue #9)\". Blocker cleared "
+            "2026-07-31: the library is restored (issue #24) and the re-gate is queued "
+            "in ALIGNMENT_REVIEW.md section 5.", 8, "2026-07-31"),
+        rel("art-prompt-library", "q-prompt-library", "retires",
+            "The restored library answers the question: all 125 prompts recovered "
+            "verbatim from committed records, every entry flagged original (issue #24). "
+            "The two threads the question gated are queued in ALIGNMENT_REVIEW.md "
+            "section 5.", 6, "2026-07-31"),
     ]
 
     # ---- the other stated dependencies ------------------------------------
@@ -2457,6 +2479,9 @@ def structural_relationships(claims, runs, run_models, sources):
                            "pre-change engine at gate_lag = 1."),
     }
     for aid, run_id in sorted(art_run.items()):
+        if run_id is None:
+            # art-prompt-library: a restored source file, not a run product.
+            continue
         R.append(rel(aid, run_id, "produced-by",
                      art_desc_override.get(
                          aid, "%s is the output record of %s."
