@@ -64,8 +64,10 @@ flat for the first thirty iterations and then contracts, so no single rate descr
 **M5.** M5 asks for the per-step rescale factor and is filed as gated on the grounds that it is never
 recorded. It is derivable from what is recorded. Measured, the loop rescales the state to **29%** of
 its size per round in one run and **10%** in another, stable across iterations. H-pos0 states this
-figure is 1 at a settled state. Because the map is not scale-invariant over this range (#69), the
-scalar does not drop out of the fixed-point condition.
+figure is 1 at a settled state. It is not, and the reason is simple: the loop shrinks the state back
+to the size of the *original prompt's* activations, and one pass through the model grows it 3.5–10×.
+Those two cancel, which is why the size looks steady — but neither is 1. The figure would be 1 only
+if the loop reset to the previous step's size instead of the seed's.
 
 ---
 
@@ -155,34 +157,58 @@ of magnitude, not a per-number statement:
 
 float32 ε = 1.192e−07.
 
+**The second decimal place in that last column is not supported by the method.** `1 − similarity` is
+computed as the engine computes it, `1.0 - mean(cos)`, with every cos ≈ 1 — so it cancels down to the
+float64 ulp. Restating the identical quantity cancellation-free as mean‖u_i − u_j‖²/2 gives
+consistently larger values: 2.418e−14 against 2.387e−14 for `Lucier` (1.3%), 1.649e−14 against
+1.599e−14 for `Imperative` (3.0%), and 8.379e−15 against 7.883e−15 for `Syntactic` (5.9%). The error
+is worst on the smallest deviation, which is `Syntactic` — the run quoted as the low end of the
+0.74–1.30 band. A 5.9% shift in 1 − similarity is 2.9% in *d*, so no conclusion here moves, but the
+band is really 0.77–1.30 and the figures should be read to one decimal. The engine's formula is
+mirrored deliberately, so this is recorded rather than fixed.
+
 **But *d* is an RMS summary**, and reading it as "every component agrees to ~1 ε" assumes the
-disagreement is spread evenly across coordinates. It is not — one coordinate carries 4–55% of it, and
-the effective number of participating coordinates is 3–23 out of 768. That assumption was flagged in
+disagreement is spread evenly across coordinates. It is not — one coordinate carries 4–55% of the
+residual energy, and
+the effective number of participating coordinates is 3–157 out of 768. That assumption was flagged in
 review and it does not hold, so the per-coordinate question has to be asked per coordinate.
+
+Both figures are computed by `per_coordinate_disagreement` and printed in the table below, and
+**neither is a stable quantity.** `Syntactic` and `Divine_Syntactic` settle to the same direction
+(1 − cos = 1.2e−10) and return 4.4% / 157 against 19.4% / 23 — a factor of seven apart at the same
+state. What they describe is the shape of an individual run's rounding residual, not a property of
+the settled state, which is why the range is this wide and why nothing downstream leans on it. That
+instability is itself what an arithmetic residual should look like.
+
+**All shares here are shares of squared residual**, i.e. of energy_k = Σ_{i<j} (u_ik − u_jk)², not of
+the angle — the angle goes as its square root. Energy is the right denominator for the question being
+asked, because 1 − similarity is itself quadratic in Δu (the mean over pairs of ‖Δu‖²/2), so a
+coordinate carrying 1% of the energy accounts for 1% of the reported deviation. That same coordinate
+carries ~10% of the *amplitude*, so these percentages should not be read as fractions of the angle.
 
 ### Per-coordinate measurement
 
 Concentration on its own proves nothing: under *relative* rounding every coordinate carries
-|Δu_k|/|u_k| ~ ε regardless of its size, and this state's energy is 91% in ten coordinates, so
+|Δu_k|/|u_k| ~ ε regardless of its size, and this state's energy is ~68% in ten coordinates, so
 rounding would look concentrated too. What separates rounding from structure is whether the *relative*
 disagreement is flat at a few ε. Scale is divided out first — H-pos0 lets each position keep its own
 scalar (M5), so the direction is what is at issue.
 
-| Run | median | p90 | p99 | >100 ε | their \|u\| | their share of angle |
-|---|---|---|---|---|---|---|
-| Lucier | 1.90 | 10.03 | 63.67 | 0.45% | 0.026 | 0.35% |
-| Semantic | 1.82 | 9.39 | 71.55 | 0.79% | 0.007 | 0.47% |
-| Syntactic | 1.69 | 9.51 | 182.02 | 1.41% | 0.003 | 1.48% |
-| Nonsense | 1.87 | 9.77 | 90.63 | 0.92% | 0.012 | 0.63% |
-| Imperative | 1.80 | 9.40 | 83.86 | 0.88% | 0.016 | 0.78% |
-| Divine_Syntactic | 1.85 | 10.24 | 190.03 | 1.56% | 0.003 | 1.32% |
-| Control_noise | 3.38 | 15.17 | 209.01 | 1.81% | 0.010 | 0.43% |
-| Control_prolet_Semantic | 1.81 | 9.61 | 77.40 | 0.79% | 0.007 | 0.36% |
+| Run | median | p90 | p99 | >100 ε | their \|u\| | their share of energy | top coord | part. ratio |
+|---|---|---|---|---|---|---|---|---|
+| Lucier | 1.90 | 10.03 | 63.67 | 0.45% | 0.026 | 0.35% | 51.2% | 3.8 |
+| Semantic | 1.82 | 9.39 | 71.55 | 0.79% | 0.007 | 0.47% | 35.9% | 7.5 |
+| Syntactic | 1.69 | 9.51 | 182.02 | 1.41% | 0.003 | 1.48% | 4.4% | 156.8 |
+| Nonsense | 1.87 | 9.77 | 90.63 | 0.92% | 0.012 | 0.63% | 42.8% | 5.4 |
+| Imperative | 1.80 | 9.40 | 83.86 | 0.88% | 0.016 | 0.78% | 39.9% | 6.2 |
+| Divine_Syntactic | 1.85 | 10.24 | 190.03 | 1.56% | 0.003 | 1.32% | 19.4% | 23.3 |
+| Control_noise | 3.38 | 15.17 | 209.01 | 1.81% | 0.010 | 0.43% | 40.2% | 5.6 |
+| Control_prolet_Semantic | 1.81 | 9.61 | 77.40 | 0.79% | 0.007 | 0.36% | 54.9% | 3.3 |
 
 **The typical coordinate agrees to about 2 ε.** The p99 column is driven by coordinates at 0.3–2.6%
 of typical magnitude, where a negligible absolute difference produces a large relative one; those
-coordinates carry ~1% of the angle. In the coordinates carrying the angle, agreement is at the few-ε
-level.
+coordinates carry ~1% of the residual energy, and so ~1% of the reported 1 − similarity. In the
+coordinates carrying the residual, agreement is at the few-ε level.
 
 **M1 conclusion.** The residual between positions is the size of float32 arithmetic noise. This bounds
 a structured disagreement to below that scale, and it holds steady over 1000 iterations. It does not
@@ -197,10 +223,13 @@ higher-precision run is required.
 | Per-coordinate median | 3.38 ε | 1.69–1.90 ε |
 | Raw deviation 1 − sim | 1.01e−13 | 7.9e−15 – 2.4e−14 |
 
-Roughly a factor of two on either per-number measure — the 9× in the raw deviation is the same fact
-seen through a square, not a separate finding. It is also the noise control, and the run with by far
-the largest rescale factor (10.1× amplification against 3.5×, see M5). Whether those are connected is
-not answerable from one run, but it is the one place here where something might sit above the floor.
+Roughly a factor of two on either per-number measure. The raw-deviation row looks like a much larger
+gap, but it is the same fact seen through a square: against the geometric mean of the other seven the
+ratio is 6.49×, and (2.66 / 1.045)² = 6.48. It is not a separate finding. The ratio is quoted against
+the geometric mean because it moves between 4.2× and 12.8× depending on which of the seven is used as
+the comparator. It is also the noise control, and the run with by far the largest rescale factor
+(10.1× amplification against 3.5×, see M5). Whether those are connected is not answerable from one
+run, but it is the one place here where something might sit above the floor.
 
 <details>
 <summary>Secondary cross-check: a synthetic sensitivity sweep, and what it is not</summary>
@@ -402,27 +431,123 @@ uses it — it holds to 2–6 × 10⁻⁷. `initial_norm` is recorded directly.
 | Control_prolet_Semantic | 12 | 1392.65 | 5230.65 | **0.2662** | 3.76× |
 
 *c* settles fast and then holds: from *c*₁₀₁ to *c*₁₀₀₁ the spread is 2×10⁻⁴ to 6×10⁻³. It is a
-**stable constant**. (Index convention, easy to get wrong: a snapshot recorded at iteration *n* holds
+**stable constant for `Control_prolet_Semantic` and `Control_noise`**. It is **not** one for
+`Divine_Syntactic`: that run is a period-2 cycle whose *c* alternates 0.288044 / 0.303536, and the
+2×10⁻⁴ spread quoted for it here is an artefact of the even-spaced snapshot schedule sampling one
+phase. See "Relation to H-pos0" below. (Index convention, easy to get wrong: a snapshot recorded at iteration *n* holds
 the state *after* *n* passes and *before* the rescale that precedes pass *n*+1, so it yields *c*ₙ₊₁.)
 
 ### Relation to H-pos0
+
+Terms used in this subsection:
+
+- **ν** — `initial_norm`; the length the loop rescales back to. Computed once at
+  `atr_engine.py:176` and never updated. It is the **whole-tensor Frobenius** norm over `[T, 768]`
+  (`atr_engine.py:214`), so the per-position norm is ν/√T — 1392.65/√12 = 402.02 for
+  `Control_prolet_Semantic`, matching its measured row norm. That identity holds only *because*
+  positions collapse (row-norm spread ~4×10⁻⁷ relative); it is not general. The same √T is what
+  `RESULTS_SUMMARY.md` flags as substituted in the random baseline's calibration.
+- **λ** — the length the forward pass hands back, ‖*F*(ν*u*)‖. At settlement this is the recorded
+  `settled ‖x‖`.
+- ***c*** — the rescale factor, ν/λ.
+- ***u*** — the state as a pure direction, *x*/‖*x*‖.
+- ***F*** — one full pass through the 12 blocks; ***F₀*** the same restricted to position 0.
+- **Δ** — everything the blocks add to the residual stream: *F*(*x*) = *x* + Δ(*x*).
+- **gain** — λ/ν, the factor by which one forward pass multiplies length. Listed as
+  `amplification` in the table above.
+- **fixed point** — a state the loop leaves unchanged.
+- **nonlinear eigenvector** — a direction a nonlinear map sends to a positive multiple of itself.
+- **LayerNorm scale-invariance** — LN(*cx*) = LN(*x*) for *c* > 0, because (*cx* − *cμ*)/(*cσ*)
+  = (*x* − *μ*)/*σ*. Exact up to the ε in the denominator.
 
 #75 states the H-pos0 argument as:
 
 > At a settled, position-uniform state ‖xⁿ‖ is constant, so ***c_n* = 1**, and the shared vector must
 > satisfy ***x\* = F₀(x\*)***
 
-‖xⁿ‖ is constant at settlement, as stated. The measured *c* at settlement is not 1: the rescale
-target is the *initial* norm and the settled norm is 3.5–10× that, giving *c* = 0.288, 0.099, 0.266 in
-the three committed runs.
+‖xⁿ‖ is constant at settlement, as stated. The step from there to *c_n* = 1 does not hold, and the
+reason is worth stating precisely, because it is a legible error rather than a loose one.
+
+**Constant and equal-to-one are different claims, and which one you get depends on the rescale
+target.** If the loop rescaled to the *previous iteration's* norm, *c* = ‖xⁿ⁻¹‖/‖xⁿ‖ would indeed be
+1 at settlement — nothing is drifting, so the correction is trivial. That is the reading under which
+#75's inference is valid. But this loop rescales to a target frozen at iteration 0
+(`atr_engine.py:176`, `215`), so *c* = ν/λ with ν fixed. At settlement that is constant, which is
+what "settled" buys, and it equals 1 only if the forward pass returns the length it was given.
+
+It does not. Measured on `Control_prolet_Semantic`, ν = 1392.65 in and λ = 5230.65 out — a gain of
+3.76. So *c* = 0.2662, and the three committed runs give 0.288, 0.099, 0.266.
+
+**Which run to use as the worked example, and a correction.** `Control_prolet_Semantic` is used above
+because it is a genuine fixed point — flat at every lag, worst deviation 3.9×10⁻⁷ relative.
+`Divine_Syntactic` is not: F9/F10 established it is an exact period-2 limit cycle,
+cos(*A*, *f*(*f*(*A*))) = 1.000000. For a 2-cycle *F*(ν*u_A*) = λ_A*u_B* with *u_B* ≠ *u_A*, so
+*F*(ν*u*) is **not** parallel to *u* and the fixed-point relation below does not apply to it.
+
+An earlier revision of this section used `Divine_Syntactic` as the worked example and reported
+‖Δ‖ = 3629.65 for it. That figure is withdrawn, and **no single ‖Δ‖ is correct for that run in
+principle**: the two phases have different output norms — λ_A = 5098.14, λ_B = 4837.94, both recorded
+in `output_hinge_eigen/hinge_eigenvalue.json` — so there are two half-step magnitudes, **3978.73** for
+*A* → *B* and **4229.92** for *B* → *A*.
+
+***c* is not a stable constant for that run either, and the M5 table above needs reading with that in
+mind.** `hinge_eigenvalue.json` records shell factors **0.288044 at *A* and 0.303536 at *B***, a 5.4%
+alternation. The table reports `Divine_Syntactic`'s *c* as settling to a spread of 2×10⁻⁴; that
+figure is the aliasing artefact described next, not a measurement of stability. *c* is a genuine
+stable constant for `Control_prolet_Semantic` and `Control_noise`, and alternates for
+`Divine_Syntactic`.
+
+**Why the error was easy to make.** `05_divine_motion.py` samples every 10 iterations from 800, and
+**10 is even**, so all 21 late snapshots sit at one parity of a period-2 cycle: their pairwise cosines
+are 1.0000 at both lag 1 and lag 2. The schedule aliases the cycle into looking converged.
+
+**But the archive is not silent about it** — an earlier revision of this paragraph claimed nothing in
+the archived state distinguishes the two, and that is wrong. Every snapshot carries `cosine_sim_last`,
+the true lag-1 cosine, reading **0.684912** at each late `Divine_Syntactic` snapshot against exactly
+1.0 for `Control_prolet_Semantic`; `output_divine_motion/probe_lag1_results.json` records the same
+split directly (odd lags L2 = 1249.43, cos = 0.684912; even lags L2 ≈ 3×10⁻⁴, cos = 1.000000). The
+alternation is in the committed data in plain sight. What the even-spaced schedule hides is only the
+*tensor* trajectory, from anyone reading the states alone.
+
+**Stated as a dynamical system.** Because the norm is clamped on entry every iteration, only the
+direction evolves, and the loop is a map on the unit sphere in ℝ⁷⁶⁸. **Scope of that reduction:** the
+true state space is ℝ^(T×768) and the sphere is S^(768T−1); the reduction holds on the row-uniform
+subspace, which is exactly invariant (identical rows give identical queries, keys and values, so every
+softmax row averages identical vectors and returns them, and LayerNorm, MLP and the residual add are
+per-position). The 768(*T*−1) transverse directions are not covered by anything below; that they
+contract is an empirical fact from M1, not a consequence of this algebra.
+
+> *u*ₙ₊₁ = *F*(ν*u*ₙ) / ‖*F*(ν*u*ₙ)‖
+
+Fixed points satisfy *F*(ν*u\**) = λ*u\**, a nonlinear eigenvector condition, with *c* = ν/λ. This
+**derives** the measured *c* rather than observing it, and it is why the engine docstring's
+"nonlinear analogue of power iteration" is literally accurate rather than a metaphor.
 
 The fixed-point condition is therefore not *x\** = *F₀*(*x\**) but
 
 > *x\** = *c* · *x\** + *g₀*(LN(*x\**))   with *c* ≈ 0.29 measured
 
-**The scalar does not drop out**, because the map is not scale-invariant over this range. #69 measured
-cos(*F*(*c*·*x*), *F*(*x*)) at 0.936 for *c* = 2 and 0.505 for *c* = 10; the measured amplification here
-is 3.5–10×.
+equivalently Δ(*u\**) = (λ − ν)*u\**: the accumulated write of all blocks must point along *u\**. Its
+size follows — ‖Δ‖ = (1 − *c*)λ = **3838.00** for `Control_prolet_Semantic`. The network writes about
+3838 of length onto a state of length 1393. (This relation holds only at a true fixed point; see the
+`Divine_Syntactic` note above.)
+
+**Where the scale dependence actually lives — this corrects an earlier statement in this file.** A
+previous revision said the scalar does not drop out "because the map is not scale-invariant over this
+range", citing #69. That is true but attributes it to the wrong place. LayerNorm is *exactly*
+scale-invariant, so every block reads a ν-independent input at first order and block 0's write does
+not see ν at all. The ν-dependence enters through the residual term: block 1 reads
+LN(ν*u* + Δ₀(*u*)) = LN(*u* + Δ₀(*u*)/ν), so it is the ratios ‖Δ_l‖/ν that carry it, and they shrink
+as ν grows. #69's own breakdown is the confirming measurement, not merely a citation for it: it
+reports the invariance holding to ~10⁻⁵ *at the LayerNorm* and failing *around the residual path*,
+which is exactly this split.
+
+**Consequence: *c* = 1 is not an absurd condition, it is a large-ν condition.** Gain is
+1 + ‖Δ‖/ν, and since Δ is fixed by direction rather than length, gain falls toward 1 as ν rises. At
+ν ≈ 3838 the gain would be about 2. These runs sit at *c* ≈ 0.27 because ν ≈ 1393 is small against
+what the network writes — and ν is small because it is whatever norm the seed prompt happened to
+produce. So the quantity is not arbitrary in the sense of meaningless; it is set by the seed, and it
+selects a position on a continuum that has *c* = 1 at one end.
 
 **Unaffected:** H-pos0's structure. Position 0's trajectory remains autonomous up to one scalar, and
 an *n* = 1 run implements the same rescaled map. The intermediate claim and the fixed-point form
@@ -448,7 +573,7 @@ at every snapshot:
 ```python
 "tensor":              current_tensor.clone().cpu(),   # line 260
 "tensor_norm":         current_tensor.norm().item(),   # line 265
-"position_similarity": position_similarity,            # line 274
+"position_similarity": position_similarity,            # line 277
 ```
 
 The iteration-0 snapshot carries the same fields, so `initial_norm` = `snapshots[0]["tensor_norm"]`
@@ -459,7 +584,7 @@ snapshots were saved intact. M5's "currently never recorded" does not hold for t
 
 | Script | What it did |
 |---|---|
-| `experiments/gpt2_small/05_divine_motion.py:118` | `make_snapshot()` — *"Slim snapshot with just the fields the analysis needs."* Reimplements the snapshot from scratch and keeps 7 of the engine's 20 fields. Drops `tensor`, `tensor_norm`, `position_similarity`. |
+| `experiments/gpt2_small/05_divine_motion.py:118` | `make_snapshot()` — *"Slim snapshot with just the fields the analysis needs."* Reimplements the snapshot from scratch and keeps 7 of the engine's 19 fields. Drops `tensor`, `tensor_norm`, `position_similarity`. |
 | `experiments/sink_geometry/02_masking_control.py:86-88` | Calls `run_atr_loop`, receives the full snapshots, keeps `means` and discards the rest before `torch.save`. |
 
 Both selected fields at save time. The fields this analysis required are among those dropped, and
@@ -493,9 +618,12 @@ oppositely. GPT-2 Small's poor single-rate fit is a latency rather than a slow r
 by the massive-activation effect documented in `sink_geometry`.
 
 **Determined.** The rescale factor *c* settles to a stable constant that is not 1: 0.288, 0.099, 0.266
-across three committed runs. H-pos0 (#75) states this figure is 1 at a settled state. Because the map
-is not scale-invariant over the measured range (#69), the scalar does not drop out of the fixed-point
-condition. M5 required neither a forward pass nor an engine change.
+across three committed runs. It is *c* = ν/λ, the seed norm over the norm one forward pass returns, so
+it is 1 only if the pass has unit gain; measured gain is 3.5–10×. H-pos0 (#75) infers *c* = 1 from the
+settled norm being constant, which would hold if the loop rescaled to the previous iteration's norm
+but does not, because the target is frozen at iteration 0. The scalar does not drop out of the
+fixed-point condition, and it enters through the residual path rather than through LayerNorm, which is
+exactly scale-invariant. M5 required neither a forward pass nor an engine change.
 
 **Bounded, not determined.** Whether the position collapse is exactly exact. The typical coordinate
 agrees to ~2 float32 ε, the scale of arithmetic noise, which bounds a structured disagreement to below
