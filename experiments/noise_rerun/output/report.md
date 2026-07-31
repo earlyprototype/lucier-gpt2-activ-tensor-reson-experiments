@@ -25,7 +25,7 @@ Config and per-prompt calibration: `calibration.json`. Raw data: `results.pt`.
 | `bourgeois` | 2 | 2.2% |
 | `agitation` | 1 | 1.1% |
 
-## Periodic trials (pass at lag 2), labeled by terminal readout
+## Periodic trials (smallest passing lag: 2), labeled by terminal readout
 
 | terminal token | trials | share of periodic |
 |:--|--:|--:|
@@ -42,7 +42,7 @@ the cycle; no per-trial phase audit exists yet for these noise trials.
 
 ## All trials at their smallest passing lag (the F15 classification rule)
 
-Basis: 125/125 trials pass at lag 1 or lag 2.
+Basis: 125/125 trials pass at lag 1 or at a higher lag (observed: 2).
 
 | terminal token | trials | share of passing |
 |:--|--:|--:|

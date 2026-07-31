@@ -119,7 +119,7 @@ def run(n_trials, max_iter):
         "calibration_mode": "pair-matched (trial k <- prompt k's seq_len and Frobenius norm)",
         "frobenius_mean": sum(norms) / len(norms),
         "frobenius_min": min(norms), "frobenius_max": max(norms),
-        "torch": torch.__version__,
+        "torch": str(torch.__version__),
     }
     with open(OUT_DIR / "calibration.json", "w", encoding="utf-8") as f:
         json.dump({"config": config, "per_prompt": calibration}, f, indent=2)
@@ -216,10 +216,12 @@ def write_report(config, results):
     ]
     for tok, c in basins:
         lines.append(f"| `{tok}` | {c} | {c / max(len(conv), 1):.1%} |")
+    lags_seen = ", ".join(str(lag) for lag in sorted(set(periodic.values())))
     if periodic_basins:
         lines += [
             "",
-            "## Periodic trials (pass at lag 2), labeled by terminal readout",
+            f"## Periodic trials (smallest passing lag: {lags_seen}), "
+            "labeled by terminal readout",
             "",
             "| terminal token | trials | share of periodic |",
             "|:--|--:|--:|",
@@ -238,7 +240,8 @@ def write_report(config, results):
         "",
         "## All trials at their smallest passing lag (the F15 classification rule)",
         "",
-        f"Basis: {n_passing}/{n} trials pass at lag 1 or lag 2"
+        f"Basis: {n_passing}/{n} trials pass at lag 1"
+        + (f" or at a higher lag (observed: {lags_seen})" if periodic else "")
         + (f"; {unclassified} pass at no scanned lag and are excluded" if unclassified else "") + ".",
         "",
         "| terminal token | trials | share of passing |",
@@ -278,8 +281,13 @@ if __name__ == "__main__":
                     help="regenerate report.md from the saved results.pt, no model run")
     args = ap.parse_args()
     if args.report_only:
-        saved = torch.load(OUT_DIR / "results.pt", map_location="cpu",
-                           weights_only=False)
+        # TorchVersion is allowlisted because the committed results.pt
+        # predates the str() cast in the config; it is a str subclass
+        # shipped by torch itself, not arbitrary pickle.
+        with torch.serialization.safe_globals(
+                [torch.torch_version.TorchVersion]):
+            saved = torch.load(OUT_DIR / "results.pt", map_location="cpu",
+                               weights_only=True)
         write_report(saved["config"], saved["results"])
     else:
         n = 2 if args.smoke else (args.trials or len(prompt_library.PROMPT_LIBRARY))

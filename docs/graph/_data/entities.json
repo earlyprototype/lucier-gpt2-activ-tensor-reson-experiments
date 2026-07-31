@@ -115,7 +115,7 @@
       "label": "Discovery 13: The five basins are regime-specific, not weight-universal",
       "type": "finding",
       "status": "corrected",
-      "description": "The five basins are regime-specific, not weight-universal. Recorded from Null model (2026-07); evidence: Noise → 18 non-semantic basins, ~0 overlap; real count 5 below random CI [11,17]. Inverted 2026-07-31: the noise arm was mis-calibrated and counted pre-convergence (caveat 18); the matched-ν, gated re-run (run 17) sends noise into the language arm's own basins (all five at the trials' smallest passing lag), prolet dominant among settled trials in both arms, so at this injection scale the basins are weight-native (FINDINGS F4).",
+      "description": "The five basins are regime-specific, not weight-universal. Recorded from Null model (2026-07); evidence: Noise → 18 non-semantic basins, ~0 overlap; real count 5 below random CI [11,17]. Inverted 2026-07-31: the noise arm was mis-calibrated and counted pre-convergence (caveat 18); the matched-ν, gated re-run (run 17) sends noise into the language arm's own basins (all five at the trials' smallest passing lag; a single-phase readout overlap, periodic trials labeled from one phase's decode), prolet dominant among settled trials in both arms, so at this injection scale the basins are weight-native (FINDINGS F4).",
       "phase": "phase-5",
       "asserted": "2026-07-10",
       "retired": null,
