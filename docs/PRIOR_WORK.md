@@ -143,7 +143,7 @@ collapse is not to one global point. The paper also contains the record's neares
 a single transformer layer recurrently at inference on a 2D toy task, feeding its output back as its next input; without skips or MLP the
 trajectories collapse to a point, and adding either stops or drastically slows the collapse (Fig. 3, pp. 9-10). Geshkovski, Letrouit,
 Polyanskiy, Rigollet (*The Emergence of Clusters in Self-Attention Dynamics*, NeurIPS 2023, arXiv 2305.05465\* [peer-reviewed]; companion
-*A Mathematical Perspective on Transformers*, arXiv 2312.10794\* [preprint]) model tokens as interacting particles that cluster as depth grows, the final configuration set by
+*A Mathematical Perspective on Transformers*, Bull. AMS 62(3):427-479, 2025, arXiv 2312.10794\* [peer-reviewed]) model tokens as interacting particles that cluster as depth grows, the final configuration set by
 the input\*. Scope caveat: the results are for idealised pure self-attention, the same restriction as Dong et al. The oversmoothing line anticipates finding 2 and supports finding 1; none of it describes an unplanned oscillation coexisting
 with position-uniform states.
 

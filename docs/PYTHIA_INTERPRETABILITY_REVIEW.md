@@ -436,7 +436,7 @@ LayerNorm scale. ATR's per-iteration L2 rescale sets that norm by fiat every ite
 ruling has since been withdrawn (the residual path bypasses layer 0's LayerNorm, so the map is not
 scale-invariant: FINDINGS caveat 7 as amended 2026-07-28), which makes this channel *more* live,
 not less; and the entropy-neuron channel additionally operates at the *other* end of the
-stack, after `ln_final`, where no invariance argument ever applied. Whether the rescale interacts
+stack, through `ln_final`, where no invariance argument ever applied. Whether the rescale interacts
 with confidence readout at the terminal LayerNorm is a distinct question from the one §1.1
 answers, and it is cheap to check: log pre-rescale residual norm per iteration alongside margin and
 entropy.

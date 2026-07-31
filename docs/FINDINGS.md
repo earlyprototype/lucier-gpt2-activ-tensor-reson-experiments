@@ -28,7 +28,8 @@ sampled only even iterations (aliasing), its argmax fixed across both phases.
 And the coherence lives one level deeper than previously measured: the settled
 basins decode as coherent clusters of related tokens, not single tokens (top-10 readout tokens with mean pairwise
 embedding cosine 0.41-0.47 against a 0.27 random baseline, p = 0.001 under
-uniform and frequency-matched permutation nulls), while the winning token
+uniform and frequency-matched permutation nulls; that null's evidential value
+is now under challenge, caveat 18b), while the winning token
 itself carries only 6-9% of the probability mass. A mechanism series (F13-F17)
 then traced the cycle to its cause: a single overshooting eigenvalue (-4.3 at the
 pivot) executed almost entirely by one attention head, L11.H8, along a flip axis
@@ -159,8 +160,13 @@ phenomenon is, on current evidence, specific to GPT-2 Small within this set.
 
 ### F4: The five basins belong to the language-driven regime, not the weights in general (null model)
 
-125 random Gaussian tensors (norm- and length-calibrated to the real runs) iterated
+*Status: provisional pending the matched-ν, gated re-run (caveat 18); the heading
+states the original reading, not a settled result.*
+
+125 random Gaussian tensors (intended as norm- and length-calibrated to the real
+runs; the calibration error is documented below) iterated
 through GPT-2 Small converge (position collapse → 1.0000) but into **18 basins**,
+counted at iteration 100 before convergence,
 dominated by the em-dash token `―` (64%), with ~zero identity overlap with the real
 five (1/125 trials reached `prolet`). Bootstrap on the random basin count: 14.1,
 95% CI [11, 17]; the real count (5) falls **below** the CI. Real language funnels
@@ -191,8 +197,10 @@ Three attribution results ([SCALING_ARTEFACT_ANALYSIS.md](SCALING_ARTEFACT_ANALY
    that inference: LayerNorm is scale-invariant but the residual path bypasses it,
    so the map is demonstrably not scale-invariant (cos(F(2x), F(x)) = 0.936 over 12
    blocks). What §1.1 *does* still establish stands: the scalar preserves the mix
-   exactly, so the rescale remains ruled out as the source of the Pythia-410m
-   fragmentation, which was the question this result was answering.
+   exactly, so the rescale is ruled out as a direction-scrambling artefact at the
+   injection step, which was the mechanism this result was interrogating. Whether
+   the ν convention itself shapes the landscape (a scale-sensitivity question,
+   not a mix question) is open pending the ν-sweep (ALIGNMENT_REVIEW.md §5).
 2. **Convergence verdicts are tensor-level:** `cos_sim_mean` never passes through
    token decoding, so Medium/160m saturation and 410m non-convergence are properties
    of the dynamics, not the readout.
@@ -289,6 +297,10 @@ distribution (k = 10 unless stated); a probability-weighted variant weights each
 token pair by its probability mass. High coherence means the head of the
 distribution is one cluster in embedding space rather than a grab-bag.
 
+*Status: under challenge (caveat 18b); the permutation result below is reported as
+measured, and its evidential weight awaits the #98 adjudication. Note also the
+effective sample: the "four" states are two distinct vectors (duplicate pairs).*
+
 Under the `prolet` argmax the whole head of the distribution is one lexical field
 (Semantic prompt shown; the other three near-identical): `prolet` .086,
 `bourgeois` .066, `Anarch` .060, `comrade` .044, `Marx` .041, `proletarian` .036,
@@ -320,7 +332,9 @@ top-10, embedding norm being the standard offline proxy for token frequency).
   `Hindu`, `Bombay`, `Hindus`, `Shiv`, at full prolet strength), and trial 12
   (the horizontal-bar token `―`, U+2015, called the em-dash token in F4; 0.313,
   p = 0.005). Noise can stumble into a real semantic well; it rarely does, while
-  the settling language states always did (4/4).
+  the settling language states always did (4/4 as archived; effectively 2
+  distinct vectors, caveat 18b). The noise trials additionally inherit the
+  caveat-18 mis-calibration.
 
 Coherence therefore separates the families as a strong statistical regularity,
 not a perfect classifier. One structural surprise: `Anarch`, a separate basin in
@@ -723,8 +737,10 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
    *c* ≈ 1, which is precisely when the rescale is not doing anything; §1.1
    itself notes norms would otherwise reach ~1.5 × 10⁶ by iteration 500, so *c*
    is far from 1 in practice. What §1.1 *does* establish stands: the scalar
-   preserves the mix exactly, and so is ruled out as the source of the
-   Pythia-410m fragmentation, which was the question it was answering.
+   preserves the mix exactly, and so is ruled out as a direction-scrambling
+   artefact at the injection step, which was the mechanism in question. Whether
+   the ν convention itself shapes the landscape is a separate, open
+   scale-sensitivity question (ν-sweep, ALIGNMENT_REVIEW.md §5).
 
    This is load-bearing for H-pos0. If the rescale were inert, position 0's
    trajectory would be **exactly** autonomous and the fixed-point constraint

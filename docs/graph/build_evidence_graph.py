@@ -2301,12 +2301,12 @@ def question_relationships():
             "question is \"blocked on the prompt-library restoration, issue #9\", "
             "repeated in caveats 11 and 14. Blocker cleared 2026-07-31: the library is "
             "restored (issue #24) and the 34-prompt run is queued in ALIGNMENT_REVIEW.md "
-            "section 5.", 8, D_ACT_II_5),
+            "section 5.", 8, "2026-07-31"),
         rel("q-lag2-regate-33", "q-prompt-library", "relates-to",
             "Formerly blocked-by: F15's own words were \"The other 33 period-2 prompts "
             "remain blocked on the prompt library (issue #9)\". Blocker cleared "
             "2026-07-31: the library is restored (issue #24) and the re-gate is queued "
-            "in ALIGNMENT_REVIEW.md section 5.", 8, D_ACT_II_5),
+            "in ALIGNMENT_REVIEW.md section 5.", 8, "2026-07-31"),
         rel("art-prompt-library", "q-prompt-library", "retires",
             "The restored library answers the question: all 125 prompts recovered "
             "verbatim from committed records, every entry flagged original (issue #24). "

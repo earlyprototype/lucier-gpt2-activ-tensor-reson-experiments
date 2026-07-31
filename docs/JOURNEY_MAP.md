@@ -1,7 +1,7 @@
 # Project ATR: Complete Journey Map
 
 **Purpose:** Continuity document. Pick up the intellectual thread from any point.
-**Last updated:** 2026-07-23 (post-close corrections; series closed 2026-07-10)
+**Last updated:** 2026-07-31 (alignment-review record repair; series closed 2026-07-10)
 
 ---
 
@@ -174,7 +174,7 @@ The bottleneck is always phase 2. Automation of interpretation is the scaling ch
 | Question | Status | Next Step |
 |---|---|---|
 | Why does GPT-2 Small, alone in this set, resolve language into few semantic basins? | **The open question of the series** | New experimental stage |
-| ~~What is the `Divine` object: limit cycle, wandering attractor, decode-region plateau?~~ | Answered (2026-07-19): an exact period-2 limit cycle (FINDINGS.md F9), converged under a lag-2 gate for the audited trajectory (F15) | Re-gate the other 33 prompts (blocked on issue #9) |
+| ~~What is the `Divine` object: limit cycle, wandering attractor, decode-region plateau?~~ | Answered (2026-07-19): an exact period-2 limit cycle (FINDINGS.md F9), converged under a lag-2 gate for the audited trajectory (F15) | Re-gate the other 33 prompts (unblocked: library restored, issue #24; run queued) |
 | Does the landscape depend on where the loop is cut (layer window / depth)? | Designed, not run | Pythia-410m depth control (0–11 vs 0–23); window sweeps |
 | ~~W_E semantic-clustering statistics~~ | Answered (2026-07-11): all-warm matrix is an anisotropy artifact: 99.9% of random 14-token sets are also all-positive; compact-subspace reading withdrawn. Neighbourhood claim remains qualitative | - |
 | True lock-in iterations (gate fired at its floor, 120) | Pending | Finer gate cadence |
@@ -187,4 +187,4 @@ The bottleneck is always phase 2. Automation of interpretation is the scaling ch
 
 ---
 
-*This document is a living map. Series closed 2026-07-10; corrections applied 2026-07-23.*
+*This document is a living map. Series closed 2026-07-10; corrections applied 2026-07-23 and 2026-07-31.*

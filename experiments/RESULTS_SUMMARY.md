@@ -356,7 +356,10 @@ Four independent lines of evidence converge:
 
 **Bottom line for the original question.** GPT-2 Medium's single `D` basin is a *real* tensor
 attractor. Pythia-410m's fragmentation is *genuine structural non-convergence* rooted in the
-model (depth/width/corpus geometry), **not** an avoidable distortion of the ATR apparatus. The
+model (depth/width/corpus geometry) on the channels tested; whether the ν convention itself
+shapes these landscapes is an open scale-sensitivity question (caveat 7 as amended; the
+ν-sweep in ALIGNMENT_REVIEW.md §5), so "not an apparatus artefact" is claimed only for the
+channels the diagnostics exonerated. The
 readout projection remains a real but secondary source of token-level jitter. *(The clause
 "the normalisation step is confirmed irrelevant (LayerNorm scale-invariance, used here in
 Notebook 3's calibration)" is withdrawn, 2026-07-31: caveat 7 as amended shows the map is not

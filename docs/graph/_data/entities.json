@@ -4406,7 +4406,7 @@
       "type": "relates-to",
       "description": "Formerly blocked-by: F10's own words were that the flip-axis generality question is \"blocked on the prompt-library restoration, issue #9\", repeated in caveats 11 and 14. Blocker cleared 2026-07-31: the library is restored (issue #24) and the 34-prompt run is queued in ALIGNMENT_REVIEW.md section 5.",
       "weight": 8,
-      "asserted": "2026-07-19"
+      "asserted": "2026-07-31"
     },
     {
       "from": "q-fractal-dimension",
@@ -4478,7 +4478,7 @@
       "type": "relates-to",
       "description": "Formerly blocked-by: F15's own words were \"The other 33 period-2 prompts remain blocked on the prompt library (issue #9)\". Blocker cleared 2026-07-31: the library is restored (issue #24) and the re-gate is queued in ALIGNMENT_REVIEW.md section 5.",
       "weight": 8,
-      "asserted": "2026-07-19"
+      "asserted": "2026-07-31"
     },
     {
       "from": "q-shape-class-null",
