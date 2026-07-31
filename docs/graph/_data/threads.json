@@ -57,11 +57,11 @@
     "shared_blockers": 2,
     "open_threads": 19,
     "low_hanging_fruit": 19,
-    "frontier": 16,
+    "frontier": 15,
     "thin_concepts": 3,
     "silent_claims": 32,
     "unreferenced_artefacts": 45,
-    "orphan_scripts": 9
+    "orphan_scripts": 8
   },
   "open_status_audit": {
     "concept": 22,
@@ -227,12 +227,12 @@
               {
                 "file": "README.md",
                 "line": 25,
-                "text": "- A null control appeared to relocate the basins: pure noise produced **18 non-semantic attractors, observed at iteration 100**, with no overlap with the real five, suggesting the basins belong to the *language-driven regime* of the model rather than the weigh"
+                "text": "- A null control at first appeared to relocate the basins: pure noise produced **18 non-semantic attractors, observed at iteration 100**, with no overlap with the real five, suggesting the basins belong to the *language-driven regime* rather than the weights. "
               },
               {
                 "file": "README.md",
                 "line": 130,
-                "text": "And a control that should unsettle any remaining certainty: iterate **pure noise** — no prompt at all — through GPT-2 Small. The initial count recorded *eighteen* scattered punctuation basins at iteration 100, none of them the five; positions collapsed, but co"
+                "text": "And a control that should unsettle any remaining certainty: iterate **pure noise** — no prompt at all — through GPT-2 Small. The initial count recorded *eighteen* scattered punctuation basins at iteration 100, none of them the five, and on that count real lang"
               },
               {
                 "file": "experiments/RESULTS_SUMMARY.md",
@@ -325,12 +325,12 @@
               },
               {
                 "file": "docs/FINDINGS.md",
-                "line": 514,
+                "line": 546,
                 "text": "build (issue #8) should be phase-aware: probe both phases and the pivot M."
               },
               {
                 "file": "docs/FINDINGS.md",
-                "line": 694,
+                "line": 726,
                 "text": "| H-J1 | `prolet` sits inside the verbalizable (J-lens) subspace, `Divine` outside | **Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)**: the point estimate runs slightly the other way at pilot confidence (`Divine` at least as lens-ex"
               }
             ]
@@ -1939,7 +1939,7 @@
     {
       "claim": "f4-null-model-regime",
       "label": "F4: The five basins belong to the language-driven regime, not the weights in general (null model)",
-      "status": "supported",
+      "status": "corrected",
       "asserted": "2026-07-10",
       "source_doc": "docs/FINDINGS.md",
       "doc_ref": "docs/FINDINGS.md#f4-the-five-basins-belong-to-the-language-driven-regime-not-the-weights-in-general-null-model",
@@ -1949,8 +1949,7 @@
         "evidenced-by",
         "produced-by",
         "qualifies",
-        "refutes",
-        "supports"
+        "refutes"
       ],
       "incoming_edges": [
         "supports"
@@ -1997,21 +1996,6 @@
     {
       "claim": "disc-14-labels-survive-gating",
       "label": "Discovery 14: Basin labels survive convergence gating, with two corrections",
-      "status": "supported",
-      "asserted": "2026-07-10",
-      "source_doc": "docs/JOURNEY_MAP.md",
-      "doc_ref": "docs/JOURNEY_MAP.md#2-key-discoveries-chronological",
-      "outgoing_edges": [
-        "documented-in",
-        "produced-by"
-      ],
-      "incoming_edges": [
-        "supports"
-      ]
-    },
-    {
-      "claim": "disc-13-basins-regime-specific",
-      "label": "Discovery 13: The five basins are regime-specific, not weight-universal",
       "status": "supported",
       "asserted": "2026-07-10",
       "source_doc": "docs/JOURNEY_MAP.md",
@@ -2570,30 +2554,6 @@
   },
   "unreferenced": {
     "artefacts": [
-      {
-        "path": "experiments/noise_rerun/output/calibration.json",
-        "size": 14296,
-        "kind": "data",
-        "classification": "orphan-directory",
-        "directory": "experiments/noise_rerun/output",
-        "produced_by_script": [
-          "experiments/noise_rerun/01_matched_nu_noise_baseline.py"
-        ],
-        "producer_resolution": "path-tied",
-        "producer_run_nodes": []
-      },
-      {
-        "path": "experiments/noise_rerun/output/results.pt",
-        "size": 2099607,
-        "kind": "data",
-        "classification": "orphan-directory",
-        "directory": "experiments/noise_rerun/output",
-        "produced_by_script": [
-          "experiments/noise_rerun/01_matched_nu_noise_baseline.py"
-        ],
-        "producer_resolution": "path-tied",
-        "producer_run_nodes": []
-      },
       {
         "path": "experiments/sink_geometry/output/masking_control.json",
         "size": 7826,
@@ -3190,6 +3150,44 @@
         ]
       },
       {
+        "path": "experiments/noise_rerun/output/calibration.json",
+        "size": 14296,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/noise_rerun/output",
+        "produced_by_script": [
+          "experiments/noise_rerun/01_matched_nu_noise_baseline.py"
+        ],
+        "producer_resolution": "path-tied",
+        "producer_run_nodes": [
+          {
+            "run": "run-17-matched-nu-noise",
+            "graph_says": "125 Gaussian tensors (seed 42), pair-matched ν and length, gated",
+            "date": "2026-07-31",
+            "label": "Run 17: Matched-ν noise baseline re-run"
+          }
+        ]
+      },
+      {
+        "path": "experiments/noise_rerun/output/results.pt",
+        "size": 2977355,
+        "kind": "data",
+        "classification": "sidecar-of-a-known-output-dir",
+        "directory": "experiments/noise_rerun/output",
+        "produced_by_script": [
+          "experiments/noise_rerun/01_matched_nu_noise_baseline.py"
+        ],
+        "producer_resolution": "path-tied",
+        "producer_run_nodes": [
+          {
+            "run": "run-17-matched-nu-noise",
+            "graph_says": "125 Gaussian tensors (seed 42), pair-matched ν and length, gated",
+            "date": "2026-07-31",
+            "label": "Run 17: Matched-ν noise baseline re-run"
+          }
+        ]
+      },
+      {
         "path": "experiments/gpt2_medium/output/config.md",
         "size": 131,
         "kind": "report",
@@ -3421,14 +3419,6 @@
         "executed": false
       },
       {
-        "path": "experiments/noise_rerun/01_matched_nu_noise_baseline.py",
-        "kind": "script",
-        "cells_total": null,
-        "code_cells": null,
-        "cells_with_outputs": null,
-        "executed": null
-      },
-      {
         "path": "experiments/sink_geometry/01_sink_profile.py",
         "kind": "script",
         "cells_total": null,
@@ -3539,6 +3529,16 @@
       "run": "run-16-eigen-rescore",
       "label": "Run 16: Per-head spectral test, eigenvector rescore",
       "script": "experiments/gpt2_small/12_eigen_rescore.py",
+      "exists": true,
+      "cells_total": null,
+      "code_cells": null,
+      "cells_with_outputs": null,
+      "note": "plain script: execution leaves no trace in the file"
+    },
+    {
+      "run": "run-17-matched-nu-noise",
+      "label": "Run 17: Matched-ν noise baseline re-run",
+      "script": "experiments/noise_rerun/01_matched_nu_noise_baseline.py",
       "exists": true,
       "cells_total": null,
       "code_cells": null,

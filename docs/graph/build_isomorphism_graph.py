@@ -189,8 +189,11 @@ RUNS = [
         "label": "Run 3: random-noise null model",
         "type": "null-model",
         "description": "125 Gaussian tensors (seed 42) iterated through GPT-2 Small in place "
-                       "of prompts. Converges into 18 non-semantic attractors with essentially "
-                       "no overlap with the five language-driven basins.",
+                       "of prompts; first reported as 18 non-semantic attractors with no "
+                       "overlap with the five. Superseded 2026-07-31: this arm ran "
+                       "mis-calibrated and was counted before convergence (FINDINGS caveat "
+                       "18); the matched-nu re-run (run 17) finds noise converging into four "
+                       "of the language arm's five basins.",
         "script": "experiments/gpt2_small/03_random_baseline.ipynb",
         "output_dir": "experiments/gpt2_small/output_random_baseline/",
         "n": "125 Gaussian tensors, seed 42",
@@ -427,13 +430,15 @@ CLAIMS_RAW = [
     ),
     (
         "concept-regime-dependence", "The attractors belong to a regime, not to the weights",
-        "finding", "supported", "transformer", "breakdown", "phase-5",
+        "finding", "corrected", "transformer", "breakdown", "phase-5",
         f"{FIND}#f4-the-five-basins-belong-to-the-language-driven-regime-not-the-weights-in-general-null-model",
         "2026-07-10", None,
-        "Drive the same weights with pure noise instead of language and the loop still "
-        "converges, but into eighteen non-semantic attractors with essentially no overlap "
-        "with the five. The basins are properties of the model as driven by language-shaped "
-        "input, not of the model.",
+        "As first recorded: pure noise seemed to converge into eighteen non-semantic "
+        "attractors with no overlap with the five, so the basins looked like properties of "
+        "the model as driven by language. Inverted 2026-07-31 (run 17): that noise arm was "
+        "mis-calibrated and counted before convergence; at matched injection energy and "
+        "gated convergence, noise falls into four of the language arm's five basins. At the "
+        "tested scale the basins belong to the weights; other scales await the nu-sweep.",
     ),
     (
         "concept-readout-bypass", "The loop is closed before the readout, not after it",
@@ -592,15 +597,20 @@ RELS_RAW = [
      "alternates 1249.43, 0.000, 1249.43, 0.001, and the cycle-anatomy run then verified "
      "cos(A, f(f(A))) = 1.000000.", 6),
 
-    # ---- the regime correction: a room's modes do not depend on the source
+    # ---- the regime correction, itself corrected: at matched injection
+    # energy the room analogy PASSES this test (run 17, 2026-07-31).
     ("ac-resonant-frequency", "concept-regime-dependence", "breaks-down-at",
      "Excite a room with anything broadband and the same modes rise: they are a property of "
-     "the space. GPT-2 Small's five basins fail that test — noise through the same weights "
-     "gives eighteen different, non-semantic attractors — so they belong to the "
-     "language-driven regime, not to the room.", 9),
+     "the space. The five basins first seemed to fail that test (noise appeared to raise "
+     "eighteen different, non-semantic attractors), but the corrected matched-energy control "
+     "(run 17, 2026-07-31) reverses it: noise raises four of the language arm's five basins, "
+     "so at the tested injection energy the analogy passes and the basins do belong to the "
+     "room. The edge is kept as the record of the correction; whether the analogy holds at "
+     "other energies is the nu-sweep's question.", 9),
     ("concept-regime-dependence", "run-03-random-baseline", "evidenced-by",
-     "125 Gaussian tensors iterated in place of prompts: convergence still happens, into 18 "
-     "non-semantic basins with essentially zero overlap with the real five.", 6),
+     "The original evidence, now superseded: 125 mis-calibrated Gaussian tensors, counted "
+     "pre-convergence, appeared to give 18 non-semantic basins. Run 17's matched-nu, gated "
+     "re-run inverts the reading (FINDINGS F4).", 6),
 
     # ---- the apparatus difference
     ("ac-tape-recorder", "concept-readout-bypass", "breaks-down-at",

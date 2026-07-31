@@ -66,3 +66,8 @@ experiments/_DATA/EXP_009/*
 # 2026-07-31: noise re-run live log. Transient and timing-stamped; the committed
 # deliverables for this experiment are results.pt and report.md (caveat 18 repair).
 experiments/noise_rerun/output/run.log
+
+# 2026-07-31: run 17's archive. Same rule as EXP_009 above: the matched-nu noise
+# baseline's per-trial results (terminal tensors + per-iteration float64 metrics)
+# are the caveat 18 repair's evidence and must survive the container.
+!experiments/noise_rerun/output/results.pt

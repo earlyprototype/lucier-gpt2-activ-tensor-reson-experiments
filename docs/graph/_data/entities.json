@@ -114,8 +114,8 @@
       "id": "disc-13-basins-regime-specific",
       "label": "Discovery 13: The five basins are regime-specific, not weight-universal",
       "type": "finding",
-      "status": "supported",
-      "description": "The five basins are regime-specific, not weight-universal. Recorded from Null model (2026-07); evidence: Noise → 18 non-semantic basins, ~0 overlap; real count 5 below random CI [11,17].",
+      "status": "corrected",
+      "description": "The five basins are regime-specific, not weight-universal. Recorded from Null model (2026-07); evidence: Noise → 18 non-semantic basins, ~0 overlap; real count 5 below random CI [11,17]. Inverted 2026-07-31: the noise arm was mis-calibrated and counted pre-convergence (caveat 18); the matched-ν, gated re-run (run 17) sends noise into four of the language arm's five basins, prolet dominant in both arms, so at this injection scale the basins are weight-native (FINDINGS F4).",
       "phase": "phase-5",
       "asserted": "2026-07-10",
       "retired": null,
@@ -440,14 +440,15 @@
       "id": "f4-null-model-regime",
       "label": "F4: The five basins belong to the language-driven regime, not the weights in general (null model)",
       "type": "finding",
-      "status": "supported",
-      "description": "125 calibrated Gaussian tensors iterated through GPT-2 Small converge into 18 non-semantic basins dominated by the horizontal-bar token (64%), with ~zero identity overlap with the real five. Bootstrap on the random basin count gives 14.1, 95% CI [11, 17]; the real count of 5 falls below the interval, so language funnels into fewer attractors than noise.",
+      "status": "corrected",
+      "description": "As registered: 125 calibrated Gaussian tensors iterated through GPT-2 Small converge into 18 non-semantic basins dominated by the horizontal-bar token (64%), locating the five basins in the language-driven regime. Inverted 2026-07-31 by the matched-nu, gated re-run (run 17): at pair-matched injection norms 90/125 noise trials lock in to 7 basins, four of them the language arm's own (prolet, solidarity, Anarch, till; 85.6% of converged trials), the em-dash basin never appears, and all 35 unconverged trials carry the Divine cycle's period-2 signature. At this injection scale the basins belong to the weights, not the input regime; the nu-sweep is the registered follow-up.",
       "phase": "phase-5",
       "asserted": "2026-07-10",
       "retired": null,
       "doc_ref": "docs/FINDINGS.md#f4-the-five-basins-belong-to-the-language-driven-regime-not-the-weights-in-general-null-model",
       "evidence": [
-        "run-3-random-noise-null"
+        "run-3-random-noise-null",
+        "run-17-matched-nu-noise"
       ]
     },
     {
@@ -1350,6 +1351,18 @@
       "doc_ref": "docs/FINDINGS.md#1-run-inventory"
     },
     {
+      "id": "run-17-matched-nu-noise",
+      "label": "Run 17: Matched-ν noise baseline re-run",
+      "type": "run",
+      "description": "Matched-ν noise baseline re-run ATR run over 125 Gaussian tensors (seed 42), pair-matched ν and length, gated, on gpt2-small.",
+      "script": "experiments/noise_rerun/01_matched_nu_noise_baseline.py",
+      "output_dir": "experiments/noise_rerun/output/",
+      "n": "125 Gaussian tensors (seed 42), pair-matched ν and length, gated",
+      "date": "2026-07-31",
+      "phase": "phase-5",
+      "doc_ref": "docs/FINDINGS.md#1-run-inventory"
+    },
+    {
       "id": "run-2-cross-model-sweeps",
       "label": "Run 2: Cross-model sweeps",
       "type": "run",
@@ -1558,7 +1571,7 @@
       "id": "null-model-gaussian-noise",
       "label": "Random-noise null model (Gaussian, seed 42)",
       "type": "null-model",
-      "description": "125 random Gaussian tensors, norm- and length-calibrated to the real runs and iterated through GPT-2 Small. They converge (position collapse to 1.0000) but into 18 basins dominated by the horizontal-bar token, with 1/125 trials reaching prolet.",
+      "description": "125 random Gaussian tensors iterated through GPT-2 Small, intended as norm- and length-calibrated to the real runs; caveat 18 later found the calibration wrong (a per-position statistic applied as the Frobenius target) and the 18-basin count read before convergence. Superseded 2026-07-31 by run 17, the pair-matched, gated re-run, which finds noise converging into four of the language arm's five basins (F4).",
       "n": "125 Gaussian tensors (seed 42); 15 calibrated trials in the confidence audit",
       "date": "2026-07-10",
       "phase": "phase-5",
@@ -2490,9 +2503,17 @@
       "from": "f4-null-model-regime",
       "to": "concept-eigenvoice",
       "type": "corrects",
-      "description": "The metaphor's reporting-register correction: there is no single native voice. What the loop settles into depends on what drove it, and noise drives it somewhere else entirely.",
+      "description": "The correction has itself been corrected. First: there is no single native voice, and what the loop settles into depends on what drove it. Run 17 inverted the second half: converged noise lands in four of the language arm's five basins (with the fifth's period-2 signature in the unconverged trials), so at this injection scale the weights do carry native voices, several rather than the metaphor's one.",
       "weight": 7,
-      "asserted": "2026-07-10"
+      "asserted": "2026-07-31"
+    },
+    {
+      "from": "f4-null-model-regime",
+      "to": "disc-13-basins-regime-specific",
+      "type": "corrects",
+      "description": "F4's null model was the evidence this discovery recorded (18 non-semantic basins, ~zero overlap), and F4's own repair overturned it: run 17's matched-nu, gated re-run sends noise into four of the language arm's five basins, so the regime-specific reading this discovery states is inverted at the tested scale.",
+      "weight": 7,
+      "asserted": "2026-07-31"
     },
     {
       "from": "f7-confidence-inversion",
@@ -3390,7 +3411,7 @@
       "from": "f4-null-model-regime",
       "to": "null-model-gaussian-noise",
       "type": "evidenced-by",
-      "description": "The 18 non-semantic basins and the bootstrap CI [11, 17] are properties of this null model.",
+      "description": "The 18 non-semantic basins and the bootstrap CI [11, 17] were properties of this null model's ORIGINAL, mis-calibrated arm; run 17's matched-nu re-run superseded them and inverted F4's reading.",
       "weight": 7,
       "asserted": "2026-07-10"
     },
@@ -3884,6 +3905,14 @@
     },
     {
       "from": "f4-null-model-regime",
+      "to": "run-17-matched-nu-noise",
+      "type": "produced-by",
+      "description": "F4 rests on Run 17: Matched-ν noise baseline re-run (125 Gaussian tensors (seed 42), pair-matched ν and length, gated).",
+      "weight": 4,
+      "asserted": "2026-07-31"
+    },
+    {
+      "from": "f4-null-model-regime",
       "to": "run-3-random-noise-null",
       "type": "produced-by",
       "description": "F4 rests on Run 3: Random-noise null model (125 Gaussian tensors (seed 42)).",
@@ -4190,25 +4219,25 @@
       "from": "f4-null-model-regime",
       "to": "concept-attractor-basin",
       "type": "qualifies",
-      "description": "Basins exist for noise inputs too, but different ones: the notion is regime-relative, not a fixed property of the weights.",
+      "description": "Basins exist for noise inputs too, and at matched injection scale they are largely the same ones (run 17): the notion is weight-native at this scale, with scale-dependence the open question (nu-sweep).",
       "weight": 6,
-      "asserted": "2026-07-10"
+      "asserted": "2026-07-31"
     },
     {
       "from": "f4-null-model-regime",
       "to": "f1-five-attractor-basins",
       "type": "qualifies",
-      "description": "The five basins are regime-specific: they belong to the language-driven region of activation space, not to universal fixed points of the weight geometry.",
+      "description": "Inverted 2026-07-31 (run 17): F1's basins are not regime-specific after all; noise at matched injection scale finds four of the five, so the landscape belongs to the weights at this scale, with scale-dependence the registered open question (nu-sweep).",
       "weight": 6,
-      "asserted": "2026-07-10"
+      "asserted": "2026-07-31"
     },
     {
       "from": "f4-null-model-regime",
       "to": "h3-corpus-topology",
       "type": "qualifies",
-      "description": "The null model relocates the basins to the language-driven regime, so any corpus topology H3 reads is a property of that regime, not of the weights.",
+      "description": "Inverted 2026-07-31 (run 17): the matched-nu control finds four of the five basins under noise, so any corpus topology H3 reads is a property of the weights at this injection scale, not of language-driven input.",
       "weight": 6,
-      "asserted": "2026-07-10"
+      "asserted": "2026-07-31"
     },
     {
       "from": "f7-confidence-inversion",
@@ -4278,9 +4307,9 @@
       "from": "f4-null-model-regime",
       "to": "h-fingerprint",
       "type": "refutes",
-      "description": "Pure noise through the same weights converges to 18 non-semantic basins disjoint from the five, so the five are not a property of the weights that a fingerprint reading would require.",
+      "description": "The refutation survives F4's inversion with its sign flipped. Originally: noise found 18 disjoint basins, so the five seemed input-specific. Run 17's matched-nu control: noise finds four of the five, so at this injection scale the basins are weight-native and read nothing about the input, let alone the training corpus. Either way, not a fingerprint.",
       "weight": 9,
-      "asserted": "2026-07-10"
+      "asserted": "2026-07-31"
     },
     {
       "from": "concept-activation-patching",
@@ -4687,6 +4716,14 @@
       "asserted": "2026-07-31"
     },
     {
+      "from": "run-17-matched-nu-noise",
+      "to": "model-gpt2-small",
+      "type": "run-on",
+      "description": "Run 17: Matched-ν noise baseline re-run iterated the ATR loop on GPT-2 Small (124M) (125 Gaussian tensors (seed 42), pair-matched ν and length, gated).",
+      "weight": 2,
+      "asserted": "2026-07-31"
+    },
+    {
       "from": "run-2-cross-model-sweeps",
       "to": "model-gpt2-medium",
       "type": "run-on",
@@ -4930,7 +4967,7 @@
       "from": "f11-jlens-pilot-null",
       "to": "f4-null-model-regime",
       "type": "supports",
-      "description": "A second, independent instrument sees the same regime boundary: a J-lens reads converged noise as less J-space-like than converged language states.",
+      "description": "A second instrument saw the same regime boundary: a J-lens read converged noise as less J-space-like than converged language states. Its support attached to the ORIGINAL reading, and its noise leg inherited the caveat-18 mis-calibration, so it awaits re-derivation against the run-17 states.",
       "weight": 6,
       "asserted": "2026-07-19"
     },
@@ -5027,14 +5064,6 @@
       "to": "disc-12-landscapes-model-specific",
       "type": "supports",
       "description": "F3's four-model table is the finding this discovery records.",
-      "weight": 7,
-      "asserted": "2026-07-10"
-    },
-    {
-      "from": "f4-null-model-regime",
-      "to": "disc-13-basins-regime-specific",
-      "type": "supports",
-      "description": "F4's null model is the evidence this discovery records: 18 non-semantic basins, ~zero overlap, real count below the random CI.",
       "weight": 7,
       "asserted": "2026-07-10"
     },

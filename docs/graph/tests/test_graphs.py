@@ -630,7 +630,15 @@ def _edges(graph, edge_type=None, source=None, target=None):
 
 
 def test_content_h_fingerprint_is_refuted_by_f3_and_f4(entities):
-    """FINDINGS.md section 3: 'H-fingerprint | ... | Refuted as stated (F3, F4).'"""
+    """FINDINGS.md section 3: 'H-fingerprint | ... | Refuted as stated (F3, F4).'
+
+    2026-07-31: F4 moved from "supported" to "corrected" when run 17 inverted
+    its registered reading (matched-nu noise finds the language arm's own
+    basins). The refutation of H-fingerprint survives the inversion with its
+    sign flipped: basins that appear with no input at all read nothing about
+    the training corpus. So F4 remains a legitimate refuter while carrying
+    "corrected"; F3's refutation is untouched and stays "supported".
+    """
     hypothesis = _claim(entities, "h-fingerprint")
     assert hypothesis["type"] == "hypothesis"
     assert hypothesis["status"] == "refuted"
@@ -639,8 +647,8 @@ def test_content_h_fingerprint_is_refuted_by_f3_and_f4(entities):
     assert refuters == {"f3-fingerprint-refuted", "f4-null-model-regime"}, (
         f"H-fingerprint should be refuted by exactly F3 and F4, got {sorted(refuters)}"
     )
-    for finding in refuters:
-        assert _claim(entities, finding)["status"] == "supported"
+    assert _claim(entities, "f3-fingerprint-refuted")["status"] == "supported"
+    assert _claim(entities, "f4-null-model-regime")["status"] == "corrected"
 
 
 def test_content_h_fingerprint_was_tested_before_it_was_refuted(entities):

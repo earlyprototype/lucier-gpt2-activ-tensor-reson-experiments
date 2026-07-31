@@ -9,7 +9,7 @@
 | Graph | ATR Evidence Graph: hypotheses, findings, runs and self-corrections |
 | Sources parsed | `docs/FINDINGS.md`, `docs/JOURNEY_MAP.md` |
 | Record last updated | 2026-07-31 |
-| Nodes read | 94 claims, 28 runs, 56 sources, 434 edges |
+| Nodes read | 94 claims, 29 runs, 56 sources, 436 edges |
 
 ---
 
@@ -129,8 +129,8 @@ Something the record names is not in the working tree, or the record defers to a
 
 *Committed prose mentioning issue #9:*
 - [`README.md`:23](../../README.md) &mdash; - GPT-2 Small resolves 125 language prompts into **five attractor basins**, classified at convergence: `prolet` 43.2%, `Divine` 27.2%, `till` 15.2%, `Anarch` 13.6%, `solidarity` 0.8% — four of the five semantically coherent in embedding space (the statistical 
-- [`README.md`:25](../../README.md) &mdash; - A null control appeared to relocate the basins: pure noise produced **18 non-semantic attractors, observed at iteration 100**, with no overlap with the real five, suggesting the basins belong to the *language-driven regime* of the model rather than the weigh
-- [`README.md`:130](../../README.md) &mdash; And a control that should unsettle any remaining certainty: iterate **pure noise** — no prompt at all — through GPT-2 Small. The initial count recorded *eighteen* scattered punctuation basins at iteration 100, none of them the five; positions collapsed, but co
+- [`README.md`:25](../../README.md) &mdash; - A null control at first appeared to relocate the basins: pure noise produced **18 non-semantic attractors, observed at iteration 100**, with no overlap with the real five, suggesting the basins belong to the *language-driven regime* rather than the weights. 
+- [`README.md`:130](../../README.md) &mdash; And a control that should unsettle any remaining certainty: iterate **pure noise** — no prompt at all — through GPT-2 Small. The initial count recorded *eighteen* scattered punctuation basins at iteration 100, none of them the five, and on that count real lang
 - [`experiments/RESULTS_SUMMARY.md`:50](../../experiments/RESULTS_SUMMARY.md) &mdash; confounds the basin-count comparison: FINDINGS caveat 18, issue #97.)*
 
 #### issue #8 &mdash; gates 2 claims; the working tree cannot settle it
@@ -146,8 +146,8 @@ Something the record names is not in the working tree, or the record defers to a
 *Committed prose mentioning issue #8:*
 - [`experiments/gpt2_small/output_jlens_phase/jlens_phase.md`:7](../../experiments/gpt2_small/output_jlens_phase/jlens_phase.md) &mdash; issue #8) probed the converged Divine (Syntactic) state before `06_bell_anatomy.py` showed
 - [`docs/BELL_PRIMER.md`:152](../../docs/BELL_PRIMER.md) &mdash; The pilot (issue #8) measured Divine before the cycle was known, so it measured one phase. Session 04 repeated the identical measurement on both phases and the midpoint. The replay of the pilot's own states reproduced its recorded numbers to 7 decimal places, 
-- [`docs/FINDINGS.md`:514](../../docs/FINDINGS.md) &mdash; build (issue #8) should be phase-aware: probe both phases and the pivot M.
-- [`docs/FINDINGS.md`:694](../../docs/FINDINGS.md) &mdash; \| H-J1 \| `prolet` sits inside the verbalizable (J-lens) subspace, `Divine` outside \| **Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)**: the point estimate runs slightly the other way at pilot confidence (`Divine` at least as lens-ex
+- [`docs/FINDINGS.md`:546](../../docs/FINDINGS.md) &mdash; build (issue #8) should be phase-aware: probe both phases and the pivot M.
+- [`docs/FINDINGS.md`:726](../../docs/FINDINGS.md) &mdash; \| H-J1 \| `prolet` sits inside the verbalizable (J-lens) subspace, `Divine` outside \| **Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)**: the point estimate runs slightly the other way at pilot confidence (`Divine` at least as lens-ex
 
 ### Prerequisites recorded in the graph
 
@@ -258,25 +258,24 @@ Findings with nothing yet pointing back at them: no incoming `corrects`, `supers
 | 2026-07-19 | `f15-lag2-gate` | supported | builds-on, documented-in, evidenced-by, produced-by, supersedes, supports |
 | 2026-07-19 | `f13-flip-axis-glitch-alignment` | supported | builds-on, cites, corrects, documented-in, evidenced-by, produced-by, supports |
 | 2026-07-19 | `f12-medium-typographic-cluster` | supported | documented-in, evidenced-by, produced-by, qualifies, supports |
-| 2026-07-10 | `f4-null-model-regime` | supported | corrects, documented-in, evidenced-by, produced-by, qualifies, refutes, supports |
+| 2026-07-10 | `f4-null-model-regime` | corrected | corrects, documented-in, evidenced-by, produced-by, qualifies, refutes |
 | 2026-07-10 | `f3-fingerprint-refuted` | supported | cites, documented-in, evidenced-by, produced-by, qualifies, refutes, retires, supersedes, supports |
 
 Clustered on: 2026-07-10 (2), 2026-07-19 (6).
 
-### From `docs/JOURNEY_MAP.md` &mdash; 8 findings
+### From `docs/JOURNEY_MAP.md` &mdash; 7 findings
 
 | Asserted | Claim | Status | Edges out |
 |:---|:---|:---|:---|
 | 2026-07-10 | `disc-16-differences-intrinsic` | supported | documented-in, produced-by |
 | 2026-07-10 | `disc-14-labels-survive-gating` | supported | documented-in, produced-by |
-| 2026-07-10 | `disc-13-basins-regime-specific` | supported | documented-in, produced-by |
 | 2026-07-10 | `disc-12-landscapes-model-specific` | supported | documented-in, produced-by, qualifies |
 | 2026-03-20 | `disc-8-structural-semantic-transition` | supported | builds-on, documented-in, produced-by |
 | 2026-03-20 | `disc-7-capit-is-capitulation` | supported | documented-in, produced-by, qualifies |
 | 2026-03-20 | `disc-10-thematic-centre-of-mass` | retired | builds-on, documented-in, produced-by |
 | 2026-03-01 | `disc-4-reproducible-terminals` | supported | documented-in, produced-by |
 
-Clustered on: 2026-03-01 (1), 2026-03-20 (3), 2026-07-10 (4).
+Clustered on: 2026-03-01 (1), 2026-03-20 (3), 2026-07-10 (3).
 
 ---
 
@@ -345,22 +344,20 @@ The vocabulary now carries a `question` type, so `open` no longer means only "a 
 
 Everything under `experiments/` that looks like a run output and appears nowhere in `entities.json`, by path or by basename. Split by whether it sits inside a directory the graph already knows as a run's `output_dir` &mdash; a sidecar of a recorded report is a much smaller matter than a file in a directory the record does not mention at all.
 
-### In directories the graph does not know (6)
+### In directories the graph does not know (4)
 
 | File | Bytes | Written by | The graph says of that run |
 |:---|---:|:---|:---|
-| `experiments/noise_rerun/output/calibration.json` | 14296 | `experiments/noise_rerun/01_matched_nu_noise_baseline.py` | no run node |
-| `experiments/noise_rerun/output/results.pt` | 2099607 | `experiments/noise_rerun/01_matched_nu_noise_baseline.py` | no run node |
 | `experiments/sink_geometry/output/masking_control.json` | 7826 | `experiments/sink_geometry/02_masking_control.py` | no run node |
 | `experiments/sink_geometry/output/sink_profile.json` | 3758 | `experiments/sink_geometry/01_sink_profile.py` | no run node |
 | `experiments/sink_geometry/output/trajectories.pt` | 4379241 | `experiments/sink_geometry/02_masking_control.py` | no run node |
 | `experiments/gpt2_small/output_head_loop_regen/REGENERATION_REPORT.md` | 7231 | `experiments/gpt2_small/spectral_resonance.ipynb` | `run-spectral-scaffold`: 144 heads, executed 2026-07-25 |
 
-### Sidecars of recorded output directories (39)
+### Sidecars of recorded output directories (41)
 
 Mostly the machine-readable twin of a report the graph does carry as an artefact node. Listed for completeness, not as a problem.
 
-<details><summary>Show all 39</summary>
+<details><summary>Show all 41</summary>
 
 - `experiments/_DATA/EXP_009/009bFIX_convergence_grid.pt` (3155 bytes)
 - `experiments/_DATA/EXP_009/009bFIX_head_loop_results.pt` (4734891 bytes)
@@ -390,6 +387,8 @@ Mostly the machine-readable twin of a report the graph does carry as an artefact
 - `experiments/gpt2_small/output_permutation/permutation_results.json` (709 bytes)
 - `experiments/gpt2_small/output_random_baseline/config.json` (384 bytes)
 - `experiments/gpt2_small/output_suppression/suppression_results.json` (509219 bytes)
+- `experiments/noise_rerun/output/calibration.json` (14296 bytes)
+- `experiments/noise_rerun/output/results.pt` (2977355 bytes)
 - `experiments/gpt2_medium/output/config.md` (131 bytes)
 - `experiments/gpt2_medium/output/dissolution_sentences.md` (55941 bytes)
 - `experiments/gpt2_small/output/config.md` (131 bytes)
@@ -404,7 +403,7 @@ Mostly the machine-readable twin of a report the graph does carry as an artefact
 
 </details>
 
-### Scripts in `experiments/` with no run node (9)
+### Scripts in `experiments/` with no run node (8)
 
 | Script | Executed | Code cells with outputs |
 |:---|:---|:---|
@@ -413,7 +412,6 @@ Mostly the machine-readable twin of a report the graph does carry as an artefact
 | `experiments/contraction/03_rescale_factor.py` | not knowable | &mdash; |
 | `experiments/gpt2_small/head_resonance.ipynb` | yes | 10 of 10 (14 cells total) |
 | `experiments/gpt2_small/layer_resonance.ipynb` | no | 0 of 10 (15 cells total) |
-| `experiments/noise_rerun/01_matched_nu_noise_baseline.py` | not knowable | &mdash; |
 | `experiments/sink_geometry/01_sink_profile.py` | not knowable | &mdash; |
 | `experiments/sink_geometry/02_masking_control.py` | not knowable | &mdash; |
 | `experiments/strip_hypotheses.py` | not knowable | &mdash; |
@@ -435,6 +433,7 @@ Every run whose script the graph names, and how much of that script carries exec
 | `run-14-jlens-phase-probe` | `experiments/gpt2_small/10_jlens_phase.py` | &mdash; | plain script: execution leaves no trace in the file |
 | `run-15-suppression-test` | `experiments/gpt2_small/11_suppression_test.py` | &mdash; | plain script: execution leaves no trace in the file |
 | `run-16-eigen-rescore` | `experiments/gpt2_small/12_eigen_rescore.py` | &mdash; | plain script: execution leaves no trace in the file |
+| `run-17-matched-nu-noise` | `experiments/noise_rerun/01_matched_nu_noise_baseline.py` | &mdash; | plain script: execution leaves no trace in the file |
 | `run-2-cross-model-sweeps` | `experiments/gpt2_medium/01_attractor_dominance.ipynb` | 12 of 12 (19 cells total) |  |
 | `run-3-random-noise-null` | `experiments/gpt2_small/03_random_baseline.ipynb` | 14 of 14 (15 cells total) |  |
 | `run-4-deep-convergence` | `experiments/pythia_410m/01b_deep_convergence.ipynb` | 14 of 14 (21 cells total) |  |

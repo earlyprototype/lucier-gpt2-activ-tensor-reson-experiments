@@ -12,9 +12,15 @@ founding hypothesis, that these basins constitute a thematic fingerprint of
 the training corpus, readable from any open-weight model, was refuted by the
 project's own validation series: GPT-2 Medium, trained on the same corpus,
 collapses all prompts to a single empty token; the Pythia models produce
-unrelated landscapes; and a random-noise control converges to eighteen
-non-semantic attractors disjoint from the five, locating the basins in the
-language-driven regime rather than the weight geometry per se. Diagnostics
+unrelated landscapes; and a random-noise control at first appeared to converge
+to eighteen non-semantic attractors disjoint from the five, locating the basins
+in the language-driven regime rather than the weight geometry per se. That last
+clause did not survive its own repair: the original noise arm ran at the wrong
+injection scale and was counted before convergence (caveat 18), and the
+matched-scale, convergence-gated re-run (2026-07-31, run 17) inverts it, with
+noise falling overwhelmingly into four of the language arm's own five basins
+(F4). At the injection scale this apparatus uses, the basins belong to the
+weights; what language input contributes is again an open question. Diagnostics
 attribute the cross-model differences to intrinsic model dynamics, not
 apparatus. What remains is a cheap, training-free probe of iterated-dynamics
 regimes, one sharp dissociation between dynamics and decoding, and one open
@@ -83,6 +89,7 @@ cloud container, a different machine class from all prior runs, with `gpt2` and
 | 14 | J-lens phase probe (both phases, pivot, flip axis) | gpt2-small | pilot lens × cycle states | `experiments/gpt2_small/output_jlens_phase/` |
 | 15 | Suppression-head test for L11.H8 | gpt2-small | 144 heads; loop ablation; 12 sentences | `experiments/gpt2_small/output_suppression/` |
 | 16 | Per-head spectral test, eigenvector rescore | gpt2-small | 144 heads; stored 009b trajectories + raw weights, no forward passes | `experiments/gpt2_small/output_eigen_rescore/` |
+| 17 | Matched-ν noise baseline re-run | gpt2-small | 125 Gaussian tensors (seed 42), pair-matched ν and length, gated | `experiments/noise_rerun/output/` |
 | - | Tensor convergence diagnostic | all four | reads runs 1–2 | `experiments/cos_sim_diagnostic.ipynb` |
 | - | Readout confidence audit | gpt2-small | single-prompt demo | `experiments/output/readout_guardrails_gpt2_small.json` |
 | - | All-warm permutation test | gpt2-small (W_E) | 10,000 random 14-token sets | `experiments/gpt2_small/output_permutation/` |
@@ -161,8 +168,10 @@ phenomenon is, on current evidence, specific to GPT-2 Small within this set.
 
 ### F4: The five basins belong to the language-driven regime, not the weights in general (null model)
 
-*Status: provisional pending the matched-ν, gated re-run (caveat 18); the heading
-states the original reading, not a settled result.*
+*Status: **inverted by the matched-ν, gated re-run (2026-07-31, run 17)**. The
+heading is retained as the registered claim; at matched injection scale and
+matched convergence state the comparison comes out the other way, and the
+outcome blockquote below is the finding's current disposition.*
 
 125 random Gaussian tensors (intended as norm- and length-calibrated to the real
 runs; the calibration error is documented below) iterated
@@ -183,6 +192,29 @@ fixed points of the weight geometry.
 > produce the 5-vs-18 gap. "Norm- and length-calibrated" above is therefore wrong
 > as stated. The direction of the finding may survive; the numbers do not, until
 > the matched-ν, gated re-run lands. Downstream inheritance in caveat 18.
+
+> **Re-run landed; the comparison inverts (2026-07-31; run 17,
+> `experiments/noise_rerun/01_matched_nu_noise_baseline.py`, report in
+> `experiments/noise_rerun/output/report.md`).** 125 noise trials, each
+> pair-matched to one real prompt's exact sequence length and iteration-0
+> Frobenius norm (injection mean ν 1427.5 against the old run's 397.18), run
+> under the engine's convergence gate. 90/125 lock in (median iteration 120)
+> into **7 basins, not 18**, and four of the language arm's five absorb most
+> of them: `prolet` 22, `solidarity` 21, `Anarch` 17, `till` 17 of the 90
+> converged trials (the report's basin table; 77 trials, an 85.6% combined
+> share), with `prolet` dominant exactly as in the language arm. The old run's
+> dominant basin, the horizontal-bar token `―`, never appears. The remaining
+> converged basins are `Spells` (10), `bourgeois` (2) and `agitation` (1). All
+> 35 trials that fail the lag-1 gate pass at lag 2, the `Divine` cycle's
+> period-2 signature (F9, F15), and five of them terminate on `Divine` itself
+> (`run.log`, trials R044, R067, R070, R091, R124). **Reading:** at this apparatus's injection scale the
+> basins are properties of the weights, not of language-driven input; the
+> registered 5-vs-18 gap was manufactured entirely by the two confounds above.
+> What language input does contribute at other injection scales is not
+> addressed by this control; the ν-sweep (ALIGNMENT_REVIEW §5) is the
+> registered follow-up. Downstream findings that consumed the OLD noise states
+> (caveat 18's inheritance list) are not repaired by this re-run and keep
+> their caveats.
 
 ### F5: The cross-model differences are intrinsic, not apparatus artefacts
 
@@ -895,6 +927,14 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
     nulls, ν-independent) and the F13–F17 mechanism series (consumes
     `state_divine.pt` only). Repair: the matched-ν, gated, archive-spec noise
     re-run, first in the experiment queue (`ALIGNMENT_REVIEW.md` §5).
+    **Repair executed (2026-07-31, run 17): the re-run landed and the F4
+    comparison inverts; the full outcome is F4's second blockquote.** The
+    re-run supersedes the OLD noise arm as a control, but the downstream
+    clauses listed above were computed against the old noise states and are
+    not repaired by it: each keeps its caveat until re-derived against the
+    run-17 states (the archive in `experiments/noise_rerun/output/results.pt`
+    carries per-iteration float64 metrics for all 125 trials, closing M2's
+    archive gap for this arm).
 18b. **F8's null is under challenge (2026-07-31; issue #98).** The coherence
     statistic measures anisotropic-cone position, not meaning: a random multiple
     of one arbitrary token embedding decodes at `prolet`'s coherence level with

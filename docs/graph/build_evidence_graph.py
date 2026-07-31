@@ -323,14 +323,22 @@ FINDING_META = {
             "run is an 8-prompt subset taken under a CPU constraint (caveat 3)."),
     ),
     "F4": dict(
-        status="supported", asserted=D_SERIES_CLOSE,
-        evidence=["run-3-random-noise-null"],
+        # "corrected" on the F2/H-flip precedent: the registered reading was
+        # overturned by the finding's own repair. The original arm's numbers
+        # (18 basins, em-dash 64%) were manufactured by a mis-calibrated
+        # injection norm and a pre-convergence count (caveat 18); run 17
+        # repeats the control pair-matched and gated, and inverts it.
+        status="corrected", asserted=D_SERIES_CLOSE,
+        evidence=["run-3-random-noise-null", "run-17-matched-nu-noise"],
         description=(
-            "125 calibrated Gaussian tensors iterated through GPT-2 Small converge into 18 "
-            "non-semantic basins dominated by the horizontal-bar token (64%), with ~zero identity "
-            "overlap with the real five. Bootstrap on the random basin count gives 14.1, 95% CI "
-            "[11, 17]; the real count of 5 falls below the interval, so language funnels into fewer "
-            "attractors than noise."),
+            "As registered: 125 calibrated Gaussian tensors iterated through GPT-2 Small converge "
+            "into 18 non-semantic basins dominated by the horizontal-bar token (64%), locating the "
+            "five basins in the language-driven regime. Inverted 2026-07-31 by the matched-nu, "
+            "gated re-run (run 17): at pair-matched injection norms 90/125 noise trials lock in to "
+            "7 basins, four of them the language arm's own (prolet, solidarity, Anarch, till; 85.6% "
+            "of converged trials), the em-dash basin never appears, and all 35 unconverged trials "
+            "carry the Divine cycle's period-2 signature. At this injection scale the basins belong "
+            "to the weights, not the input regime; the nu-sweep is the registered follow-up."),
     ),
     "F5": dict(
         status="corrected", asserted=D_SERIES_CLOSE,
@@ -705,8 +713,12 @@ DISC_OVERRIDE = {
     "10": dict(retired=D_PERMUTATION),
 }
 
-ANNOT_RE = re.compile(r"\*(Retired|Corrected|Resolved)(?:\s+(\d{4}-\d{2}-\d{2}))?\s*:", re.I)
-ANNOT_STATUS = {"retired": "retired", "corrected": "corrected", "resolved": "corrected"}
+# "Inverted" joined the vocabulary 2026-07-31, when run 17 reversed Key
+# Discovery 13's reading; it maps to "corrected" like "Resolved" does.
+ANNOT_RE = re.compile(
+    r"\*(Retired|Corrected|Resolved|Inverted)(?:\s+(\d{4}-\d{2}-\d{2}))?\s*:", re.I)
+ANNOT_STATUS = {"retired": "retired", "corrected": "corrected",
+                "resolved": "corrected", "inverted": "corrected"}
 
 
 def parse_discoveries(journey: str):
@@ -1225,6 +1237,7 @@ RUN_ID = {
     "14": "run-14-jlens-phase-probe",
     "15": "run-15-suppression-test",
     "16": "run-16-eigen-rescore",
+    "17": "run-17-matched-nu-noise",
     "Tensor convergence diagnostic": "run-cos-sim-diagnostic",
     "Readout confidence audit": "run-readout-guardrails",
     "All-warm permutation test": "run-all-warm-permutation",
@@ -1252,6 +1265,7 @@ RUN_SCRIPT = {
     "run-14-jlens-phase-probe": "experiments/gpt2_small/10_jlens_phase.py",
     "run-15-suppression-test": "experiments/gpt2_small/11_suppression_test.py",
     "run-16-eigen-rescore": "experiments/gpt2_small/12_eigen_rescore.py",
+    "run-17-matched-nu-noise": "experiments/noise_rerun/01_matched_nu_noise_baseline.py",
     "run-cos-sim-diagnostic": "experiments/cos_sim_diagnostic.ipynb",
     "run-readout-guardrails": "experiments/readout_guardrails.ipynb",
     "run-all-warm-permutation": "experiments/gpt2_small/02b_permutation_test.py",
@@ -1273,6 +1287,7 @@ RUN_OUTPUT_DIR = {
     "run-14-jlens-phase-probe": "experiments/gpt2_small/output_jlens_phase/",
     "run-15-suppression-test": "experiments/gpt2_small/output_suppression/",
     "run-16-eigen-rescore": "experiments/gpt2_small/output_eigen_rescore/",
+    "run-17-matched-nu-noise": "experiments/noise_rerun/output/",
     "run-readout-guardrails": "experiments/output/",
     "run-all-warm-permutation": "experiments/gpt2_small/output_permutation/",
 }
@@ -1298,6 +1313,7 @@ RUN_DATE = {
     "run-14-jlens-phase-probe": D_ACT_II_5,
     "run-15-suppression-test": D_ACT_II_5,
     "run-16-eigen-rescore": D_RESCORE,
+    "run-17-matched-nu-noise": D_RESCORE,
     "run-cos-sim-diagnostic": D_SERIES_CLOSE,
     "run-readout-guardrails": D_SERIES_CLOSE,
     "run-all-warm-permutation": D_PERMUTATION,
@@ -1461,10 +1477,12 @@ MODELS = [
         ("id", "null-model-gaussian-noise"),
         ("label", "Random-noise null model (Gaussian, seed 42)"),
         ("type", "null-model"),
-        ("description", ("125 random Gaussian tensors, norm- and length-calibrated to the real "
-                         "runs and iterated through GPT-2 Small. They converge (position collapse "
-                         "to 1.0000) but into 18 basins dominated by the horizontal-bar token, "
-                         "with 1/125 trials reaching prolet.")),
+        ("description", ("125 random Gaussian tensors iterated through GPT-2 Small, intended as "
+                         "norm- and length-calibrated to the real runs; caveat 18 later found the "
+                         "calibration wrong (a per-position statistic applied as the Frobenius "
+                         "target) and the 18-basin count read before convergence. Superseded "
+                         "2026-07-31 by run 17, the pair-matched, gated re-run, which finds noise "
+                         "converging into four of the language arm's five basins (F4).")),
         ("n", "125 Gaussian tensors (seed 42); 15 calibrated trials in the confidence audit"),
         ("date", D_SERIES_CLOSE), ("phase", "phase-5"),
         ("doc_ref", "docs/FINDINGS.md#f4-the-five-basins-belong-to-the-language-driven-regime-not-the-weights-in-general-null-model"),
@@ -1763,15 +1781,18 @@ def curated_relationships():
             "at all, so basin profiles cannot be read as a thematic fingerprint of the corpus "
             "from any model.", 10, D_SERIES_CLOSE),
         rel(F4, HFP, "refutes",
-            "Pure noise through the same weights converges to 18 non-semantic basins disjoint "
-            "from the five, so the five are not a property of the weights that a fingerprint "
-            "reading would require.", 9, D_SERIES_CLOSE),
+            "The refutation survives F4's inversion with its sign flipped. Originally: noise "
+            "found 18 disjoint basins, so the five seemed input-specific. Run 17's matched-nu "
+            "control: noise finds four of the five, so at this injection scale the basins are "
+            "weight-native and read nothing about the input, let alone the training corpus. "
+            "Either way, not a fingerprint.", 9, D_RESCORE),
         rel(F3, H3, "qualifies",
             "The corpus-causal half of H3 fails cross-model: same corpus, different landscape. "
             "Only the embedding-space clustering observation survives.", 8, D_SERIES_CLOSE),
         rel(F4, H3, "qualifies",
-            "The null model relocates the basins to the language-driven regime, so any corpus "
-            "topology H3 reads is a property of that regime, not of the weights.", 6, D_SERIES_CLOSE),
+            "Inverted 2026-07-31 (run 17): the matched-nu control finds four of the five "
+            "basins under noise, so any corpus topology H3 reads is a property of the weights "
+            "at this injection scale, not of language-driven input.", 6, D_RESCORE),
         rel(F8, H3, "supports",
             "The semantic-coherence half of H3 is upgraded: it now holds in the full readout "
             "distribution with permutation support (0.41-0.47 against 0.27, p = 0.001 under "
@@ -1866,9 +1887,10 @@ def curated_relationships():
             "labels are carried by a coherent distribution rather than a confident winner.",
             5, D_ACT_II_5),
         rel(F4, F1, "qualifies",
-            "The five basins are regime-specific: they belong to the language-driven region of "
-            "activation space, not to universal fixed points of the weight geometry.",
-            6, D_SERIES_CLOSE),
+            "Inverted 2026-07-31 (run 17): F1's basins are not regime-specific after all; noise "
+            "at matched injection scale finds four of the five, so the landscape belongs to the "
+            "weights at this scale, with scale-dependence the registered open question "
+            "(nu-sweep).", 6, D_RESCORE),
         rel(F12, F8, "qualifies",
             "Coherence measures embedding-space clustering of any kind: GPT-2 Medium's D state "
             "passes at p = 0.001 on purely typographic grounds, so no cross-model coherence "
@@ -1882,9 +1904,10 @@ def curated_relationships():
             "distribution view: a near-flat readout, effective support ~2,800 tokens.",
             6, D_ACT_II_5),
         rel(F11, F4, "supports",
-            "A second, independent instrument sees the same regime boundary: a J-lens reads "
-            "converged noise as less J-space-like than converged language states.",
-            6, D_ACT_II_5),
+            "A second instrument saw the same regime boundary: a J-lens read converged noise "
+            "as less J-space-like than converged language states. Its support attached to the "
+            "ORIGINAL reading, and its noise leg inherited the caveat-18 mis-calibration, so "
+            "it awaits re-derivation against the run-17 states.", 6, D_ACT_II_5),
         rel(F16, F10, "supports",
             "F10's readout-invisibility restated in the lens frame: the physical flip axis "
             "holds span share 0.013 at L11 against a 0.252 chance level, 97.0% of its energy "
@@ -1987,9 +2010,12 @@ def curated_relationships():
             "gate by iteration 120 and keep their label.", 7, D_SERIES_CLOSE),
         rel(F3, D["12"], "supports",
             "F3's four-model table is the finding this discovery records.", 7, D_SERIES_CLOSE),
-        rel(F4, D["13"], "supports",
-            "F4's null model is the evidence this discovery records: 18 non-semantic basins, "
-            "~zero overlap, real count below the random CI.", 7, D_SERIES_CLOSE),
+        rel(F4, D["13"], "corrects",
+            "F4's null model was the evidence this discovery recorded (18 non-semantic "
+            "basins, ~zero overlap), and F4's own repair overturned it: run 17's matched-nu, "
+            "gated re-run sends noise into four of the language arm's five basins, so the "
+            "regime-specific reading this discovery states is inverted at the tested scale.",
+            7, D_RESCORE),
         rel(F5, D["16"], "supports",
             "F5's three attribution results are what this discovery records.", 7, D_SERIES_CLOSE),
         rel(F2, D["15"], "supports",
@@ -2060,9 +2086,12 @@ def curated_relationships():
             "fingerprint of training-data themes does not survive the cross-model table.",
             9, D_SERIES_CLOSE),
         rel(F4, "concept-eigenvoice", "corrects",
-            "The metaphor's reporting-register correction: there is no single native voice. "
-            "What the loop settles into depends on what drove it, and noise drives it "
-            "somewhere else entirely.", 7, D_SERIES_CLOSE),
+            "The correction has itself been corrected. First: there is no single native voice, "
+            "and what the loop settles into depends on what drove it. Run 17 inverted the "
+            "second half: converged noise lands in four of the language arm's five basins "
+            "(with the fifth's period-2 signature in the unconverged trials), so at this "
+            "injection scale the weights do carry native voices, several rather than the "
+            "metaphor's one.", 7, D_RESCORE),
         rel(F13, "concept-glitch-token", "corrects",
             "The Session 01 glossary note ruled glitch tokens out for the basins; the Divine "
             "cycle's phase-B pole is measured at cos +0.596 to the under-trained core, so the "
@@ -2076,8 +2105,9 @@ def curated_relationships():
             "Five basins, each classified at lock-in and each retaining its members under the "
             "convergence gate.", 6, D_SERIES_CLOSE),
         rel(F4, "concept-attractor-basin", "qualifies",
-            "Basins exist for noise inputs too, but different ones: the notion is "
-            "regime-relative, not a fixed property of the weights.", 6, D_SERIES_CLOSE),
+            "Basins exist for noise inputs too, and at matched injection scale they are "
+            "largely the same ones (run 17): the notion is weight-native at this scale, with "
+            "scale-dependence the open question (nu-sweep).", 6, D_RESCORE),
         rel(F1, "concept-byte-pair-encoding", "relates-to",
             "Basin identities are single BPE tokens (prolet, Anarch), so any multi-token "
             "structure behind them is invisible to the current readout (caveat 8).",
@@ -2493,8 +2523,9 @@ def structural_relationships(claims, runs, run_models, sources):
             "The noise control supplies the third lag signature: monotonic decay with lag, no "
             "period.", 3, D_ACT_II_5),
         rel(FINDING_ID["F4"], "null-model-gaussian-noise", "evidenced-by",
-            "The 18 non-semantic basins and the bootstrap CI [11, 17] are properties of this "
-            "null model.", 7, D_SERIES_CLOSE),
+            "The 18 non-semantic basins and the bootstrap CI [11, 17] were properties of this "
+            "null model's ORIGINAL, mis-calibrated arm; run 17's matched-nu re-run superseded "
+            "them and inverted F4's reading.", 7, D_SERIES_CLOSE),
     ]
 
     # artefacts -> runs, findings -> artefacts

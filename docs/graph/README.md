@@ -86,8 +86,10 @@ identity.
 **Why it exists:** because an analogy that is never tested is decoration, and this one has been
 tested to destruction in three specific places. A room mode is a fixed point; `Divine` is an exact
 period-2 limit cycle, home only every second pass (F9). A room's modes are a property of the room;
-GPT-2 Small's basins are not a property of the weights, since noise driven through the same weights
-finds eighteen different ones (F4). And the argument that promoted the analogy to a theorem — every
+GPT-2 Small's basins first seemed not to be, when a mis-calibrated noise control appeared to find
+eighteen different ones, but the corrected matched-energy re-run (run 17, 2026-07-31) reversed
+that: noise raises four of the language arm's five basins, so on this test the analogy now holds
+at the tested energy (F4, corrected). And the argument that promoted the analogy to a theorem — every
 normalised transformer must have basins, by Brouwer — is in the graph too, in correction blue, with
 the reason it fell over attached to it: the L2 shell is a sphere, and a sphere is not convex
 (JOURNEY_MAP Key Discovery 11, corrected 2026-07-23).
@@ -487,8 +489,9 @@ four hops:
 > **H-fingerprint** — *basin profiles read training bias from any model* — is refuted by **F3**,
 > which is evidenced by **run 2, the cross-model sweeps**, run on **GPT-2 Medium**, which shares
 > GPT-2 Small's corpus and produces no semantic basins at all. And it is refuted again, from a
-> different direction, by **F4**, evidenced by **run 3, the null model**, where noise through the
-> same weights finds eighteen attractors none of which are the five.
+> different direction, by **F4**, whose corrected control (**run 17**, superseding run 3's
+> mis-calibrated arm) finds noise landing in the language arm's own basins: states that appear
+> with no input at all read nothing about the training corpus.
 
 Two independent trails converging on one dead claim. That is what a refutation looks like when it
 is done properly, and it is legible in the graph in about five seconds.
