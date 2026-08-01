@@ -71,3 +71,8 @@ experiments/noise_rerun/output/run.log
 # baseline's per-trial results (terminal tensors + per-iteration float64 metrics)
 # are the caveat 18 repair's evidence and must survive the container.
 !experiments/noise_rerun/output/results.pt
+
+# 2026-08-01: renorm probes (#112). Same rule: per-prompt engine results with
+# per-iteration metrics are the probes' evidence and must survive the container.
+!experiments/renorm_probe/output/free_norm_results.pt
+!experiments/renorm_probe/output/natural_arm_results.pt
