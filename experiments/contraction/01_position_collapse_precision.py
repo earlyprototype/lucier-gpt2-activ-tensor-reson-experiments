@@ -97,20 +97,53 @@ def rms_residual_scale(deviation):
 
 
 def per_coordinate_disagreement(tensor):
-    """
-    Measure coordinate-level disagreement between normalized position vectors.
-    
+    """Coordinate-by-coordinate relative disagreement, assuming nothing.
+
+    `rms_residual_scale` above summarises the angle into one number, but
+    turning that into a per-component statement assumes the disagreement is
+    spread evenly over coordinates, which it is not. This measures the
+    disagreement per coordinate instead.
+
+    Under relative rounding every coordinate carries |du_k| / |u_k| ~ eps
+    regardless of its size, so the disagreement being CONCENTRATED proves
+    nothing on its own: relative rounding of a state whose energy is ~68% in ten
+    coordinates is concentrated too. What separates rounding from structure is
+    whether the relative disagreement is flat at a few eps across coordinates.
+
+    Scale is divided out first -- H-pos0 allows each position its own scalar
+    (see M5), so what is at issue is the direction, not the length.
+
+    EVERY SHARE HERE IS A SHARE OF energy[k] = sum_{i<j} (u_ik - u_jk)^2, i.e.
+    of the SQUARED residual, not of the angle -- the angle goes as its square
+    root. Energy is the right denominator for the question being asked, because
+    1 - position_similarity is itself quadratic in du (it is the mean over pairs
+    of ||du||^2 / 2), so a coordinate carrying 1% of the energy accounts for 1%
+    of the reported deviation. That same coordinate carries ~10% of the
+    amplitude, which is why these are named for energy and must not be read as
+    fractions of the angle.
+
+    The two concentration figures are the grounds for refusing to read `d` per
+    component, so they are computed here rather than asserted. Neither is a
+    stable quantity: Syntactic and Divine_Syntactic settle to the same direction
+    (1 - cos = 1.2e-10) and return 4.4% / 157 against 19.4% / 23. What they
+    describe is the shape of one run's rounding residual, not a property of the
+    settled state. See RESULTS.md before leaning on them.
+
     Parameters:
-        tensor (torch.Tensor): Position vectors to compare. Each row must be finite
-            and have a nonzero norm.
-    
+        tensor (torch.Tensor): Position vectors to compare. Each row must be
+            finite and have a nonzero norm.
+
     Returns:
-        dict: Relative disagreement quantiles in float32-epsilon units, the
-            fraction and magnitude of high-disagreement coordinates, the share of
-            residual energy in the high-disagreement tail, the largest
-            per-coordinate residual-energy share, and the effective number of
-            participating coordinates.
-    
+        dict: Relative disagreement quantiles |du_k| / |u_k| in units of
+            float32 eps; the fraction of coordinates above 100 eps and how far
+            below typical magnitude they sit (a coordinate near zero has a huge
+            relative error for a negligible absolute one); the share of residual
+            ENERGY that tail carries; the largest single coordinate's share of
+            that energy; and the inverse participation ratio 1 / sum(p^2) as an
+            effective count of participating coordinates. The last two are NaN
+            when positions are bit-identical, since the distribution of a
+            non-existent disagreement is undefined.
+
     Raises:
         ValueError: If the tensor contains non-finite values or a zero-norm row.
     """
