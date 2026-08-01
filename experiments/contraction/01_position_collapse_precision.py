@@ -130,22 +130,30 @@ def per_coordinate_disagreement(tensor):
     settled state. See RESULTS.md before leaning on them.
 
     Parameters:
-        tensor (torch.Tensor): Position vectors to compare. Each row must be
-            finite and have a nonzero norm.
+        tensor (torch.Tensor): At least two position vectors to compare, shape
+            [T, d_model] with T >= 2. Each row must be finite and have a
+            nonzero norm.
 
     Returns:
-        dict: Relative disagreement quantiles |du_k| / |u_k| in units of
-            float32 eps; the fraction of coordinates above 100 eps and how far
-            below typical magnitude they sit (a coordinate near zero has a huge
+        dict: Quantiles of the per-coordinate relative disagreement
+            |u_ik - u_jk| / max(|u_ik|, |u_jk|), in units of float32 eps -- note
+            the denominator is the larger of the two coordinates, not either one
+            alone; the fraction of coordinates above 100 eps and how far below
+            typical magnitude they sit (a coordinate near zero has a huge
             relative error for a negligible absolute one); the share of residual
             ENERGY that tail carries; the largest single coordinate's share of
             that energy; and the inverse participation ratio 1 / sum(p^2) as an
             effective count of participating coordinates. The last two are NaN
-            when positions are bit-identical, since the distribution of a
-            non-existent disagreement is undefined.
+            when the NORMALISED positions are exactly identical, since the
+            distribution of a non-existent disagreement is undefined. Rows that
+            are bit-identical guarantee that; rows differing by a positive scale
+            generally do not, because the normalisation is not exact in floating
+            point (measured: rows at 1x, 3.7x and 0.41x of one direction return
+            a participation ratio of 12.3, not NaN).
 
     Raises:
-        ValueError: If the tensor contains non-finite values or a zero-norm row.
+        ValueError: If the tensor has fewer than two rows, contains non-finite
+            values, or has a zero-norm row.
     """
     t = tensor.to(torch.float64)
     # Loud rather than silent. A zero-norm position makes `unit` NaN, and NaN
@@ -155,6 +163,15 @@ def per_coordinate_disagreement(tensor):
     # instead is worse: it maps a zero row to a zero unit vector, and the
     # relative disagreement against any real row then reads 1/eps = 8.4e6 eps,
     # a fabricated number that enters the median as if it were a measurement.
+    # Fewer than two rows means no pairs, so the collections below stay empty
+    # and torch.cat raises "expected a non-empty list of Tensors" -- a torch
+    # implementation detail rather than a statement about the input. Say what
+    # is actually wrong instead.
+    if t.ndim != 2 or t.shape[0] < 2:
+        raise ValueError(
+            "per_coordinate_disagreement compares positions pairwise and needs "
+            f"a [T, d_model] tensor with T >= 2; got shape {tuple(t.shape)}."
+        )
     norms = t.norm(dim=1)
     if not bool(torch.isfinite(t).all()) or bool((norms == 0).any()):
         raise ValueError(
@@ -343,7 +360,8 @@ def main():
 
     # Per coordinate, assuming nothing about how the disagreement is spread.
     print()
-    print("Per coordinate: relative disagreement |du_k| / |u_k| in units of eps,")
+    print("Per coordinate: relative disagreement |u_ik - u_jk| / max(|u_ik|,|u_jk|)")
+    print("in units of eps,")
     print("scale divided out (each position may keep its own scalar -- see M5).")
     print()
     header4 = (
