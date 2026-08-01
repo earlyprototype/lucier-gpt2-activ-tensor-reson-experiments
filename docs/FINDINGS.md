@@ -4,7 +4,9 @@
 
 Activation Tensor Resonance (ATR) iterates a transformer's full residual-stream
 tensor back through its own forward pass (extract at the final layer,
-L2-rescale, re-inject at layer 0) until the state stabilises. On GPT-2 Small,
+L2-rescale to ν, the first pass's exit norm, an apparatus parameter held fixed
+for the run and 67-72× the model's natural entry scale, re-inject at layer 0)
+until the state stabilises. On GPT-2 Small,
 125 language prompts resolve into five attractor basins (`prolet` 43.2%,
 `Divine` 27.2%, `till` 15.2%, `Anarch` 13.6%, `solidarity` 0.8%, classified at
 convergence), four of them semantically coherent in embedding space. The
@@ -956,6 +958,29 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
     "the noise attractors are the real anomaly" reading waits on caveat 18's
     re-run, because the noise states carrying that anomaly were produced under
     the mis-calibration.
+19. **Basin identity is injection-scale-bound; ν is an apparatus parameter
+    (2026-08-01; issue #112, both probes registered before execution).** The
+    loop's rescale pins every iterate to ν, the first pass's exit Frobenius
+    norm, for the whole run. The natural-scale probe measured what that pin
+    does: the registered protocol injects at 67-72× the size layer 0
+    naturally receives (per prompt, first ten library prompts), so the model
+    runs outside its trained input range from iteration 1. Two probes now
+    bracket the registered regime. At the natural entry scale
+    (`renorm="natural_i"`, ν ≈ 18-20): 0/10 prompts lock under the lag-1
+    gate, the landscape is periodic (smallest passing lags 2 and 4; one
+    trial passes no scanned lag), and the terminal readouts (`Indian` 3,
+    `Gujarat` 3, `lakh` 2, `football` 1, `Hindu` 1) overlap the five basins
+    in zero trials. With the rescale removed (`renorm="none"`): the norm
+    grows without equilibrium (per-pass gain falls to 1.005 by pass 200, no
+    saturation, no explosion), position collapse stops partway (0.24-0.61
+    against ~1.0 pinned), and the readout leaves the basins for function
+    tokens (`the` ×3, `in`, `,`). Together with run 17, which found the
+    basins weight-native *at* the registered scale, the five-basin landscape
+    is established at ν ≈ 1400 and absent at both brackets. Until the
+    ν-sweep (now first in the queue, `ALIGNMENT_REVIEW.md` §5 amendment)
+    maps the transitions, every basin-identity claim carries an implicit
+    "at the registered injection scale". Records and regenerating scripts:
+    `experiments/renorm_probe/`.
 
 ## 5. What ATR is, after this series
 
