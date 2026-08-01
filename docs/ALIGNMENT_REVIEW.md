@@ -171,6 +171,16 @@ Three tiers. Tier 0 requires no ruling and no compute; Tier 1 is the STOP work p
 
 ### Tier 2: the experiment queue (in order; nothing jumps it)
 
+> **Amendment (2026-08-01, operator ruling; registration in issue #112).** With
+> item 1 delivered (run 17), the ν-sweep is promoted to the front of all
+> remaining work, ahead of Tier 1's #94 Part A. Reason: the engine's rescale
+> pins every iterate to the first pass's exit norm for the whole run, run 17
+> demonstrated the landscape changes with that pin, and the operator has ruled
+> the pin is to be treated as a measured free parameter rather than an assumed
+> constant. Two registered groundwork probes run immediately (issue #112): a
+> free-norm growth diagnostic (`renorm="none"`) and a natural entry-norm arm
+> (`renorm="natural_i"`, first 10 library prompts).
+
 1. **Matched-ν noise baseline re-run** (repairs F4 and every inherited noise control; makes #98's relocated anomaly decidable), under the standing archive spec below, with gated classification at lock-in, full lag table, per-position per-iteration float64 archives. Closes the #97 loop and the M2 gap in one run.
 2. **The ν-sweep**: one experiment, currently filed twice (#27 E1 ≡ #91 E4; CE11's natural-energy control on Small is its ν → natural endpoint). Decides whether basin identity depends on the arbitrary rescale target, the live confound under every basin-identity claim.
 3. **M3/M4** if not already run under Tier 1.

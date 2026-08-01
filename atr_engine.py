@@ -314,10 +314,12 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
     (``{lag: mean cosine}`` over the last 9 mean-vector iterates, for periodic
     -attractor census). ``inject_hook_name`` (default None) overrides the
     injection hook point (an injection-site sanity control). ``renorm``
-    (``"seed_j"`` default, or ``"natural_i"``) selects the rescale target:
-    ``"seed_j"`` uses the seed norm at the extraction layer (the historical
-    path); ``"natural_i"`` uses the natural ``resid_pre`` norm at the
-    injection layer. These three parameters were developed for the Stage 2
+    (``"seed_j"`` default, ``"natural_i"``, or ``"none"``) selects the rescale
+    target: ``"seed_j"`` uses the seed norm at the extraction layer (the
+    historical path); ``"natural_i"`` uses the natural ``resid_pre`` norm at
+    the injection layer; ``"none"`` (issue #112's free-norm growth probe)
+    applies no rescale at all, so the norm evolves freely and ``target_norm``
+    is reported as None. These parameters were developed for the Stage 2
     layer-window experiments (EXP_010c); the defaults reproduce the registered
     single-window path exactly, so existing callers are unaffected.
 
@@ -366,8 +368,9 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
         raise ValueError(
             f"check_start ({check_start}) must be >= gate_lag ({gate_lag}) "
             "for the lagged comparison to be well-formed")
-    if renorm not in ("seed_j", "natural_i"):
-        raise ValueError(f"renorm must be 'seed_j' or 'natural_i', got {renorm!r}")
+    if renorm not in ("seed_j", "natural_i", "none"):
+        raise ValueError(
+            f"renorm must be 'seed_j', 'natural_i' or 'none', got {renorm!r}")
     if seed_tensor is not None:
         if renorm != "seed_j":
             raise ValueError(
@@ -409,6 +412,8 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
         initial_norm = current_tensor.norm().item()
         if renorm == "natural_i":
             target_norm = cache[natural_pre_name][0].norm().item()
+        elif renorm == "none":
+            target_norm = None
         else:
             target_norm = initial_norm
     metrics = [] if record_metrics else None
@@ -424,7 +429,7 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
 
     for i in range(1, max_iter + 1):
         current_norm = current_tensor.norm().item()
-        if current_norm > 0:
+        if target_norm is not None and current_norm > 0:
             current_tensor = current_tensor * (target_norm / current_norm)
 
         inject_tensor = current_tensor.clone()

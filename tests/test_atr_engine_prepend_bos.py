@@ -206,3 +206,21 @@ def test_token_ids_alone_are_fine():
     engine = _engine()
     import torch
     assert engine._bos_kwargs(torch.tensor([[50256]]), None) == {}
+
+
+def test_renorm_accepted_values_are_pinned():
+    """The renorm mode set is a value contract, not just a signature one:
+    seed_j (the historical exit-norm pin), natural_i (EXP_010c control B,
+    the entry-norm pin), none (issue #112's free-norm growth probe, no pin).
+    A removed or renamed mode silently invalidates registered experiment
+    scripts, so the accepted tuple is pinned here."""
+    func = _function("run_atr_gated")
+    tuples = [
+        tuple(elt.value for elt in node.comparators[0].elts)
+        for node in ast.walk(func)
+        if isinstance(node, ast.Compare)
+        and isinstance(node.ops[0], ast.NotIn)
+        and isinstance(node.left, ast.Name) and node.left.id == "renorm"
+        and isinstance(node.comparators[0], ast.Tuple)
+    ]
+    assert tuples == [("seed_j", "natural_i", "none")]
