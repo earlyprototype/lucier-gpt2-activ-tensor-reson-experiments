@@ -76,3 +76,9 @@ experiments/noise_rerun/output/run.log
 # per-iteration metrics are the probes' evidence and must survive the container.
 !experiments/renorm_probe/output/free_norm_results.pt
 !experiments/renorm_probe/output/natural_arm_results.pt
+
+# 2026-08-02: nu-sweep (#113). Same rule: the assembled per-trial archives are
+# the sweep's evidence and must survive the container. The per-trial checkpoint
+# files stay ignored: they are the resume unit, duplicated into the archive.
+!experiments/nu_sweep/output/stage_a_results.pt
+!experiments/nu_sweep/output/stage_b_results.pt
