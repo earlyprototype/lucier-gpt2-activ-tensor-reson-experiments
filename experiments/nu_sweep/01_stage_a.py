@@ -353,6 +353,13 @@ def write_report():
         f"- Threshold crossings between adjacent levels (Stage B brackets "
         f"each at full sweep width): "
         f"{[f'{a} to {b}' for a, b in crossings] if crossings else 'none'}.",
+        f"- Lag-1 lock rate at the crossing levels (a fully locked level's "
+        f"labels carry no periodic single-phase ambiguity, so an edge "
+        f"between fully locked levels is independent of that caveat): "
+        + (", ".join(
+            f"{lv} {stats[lv]['locked']}/{stats[lv]['n']}"
+            for lv in dict.fromkeys(lv for pair in crossings for lv in pair))
+           if crossings else "n/a") + ".",
         "",
         "## Reading",
         "",

@@ -41,6 +41,7 @@ trial's smallest passing lag.
 - Band statistic: share of trials whose terminal label at their smallest passing lag is one of ['Anarch', 'Divine', 'prolet', 'solidarity', 'till'].
 - Levels above the 50% threshold, in pin order: ['m064', 'historical', 'm128'].
 - Threshold crossings between adjacent levels (Stage B brackets each at full sweep width): ['m032 to m064', 'm128 to m256'].
+- Lag-1 lock rate at the crossing levels (a fully locked level's labels carry no periodic single-phase ambiguity, so an edge between fully locked levels is independent of that caveat): m032 25/25, m064 25/25, m128 25/25, m256 25/25.
 
 ## Reading
 
