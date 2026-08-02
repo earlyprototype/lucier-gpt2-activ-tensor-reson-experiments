@@ -82,3 +82,8 @@ experiments/noise_rerun/output/run.log
 # files stay ignored: they are the resume unit, duplicated into the archive.
 !experiments/nu_sweep/output/stage_a_results.pt
 !experiments/nu_sweep/output/stage_b_results.pt
+experiments/nu_sweep/output/checkpoints/
+
+# 2026-08-02: local GPT-2 weights downloaded from the legacy S3 mirror for
+# offline loading (ATR_GPT2_LOCAL). Ephemeral, rebuilt per container.
+gpt2_local/
