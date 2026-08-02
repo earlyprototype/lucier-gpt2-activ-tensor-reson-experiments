@@ -1,0 +1,849 @@
+{
+  "config": {
+    "n_null": 1000,
+    "top_k": 50,
+    "seed": 42,
+    "rule": "points into cluster if top-50 fraction empirical p < 0.001 vs matched random null",
+    "chance_cos_768": 0.0288
+  },
+  "clusters": {
+    "geom_0p1": 50,
+    "geom_0p5": 251,
+    "lownorm_0p1": 50,
+    "lownorm_0p5": 251,
+    "curated_core": 52,
+    "curated_all": 58
+  },
+  "levels": {
+    "m001": {
+      "n_trials": 25,
+      "clusters": {
+        "geom_0p1": {
+          "cos_mean_dir": -0.23710735142230988,
+          "cos_null_mean": -0.0024493837263435125,
+          "cos_null_std": 0.04518813639879227,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.18359853327274323,
+          "per_trial_cos_min": -0.5078163743019104,
+          "per_trial_cos_max": 0.21477176249027252,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0010000000474974513,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "geom_0p5": {
+          "cos_mean_dir": 0.02836085483431816,
+          "cos_null_mean": 0.0017652747919782996,
+          "cos_null_std": 0.04297252744436264,
+          "p_cos_two_sided": 0.515999972820282,
+          "per_trial_cos_mean": 0.02196057327091694,
+          "per_trial_cos_min": -0.020523495972156525,
+          "per_trial_cos_max": 0.06497833132743835,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.004939999431371689,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "lownorm_0p1": {
+          "cos_mean_dir": 0.24590757489204407,
+          "cos_null_mean": 0.0007405434735119343,
+          "cos_null_std": 0.04431421682238579,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.19041280448436737,
+          "per_trial_cos_min": -0.19636018574237823,
+          "per_trial_cos_max": 0.5040338635444641,
+          "top50_fraction": 0.4,
+          "top50_null_mean": 0.00107999995816499,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "lownorm_0p5": {
+          "cos_mean_dir": 0.25533440709114075,
+          "cos_null_mean": -0.0013602373655885458,
+          "cos_null_std": 0.044265564531087875,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.19771230220794678,
+          "per_trial_cos_min": -0.20078279078006744,
+          "per_trial_cos_max": 0.5188726782798767,
+          "top50_fraction": 0.76,
+          "top50_null_mean": 0.004619999323040247,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "curated_core": {
+          "cos_mean_dir": -0.21705865859985352,
+          "cos_null_mean": 0.0023196593392640352,
+          "cos_null_std": 0.04333943501114845,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.16807430982589722,
+          "per_trial_cos_min": -0.42695489525794983,
+          "per_trial_cos_max": 0.15559247136116028,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0009999999310821295,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "curated_all": {
+          "cos_mean_dir": -0.21877571940422058,
+          "cos_null_mean": 0.0028295854572206736,
+          "cos_null_std": 0.04301128163933754,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.16940389573574066,
+          "per_trial_cos_min": -0.42529889941215515,
+          "per_trial_cos_max": 0.15169644355773926,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0009199999622069299,
+          "p_top50": 1.0,
+          "points_into": false
+        }
+      }
+    },
+    "m002": {
+      "n_trials": 25,
+      "clusters": {
+        "geom_0p1": {
+          "cos_mean_dir": 0.12814533710479736,
+          "cos_null_mean": -0.00012560992036014795,
+          "cos_null_std": 0.02662121132016182,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.1281317174434662,
+          "per_trial_cos_min": 0.1270550787448883,
+          "per_trial_cos_max": 0.1311844289302826,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0009399999398738146,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "geom_0p5": {
+          "cos_mean_dir": 0.048455461859703064,
+          "cos_null_mean": -0.00010755466064438224,
+          "cos_null_std": 0.025843558833003044,
+          "p_cos_two_sided": 0.06800000369548798,
+          "per_trial_cos_mean": 0.0484502948820591,
+          "per_trial_cos_min": 0.04705793410539627,
+          "per_trial_cos_max": 0.05313079431653023,
+          "top50_fraction": 0.04,
+          "top50_null_mean": 0.004879999440163374,
+          "p_top50": 0.020999999716877937,
+          "points_into": false
+        },
+        "lownorm_0p1": {
+          "cos_mean_dir": -0.11794786900281906,
+          "cos_null_mean": 0.0007510364521294832,
+          "cos_null_std": 0.02673969976603985,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.11793528497219086,
+          "per_trial_cos_min": -0.11819365620613098,
+          "per_trial_cos_max": -0.11772115528583527,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0010999999940395355,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "lownorm_0p5": {
+          "cos_mean_dir": -0.12680552899837494,
+          "cos_null_mean": 0.0001071443548426032,
+          "cos_null_std": 0.026988927274942398,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.12679201364517212,
+          "per_trial_cos_min": -0.12719708681106567,
+          "per_trial_cos_max": -0.1265013962984085,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.004799999762326479,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "curated_core": {
+          "cos_mean_dir": 0.08488205075263977,
+          "cos_null_mean": -0.0006403536535799503,
+          "cos_null_std": 0.026496676728129387,
+          "p_cos_two_sided": 0.0020000000949949026,
+          "per_trial_cos_mean": 0.08487299829721451,
+          "per_trial_cos_min": 0.08456545323133469,
+          "per_trial_cos_max": 0.08538699895143509,
+          "top50_fraction": 0.06,
+          "top50_null_mean": 0.000759999908041209,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "curated_all": {
+          "cos_mean_dir": 0.0881403312087059,
+          "cos_null_mean": 0.00045380761730484664,
+          "cos_null_std": 0.026273520663380623,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.08813092112541199,
+          "per_trial_cos_min": 0.08800693601369858,
+          "per_trial_cos_max": 0.08822687715291977,
+          "top50_fraction": 0.06,
+          "top50_null_mean": 0.00107999995816499,
+          "p_top50": 0.0,
+          "points_into": true
+        }
+      }
+    },
+    "m004": {
+      "n_trials": 25,
+      "clusters": {
+        "geom_0p1": {
+          "cos_mean_dir": 0.17148086428642273,
+          "cos_null_mean": 0.0014291664119809866,
+          "cos_null_std": 0.029187036678195,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.1714777946472168,
+          "per_trial_cos_min": 0.16741745173931122,
+          "per_trial_cos_max": 0.17252542078495026,
+          "top50_fraction": 0.74,
+          "top50_null_mean": 0.0007999999797903001,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "geom_0p5": {
+          "cos_mean_dir": 0.05038684234023094,
+          "cos_null_mean": -0.0010098699713125825,
+          "cos_null_std": 0.02957753650844097,
+          "p_cos_two_sided": 0.08399999886751175,
+          "per_trial_cos_mean": 0.050385937094688416,
+          "per_trial_cos_min": 0.04894015192985535,
+          "per_trial_cos_max": 0.0508505254983902,
+          "top50_fraction": 0.9,
+          "top50_null_mean": 0.004959999583661556,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "lownorm_0p1": {
+          "cos_mean_dir": -0.16346633434295654,
+          "cos_null_mean": -0.0009224787936545908,
+          "cos_null_std": 0.02921450138092041,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.16346345841884613,
+          "per_trial_cos_min": -0.16420558094978333,
+          "per_trial_cos_max": -0.16018955409526825,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0010999998776242137,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "lownorm_0p5": {
+          "cos_mean_dir": -0.17185762524604797,
+          "cos_null_mean": -0.0009238615748472512,
+          "cos_null_std": 0.02822430245578289,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.17185455560684204,
+          "per_trial_cos_min": -0.17254357039928436,
+          "per_trial_cos_max": -0.1687236875295639,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.004799999762326479,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "curated_core": {
+          "cos_mean_dir": 0.1287146508693695,
+          "cos_null_mean": -0.00037091010017320514,
+          "cos_null_std": 0.029561111703515053,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.12871234118938446,
+          "per_trial_cos_min": 0.1254848837852478,
+          "per_trial_cos_max": 0.12953589856624603,
+          "top50_fraction": 0.18,
+          "top50_null_mean": 0.0013599998783320189,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "curated_all": {
+          "cos_mean_dir": 0.13264641165733337,
+          "cos_null_mean": -0.0008586786570958793,
+          "cos_null_std": 0.03065594658255577,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.13264405727386475,
+          "per_trial_cos_min": 0.12966299057006836,
+          "per_trial_cos_max": 0.1333972066640854,
+          "top50_fraction": 0.18,
+          "top50_null_mean": 0.00107999995816499,
+          "p_top50": 0.0,
+          "points_into": true
+        }
+      }
+    },
+    "m008": {
+      "n_trials": 25,
+      "clusters": {
+        "geom_0p1": {
+          "cos_mean_dir": 0.1270357370376587,
+          "cos_null_mean": 0.00019565076217986643,
+          "cos_null_std": 0.026184774935245514,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.1270337551832199,
+          "per_trial_cos_min": 0.12417586892843246,
+          "per_trial_cos_max": 0.13437311351299286,
+          "top50_fraction": 0.14,
+          "top50_null_mean": 0.0011199999134987593,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "geom_0p5": {
+          "cos_mean_dir": 0.04510621726512909,
+          "cos_null_mean": 9.64122373261489e-05,
+          "cos_null_std": 0.026758253574371338,
+          "p_cos_two_sided": 0.09799999743700027,
+          "per_trial_cos_mean": 0.04510553181171417,
+          "per_trial_cos_min": 0.04448199272155762,
+          "per_trial_cos_max": 0.04658139497041702,
+          "top50_fraction": 0.22,
+          "top50_null_mean": 0.005239999853074551,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "lownorm_0p1": {
+          "cos_mean_dir": -0.11610904335975647,
+          "cos_null_mean": 0.0011803277302533388,
+          "cos_null_std": 0.02749481424689293,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.11610732972621918,
+          "per_trial_cos_min": -0.123236745595932,
+          "per_trial_cos_max": -0.11339487135410309,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0008800000068731606,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "lownorm_0p5": {
+          "cos_mean_dir": -0.12310278415679932,
+          "cos_null_mean": 0.00037864744081161916,
+          "cos_null_std": 0.02610965631902218,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.12310095876455307,
+          "per_trial_cos_min": -0.13039009273052216,
+          "per_trial_cos_max": -0.12029262632131577,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.005919999442994595,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "curated_core": {
+          "cos_mean_dir": 0.09454476833343506,
+          "cos_null_mean": -0.00026237411657348275,
+          "cos_null_std": 0.026656318455934525,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.09454330801963806,
+          "per_trial_cos_min": 0.09218090027570724,
+          "per_trial_cos_max": 0.10039890557527542,
+          "top50_fraction": 0.08,
+          "top50_null_mean": 0.0011999999405816197,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "curated_all": {
+          "cos_mean_dir": 0.09931328892707825,
+          "cos_null_mean": 0.000926435983274132,
+          "cos_null_std": 0.025922220200300217,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.09931178390979767,
+          "per_trial_cos_min": 0.09697475284337997,
+          "per_trial_cos_max": 0.10504059493541718,
+          "top50_fraction": 0.08,
+          "top50_null_mean": 0.0011799999047070742,
+          "p_top50": 0.0,
+          "points_into": true
+        }
+      }
+    },
+    "m016": {
+      "n_trials": 25,
+      "clusters": {
+        "geom_0p1": {
+          "cos_mean_dir": 0.03161764144897461,
+          "cos_null_mean": 0.0008509541512466967,
+          "cos_null_std": 0.025503462180495262,
+          "p_cos_two_sided": 0.21299999952316284,
+          "per_trial_cos_mean": 0.031596433371305466,
+          "per_trial_cos_min": 0.0243731327354908,
+          "per_trial_cos_max": 0.04394202679395676,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0008199999574571848,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "geom_0p5": {
+          "cos_mean_dir": 0.03228413313627243,
+          "cos_null_mean": -0.0003772941417992115,
+          "cos_null_std": 0.02412746660411358,
+          "p_cos_two_sided": 0.17800000309944153,
+          "per_trial_cos_mean": 0.03226251155138016,
+          "per_trial_cos_min": 0.029460083693265915,
+          "per_trial_cos_max": 0.03342007100582123,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.005119999870657921,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "lownorm_0p1": {
+          "cos_mean_dir": -0.02181054651737213,
+          "cos_null_mean": 0.000345689186360687,
+          "cos_null_std": 0.024429475888609886,
+          "p_cos_two_sided": 0.36899998784065247,
+          "per_trial_cos_mean": -0.021795883774757385,
+          "per_trial_cos_min": -0.037812646478414536,
+          "per_trial_cos_max": -0.012365337461233139,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0009800000116229057,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "lownorm_0p5": {
+          "cos_mean_dir": -0.026221096515655518,
+          "cos_null_mean": -4.836429070564918e-05,
+          "cos_null_std": 0.02401394210755825,
+          "p_cos_two_sided": 0.2720000147819519,
+          "per_trial_cos_mean": -0.02620350755751133,
+          "per_trial_cos_min": -0.041320621967315674,
+          "per_trial_cos_max": -0.017151212319731712,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.004659999627619982,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "curated_core": {
+          "cos_mean_dir": 0.017256200313568115,
+          "cos_null_mean": -0.0005206865607760847,
+          "cos_null_std": 0.025137655436992645,
+          "p_cos_two_sided": 0.4860000014305115,
+          "per_trial_cos_mean": 0.017244655638933182,
+          "per_trial_cos_min": 0.01321597769856453,
+          "per_trial_cos_max": 0.02434220351278782,
+          "top50_fraction": 0.02,
+          "top50_null_mean": 0.0010999999940395355,
+          "p_top50": 0.05299999937415123,
+          "points_into": false
+        },
+        "curated_all": {
+          "cos_mean_dir": 0.024163737893104553,
+          "cos_null_mean": 0.00067918561398983,
+          "cos_null_std": 0.02438272349536419,
+          "p_cos_two_sided": 0.3199999928474426,
+          "per_trial_cos_mean": 0.024147532880306244,
+          "per_trial_cos_min": 0.019709404557943344,
+          "per_trial_cos_max": 0.029356328770518303,
+          "top50_fraction": 0.02,
+          "top50_null_mean": 0.0011599998688325286,
+          "p_top50": 0.054999999701976776,
+          "points_into": false
+        }
+      }
+    },
+    "m032": {
+      "n_trials": 25,
+      "clusters": {
+        "geom_0p1": {
+          "cos_mean_dir": -0.29898321628570557,
+          "cos_null_mean": 0.0008749963599257171,
+          "cos_null_std": 0.04925549775362015,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.2911459803581238,
+          "per_trial_cos_min": -0.35726016759872437,
+          "per_trial_cos_max": -0.07983701676130295,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0009399999980814755,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "geom_0p5": {
+          "cos_mean_dir": -0.07109325379133224,
+          "cos_null_mean": 0.0017206271877512336,
+          "cos_null_std": 0.047198619693517685,
+          "p_cos_two_sided": 0.13199999928474426,
+          "per_trial_cos_mean": -0.06922969967126846,
+          "per_trial_cos_min": -0.0874994695186615,
+          "per_trial_cos_max": -0.01860162429511547,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.005539999809116125,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "lownorm_0p1": {
+          "cos_mean_dir": 0.3017493486404419,
+          "cos_null_mean": 0.0012744934065267444,
+          "cos_null_std": 0.04680679365992546,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.29383960366249084,
+          "per_trial_cos_min": 0.0921468660235405,
+          "per_trial_cos_max": 0.3595774471759796,
+          "top50_fraction": 0.44,
+          "top50_null_mean": 0.0012400000123307109,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "lownorm_0p5": {
+          "cos_mean_dir": 0.30402863025665283,
+          "cos_null_mean": 0.0007737802225165069,
+          "cos_null_std": 0.050010982900857925,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.29605913162231445,
+          "per_trial_cos_min": 0.0903877317905426,
+          "per_trial_cos_max": 0.36457934975624084,
+          "top50_fraction": 0.84,
+          "top50_null_mean": 0.004819999914616346,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "curated_core": {
+          "cos_mean_dir": -0.2251485139131546,
+          "cos_null_mean": 0.0009395927772857249,
+          "cos_null_std": 0.045833270996809006,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.21924668550491333,
+          "per_trial_cos_min": -0.280603289604187,
+          "per_trial_cos_max": -0.04716789722442627,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.000859999970998615,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "curated_all": {
+          "cos_mean_dir": -0.20638339221477509,
+          "cos_null_mean": -0.00019457620510365814,
+          "cos_null_std": 0.04842141643166542,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.20097346603870392,
+          "per_trial_cos_min": -0.26839932799339294,
+          "per_trial_cos_max": -0.0275164395570755,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0010999998776242137,
+          "p_top50": 1.0,
+          "points_into": false
+        }
+      }
+    },
+    "m064": {
+      "n_trials": 25,
+      "clusters": {
+        "geom_0p1": {
+          "cos_mean_dir": -0.45157957077026367,
+          "cos_null_mean": 0.0034120921045541763,
+          "cos_null_std": 0.06417673081159592,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.45151928067207336,
+          "per_trial_cos_min": -0.45720764994621277,
+          "per_trial_cos_max": -0.4383177161216736,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0009599999175406992,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "geom_0p5": {
+          "cos_mean_dir": -0.07062603533267975,
+          "cos_null_mean": 0.000768281111959368,
+          "cos_null_std": 0.06352648884057999,
+          "p_cos_two_sided": 0.27900001406669617,
+          "per_trial_cos_mean": -0.07061661034822464,
+          "per_trial_cos_min": -0.07196646183729172,
+          "per_trial_cos_max": -0.06742992252111435,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.004879999440163374,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "lownorm_0p1": {
+          "cos_mean_dir": 0.44999822974205017,
+          "cos_null_mean": 0.0008727957610972226,
+          "cos_null_std": 0.06419218331575394,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.4499381184577942,
+          "per_trial_cos_min": 0.43683305382728577,
+          "per_trial_cos_max": 0.4556617736816406,
+          "top50_fraction": 0.42,
+          "top50_null_mean": 0.0009800000116229057,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "lownorm_0p5": {
+          "cos_mean_dir": 0.45693549513816833,
+          "cos_null_mean": 0.00024588865926489234,
+          "cos_null_std": 0.06491509079933167,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.4568746089935303,
+          "per_trial_cos_min": 0.4433368444442749,
+          "per_trial_cos_max": 0.4628308415412903,
+          "top50_fraction": 0.8,
+          "top50_null_mean": 0.004879999440163374,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "curated_core": {
+          "cos_mean_dir": -0.39235448837280273,
+          "cos_null_mean": -0.0016694702208042145,
+          "cos_null_std": 0.06461891531944275,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.39230209589004517,
+          "per_trial_cos_min": -0.39658743143081665,
+          "per_trial_cos_max": -0.3822638690471649,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0011399999493733048,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "curated_all": {
+          "cos_mean_dir": -0.37862691283226013,
+          "cos_null_mean": -0.0006432997179217637,
+          "cos_null_std": 0.06472878903150558,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.3785763680934906,
+          "per_trial_cos_min": -0.38269948959350586,
+          "per_trial_cos_max": -0.36881300806999207,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0011999999405816197,
+          "p_top50": 1.0,
+          "points_into": false
+        }
+      }
+    },
+    "m128": {
+      "n_trials": 25,
+      "clusters": {
+        "geom_0p1": {
+          "cos_mean_dir": -0.4259600341320038,
+          "cos_null_mean": 0.0022638964001089334,
+          "cos_null_std": 0.062402140349149704,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.42590123414993286,
+          "per_trial_cos_min": -0.42635950446128845,
+          "per_trial_cos_max": -0.42577776312828064,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.001019999966956675,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "geom_0p5": {
+          "cos_mean_dir": -0.06381550431251526,
+          "cos_null_mean": -0.0011634457623586059,
+          "cos_null_std": 0.06321828067302704,
+          "p_cos_two_sided": 0.3059999942779541,
+          "per_trial_cos_mean": -0.0638066828250885,
+          "per_trial_cos_min": -0.06630528718233109,
+          "per_trial_cos_max": -0.062088433653116226,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.004819999914616346,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "lownorm_0p1": {
+          "cos_mean_dir": 0.4468040466308594,
+          "cos_null_mean": 0.0032750649843364954,
+          "cos_null_std": 0.06226161867380142,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.44674232602119446,
+          "per_trial_cos_min": 0.4456094205379486,
+          "per_trial_cos_max": 0.44806018471717834,
+          "top50_fraction": 0.42,
+          "top50_null_mean": 0.0013799999142065644,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "lownorm_0p5": {
+          "cos_mean_dir": 0.45442119240760803,
+          "cos_null_mean": 0.0033463044092059135,
+          "cos_null_std": 0.06454622000455856,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.45435839891433716,
+          "per_trial_cos_min": 0.4533355236053467,
+          "per_trial_cos_max": 0.45559027791023254,
+          "top50_fraction": 0.88,
+          "top50_null_mean": 0.004699999932199717,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "curated_core": {
+          "cos_mean_dir": -0.3679981529712677,
+          "cos_null_mean": -0.0003390548226889223,
+          "cos_null_std": 0.0635206326842308,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.3679473102092743,
+          "per_trial_cos_min": -0.3686348795890808,
+          "per_trial_cos_max": -0.3669689893722534,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.001019999966956675,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "curated_all": {
+          "cos_mean_dir": -0.3559826612472534,
+          "cos_null_mean": -0.0004372880794107914,
+          "cos_null_std": 0.06291982531547546,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.3559335470199585,
+          "per_trial_cos_min": -0.35627487301826477,
+          "per_trial_cos_max": -0.35534319281578064,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0012799999676644802,
+          "p_top50": 1.0,
+          "points_into": false
+        }
+      }
+    },
+    "m256": {
+      "n_trials": 25,
+      "clusters": {
+        "geom_0p1": {
+          "cos_mean_dir": -0.5424008965492249,
+          "cos_null_mean": -0.0009468666394241154,
+          "cos_null_std": 0.07450984418392181,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.42752814292907715,
+          "per_trial_cos_min": -0.522415041923523,
+          "per_trial_cos_max": -0.37678632140159607,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0009999999310821295,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "geom_0p5": {
+          "cos_mean_dir": -0.09171523153781891,
+          "cos_null_mean": -0.0018179330509155989,
+          "cos_null_std": 0.07298608869314194,
+          "p_cos_two_sided": 0.20999999344348907,
+          "per_trial_cos_mean": -0.07229125499725342,
+          "per_trial_cos_min": -0.10473822802305222,
+          "per_trial_cos_max": -0.05702200531959534,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.004959999583661556,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "lownorm_0p1": {
+          "cos_mean_dir": 0.5539366006851196,
+          "cos_null_mean": -0.00346393627114594,
+          "cos_null_std": 0.07511698454618454,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.43662071228027344,
+          "per_trial_cos_min": 0.3363432288169861,
+          "per_trial_cos_max": 0.5023707151412964,
+          "top50_fraction": 0.44,
+          "top50_null_mean": 0.0008999999263323843,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "lownorm_0p5": {
+          "cos_mean_dir": 0.5676860809326172,
+          "cos_null_mean": 0.0029570339247584343,
+          "cos_null_std": 0.07722262293100357,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.4474582374095917,
+          "per_trial_cos_min": 0.34390971064567566,
+          "per_trial_cos_max": 0.5187131762504578,
+          "top50_fraction": 0.86,
+          "top50_null_mean": 0.00546000013127923,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "curated_core": {
+          "cos_mean_dir": -0.45448142290115356,
+          "cos_null_mean": 0.004212555009871721,
+          "cos_null_std": 0.07466044276952744,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.35822877287864685,
+          "per_trial_cos_min": -0.4145379960536957,
+          "per_trial_cos_max": -0.27457395195961,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0010000000474974513,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "curated_all": {
+          "cos_mean_dir": -0.44212499260902405,
+          "cos_null_mean": 0.0026583962608128786,
+          "cos_null_std": 0.07706527411937714,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.34848925471305847,
+          "per_trial_cos_min": -0.40262094140052795,
+          "per_trial_cos_max": -0.26785531640052795,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0012199998600408435,
+          "p_top50": 1.0,
+          "points_into": false
+        }
+      }
+    },
+    "historical": {
+      "n_trials": 25,
+      "clusters": {
+        "geom_0p1": {
+          "cos_mean_dir": -0.5116481184959412,
+          "cos_null_mean": -0.0007245160522870719,
+          "cos_null_std": 0.06973165273666382,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.4866602420806885,
+          "per_trial_cos_min": -0.5532011985778809,
+          "per_trial_cos_max": -0.4402976930141449,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0011599999852478504,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "geom_0p5": {
+          "cos_mean_dir": -0.07688478380441666,
+          "cos_null_mean": 0.0031862477771937847,
+          "cos_null_std": 0.07007633149623871,
+          "p_cos_two_sided": 0.2800000011920929,
+          "per_trial_cos_mean": -0.07312988489866257,
+          "per_trial_cos_min": -0.07945240288972855,
+          "per_trial_cos_max": -0.061385031789541245,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.004679999314248562,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "lownorm_0p1": {
+          "cos_mean_dir": 0.5137409567832947,
+          "cos_null_mean": -0.00414310721680522,
+          "cos_null_std": 0.07117655128240585,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.4886508882045746,
+          "per_trial_cos_min": 0.4387790560722351,
+          "per_trial_cos_max": 0.563654363155365,
+          "top50_fraction": 0.44,
+          "top50_null_mean": 0.00107999995816499,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "lownorm_0p5": {
+          "cos_mean_dir": 0.5235263109207153,
+          "cos_null_mean": 0.0024486060719937086,
+          "cos_null_std": 0.07230919599533081,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": 0.49795833230018616,
+          "per_trial_cos_min": 0.44533464312553406,
+          "per_trial_cos_max": 0.5772102475166321,
+          "top50_fraction": 0.82,
+          "top50_null_mean": 0.005339999683201313,
+          "p_top50": 0.0,
+          "points_into": true
+        },
+        "curated_core": {
+          "cos_mean_dir": -0.4286715090274811,
+          "cos_null_mean": -0.0010536342160776258,
+          "cos_null_std": 0.07031474262475967,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.40773600339889526,
+          "per_trial_cos_min": -0.42397138476371765,
+          "per_trial_cos_max": -0.3837823271751404,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0008600000292062759,
+          "p_top50": 1.0,
+          "points_into": false
+        },
+        "curated_all": {
+          "cos_mean_dir": -0.40838536620140076,
+          "cos_null_mean": -0.0022797398269176483,
+          "cos_null_std": 0.07231590896844864,
+          "p_cos_two_sided": 0.0,
+          "per_trial_cos_mean": -0.38844063878059387,
+          "per_trial_cos_min": -0.3933553099632263,
+          "per_trial_cos_max": -0.37030354142189026,
+          "top50_fraction": 0.0,
+          "top50_null_mean": 0.0009599999757483602,
+          "p_top50": 1.0,
+          "points_into": false
+        }
+      }
+    }
+  }
+}
