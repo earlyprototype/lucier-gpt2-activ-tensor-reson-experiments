@@ -40,6 +40,7 @@ vocab.json, merges.txt) and the script loads offline.
 """
 
 import argparse
+import itertools
 import json
 import os
 import statistics
@@ -122,7 +123,7 @@ def run_contract(model):
     """Numeric-pin bit-identity contract (issue #113): renorm=<seed norm as a
     number> must reproduce renorm="seed_j" exactly. Writes contract_check.json
     and returns True on pass."""
-    pid = list(prompt_library.PROMPT_LIBRARY)[0]
+    pid = next(iter(prompt_library.PROMPT_LIBRARY))
     prompt = prompt_library.PROMPT_LIBRARY[pid]
     kw = gate_kwargs()
     kw["max_iter"] = 150  # enough to include gate checks; both runs identical
@@ -141,7 +142,9 @@ def run_contract(model):
             ma["position_similarity_f64"] == mb["position_similarity_f64"]
             and ma["tensor_norm"] == mb["tensor_norm"]
             and ma["cos_sim_mean_lag1"] == mb["cos_sim_mean_lag1"]
-            for ma, mb in zip(a["metrics"], b["metrics"])),
+            # strict=False by intent: a length mismatch must record a False
+            # check above, not raise here before the result file is written.
+            for ma, mb in zip(a["metrics"], b["metrics"], strict=False)),
     }
     result = {
         "prompt": pid,
@@ -288,6 +291,7 @@ def write_report():
             "mean_pin": statistics.mean(
                 r["target_norm"] for r in rows.values()),
             "share_in_five": in_five / len(rows),
+            "n_in_five": in_five,
             "locked": len(locked),
             "median_lock_in": statistics.median(locked) if locked else None,
             "labels": labels,
@@ -296,7 +300,7 @@ def write_report():
     band = [lv for lv in ordered
             if stats[lv]["share_in_five"] > BAND_THRESHOLD]
     crossings = [
-        (a, b) for a, b in zip(ordered, ordered[1:])
+        (a, b) for a, b in itertools.pairwise(ordered)
         if (stats[a]["share_in_five"] > BAND_THRESHOLD)
         != (stats[b]["share_in_five"] > BAND_THRESHOLD)]
 
@@ -329,7 +333,7 @@ def write_report():
         gain = f"{s['mean_gain']:.2f}" if s["mean_gain"] else "n/a"
         lines.append(
             f"| {level} | {s['mean_pin']:.0f} | "
-            f"{s['share_in_five']:.0%} ({round(s['share_in_five'] * s['n'])}"
+            f"{s['share_in_five']:.0%} ({s['n_in_five']}"
             f"/{s['n']}) | {s['locked']}/{s['n']} | {med} | "
             f"{len(s['labels'])} | {gain} |")
     lines += ["", "## Basin table per level", ""]
