@@ -88,7 +88,7 @@ README_MD = os.path.join(REPO, "README.md")
 
 # Build stamp is a constant, not "today", so re-running is byte-identical.
 BUILD_DATE = "2026-07-25"
-SOURCE_LAST_UPDATED = "2026-07-23"  # JOURNEY_MAP.md header: post-close corrections
+SOURCE_LAST_UPDATED = "2026-07-31"  # FINDINGS.md H4 row: the #54 rescore ruling landed
 
 # Dates that appear throughout the record.
 D_SERIES_CLOSE = "2026-07-10"  # FINDINGS.md provenance; JOURNEY_MAP Phase 5
@@ -96,6 +96,8 @@ D_PERMUTATION = "2026-07-11"   # RESULTS_SUMMARY.md section 6; permutation_repor
 D_ACT_II_5 = "2026-07-19"      # FINDINGS.md scope note; confidence_report.md
 D_POST_CLOSE = "2026-07-23"    # JOURNEY_MAP.md header; bell_anatomy.md correction
 D_POS0 = "2026-07-28"          # FINDINGS.md H-pos0 row; GPT2_DEEP_DIVE.md section 2.5
+D_REGEN = "2026-07-25"         # REGENERATION_REPORT.md; spectral_resonance.ipynb execution
+D_RESCORE = "2026-07-31"       # FINDINGS.md H4 row; output_eigen_rescore/report.md; issue #54 ruling
 D_SUPERVISORY = "2026-03-20"   # JOURNEY_MAP Phase 4 heading
 D_EXPLORATORY = "2026-03-01"   # month anchor: FINDINGS "Original exploratory work: 2026-03"
 
@@ -321,14 +323,25 @@ FINDING_META = {
             "run is an 8-prompt subset taken under a CPU constraint (caveat 3)."),
     ),
     "F4": dict(
-        status="supported", asserted=D_SERIES_CLOSE,
-        evidence=["run-3-random-noise-null"],
+        # "corrected" on the F2/H-flip precedent: the registered reading was
+        # overturned by the finding's own repair. The original arm's numbers
+        # (18 basins, em-dash 64%) were manufactured by a mis-calibrated
+        # injection norm and a pre-convergence count (caveat 18); run 17
+        # repeats the control pair-matched and gated, and inverts it.
+        status="corrected", asserted=D_SERIES_CLOSE,
+        evidence=["run-3-random-noise-null", "run-17-matched-nu-noise"],
         description=(
-            "125 calibrated Gaussian tensors iterated through GPT-2 Small converge into 18 "
-            "non-semantic basins dominated by the horizontal-bar token (64%), with ~zero identity "
-            "overlap with the real five. Bootstrap on the random basin count gives 14.1, 95% CI "
-            "[11, 17]; the real count of 5 falls below the interval, so language funnels into fewer "
-            "attractors than noise."),
+            "As registered: 125 calibrated Gaussian tensors iterated through GPT-2 Small converge "
+            "into 18 non-semantic basins dominated by the horizontal-bar token (64%), locating the "
+            "five basins in the language-driven regime. Inverted 2026-07-31 by the matched-nu, "
+            "gated re-run (run 17): at pair-matched injection norms 90/125 noise trials lock in to "
+            "7 basins, four of them the language arm's own (prolet, solidarity, Anarch, till; 85.6% "
+            "of converged trials), the em-dash basin never appears, and all 35 unconverged trials "
+            "pass at lag 2, the Divine cycle's period-2 signature. Labeled at their smallest "
+            "passing lag (F15's rule) those periodic trials decode to till, i, player and Divine "
+            "itself, so all five language basins reappear and 97/125 trials (77.6%) land in them. "
+            "At this injection scale the basins belong "
+            "to the weights, not the input regime; the nu-sweep is the registered follow-up."),
     ),
     "F5": dict(
         status="corrected", asserted=D_SERIES_CLOSE,
@@ -554,6 +567,15 @@ HYP_ID = {
 #         semantic-coherence half was UPGRADED with permutation support ("coherence
 #         0.41-0.47 vs 0.27, p = 0.001 under both nulls; F8"). A claim that lost one
 #         half and strengthened the other is the textbook "qualified", not a null.
+#   H4    "Not supported as registered; superseded by the corrected-target rescore"
+#         -> not-supported, on the H-J1 precedent: the registered claim (settled
+#         state ~ TOP SINGULAR VECTOR, cos > 0.9, most heads) failed at 5/144.
+#         The rescore's finding (settled state = DOMINANT EIGENVECTOR for every
+#         settling head) is a different, corrected claim raised by run 16 under
+#         TC's #54 ruling, carried in the disposition prose and the run-16
+#         evidence edge, not by the one-word status. "refuted" would be wrong:
+#         the corrected claim is the registered idea aimed at the right object,
+#         and it largely succeeds.
 # The `asserted` dates below are NOT in the record: the documents date dispositions,
 # never the moment a hypothesis was raised. They are placements, not measurements;
 # see metadata.date_precision.
@@ -562,7 +584,7 @@ HYP_META = {
     "H1":            dict(status="supported", phase="phase-2", asserted=D_EXPLORATORY, retired=None),
     "H2":            dict(status="supported", phase="phase-2", asserted=D_EXPLORATORY, retired=None),
     "H3":            dict(status="qualified", phase="phase-2", asserted=D_EXPLORATORY, retired=None),
-    "H4":            dict(status="untested",  phase="phase-4", asserted=D_SUPERVISORY, retired=None),
+    "H4":            dict(status="not-supported", phase="phase-4", asserted=D_SUPERVISORY, retired=None),
     "H-fingerprint": dict(status="refuted",   phase="phase-4", asserted=D_SUPERVISORY, retired=D_SERIES_CLOSE),
     "H-till":        dict(status="refuted",   phase="phase-5", asserted=D_SERIES_CLOSE, retired=D_SERIES_CLOSE),
     "H-D1":          dict(status="supported", phase="phase-5", asserted=D_SERIES_CLOSE, retired=None),
@@ -573,8 +595,9 @@ HYP_META = {
     # H-pos0 is the first hypothesis on the record derived from the architecture
     # rather than from a run, so it carries no evidence edges: the causal-mask
     # argument is deductive, and the sequence-length-1 test that would make it
-    # empirical has not been run (and needs an engine change first). "untested"
-    # is the same status H4 carries for the same reason.
+    # empirical has not been run (and needs an engine change first). H4 carried
+    # "untested" for the same reason until run 16 gave it evidence and the #54
+    # ruling moved it to "not-supported"; H-pos0 has no such run yet.
     "H-pos0":        dict(status="untested",  phase="phase-5", asserted=D_POS0, retired=None),
 }
 
@@ -584,7 +607,7 @@ HYP_EVIDENCE = {
     "H2": ["run-5-gated-resweep", "run-8-divine-motion-audit", "run-9-cycle-anatomy"],
     "H3": ["run-token-neighbourhood", "run-all-warm-permutation",
            "run-7-coherence-formalization"],
-    "H4": [],
+    "H4": ["run-16-eigen-rescore"],
     "H-fingerprint": ["run-2-cross-model-sweeps", "run-3-random-noise-null"],
     "H-till": ["run-5-gated-resweep"],
     "H-D1": ["run-8-divine-motion-audit", "run-9-cycle-anatomy"],
@@ -693,8 +716,12 @@ DISC_OVERRIDE = {
     "10": dict(retired=D_PERMUTATION),
 }
 
-ANNOT_RE = re.compile(r"\*(Retired|Corrected|Resolved)(?:\s+(\d{4}-\d{2}-\d{2}))?\s*:", re.I)
-ANNOT_STATUS = {"retired": "retired", "corrected": "corrected", "resolved": "corrected"}
+# "Inverted" joined the vocabulary 2026-07-31, when run 17 reversed Key
+# Discovery 13's reading; it maps to "corrected" like "Resolved" does.
+ANNOT_RE = re.compile(
+    r"\*(Retired|Corrected|Resolved|Inverted)(?:\s+(\d{4}-\d{2}-\d{2}))?\s*:", re.I)
+ANNOT_STATUS = {"retired": "retired", "corrected": "corrected",
+                "resolved": "corrected", "inverted": "corrected"}
 
 
 def parse_discoveries(journey: str):
@@ -1212,10 +1239,16 @@ RUN_ID = {
     "13": "run-13-lagk-regate",
     "14": "run-14-jlens-phase-probe",
     "15": "run-15-suppression-test",
+    "16": "run-16-eigen-rescore",
+    "17": "run-17-matched-nu-noise",
     "Tensor convergence diagnostic": "run-cos-sim-diagnostic",
     "Readout confidence audit": "run-readout-guardrails",
     "All-warm permutation test": "run-all-warm-permutation",
 }
+
+# Runs that are analysis over committed artifacts and raw weights, with no
+# ATR loop executed. The generic run templates must not call these ATR runs.
+ANALYSIS_ONLY_RUNS = {"run-16-eigen-rescore"}
 
 RUN_SCRIPT = {
     "run-0-repeatability-gate": "experiments/gpt2_small/00_reproducibility_gate.ipynb",
@@ -1234,6 +1267,8 @@ RUN_SCRIPT = {
     "run-13-lagk-regate": "experiments/gpt2_small/09_lagk_gate.py",
     "run-14-jlens-phase-probe": "experiments/gpt2_small/10_jlens_phase.py",
     "run-15-suppression-test": "experiments/gpt2_small/11_suppression_test.py",
+    "run-16-eigen-rescore": "experiments/gpt2_small/12_eigen_rescore.py",
+    "run-17-matched-nu-noise": "experiments/noise_rerun/01_matched_nu_noise_baseline.py",
     "run-cos-sim-diagnostic": "experiments/cos_sim_diagnostic.ipynb",
     "run-readout-guardrails": "experiments/readout_guardrails.ipynb",
     "run-all-warm-permutation": "experiments/gpt2_small/02b_permutation_test.py",
@@ -1254,6 +1289,8 @@ RUN_OUTPUT_DIR = {
     "run-13-lagk-regate": "experiments/gpt2_small/output_lagk/",
     "run-14-jlens-phase-probe": "experiments/gpt2_small/output_jlens_phase/",
     "run-15-suppression-test": "experiments/gpt2_small/output_suppression/",
+    "run-16-eigen-rescore": "experiments/gpt2_small/output_eigen_rescore/",
+    "run-17-matched-nu-noise": "experiments/noise_rerun/output/",
     "run-readout-guardrails": "experiments/output/",
     "run-all-warm-permutation": "experiments/gpt2_small/output_permutation/",
 }
@@ -1278,6 +1315,8 @@ RUN_DATE = {
     "run-13-lagk-regate": D_ACT_II_5,
     "run-14-jlens-phase-probe": D_ACT_II_5,
     "run-15-suppression-test": D_ACT_II_5,
+    "run-16-eigen-rescore": D_RESCORE,
+    "run-17-matched-nu-noise": D_RESCORE,
     "run-cos-sim-diagnostic": D_SERIES_CLOSE,
     "run-readout-guardrails": D_SERIES_CLOSE,
     "run-all-warm-permutation": D_PERMUTATION,
@@ -1329,7 +1368,10 @@ def parse_runs(findings_md: str):
             ("id", rid),
             ("label", label),
             ("type", "run"),
-            ("description", "%s ATR run over %s, on %s." % (
+            ("description", (
+                "%s: analysis over %s, on %s; no forward passes, no ATR loop."
+                if rid in ANALYSIS_ONLY_RUNS else
+                "%s ATR run over %s, on %s.") % (
                 name, demark(row["N"]), demark(row["Model(s)"]))),
         ])
         if RUN_SCRIPT.get(rid):
@@ -1383,14 +1425,16 @@ EXTRA_RUNS = [
     ]),
     OrderedDict([
         ("id", "run-spectral-scaffold"),
-        ("label", "Spectral resonance scaffold (H4, not run)"),
+        ("label", "Spectral resonance protocol (H4, executed 2026-07-25)"),
         ("type", "run"),
         ("description", ("Pre-registered protocol for H4: per-head resonance against the top "
-                         "singular vector of W_OV. Scaffolded and retained as pre-registration, "
-                         "never executed.")),
+                         "singular vector of W_OV. Executed end to end 2026-07-25 in the issue "
+                         "#25 artifact regeneration (5/144 heads above 0.9, NOT SUPPORTED as "
+                         "registered); superseded 2026-07-31 by the corrected-target rescore, "
+                         "run 16, per the operator ruling in issue #54.")),
         ("script", "experiments/gpt2_small/spectral_resonance.ipynb"),
-        ("n", "not run"),
-        ("date", None),
+        ("n", "144 heads, executed 2026-07-25"),
+        ("date", D_REGEN),
         ("phase", "phase-4"),
         ("doc_ref", "docs/FINDINGS.md#3-hypothesis-dispositions"),
     ]),
@@ -1436,10 +1480,13 @@ MODELS = [
         ("id", "null-model-gaussian-noise"),
         ("label", "Random-noise null model (Gaussian, seed 42)"),
         ("type", "null-model"),
-        ("description", ("125 random Gaussian tensors, norm- and length-calibrated to the real "
-                         "runs and iterated through GPT-2 Small. They converge (position collapse "
-                         "to 1.0000) but into 18 basins dominated by the horizontal-bar token, "
-                         "with 1/125 trials reaching prolet.")),
+        ("description", ("125 random Gaussian tensors iterated through GPT-2 Small, intended as "
+                         "norm- and length-calibrated to the real runs; caveat 18 later found the "
+                         "calibration wrong (a per-position statistic applied as the Frobenius "
+                         "target) and the 18-basin count read before convergence. Superseded "
+                         "2026-07-31 by run 17, the pair-matched, gated re-run, which finds noise "
+                         "landing in the language arm's own basins, all five at smallest "
+                         "passing lag (F4).")),
         ("n", "125 Gaussian tensors (seed 42); 15 calibrated trials in the confidence audit"),
         ("date", D_SERIES_CLOSE), ("phase", "phase-5"),
         ("doc_ref", "docs/FINDINGS.md#f4-the-five-basins-belong-to-the-language-driven-regime-not-the-weights-in-general-null-model"),
@@ -1738,15 +1785,21 @@ def curated_relationships():
             "at all, so basin profiles cannot be read as a thematic fingerprint of the corpus "
             "from any model.", 10, D_SERIES_CLOSE),
         rel(F4, HFP, "refutes",
-            "Pure noise through the same weights converges to 18 non-semantic basins disjoint "
-            "from the five, so the five are not a property of the weights that a fingerprint "
-            "reading would require.", 9, D_SERIES_CLOSE),
+            "The refutation survives F4's inversion with its sign flipped. Originally: noise "
+            "found 18 disjoint basins, so the five seemed input-specific. Run 17's matched-nu "
+            "control: noise finds all five (97/125 trials at smallest passing lag), so at this "
+            "injection scale the basins do not require language-shaped input; the noise still "
+            "passes through the trained weights, so what refutes the corpus reading is F3's "
+            "cross-model table (same corpus, no shared basins), which run 17 leaves untouched. "
+            "Either way, not a fingerprint.", 9, D_RESCORE),
         rel(F3, H3, "qualifies",
             "The corpus-causal half of H3 fails cross-model: same corpus, different landscape. "
             "Only the embedding-space clustering observation survives.", 8, D_SERIES_CLOSE),
         rel(F4, H3, "qualifies",
-            "The null model relocates the basins to the language-driven regime, so any corpus "
-            "topology H3 reads is a property of that regime, not of the weights.", 6, D_SERIES_CLOSE),
+            "Inverted 2026-07-31 (run 17): the matched-nu control finds all five basins "
+            "under noise (97/125 trials at smallest passing lag), so any corpus topology H3 "
+            "reads is a property of the weights "
+            "at this injection scale, not of language-driven input.", 6, D_RESCORE),
         rel(F8, H3, "supports",
             "The semantic-coherence half of H3 is upgraded: it now holds in the full readout "
             "distribution with permutation support (0.41-0.47 against 0.27, p = 0.001 under "
@@ -1841,9 +1894,10 @@ def curated_relationships():
             "labels are carried by a coherent distribution rather than a confident winner.",
             5, D_ACT_II_5),
         rel(F4, F1, "qualifies",
-            "The five basins are regime-specific: they belong to the language-driven region of "
-            "activation space, not to universal fixed points of the weight geometry.",
-            6, D_SERIES_CLOSE),
+            "Inverted 2026-07-31 (run 17): F1's basins are not regime-specific after all; noise "
+            "at matched injection scale finds all five, so the landscape belongs to the "
+            "weights at this scale, with scale-dependence the registered open question "
+            "(nu-sweep).", 6, D_RESCORE),
         rel(F12, F8, "qualifies",
             "Coherence measures embedding-space clustering of any kind: GPT-2 Medium's D state "
             "passes at p = 0.001 on purely typographic grounds, so no cross-model coherence "
@@ -1857,9 +1911,10 @@ def curated_relationships():
             "distribution view: a near-flat readout, effective support ~2,800 tokens.",
             6, D_ACT_II_5),
         rel(F11, F4, "supports",
-            "A second, independent instrument sees the same regime boundary: a J-lens reads "
-            "converged noise as less J-space-like than converged language states.",
-            6, D_ACT_II_5),
+            "A second instrument saw the same regime boundary: a J-lens read converged noise "
+            "as less J-space-like than converged language states. Its support attached to the "
+            "ORIGINAL reading, and its noise leg inherited the caveat-18 mis-calibration, so "
+            "it awaits re-derivation against the run-17 states.", 6, D_ACT_II_5),
         rel(F16, F10, "supports",
             "F10's readout-invisibility restated in the lens frame: the physical flip axis "
             "holds span share 0.013 at L11 against a 0.252 chance level, 97.0% of its energy "
@@ -1962,9 +2017,12 @@ def curated_relationships():
             "gate by iteration 120 and keep their label.", 7, D_SERIES_CLOSE),
         rel(F3, D["12"], "supports",
             "F3's four-model table is the finding this discovery records.", 7, D_SERIES_CLOSE),
-        rel(F4, D["13"], "supports",
-            "F4's null model is the evidence this discovery records: 18 non-semantic basins, "
-            "~zero overlap, real count below the random CI.", 7, D_SERIES_CLOSE),
+        rel(F4, D["13"], "corrects",
+            "F4's null model was the evidence this discovery recorded (18 non-semantic "
+            "basins, ~zero overlap), and F4's own repair overturned it: run 17's matched-nu, "
+            "gated re-run sends noise into the language arm's own five basins, so the "
+            "regime-specific reading this discovery states is inverted at the tested scale.",
+            7, D_RESCORE),
         rel(F5, D["16"], "supports",
             "F5's three attribution results are what this discovery records.", 7, D_SERIES_CLOSE),
         rel(F2, D["15"], "supports",
@@ -2035,9 +2093,12 @@ def curated_relationships():
             "fingerprint of training-data themes does not survive the cross-model table.",
             9, D_SERIES_CLOSE),
         rel(F4, "concept-eigenvoice", "corrects",
-            "The metaphor's reporting-register correction: there is no single native voice. "
-            "What the loop settles into depends on what drove it, and noise drives it "
-            "somewhere else entirely.", 7, D_SERIES_CLOSE),
+            "The correction has itself been corrected. First: there is no single native voice, "
+            "and what the loop settles into depends on what drove it. Run 17 inverted the "
+            "second half: converged noise lands in four of the language arm's five basins "
+            "(and the period-2 trials decode to the fifth, Divine, itself), so at this "
+            "injection scale the weights do carry native voices, several rather than the "
+            "metaphor's one.", 7, D_RESCORE),
         rel(F13, "concept-glitch-token", "corrects",
             "The Session 01 glossary note ruled glitch tokens out for the basins; the Divine "
             "cycle's phase-B pole is measured at cos +0.596 to the under-trained core, so the "
@@ -2051,8 +2112,9 @@ def curated_relationships():
             "Five basins, each classified at lock-in and each retaining its members under the "
             "convergence gate.", 6, D_SERIES_CLOSE),
         rel(F4, "concept-attractor-basin", "qualifies",
-            "Basins exist for noise inputs too, but different ones: the notion is "
-            "regime-relative, not a fixed property of the weights.", 6, D_SERIES_CLOSE),
+            "Basins exist for noise inputs too, and at matched injection scale they are "
+            "largely the same ones (run 17): the notion is weight-native at this scale, with "
+            "scale-dependence the open question (nu-sweep).", 6, D_RESCORE),
         rel(F1, "concept-byte-pair-encoding", "relates-to",
             "Basin identities are single BPE tokens (prolet, Anarch), so any multi-token "
             "structure behind them is invisible to the current readout (caveat 8).",
@@ -2181,8 +2243,9 @@ def curated_relationships():
             "The pre-registered null for the all-warm matrix: 10,000 random 14-token sets "
             "against the canonical 14.", 7),
         rel("run-spectral-scaffold", H4, "tests",
-            "The scaffolded protocol for H4: per-head resonance against the top singular vector "
-            "of W_OV. Retained as pre-registration, never executed.", 4),
+            "The pre-registered protocol for H4: per-head resonance against the top singular "
+            "vector of W_OV. Executed 2026-07-25 (issue #25 regeneration); superseded by the "
+            "run-16 eigenvector rescore per the #54 ruling.", 4),
         rel("run-6-full-distribution-confidence", H0, "tests",
             "Result 0 of the confidence audit is a replication check: same code, new machine "
             "class, mirror-sourced weights, three repeats.", 6),
@@ -2445,7 +2508,9 @@ def structural_relationships(claims, runs, run_models, sources):
         for mid in run_models.get(r["id"], []):
             R.append(rel(
                 r["id"], mid, "run-on",
-                "%s iterated the ATR loop on %s (%s)." % (
+                ("%s analysed %s from its weights and committed artifacts (%s)."
+                 if r["id"] in ANALYSIS_ONLY_RUNS else
+                 "%s iterated the ATR loop on %s (%s).") % (
                     r["label"], next(m["label"] for m in runs if m["id"] == mid),
                     r.get("n", "")),
                 2, r.get("date")))
@@ -2465,8 +2530,9 @@ def structural_relationships(claims, runs, run_models, sources):
             "The noise control supplies the third lag signature: monotonic decay with lag, no "
             "period.", 3, D_ACT_II_5),
         rel(FINDING_ID["F4"], "null-model-gaussian-noise", "evidenced-by",
-            "The 18 non-semantic basins and the bootstrap CI [11, 17] are properties of this "
-            "null model.", 7, D_SERIES_CLOSE),
+            "The 18 non-semantic basins and the bootstrap CI [11, 17] were properties of this "
+            "null model's ORIGINAL, mis-calibrated arm; run 17's matched-nu re-run superseded "
+            "them and inverted F4's reading.", 7, D_SERIES_CLOSE),
     ]
 
     # artefacts -> runs, findings -> artefacts

@@ -630,7 +630,18 @@ def _edges(graph, edge_type=None, source=None, target=None):
 
 
 def test_content_h_fingerprint_is_refuted_by_f3_and_f4(entities):
-    """FINDINGS.md section 3: 'H-fingerprint | ... | Refuted as stated (F3, F4).'"""
+    """FINDINGS.md section 3: 'H-fingerprint | ... | Refuted as stated (F3, F4).'
+
+    2026-07-31: F4 moved from "supported" to "corrected" when run 17 inverted
+    its registered reading (matched-nu noise finds the language arm's own
+    basins). The refutation of H-fingerprint survives the inversion with its
+    sign flipped: the basins do not require language-shaped input at the
+    tested scale, and the corpus reading itself is refuted by F3's
+    cross-model table (the noise still passes through the trained weights,
+    so run 17 alone cannot rule on corpus content). So F4 remains a
+    legitimate refuter while carrying
+    "corrected"; F3's refutation is untouched and stays "supported".
+    """
     hypothesis = _claim(entities, "h-fingerprint")
     assert hypothesis["type"] == "hypothesis"
     assert hypothesis["status"] == "refuted"
@@ -639,8 +650,8 @@ def test_content_h_fingerprint_is_refuted_by_f3_and_f4(entities):
     assert refuters == {"f3-fingerprint-refuted", "f4-null-model-regime"}, (
         f"H-fingerprint should be refuted by exactly F3 and F4, got {sorted(refuters)}"
     )
-    for finding in refuters:
-        assert _claim(entities, finding)["status"] == "supported"
+    assert _claim(entities, "f3-fingerprint-refuted")["status"] == "supported"
+    assert _claim(entities, "f4-null-model-regime")["status"] == "corrected"
 
 
 def test_content_h_fingerprint_was_tested_before_it_was_refuted(entities):
@@ -755,10 +766,41 @@ def test_content_not_supported_claims_are_only_the_ones_audited(entities):
     """The 2026-07 status-vocabulary sweep read all 12 dispositions in
     FINDINGS.md section 3 and all 33 findings, and moved exactly one claim.
     If a builder adds another, that is a judgement call and belongs in this pin.
+
+    2026-07-31: H4 added, on the H-J1 precedent, after the operator's ruling
+    in issue #54. The registered claim (settled state matches the top singular
+    vector, cos > 0.9, most heads) failed at 5/144; the corrected-target
+    rescore (run 16) raised a different, largely successful claim, carried by
+    the disposition prose and the evidence edge, not by the one-word status.
+    See the HYP_META audit note in build_evidence_graph.py.
     """
     nulls = sorted(c["id"] for c in entities["claims"]
                    if c["status"] == "not-supported")
-    assert nulls == ["h-j1"], f"unaudited not-supported claims: {nulls}"
+    assert nulls == ["h-j1", "h4-head-power-iteration"], \
+        f"unaudited not-supported claims: {nulls}"
+
+
+def test_content_h4_run16_evidence_is_a_structural_relation(entities):
+    """The #54 ruling's evidence is a graph relation, not just status prose.
+
+    H4's corrected-target rescore must be wired in as an edge so a
+    regeneration cannot depend on the one-word status alone: H4 rests on
+    run-16 via `produced-by`, while the superseded scaffold keeps its
+    historical `tests` edge, distinguishable by run id.
+    """
+    rels = entities["relationships"]
+    assert any(
+        r["from"] == "h4-head-power-iteration"
+        and r["to"] == "run-16-eigen-rescore"
+        and r["type"] == "produced-by"
+        for r in rels
+    ), "H4 -> run-16 produced-by evidence edge is missing"
+    assert any(
+        r["from"] == "run-spectral-scaffold"
+        and r["to"] == "h4-head-power-iteration"
+        and r["type"] == "tests"
+        for r in rels
+    ), "the superseded scaffold's historical tests edge is missing"
 
 
 def test_content_f11_is_qualified_because_a_null_finding_still_stands(entities):

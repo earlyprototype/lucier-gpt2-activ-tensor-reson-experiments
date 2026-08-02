@@ -62,3 +62,17 @@ experiments/_DATA/EXP_009/*
 # 2026-07-26: sink_geometry ATR trajectories. Same rule as EXP_009 above —
 # outputs are committed so the masking analysis can be re-run without a sweep.
 !experiments/sink_geometry/output/trajectories.pt
+
+# 2026-07-31: noise re-run live log. Transient and timing-stamped; the committed
+# deliverables for this experiment are results.pt and report.md (caveat 18 repair).
+experiments/noise_rerun/output/run.log
+
+# 2026-07-31: run 17's archive. Same rule as EXP_009 above: the matched-nu noise
+# baseline's per-trial results (terminal tensors + per-iteration float64 metrics)
+# are the caveat 18 repair's evidence and must survive the container.
+!experiments/noise_rerun/output/results.pt
+
+# 2026-08-01: renorm probes (#112). Same rule: per-prompt engine results with
+# per-iteration metrics are the probes' evidence and must survive the container.
+!experiments/renorm_probe/output/free_norm_results.pt
+!experiments/renorm_probe/output/natural_arm_results.pt

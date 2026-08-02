@@ -121,10 +121,16 @@ def test_comments_and_blank_lines_are_skipped(tmp_path):
 
 
 def test_the_repositorys_own_allowlist_parses(tmp_path):
-    """The committed .drift-allow is itself well formed."""
+    """The committed .drift-allow is itself well formed.
+
+    An empty allowlist is a legitimate, healthy state: it means every known
+    divergence has been resolved (the last two entries, both tied to issue
+    #54, were deleted 2026-07-31 when the operator's ruling landed and the
+    record was updated). What this test guards is that whatever entries do
+    exist parse cleanly, never that entries exist.
+    """
     allow, problems = drift.load_allowlist(str(GRAPH_DIR / ".drift-allow"))
     assert problems == []
-    assert allow, "the committed allowlist parsed to nothing"
 
 
 # --------------------------------------------------------------------------

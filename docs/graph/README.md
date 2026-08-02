@@ -86,8 +86,10 @@ identity.
 **Why it exists:** because an analogy that is never tested is decoration, and this one has been
 tested to destruction in three specific places. A room mode is a fixed point; `Divine` is an exact
 period-2 limit cycle, home only every second pass (F9). A room's modes are a property of the room;
-GPT-2 Small's basins are not a property of the weights, since noise driven through the same weights
-finds eighteen different ones (F4). And the argument that promoted the analogy to a theorem — every
+GPT-2 Small's basins first seemed not to be, when a mis-calibrated noise control appeared to find
+eighteen different ones, but the corrected matched-ν re-run (run 17, 2026-07-31) reversed
+that: noise raises the language arm's own five basins, so on this test the analogy now holds
+at the tested injection scale (F4, corrected). And the argument that promoted the analogy to a theorem — every
 normalised transformer must have basins, by Brouwer — is in the graph too, in correction blue, with
 the reason it fell over attached to it: the L2 shell is a sphere, and a sphere is not convex
 (JOURNEY_MAP Key Discovery 11, corrected 2026-07-23).
@@ -116,14 +118,15 @@ the graph *and the working tree*:
 
 **Why it exists:** because the two things worth acting on are the two things prose hides.
 
-The first is a claim the record has fallen behind. H4 is the only hypothesis in the graph with a
-`tests` edge and no verdict edge — and the notebook that edge points at,
-`experiments/gpt2_small/spectral_resonance.ipynb`, has executed output in 8 of its 14 cells, with
-cell 9 reading `NOT SUPPORTED … Mean |cos sim| 0.2387 … Heads > 0.9: 5 / 144`. FINDINGS.md,
-JOURNEY_MAP.md and the notebook's own status banner all still say "not run". The graph could not
-catch this on its own — it is parsed *from* those documents, so it faithfully reproduced their
+The first was a claim the record had fallen behind. H4 was, until 2026-07-31, the only hypothesis
+in the graph with a `tests` edge and no verdict edge, while the notebook that edge points at,
+`experiments/gpt2_small/spectral_resonance.ipynb`, carried executed output in 8 of its 14 cells,
+cell 9 reading `NOT SUPPORTED … Mean |cos sim| 0.2387 … Heads > 0.9: 5 / 144`, with FINDINGS.md,
+JOURNEY_MAP.md and the notebook's own status banner all still saying "not run". The operator's
+ruling in issue #54 settled the disposition and closed the gap. The graph could not have
+caught this on its own: it is parsed *from* those documents, so it faithfully reproduced their
 staleness. Only the cross-check against the filesystem catches it, which is why the classification
-is an overlay and not a graph property. Clicking the node quotes the cell.
+is an overlay and not a graph property, and this catch is why the check exists.
 
 The second is a shared blocker. `blocks` / `blocked-by` edges are drawn thick, dashed and purple,
 and a blocker the graph has no node of its own for — an issue number, an artefact named only in
@@ -486,8 +489,11 @@ four hops:
 > **H-fingerprint** — *basin profiles read training bias from any model* — is refuted by **F3**,
 > which is evidenced by **run 2, the cross-model sweeps**, run on **GPT-2 Medium**, which shares
 > GPT-2 Small's corpus and produces no semantic basins at all. And it is refuted again, from a
-> different direction, by **F4**, evidenced by **run 3, the null model**, where noise through the
-> same weights finds eighteen attractors none of which are the five.
+> different direction, by **F4**, whose corrected control (**run 17**, superseding run 3's
+> mis-calibrated arm) finds noise landing in the language arm's own basins: the basins do not
+> require language-shaped input at the tested injection scale, and F3's cross-model table is
+> what pins the corpus half down (the noise still flows through the trained weights, so run 17
+> alone cannot say what those weights absorbed from the corpus).
 
 Two independent trails converging on one dead claim. That is what a refutation looks like when it
 is done properly, and it is legible in the graph in about five seconds.

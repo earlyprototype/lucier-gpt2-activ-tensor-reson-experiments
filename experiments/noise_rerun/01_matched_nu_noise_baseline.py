@@ -92,6 +92,7 @@ def stage_b_noise(calibration, n_trials):
 
 
 def smallest_passing_lag(lag_table, threshold=THRESHOLD):
+    """Return the smallest lag whose terminal cosine clears the gate threshold, or None."""
     if not lag_table:
         return None
     for lag in sorted(lag_table):
@@ -101,6 +102,7 @@ def smallest_passing_lag(lag_table, threshold=THRESHOLD):
 
 
 def run(n_trials, max_iter):
+    """Calibrate against the prompt library, run every noise trial, write the report."""
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     from transformer_lens import HookedTransformer
     model = HookedTransformer.from_pretrained("gpt2")
@@ -117,7 +119,7 @@ def run(n_trials, max_iter):
         "calibration_mode": "pair-matched (trial k <- prompt k's seq_len and Frobenius norm)",
         "frobenius_mean": sum(norms) / len(norms),
         "frobenius_min": min(norms), "frobenius_max": max(norms),
-        "torch": torch.__version__,
+        "torch": str(torch.__version__),
     }
     with open(OUT_DIR / "calibration.json", "w", encoding="utf-8") as f:
         json.dump({"config": config, "per_prompt": calibration}, f, indent=2)
@@ -148,6 +150,7 @@ def run(n_trials, max_iter):
 
 
 def write_report(config, results):
+    """Regenerate report.md from the per-trial results; every published number originates here."""
     conv = {k: v for k, v in results.items() if v["result"]["converged"]}
     unconv = {k: v for k, v in results.items() if not v["result"]["converged"]}
     periodic = {}
@@ -165,6 +168,24 @@ def write_report(config, results):
     dom = basins[0] if basins else ("-", 0)
     lock_iters = sorted(v["result"]["lock_in_iter"] for v in conv.values())
     med_lock = lock_iters[len(lock_iters) // 2] if lock_iters else None
+
+    # F15's classification rule is "smallest passing lag", so the periodic
+    # trials are basins too, labeled by the readout of the captured terminal
+    # iterate. The language arm labels its own period-2 basin (Divine) the
+    # same single-phase way.
+    periodic_counts = {}
+    for k in periodic:
+        tok = unconv[k]["result"]["terminal_token"].strip()
+        periodic_counts[tok] = periodic_counts.get(tok, 0) + 1
+    periodic_basins = sorted(periodic_counts.items(), key=lambda kv: -kv[1])
+    combined_counts = dict(basin_counts)
+    for tok, c in periodic_counts.items():
+        combined_counts[tok] = combined_counts.get(tok, 0) + c
+    combined = sorted(combined_counts.items(), key=lambda kv: -kv[1])
+    n_passing = len(conv) + len(periodic)
+    combined_overlap = sorted(set(combined_counts) & REAL_FIVE)
+    in_five = sum(c for tok, c in combined if tok in REAL_FIVE)
+    unclassified = len(unconv) - len(periodic)
 
     lines = [
         "# Matched-nu noise baseline: results",
@@ -195,7 +216,46 @@ def write_report(config, results):
     ]
     for tok, c in basins:
         lines.append(f"| `{tok}` | {c} | {c / max(len(conv), 1):.1%} |")
+    lags_seen = ", ".join(str(lag) for lag in sorted(set(periodic.values())))
+    if periodic_basins:
+        lines += [
+            "",
+            f"## Periodic trials (smallest passing lag: {lags_seen}), "
+            "labeled by terminal readout",
+            "",
+            "| terminal token | trials | share of periodic |",
+            "|:--|--:|--:|",
+        ]
+        for tok, c in periodic_basins:
+            lines.append(f"| `{tok}` | {c} | {c / len(periodic):.1%} |")
+        lines += [
+            "",
+            "Label provenance: each periodic trial's label is the argmax readout of",
+            "the captured terminal iterate, which is one phase of the cycle. The",
+            "language arm's `Divine` label has the same single-phase provenance,",
+            "with run 8 (F2) additionally auditing that readout as stable across",
+            "the cycle; no per-trial phase audit exists yet for these noise trials.",
+        ]
     lines += [
+        "",
+        "## All trials at their smallest passing lag (the F15 classification rule)",
+        "",
+        f"Basis: {n_passing}/{n} trials pass at lag 1"
+        + (f" or at a higher lag (observed: {lags_seen})" if periodic else "")
+        + (f"; {unclassified} pass at no scanned lag and are excluded" if unclassified else "") + ".",
+        "",
+        "| terminal token | trials | share of passing |",
+        "|:--|--:|--:|",
+    ]
+    for tok, c in combined:
+        lines.append(f"| `{tok}` | {c} | {c / max(n_passing, 1):.1%} |")
+    lines += [
+        "",
+        f"- Distinct labels over all passing trials: **{len(combined_counts)}**.",
+        f"- Overlap with the real five {sorted(REAL_FIVE)}: "
+        f"{combined_overlap if combined_overlap else 'none'}.",
+        f"- Passing trials landing in the real five: **{in_five}/{n_passing}"
+        f" ({in_five / max(n_passing, 1):.1%})**.",
         "",
         "## Reading",
         "",
@@ -217,6 +277,18 @@ if __name__ == "__main__":
     ap.add_argument("--smoke", action="store_true",
                     help="2 trials, 150-iteration ceiling")
     ap.add_argument("--trials", type=int, default=None)
+    ap.add_argument("--report-only", action="store_true",
+                    help="regenerate report.md from the saved results.pt, no model run")
     args = ap.parse_args()
-    n = 2 if args.smoke else (args.trials or len(prompt_library.PROMPT_LIBRARY))
-    run(n, 150 if args.smoke else MAX_ITER)
+    if args.report_only:
+        # TorchVersion is allowlisted because the committed results.pt
+        # predates the str() cast in the config; it is a str subclass
+        # shipped by torch itself, not arbitrary pickle.
+        with torch.serialization.safe_globals(
+                [torch.torch_version.TorchVersion]):
+            saved = torch.load(OUT_DIR / "results.pt", map_location="cpu",
+                               weights_only=True)
+        write_report(saved["config"], saved["results"])
+    else:
+        n = 2 if args.smoke else (args.trials or len(prompt_library.PROMPT_LIBRARY))
+        run(n, 150 if args.smoke else MAX_ITER)

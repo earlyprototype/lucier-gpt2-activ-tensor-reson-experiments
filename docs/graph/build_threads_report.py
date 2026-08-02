@@ -114,6 +114,17 @@ WAS_RUN_RE = re.compile(
     r"re-execution|regenerat",
     re.IGNORECASE,
 )
+# Prose that reports an obstacle RESOLVED rather than standing. A sentence
+# carrying one of these does not register the issue numbers it cites as live
+# blockers: "restored (issue #24)" is a receipt, not an obstacle. The words
+# are broad on purpose; the cost of skipping a live blocker whose sentence
+# happens to contain "executed" is far below the cost of a resolved issue
+# haunting the still-blocked list forever.
+RESOLVED_RE = re.compile(
+    r"\bAnswered\b|\bexecuted\b|\brestored\b|\bsuperseded\b|\bresolved\b|"
+    r"\bruled\b|\bmerged\b|\bdelivered\b|\bwithdrawn\b",
+    re.IGNORECASE,
+)
 
 DATA_EXT = (".pt", ".pth", ".json", ".npy", ".npz", ".csv", ".md", ".png")
 ARTEFACT_EXT = (".pt", ".pth", ".json", ".npy", ".npz", ".csv")
@@ -551,6 +562,8 @@ def prose_mentions(needle: str, matcher: re.Pattern, limit=6):
     """Markdown lines mentioning `needle` that also match `matcher`."""
     hits = []
     for path, no, text in markdown_index():
+        if path == "docs/PODCAST_SOURCES.md":
+            continue  # dated snapshot bundle; its mirrored prose is not the record
         if needle in text and matcher.search(text):
             hits.append({"file": path, "line": no,
                          "text": " ".join(text.split())[:300]})
@@ -588,6 +601,17 @@ def detect_answered_but_unrecorded(graph: Graph, repo_modules):
         verdicts = [e for e in graph.incoming.get(claim_id, [])
                     if e["type"] in VERDICT_EDGES]
         if verdicts:
+            continue
+        # A recorded disposition IS the record's verdict for a hypothesis.
+        # This detector exists for claims the record has fallen behind on,
+        # not for ones the operator has ruled on: once the status leaves
+        # "untested", the gap this detector reports is closed (H4 / issue
+        # #54 was the motivating case in both directions). Accepted trade:
+        # a ruling that a LATER run quietly contradicts will not resurface
+        # here; that case is the drift check's to catch, since it compares
+        # the record's prose against the disk without consulting statuses.
+        if claim.get("type") == "hypothesis" and claim.get("status") not in (
+                None, "untested", "open"):
             continue
 
         record = {
@@ -1015,8 +1039,12 @@ def detect_blockers(graph: Graph):
     """
     groups = {}
     for claim_id, claim in sorted(graph.claims.items()):
+        if claim.get("status") == "retired":
+            continue  # a retired claim's prose is history, not an obstacle
         desc = claim.get("description") or ""
         for sentence in sentences_of(desc):
+            if RESOLVED_RE.search(sentence):
+                continue  # a receipt for a cleared obstacle, not a live one
             issues = sorted(set(ISSUE_RE.findall(sentence)), key=int)
             phrases = []
             for _kind, pattern in BLOCKER_PATTERNS:
@@ -1146,8 +1174,24 @@ def detect_open_threads(graph: Graph, answered, blockers, repo_modules):
     claim_ids = set()
     pending_hits = {}
     for claim_id, claim in graph.claims.items():
+        if claim.get("status") == "retired":
+            continue  # answered and retired: nothing here is unfinished
         desc = claim.get("description") or ""
-        hits = sorted({m.group(0).lower() for m in PENDING_RE.finditer(desc)})
+        hits = set()
+        # Sentence by sentence, so a resolution receipt ("Answered
+        # 2026-07-31 ... issue #24", "executed 2026-07-25 in the issue #25
+        # artifact regeneration") does not read as pending work merely
+        # because it cites the issue it closed.
+        for sentence in sentences_of(desc):
+            found = [m.group(0).lower()
+                     for m in PENDING_RE.finditer(sentence)]
+            # A receipt sentence cites the issue it closed, so its issue
+            # reference is not pending work. Other pending language in the
+            # same sentence still is ("withdrawn pending re-derivation").
+            if RESOLVED_RE.search(sentence):
+                found = [h for h in found if not h.startswith("issue #")]
+            hits.update(found)
+        hits = sorted(hits)
         if hits:
             claim_ids.add(claim_id)
             pending_hits[claim_id] = hits
@@ -1434,10 +1478,42 @@ def detect_unreferenced(graph: Graph):
     scripts = walk_repo("experiments", SCRIPT_EXT)
     script_text = {s: read_text(s) for s in scripts}
 
-    def producer_of(basename):
+    run_pairs = set()
+    for run in graph.runs.values():
+        script = run.get("script")
+        outdir = (run.get("output_dir") or "").rstrip("/")
+        if script and outdir:
+            run_pairs.add((script, outdir))
+
+    def producer_of(basename, parent):
+        """Scripts that plausibly WRITE this artefact.
+
+        A bare basename match is not enough: half the experiment scripts
+        save a file called results.json, and matching on the name alone
+        attributed each one's artefact to all of the others. So the script
+        must also be TIED to the artefact's directory, one of three ways:
+        a run node pairs the script with that output directory; the script
+        sits in the directory's parent and names the directory in its own
+        text (output paths are built from string literals); or the artefact
+        sits directly beside the script.
+        """
+        parent_norm = parent.rstrip("/")
+        dir_base = os.path.basename(parent_norm)
+        parent_of_parent = os.path.dirname(parent_norm)
         hits = []
         for path, text in script_text.items():
-            if basename in text and "save" in text.lower():
+            low = text.lower()
+            writes = ("save" in low or "json.dump" in low
+                      or "to_csv" in low or '"w"' in low or "'w'" in low)
+            if basename not in text or not writes:
+                continue
+            script_dir = os.path.dirname(path)
+            tied = (
+                (path, parent_norm) in run_pairs
+                or (script_dir == parent_of_parent and dir_base in text)
+                or script_dir == parent_norm
+            )
+            if tied:
                 hits.append(path)
         return sorted(hits)
 
@@ -1448,7 +1524,7 @@ def detect_unreferenced(graph: Graph):
             continue
         parent = os.path.dirname(path)
         in_known_dir = parent.rstrip("/") in known_dirs or parent in graph.blob
-        producers = producer_of(base)
+        producers = producer_of(base, parent)
         producer_runs = []
         for prod in producers:
             for run_id, run in graph.runs.items():
@@ -1465,6 +1541,10 @@ def detect_unreferenced(graph: Graph):
                               else "orphan-directory",
             "directory": parent,
             "produced_by_script": producers,
+            # An empty producers list is a statement, not a blank: no script
+            # could be tied to this artefact's directory, so the attribution
+            # is unresolved rather than silently guessed from a basename.
+            "producer_resolution": "path-tied" if producers else "unresolved",
             "producer_run_nodes": producer_runs,
         })
 
@@ -1662,7 +1742,7 @@ def render_markdown(graph, answered, blockers, threads, frontier, undeveloped,
             add("")
         if record["disk_evidence"]:
             state = record["disk_evidence"][0].get("script_state") or {}
-            if state.get("banner"):
+            if state.get("banner") and NOT_RUN_RE.search(state["banner"]):
                 add("The notebook's own opening cell agrees with the prose and "
                     "not with its own outputs:")
                 add("")

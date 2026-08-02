@@ -4,7 +4,9 @@
 
 Activation Tensor Resonance (ATR) iterates a transformer's full residual-stream
 tensor back through its own forward pass (extract at the final layer,
-L2-rescale, re-inject at layer 0) until the state stabilises. On GPT-2 Small,
+L2-rescale to ν, the first pass's exit norm, an apparatus parameter held fixed
+for the run and 67-72× the model's natural entry scale, re-inject at layer 0)
+until the state stabilises. On GPT-2 Small,
 125 language prompts resolve into five attractor basins (`prolet` 43.2%,
 `Divine` 27.2%, `till` 15.2%, `Anarch` 13.6%, `solidarity` 0.8%, classified at
 convergence), four of them semantically coherent in embedding space. The
@@ -12,9 +14,16 @@ founding hypothesis, that these basins constitute a thematic fingerprint of
 the training corpus, readable from any open-weight model, was refuted by the
 project's own validation series: GPT-2 Medium, trained on the same corpus,
 collapses all prompts to a single empty token; the Pythia models produce
-unrelated landscapes; and a random-noise control converges to eighteen
-non-semantic attractors disjoint from the five, locating the basins in the
-language-driven regime rather than the weight geometry per se. Diagnostics
+unrelated landscapes; and a random-noise control at first appeared to converge
+to eighteen non-semantic attractors disjoint from the five, locating the basins
+in the language-driven regime rather than the weight geometry per se. That last
+clause did not survive its own repair: the original noise arm ran at the wrong
+injection scale and was counted before convergence (caveat 18), and the
+matched-scale, convergence-gated re-run (2026-07-31, run 17) inverts it:
+classified at the smallest passing lag, the noise trials reproduce all five of
+the language arm's basins, with 97 of 125 trials landing in them
+(F4). At the injection scale this apparatus uses, the basins belong to the
+weights; what language input contributes is again an open question. Diagnostics
 attribute the cross-model differences to intrinsic model dynamics, not
 apparatus. What remains is a cheap, training-free probe of iterated-dynamics
 regimes, one sharp dissociation between dynamics and decoding, and one open
@@ -82,6 +91,8 @@ cloud container, a different machine class from all prior runs, with `gpt2` and
 | 13 | Lag-k re-gate + engine `gate_lag` | gpt2-small | 3 states × 25 dense iters | `experiments/gpt2_small/output_lagk/` |
 | 14 | J-lens phase probe (both phases, pivot, flip axis) | gpt2-small | pilot lens × cycle states | `experiments/gpt2_small/output_jlens_phase/` |
 | 15 | Suppression-head test for L11.H8 | gpt2-small | 144 heads; loop ablation; 12 sentences | `experiments/gpt2_small/output_suppression/` |
+| 16 | Per-head spectral test, eigenvector rescore | gpt2-small | 144 heads; stored 009b trajectories + raw weights, no forward passes | `experiments/gpt2_small/output_eigen_rescore/` |
+| 17 | Matched-ν noise baseline re-run | gpt2-small | 125 Gaussian tensors (seed 42), pair-matched ν and length, gated | `experiments/noise_rerun/output/` |
 | - | Tensor convergence diagnostic | all four | reads runs 1–2 | `experiments/cos_sim_diagnostic.ipynb` |
 | - | Readout confidence audit | gpt2-small | single-prompt demo | `experiments/output/readout_guardrails_gpt2_small.json` |
 | - | All-warm permutation test | gpt2-small (W_E) | 10,000 random 14-token sets | `experiments/gpt2_small/output_permutation/` |
@@ -160,8 +171,10 @@ phenomenon is, on current evidence, specific to GPT-2 Small within this set.
 
 ### F4: The five basins belong to the language-driven regime, not the weights in general (null model)
 
-*Status: provisional pending the matched-ν, gated re-run (caveat 18); the heading
-states the original reading, not a settled result.*
+*Status: **inverted by the matched-ν, gated re-run (2026-07-31, run 17)**. The
+heading is retained as the registered claim; at matched injection scale and
+matched convergence state the comparison comes out the other way, and the
+outcome blockquote below is the finding's current disposition.*
 
 125 random Gaussian tensors (intended as norm- and length-calibrated to the real
 runs; the calibration error is documented below) iterated
@@ -182,6 +195,35 @@ fixed points of the weight geometry.
 > produce the 5-vs-18 gap. "Norm- and length-calibrated" above is therefore wrong
 > as stated. The direction of the finding may survive; the numbers do not, until
 > the matched-ν, gated re-run lands. Downstream inheritance in caveat 18.
+
+> **Re-run landed; the comparison inverts (2026-07-31; run 17,
+> `experiments/noise_rerun/01_matched_nu_noise_baseline.py`, report in
+> `experiments/noise_rerun/output/report.md`).** 125 noise trials, each
+> pair-matched to one real prompt's exact sequence length and iteration-0
+> Frobenius norm (injection mean ν 1427.5 against the old run's 397.18), run
+> under the engine's convergence gate. 90/125 lock in (median iteration 120)
+> into **7 basins, not 18**, and four of the language arm's five absorb most
+> of them: `prolet` 22, `solidarity` 21, `Anarch` 17, `till` 17 of the 90
+> converged trials (the report's basin table; 77 trials, an 85.6% combined
+> share), with `prolet` dominant exactly as in the language arm. The old run's
+> dominant basin, the horizontal-bar token `―`, never appears. The remaining
+> converged basins are `Spells` (10), `bourgeois` (2) and `agitation` (1);
+> that seven-basin table covers the 90 lag-1 lock-ins only. The other 35
+> trials all pass at lag 2, the `Divine` cycle's period-2 signature (F9, F15),
+> and F15's rule (classify each state at its smallest passing lag) makes them
+> basins too: labeled by terminal readout they split `till` 15, `i` 10,
+> `player` 5 and `Divine` 5 (the report's periodic table), so the language
+> arm's period-2 `Divine` basin itself reappears under noise. Over all 125
+> trials at their smallest passing lag the noise arm shows 10 distinct labels,
+> every one of the language arm's five among them, and 97/125 trials (77.6%)
+> land in those five (the report's all-trials table). **Reading:** at this apparatus's injection scale the
+> basins are properties of the weights, not of language-driven input; the
+> registered 5-vs-18 gap was manufactured entirely by the two confounds above.
+> What language input does contribute at other injection scales is not
+> addressed by this control; the ν-sweep (ALIGNMENT_REVIEW §5) is the
+> registered follow-up. Downstream findings that consumed the OLD noise states
+> (caveat 18's inheritance list) are not repaired by this re-run and keep
+> their caveats.
 
 ### F5: The cross-model differences are intrinsic, not apparatus artefacts
 
@@ -686,7 +728,7 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
 | H1 | `prolet` is the dominant basin | **Supported, revised upward**: 43.2% at lock-in (was 35.2% at iter 100). Per-prompt category predictions remained poor (~25%); the structural claim stands, the predictive one does not. |
 | H2 | `Divine` is a genuine secondary basin | **Supported; the object is now resolved (2026-07-19)**: 27.2%, and unlike the other four it is not a fixed point but an exact period-2 limit cycle with a phase-invariant argmax (F2, F9, F10): a high-probability single token over a moving tensor, not a low-probability basin. |
 | H3 | Intermediate tokens reflect training-corpus topology | **Weakened further at close; coherence half upgraded 2026-07-19**: the all-warm cross-similarity matrix was permutation-tested and found to be an anisotropy artifact (99.9% of random 14-token sets are also all-positive; see caveat 4, resolved), and the corpus-causal reading had already failed cross-model (F3). The semantic-coherence observation itself, however, no longer stands as qualitative only: it now holds one level deeper than the token-level W_E neighbourhood, in the full readout distribution, with permutation support (coherence 0.41-0.47 vs 0.27, p = 0.001 under both nulls; F8). |
-| H4 | Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector) | **Untested**: protocol scaffolded (`experiments/gpt2_small/spectral_resonance.ipynb`), not run. |
+| H4 | Per-head resonance ≈ linear power iteration on W_OV (cos > 0.9 to top singular vector) | **Not supported as registered; superseded 2026-07-31 by the corrected-target rescore (run 16; TC ruling, #54)**: executed 2026-07-25 in the issue #25 artifact regeneration (`spectral_resonance.ipynb`; artifacts `experiments/_DATA/EXP_009/009c_*.pt`): 5/144 heads above 0.9 to the top singular vector (mean absolute cosine 0.2387, median 0.1614; the sixth head sits at 0.8973, so the count splits a near-tie). The registered target was the wrong object: the isolated loop applies W_OV transposed with a direction-preserving rescale (no LayerNorm, attention, or biases inside it), power iteration proper, whose limit is the dominant *eigenvector* of W_OV transposed (equivalently a dominant left eigenvector of W_OV), not W_OV's top singular vector. Rescored against that eigenvector (run 16, `experiments/gpt2_small/output_eigen_rescore/report.md`, which retains the original scoring as its footnote): 87/144 heads carry a real dominant eigenvalue, of which 81 had settled by iteration 500 and **every settled axis matches the iterated operator's dominant eigenvector** (minimum agreement 0.9999999); the 6 still converging at 500 already sit at 0.97 to 0.9999 alignment to it; the other 57 heads carry a complex dominant pair and rotate as predicted, 55/57 inside the pair's own invariant plane (median in-plane fraction 1.0000; the two exceptions, L0.H1 at 0.476 and L6.H8 at 0.940, are named in the report). The registered passes are exactly the heads where eigenvector and singular vector coincide, led by L11.H8 (largest singular gap of all 144, 11.49; eigenvalue gap 17.25; negative dominant eigenvalue, modulus 86.7), the F14/F17 flip-axis head, here too a period-2 sign-flipper: two independent instruments agree on its direction-flipping structure. Chance is excluded under both the uniform 768-dimensional null (single-head probability of clearing 0.9 about 8e-279) and a null calibrated to the bulk's anisotropy (effective dimension 11.7; probability of at least 5 passes in 144 about 3e-14). The registered proposition was naive: it named the wrong spectral object, and a head in isolation idealises away the MLP, the layer's other eleven heads acting in concert, LayerNorm and attention; the rescore results stand as real artifacts on that hyper-constrained basis and claim nothing about heads in place. Both regeneration deviations (`.detach()`, `.clone()`) verified value-preserving inside run 16; the committed 009c artifacts reproduce from the raw weights within float32 precision. |
 | H-fingerprint | Basin profiles read training-data bias without data access | **Refuted as stated** (F3, F4). |
 | H-till | `till` is a slow transient | **Refuted** (F1: 19/19 stable). |
 | H-D1 | `Divine`'s late-stage motion lies mostly in readout-flattened directions | **Supported in a weakened, more precise form (2026-07-19)**: the motion is an exact period-2 cycle whose per-step readout response is 0.295 of the equal-norm random baseline and whose flip axis responds at 0.054, but the distribution visibly shifts (p(top-1) swings 0.505 to 0.225 each half-cycle) while the argmax stays fixed (F9, F10). |
@@ -894,6 +936,14 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
     nulls, ν-independent) and the F13–F17 mechanism series (consumes
     `state_divine.pt` only). Repair: the matched-ν, gated, archive-spec noise
     re-run, first in the experiment queue (`ALIGNMENT_REVIEW.md` §5).
+    **Repair executed (2026-07-31, run 17): the re-run landed and the F4
+    comparison inverts; the full outcome is F4's second blockquote.** The
+    re-run supersedes the OLD noise arm as a control, but the downstream
+    clauses listed above were computed against the old noise states and are
+    not repaired by it: each keeps its caveat until re-derived against the
+    run-17 states (the archive in `experiments/noise_rerun/output/results.pt`
+    carries per-iteration float64 metrics for all 125 trials, closing M2's
+    archive gap for this arm).
 18b. **F8's null is under challenge (2026-07-31; issue #98).** The coherence
     statistic measures anisotropic-cone position, not meaning: a random multiple
     of one arbitrary token embedding decodes at `prolet`'s coherence level with
@@ -908,6 +958,29 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
     "the noise attractors are the real anomaly" reading waits on caveat 18's
     re-run, because the noise states carrying that anomaly were produced under
     the mis-calibration.
+19. **Basin identity is injection-scale-bound; ν is an apparatus parameter
+    (2026-08-01; issue #112, both probes registered before execution).** The
+    loop's rescale pins every iterate to ν, the first pass's exit Frobenius
+    norm, for the whole run. The natural-scale probe measured what that pin
+    does: the registered protocol injects at 67-72× the size layer 0
+    naturally receives (per prompt, first ten library prompts), so the model
+    runs outside its trained input range from iteration 1. Two probes now
+    bracket the registered regime. At the natural entry scale
+    (`renorm="natural_i"`, ν ≈ 18-20): 0/10 prompts lock under the lag-1
+    gate, the landscape is periodic (smallest passing lags 2 and 4; one
+    trial passes no scanned lag), and the terminal readouts (`Indian` 3,
+    `Gujarat` 3, `lakh` 2, `football` 1, `Hindu` 1) overlap the five basins
+    in zero trials. With the rescale removed (`renorm="none"`): the norm
+    grows without equilibrium (per-pass gain falls to 1.005 by pass 200, no
+    saturation, no explosion), position collapse stops partway (0.24-0.61
+    against ~1.0 pinned), and the readout leaves the basins for function
+    tokens (`the` ×3, `in`, `,`). Together with run 17, which found the
+    basins weight-native *at* the registered scale, the five-basin landscape
+    is established at ν ≈ 1400 and absent at both brackets. Until the
+    ν-sweep (now first in the queue, `ALIGNMENT_REVIEW.md` §5 amendment)
+    maps the transitions, every basin-identity claim carries an implicit
+    "at the registered injection scale". Records and regenerating scripts:
+    `experiments/renorm_probe/`.
 
 ## 5. What ATR is, after this series
 
@@ -941,7 +1014,9 @@ cycling prompts and whether they share the F10 flip axis (unblocked: the prompt
 library is restored, issue #24; run queued); the shape-class-matched coherence null and
 its application to the 125-sweep (F12, caveat 10); the phase-aware J-lens full
 build (F11, issue #8); hook-window/depth dependence (caveat 6); gate cadence
-(caveat 5); H4.
+(caveat 5); the H4 rescore's residue (why a large minority of heads carry complex
+dominant eigenvalues, and whether the per-head spectral profiles predict anything
+about the full-stack loop; run 16).
 
 ## 6. Stage boundary: why the series closed with work unexecuted
 
@@ -957,8 +1032,9 @@ three classes, deliberately:
 2. **Transferred to the next question.** The depth control (caveat 6), per-layer /
    per-head decomposition, the spectral test (H4), and readout upgrades do not test
    whether the result is real; they test *why the models differ*. That is the
-   successor project's question. Their scaffolds are retained, labelled not-run, as
-   pre-registration.
+   successor project's question. Their scaffolds were retained as pre-registration;
+   the spectral test has since run and been rescored (H4 disposition, run 16), the
+   others remain labelled not-run.
 3. **Declared debt.** One item remains open: finer convergence-gate cadence
    (caveat 5). It cannot overturn a principal finding: basin identities stand on
    the gate regardless of cadence. (The other declared item, the W_E permutation

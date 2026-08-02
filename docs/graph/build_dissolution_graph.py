@@ -125,7 +125,11 @@ MODEL_SPECS = [
         "path": "experiments/gpt2_small/output_random_baseline/dissolution_pathways_random.md",
         "kind": "null-model",
         "register_override": "Noise",
-        "note": "Null control: noise through GPT-2 Small converges into non-semantic basins (F4).",
+        "note": "Null control, ORIGINAL arm (run 3): its pathways are kept as the "
+                "historical record. Superseded 2026-07-31 by the matched-nu re-run "
+                "(run 17), which inverted F4: at matched injection scale noise "
+                "lands in the language arm's own basins, all five reappearing at "
+                "the trials' smallest passing lag.",
     },
 ]
 
@@ -153,9 +157,12 @@ DOCUMENTED = {
         "expectation": "no consolidation — 40+ distinct fragments, no dominant basin",
     },
     "noise-null": {
-        "source": "FINDINGS.md F4",
+        "source": "FINDINGS.md F4 (original run 3; superseded by run 17)",
         "iter100_125": {"―": 64.0},
-        "expectation": "18 non-semantic basins, dominated by em-dash ― (64%)",
+        "expectation": "original arm: 18 non-semantic basins, em-dash-dominated "
+                       "(64%). Superseded 2026-07-31: run 17 at matched nu finds "
+                       "the language arm's own basins (7 at lock-in, all five "
+                       "over all trials at smallest passing lag; F4).",
     },
 }
 
