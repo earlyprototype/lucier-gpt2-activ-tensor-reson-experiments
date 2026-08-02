@@ -42,12 +42,12 @@ Tiers 1 to 3 are the fruit proper &mdash; 6 of 21 open threads. The rest are ran
 
 | # | Cheap? | Tier | Claim | Evidence, in brief |
 |---:|:---:|:---|:---|:---|
-| 1 | yes | newly-unblocked | `f10-cycle-anatomy-flip-axis` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the... |
-| 2 | yes | newly-unblocked | `f15-lag2-gate` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the... |
-| 3 | yes | newly-unblocked | `q-flip-axis-generality` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the... |
-| 4 | yes | newly-unblocked | `q-lag2-regate-33` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the... |
+| 1 | yes | newly-unblocked | `f10-cycle-anatomy-flip-axis` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:155), so the... |
+| 2 | yes | newly-unblocked | `f15-lag2-gate` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:155), so the... |
+| 3 | yes | newly-unblocked | `q-flip-axis-generality` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:155), so the... |
+| 4 | yes | newly-unblocked | `q-lag2-regate-33` | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:155), so the... |
 | 5 | yes | answerable-from-disk | `disc-16-differences-intrinsic` | experiments/preln_rescale_check.py exists, every input it declares is present in the tree, and it has not been executed |
-| 6 | yes | answerable-from-disk | `q-tmix-llm` | the record itself says the inputs are already committed ("JOURNEY_MAP section 7: "What is T_mix_LLM for each basin? \| Measurable from existing data \| Compute from .pt"."), and 15 .pt... |
+| 6 | yes | answerable-from-disk | `q-tmix-llm` | the record itself says the inputs are already committed ("JOURNEY_MAP section 7: "What is T_mix_LLM for each basin? \| Measurable from existing data \| Compute from .pt"."), and 690 .pt... |
 | 7 | no | needs-compute | `concept-fractal-dimension` | the record states the work has not been done ("Relevance to ATR: Potential metric for basin characterisation (untested).") and names no script for it, so answering it requires a fresh run |
 | 8 | no | needs-compute | `f1-five-attractor-basins` | the record states the work has not been done ("…gate, all at iteration 120, which is the gate's earliest possible firing point rather than a measured settling time: the true iteration... |
 | 9 | no | needs-compute | `h-pos0` | the record states the work has not been done ("Disposition: Registered, untested (2026-07-28): under the causal mask, attention at position 0 attends only to position 0 (its softmax row... |
@@ -71,26 +71,26 @@ The cheap ones in full:
 - Tier: *newly-unblocked*
 - Record: `docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole`
 - Script(s): `experiments/gpt2_small/06_bell_anatomy.py`
-- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's
+- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:155), so the name is the record's and not this tool's
 
 **2. F15: A lag-2 convergence gate recognises the period-2 cycle; the engine now supports it**
 
 - Tier: *newly-unblocked*
 - Record: `docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it`
 - Script(s): `experiments/gpt2_small/09_lagk_gate.py`
-- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's
+- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:155), so the name is the record's and not this tool's
 
 **3. Q: Do all 34 Divine prompts share the F10 flip axis, head and eigenvalue?**
 
 - Tier: *newly-unblocked*
 - Record: `docs/FINDINGS.md#f10-anatomy-of-the-period-2-cycle-one-nearly-readout-invisible-flip-axis-between-a-game-vocabulary-pole-and-the-glitch-token-pole`
-- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's
+- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:155), so the name is the record's and not this tool's
 
 **4. Q: Do the other 33 period-2 prompts re-gate as converged?**
 
 - Tier: *newly-unblocked*
 - Record: `docs/FINDINGS.md#f15-a-lag-2-convergence-gate-recognises-the-period-2-cycle-the-engine-now-supports-it`
-- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's
+- Evidence: the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:155), so the name is the record's and not this tool's
 
 **5. Discovery 16: Cross-model differences are intrinsic dynamics, not apparatus**
 
@@ -103,7 +103,7 @@ The cheap ones in full:
 
 - Tier: *answerable-from-disk*
 - Record: `docs/JOURNEY_MAP.md#7-open-questions`
-- Evidence: the record itself says the inputs are already committed ("JOURNEY_MAP section 7: "What is T_mix_LLM for each basin? | Measurable from existing data | Compute from .pt"."), and 15 .pt artefact(s) exist under experiments/; no script is named for the computation, so this rests on the record's word plus the presence of the data
+- Evidence: the record itself says the inputs are already committed ("JOURNEY_MAP section 7: "What is T_mix_LLM for each basin? | Measurable from existing data | Compute from .pt"."), and 690 .pt artefact(s) exist under experiments/; no script is named for the computation, so this rests on the record's word plus the presence of the data
 
 ---
 
@@ -127,7 +127,7 @@ Something the record names is not in the working tree, or the record defers to a
   > F15 demonstrates the lag-k gate for one trajectory and records the rest as outstanding: "The other 33 period-2 prompts remain blocked on the prompt library (issue #9);
   > JOURNEY_MAP section 7 gives the same next step: "Re-gate the other 33 prompts (blocked on issue #9)".
 
-*Disk check:* `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's
+*Disk check:* `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:155), so the name is the record's and not this tool's
 
 *What the record still says, and this disagrees with:*
 - `experiments/gpt2_small/output_lagk/lagk_report.md`:56 &mdash; “The other 33 cycling prompts exist in the sweep records only as ids and terminal tokens; their texts live in `prompt_library.py`, which exists only on Thom's home machine (issue #9, his errand). Until it is restored they cannot be re-run, so "34 prompts ring, pending re-gate" resolves today to: 1 re” (stale: the file it calls absent is in the tree)
@@ -155,8 +155,8 @@ Something the record names is not in the working tree, or the record defers to a
 *Committed prose mentioning issue #8:*
 - [`experiments/gpt2_small/output_jlens_phase/jlens_phase.md`:7](../../experiments/gpt2_small/output_jlens_phase/jlens_phase.md) &mdash; issue #8) probed the converged Divine (Syntactic) state before `06_bell_anatomy.py` showed
 - [`docs/BELL_PRIMER.md`:152](../../docs/BELL_PRIMER.md) &mdash; The pilot (issue #8) measured Divine before the cycle was known, so it measured one phase. Session 04 repeated the identical measurement on both phases and the midpoint. The replay of the pilot's own states reproduced its recorded numbers to 7 decimal places, 
-- [`docs/FINDINGS.md`:553](../../docs/FINDINGS.md) &mdash; build (issue #8) should be phase-aware: probe both phases and the pivot M.
-- [`docs/FINDINGS.md`:733](../../docs/FINDINGS.md) &mdash; \| H-J1 \| `prolet` sits inside the verbalizable (J-lens) subspace, `Divine` outside \| **Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)**: the point estimate runs slightly the other way at pilot confidence (`Divine` at least as lens-ex
+- [`docs/FINDINGS.md`:555](../../docs/FINDINGS.md) &mdash; build (issue #8) should be phase-aware: probe both phases and the pivot M.
+- [`docs/FINDINGS.md`:735](../../docs/FINDINGS.md) &mdash; \| H-J1 \| `prolet` sits inside the verbalizable (J-lens) subspace, `Divine` outside \| **Not supported at pilot confidence (2026-07-19); now phase-qualified (F16)**: the point estimate runs slightly the other way at pilot confidence (`Divine` at least as lens-ex
 
 ### Prerequisites recorded in the graph
 
@@ -211,12 +211,12 @@ A thread is open here if its description carries pending-work language, or it is
 
 | Claim | Status | Verdict | Evidence |
 |:---|:---|:---|:---|
-| `f10-cycle-anatomy-flip-axis` | corrected | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's |
-| `f15-lag2-gate` | supported | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's |
-| `q-flip-axis-generality` | open | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's |
-| `q-lag2-regate-33` | open | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:153), so the name is the record's and not this tool's |
+| `f10-cycle-anatomy-flip-axis` | corrected | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:155), so the name is the record's and not this tool's |
+| `f15-lag2-gate` | supported | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:155), so the name is the record's and not this tool's |
+| `q-flip-axis-generality` | open | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:155), so the name is the record's and not this tool's |
+| `q-lag2-regate-33` | open | **newly-unblocked** | the record calls this blocked on prompt library (issue #9), and `prompt_library.py` is present in the working tree (17193 bytes); the record writes this filename (README.md:155), so the name is the record's and not this tool's |
 | `disc-16-differences-intrinsic` | supported | **answerable-from-disk** | experiments/preln_rescale_check.py exists, every input it declares is present in the tree, and it has not been executed |
-| `q-tmix-llm` | open | **answerable-from-disk** | the record itself says the inputs are already committed ("JOURNEY_MAP section 7: "What is T_mix_LLM for each basin? \| Measurable from existing data \| Compute from .pt"."), and 15 .pt artefact(s) exist under experiments/; no script is named for the computation, so this rests on the record's word plus the presence of the data |
+| `q-tmix-llm` | open | **answerable-from-disk** | the record itself says the inputs are already committed ("JOURNEY_MAP section 7: "What is T_mix_LLM for each basin? \| Measurable from existing data \| Compute from .pt"."), and 690 .pt artefact(s) exist under experiments/; no script is named for the computation, so this rests on the record's word plus the presence of the data |
 | `concept-fractal-dimension` | untested | **needs-compute** | the record states the work has not been done ("Relevance to ATR: Potential metric for basin characterisation (untested).") and names no script for it, so answering it requires a fresh run |
 | `f1-five-attractor-basins` | qualified | **needs-compute** | the record states the work has not been done ("…gate, all at iteration 120, which is the gate's earliest possible firing point rather than a measured settling time: the true iteration lies somewhere between 100 and 120 and finer cadence was never run (caveat 5).") and names no script for it, so answering it requires a fresh run |
 | `h-pos0` | untested | **needs-compute** | the record states the work has not been done ("Disposition: Registered, untested (2026-07-28): under the causal mask, attention at position 0 attends only to position 0 (its softmax row has one unmasked entry, so the weight is exactly 1), and LayerNorm, the MLP and…") and names no script for it, so answering it requires a fresh run |
@@ -357,14 +357,697 @@ The vocabulary now carries a `question` type, so `open` no longer means only "a 
 
 Everything under `experiments/` that looks like a run output and appears nowhere in `entities.json`, by path or by basename. Split by whether it sits inside a directory the graph already knows as a run's `output_dir` &mdash; a sidecar of a recorded report is a much smaller matter than a file in a directory the record does not mention at all.
 
-### In directories the graph does not know (4)
+### In directories the graph does not know (687)
 
 | File | Bytes | Written by | The graph says of that run |
 |:---|---:|:---|:---|
+| `experiments/nu_sweep/output/checkpoints/historical_A01_physics.pt` | 13981 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A02_medical.pt` | 13981 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A03_neuro.pt` | 13837 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A04_climate.pt` | 13981 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A05_evolution.pt` | 13997 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A06_epistemology.pt` | 14021 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A07_sociology.pt` | 13997 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A08_linguistics.pt` | 54077 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A09_code.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A10_sql.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A11_ml.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A12_systems.pt` | 13981 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A13_networking.pt` | 14005 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A14_kant.pt` | 53957 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A15_sartre.pt` | 53973 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A16_wittgenstein.pt` | 14021 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A17_marx.pt` | 53957 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A18_gothic.pt` | 13909 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A19_romantic.pt` | 13989 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A20_modernist.pt` | 13997 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A21_dickens.pt` | 54045 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A22_legal.pt` | 13837 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A23_contract.pt` | 13989 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A24_patent.pt` | 13909 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/historical_A25_academic_abs.pt` | 54085 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A01_physics.pt` | 53933 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A02_medical.pt` | 53933 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A03_neuro.pt` | 53917 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A04_climate.pt` | 53933 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A05_evolution.pt` | 53949 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A06_epistemology.pt` | 53973 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A07_sociology.pt` | 53949 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A08_linguistics.pt` | 53965 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A09_code.pt` | 53909 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A10_sql.pt` | 53901 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A11_ml.pt` | 53893 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A12_systems.pt` | 53933 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A13_networking.pt` | 53957 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A14_kant.pt` | 53909 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A15_sartre.pt` | 53925 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A16_wittgenstein.pt` | 53973 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A17_marx.pt` | 53909 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A18_gothic.pt` | 53925 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A19_romantic.pt` | 53941 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A20_modernist.pt` | 53949 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A21_dickens.pt` | 53933 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A22_legal.pt` | 53917 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A23_contract.pt` | 53941 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A24_patent.pt` | 53925 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m001_A25_academic_abs.pt` | 53973 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A01_physics.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A02_medical.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A03_neuro.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A04_climate.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A05_evolution.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A06_epistemology.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A07_sociology.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A08_linguistics.pt` | 13837 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A09_code.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A10_sql.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A11_ml.pt` | 13765 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A12_systems.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A13_networking.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A14_kant.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A15_sartre.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A16_wittgenstein.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A17_marx.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A18_gothic.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A19_romantic.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A20_modernist.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A21_dickens.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A22_legal.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A23_contract.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A24_patent.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m002_A25_academic_abs.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A01_physics.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A02_medical.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A03_neuro.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A04_climate.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A05_evolution.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A06_epistemology.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A07_sociology.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A08_linguistics.pt` | 13837 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A09_code.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A10_sql.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A11_ml.pt` | 13765 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A12_systems.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A13_networking.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A14_kant.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A15_sartre.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A16_wittgenstein.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A17_marx.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A18_gothic.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A19_romantic.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A20_modernist.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A21_dickens.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A22_legal.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A23_contract.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A24_patent.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m004_A25_academic_abs.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A01_physics.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A02_medical.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A03_neuro.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A04_climate.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A05_evolution.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A06_epistemology.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A07_sociology.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A08_linguistics.pt` | 13837 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A09_code.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A10_sql.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A11_ml.pt` | 13765 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A12_systems.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A13_networking.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A14_kant.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A15_sartre.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A16_wittgenstein.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A17_marx.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A18_gothic.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A19_romantic.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A20_modernist.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m006_A21_dickens.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A01_physics.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A02_medical.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A03_neuro.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A04_climate.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A05_evolution.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A06_epistemology.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A07_sociology.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A08_linguistics.pt` | 13837 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A09_code.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A10_sql.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A11_ml.pt` | 13765 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A12_systems.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A13_networking.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A14_kant.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A15_sartre.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A16_wittgenstein.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A17_marx.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A18_gothic.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A19_romantic.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A20_modernist.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A21_dickens.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A22_legal.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A23_contract.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A24_patent.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m008_A25_academic_abs.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A01_physics.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A02_medical.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A03_neuro.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A04_climate.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A05_evolution.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A06_epistemology.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A07_sociology.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A08_linguistics.pt` | 13837 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A09_code.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A10_sql.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A11_ml.pt` | 13765 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A12_systems.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A13_networking.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A14_kant.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A15_sartre.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A16_wittgenstein.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A17_marx.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A18_gothic.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A19_romantic.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A20_modernist.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A21_dickens.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A22_legal.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A23_contract.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A24_patent.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m016_A25_academic_abs.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A01_physics.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A02_medical.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A03_neuro.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A04_climate.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A05_evolution.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A06_epistemology.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A07_sociology.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A08_linguistics.pt` | 13837 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A09_code.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A10_sql.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A11_ml.pt` | 13765 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A12_systems.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A13_networking.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A14_kant.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A15_sartre.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A16_wittgenstein.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A17_marx.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A18_gothic.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A19_romantic.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A20_modernist.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A21_dickens.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A22_legal.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A23_contract.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A24_patent.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_A25_academic_abs.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B01_napoleon.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B02_wwi.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B03_moon.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B04_rome.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B05_mlk.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B06_sources.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B07_breaking.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B08_editorial.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B09_sports.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B10_weather.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B11_alone.pt` | 53917 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B12_fear.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B13_joy.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B14_anger.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B15_casual.pt` | 53925 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B16_gossip.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B17_argument.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B18_advice.pt` | 53925 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B19_question.pt` | 53941 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_B20_reddit.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C01_jack_jill.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C02_king_cole.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C03_mary_lamb.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C04_humpty.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C05_twinkle.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C06_dog.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C07_cat_mat.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C08_boy_girl.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C09_run.pt` | 53901 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C10_spot.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C11_genesis.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C12_beatitudes.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C13_psalm.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C14_commandment.pt` | 53965 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C15_fox_hen.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C16_ant_dove.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C17_tortoise.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C18_wolf.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C19_lion_mouse.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_C20_crow.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_D01_water.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_D02_periodic.pt` | 53941 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_D03_organic.pt` | 53933 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_D04_equation.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_D05_amino.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_D06_physics_eq.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_D07_dna.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_D08_math.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_D09_units.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_D10_isotopes.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_E01_politics.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_E02_tech.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_E03_orgs.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_E04_internet.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_E05_finance.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_E06_medical.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_E07_military.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_E08_academic.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_E09_mixed.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_E10_crypto.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_F01_anger.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_F02_insult.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_F03_frustration.pt` | 13837 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_F04_argument.pt` | 53941 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_F05_rant.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_F06_dismissal.pt` | 53949 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_F07_shock.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_F08_mild.pt` | 53909 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_F09_slur_adjacent.pt` | 13917 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_F10_exasperation.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G01_punctuation.pt` | 53965 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G02_brackets.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G03_counting.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G04_fibonacci.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G05_primes.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G06_binary.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G07_the.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G08_period.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G09_space.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G10_newline.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G11_aaa.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G12_the_the.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G13_buffalo.pt` | 53933 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G14_nursery_acad.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G15_bible_code.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G16_nursery_vulgar.pt` | 13925 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G17_formal_slang.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G18_french.pt` | 53925 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G19_german.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G20_spanish.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G21_latin.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G22_japanese_rom.pt` | 53973 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G23_emoji.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G24_beatles.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G25_rickroll.pt` | 53941 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G26_bohemian.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G27_ignore.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G28_system.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G29_palindrome.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m032_G30_alphabet.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A01_physics.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A02_medical.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A03_neuro.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A04_climate.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A05_evolution.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A06_epistemology.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A07_sociology.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A08_linguistics.pt` | 13837 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A09_code.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A10_sql.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A11_ml.pt` | 13765 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A12_systems.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A13_networking.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A14_kant.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A15_sartre.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A16_wittgenstein.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A17_marx.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A18_gothic.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A19_romantic.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A20_modernist.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A21_dickens.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A22_legal.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A23_contract.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A24_patent.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_A25_academic_abs.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B01_napoleon.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B02_wwi.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B03_moon.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B04_rome.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B05_mlk.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B06_sources.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B07_breaking.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B08_editorial.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B09_sports.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B10_weather.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B11_alone.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B12_fear.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B13_joy.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B14_anger.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B15_casual.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B16_gossip.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B17_argument.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B18_advice.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B19_question.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_B20_reddit.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C01_jack_jill.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C02_king_cole.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C03_mary_lamb.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C04_humpty.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C05_twinkle.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C06_dog.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C07_cat_mat.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C08_boy_girl.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C09_run.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C10_spot.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C11_genesis.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C12_beatitudes.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C13_psalm.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C14_commandment.pt` | 13837 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C15_fox_hen.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C16_ant_dove.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C17_tortoise.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C18_wolf.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C19_lion_mouse.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_C20_crow.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_D01_water.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_D02_periodic.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_D03_organic.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_D04_equation.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_D05_amino.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_D06_physics_eq.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_D07_dna.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_D08_math.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_D09_units.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_D10_isotopes.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_E01_politics.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_E02_tech.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_E03_orgs.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_E04_internet.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_E05_finance.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_E06_medical.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_E07_military.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_E08_academic.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_E09_mixed.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_E10_crypto.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_F01_anger.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_F02_insult.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_F03_frustration.pt` | 13837 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_F04_argument.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_F05_rant.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_F06_dismissal.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_F07_shock.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_F08_mild.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_F09_slur_adjacent.pt` | 13917 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_F10_exasperation.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G01_punctuation.pt` | 13837 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G02_brackets.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G03_counting.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G04_fibonacci.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G05_primes.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G06_binary.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G07_the.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G08_period.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G09_space.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G10_newline.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G11_aaa.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G12_the_the.pt` | 53933 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G13_buffalo.pt` | 53933 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G14_nursery_acad.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G15_bible_code.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G16_nursery_vulgar.pt` | 13989 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G17_formal_slang.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G18_french.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G19_german.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G20_spanish.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G21_latin.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G22_japanese_rom.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G23_emoji.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G24_beatles.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G25_rickroll.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G26_bohemian.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G27_ignore.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G28_system.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G29_palindrome.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m064_G30_alphabet.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A01_physics.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A02_medical.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A03_neuro.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A04_climate.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A05_evolution.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A06_epistemology.pt` | 13909 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A07_sociology.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A08_linguistics.pt` | 13837 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A09_code.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A10_sql.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A11_ml.pt` | 13765 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A12_systems.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A13_networking.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A14_kant.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A15_sartre.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A16_wittgenstein.pt` | 13909 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A17_marx.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A18_gothic.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A19_romantic.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A20_modernist.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A21_dickens.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A22_legal.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A23_contract.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A24_patent.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_A25_academic_abs.pt` | 13909 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B01_napoleon.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B02_wwi.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B03_moon.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B04_rome.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B05_mlk.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B06_sources.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B07_breaking.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B08_editorial.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B09_sports.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B10_weather.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B11_alone.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B12_fear.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B13_joy.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B14_anger.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B15_casual.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B16_gossip.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B17_argument.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B18_advice.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B19_question.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_B20_reddit.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C01_jack_jill.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C02_king_cole.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C03_mary_lamb.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C04_humpty.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C05_twinkle.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C06_dog.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C07_cat_mat.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C08_boy_girl.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C09_run.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C10_spot.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C11_genesis.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C12_beatitudes.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C13_psalm.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C14_commandment.pt` | 13837 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C15_fox_hen.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C16_ant_dove.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C17_tortoise.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C18_wolf.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C19_lion_mouse.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_C20_crow.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_D01_water.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_D02_periodic.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_D03_organic.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_D04_equation.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_D05_amino.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_D06_physics_eq.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_D07_dna.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_D08_math.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_D09_units.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_D10_isotopes.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_E01_politics.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_E02_tech.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_E03_orgs.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_E04_internet.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_E05_finance.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_E06_medical.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_E07_military.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_E08_academic.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_E09_mixed.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_E10_crypto.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_F01_anger.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_F02_insult.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_F03_frustration.pt` | 13837 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_F04_argument.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_F05_rant.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_F06_dismissal.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_F07_shock.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_F08_mild.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_F09_slur_adjacent.pt` | 13981 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_F10_exasperation.pt` | 13909 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G01_punctuation.pt` | 13837 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G02_brackets.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G03_counting.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G04_fibonacci.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G05_primes.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G06_binary.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G07_the.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G08_period.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G09_space.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G10_newline.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G11_aaa.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G12_the_the.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G13_buffalo.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G14_nursery_acad.pt` | 13909 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G15_bible_code.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G16_nursery_vulgar.pt` | 13989 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G17_formal_slang.pt` | 13909 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G18_french.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G19_german.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G20_spanish.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G21_latin.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G22_japanese_rom.pt` | 13909 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G23_emoji.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G24_beatles.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G25_rickroll.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G26_bohemian.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G27_ignore.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G28_system.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G29_palindrome.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m128_G30_alphabet.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A01_physics.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A02_medical.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A03_neuro.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A04_climate.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A05_evolution.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A06_epistemology.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A07_sociology.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A08_linguistics.pt` | 13901 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A09_code.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A10_sql.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A11_ml.pt` | 13765 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A12_systems.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A13_networking.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A14_kant.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A15_sartre.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A16_wittgenstein.pt` | 13909 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A17_marx.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A18_gothic.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A19_romantic.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A20_modernist.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A21_dickens.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A22_legal.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A23_contract.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A24_patent.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_A25_academic_abs.pt` | 13909 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B01_napoleon.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B02_wwi.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B03_moon.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B04_rome.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B05_mlk.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B06_sources.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B07_breaking.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B08_editorial.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B09_sports.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B10_weather.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B11_alone.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B12_fear.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B13_joy.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B14_anger.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B15_casual.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B16_gossip.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B17_argument.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B18_advice.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B19_question.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_B20_reddit.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C01_jack_jill.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C02_king_cole.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C03_mary_lamb.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C04_humpty.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C05_twinkle.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C06_dog.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C07_cat_mat.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C08_boy_girl.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C09_run.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C10_spot.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C11_genesis.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C12_beatitudes.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C13_psalm.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C14_commandment.pt` | 13901 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C15_fox_hen.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C16_ant_dove.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C17_tortoise.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C18_wolf.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C19_lion_mouse.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_C20_crow.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_D01_water.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_D02_periodic.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_D03_organic.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_D04_equation.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_D05_amino.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_D06_physics_eq.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_D07_dna.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_D08_math.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_D09_units.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_D10_isotopes.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_E01_politics.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_E02_tech.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_E03_orgs.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_E04_internet.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_E05_finance.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_E06_medical.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_E07_military.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_E08_academic.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_E09_mixed.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_E10_crypto.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_F01_anger.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_F02_insult.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_F03_frustration.pt` | 13901 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_F04_argument.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_F05_rant.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_F06_dismissal.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_F07_shock.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_F08_mild.pt` | 13781 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_F09_slur_adjacent.pt` | 13981 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_F10_exasperation.pt` | 13909 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G01_punctuation.pt` | 13901 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G02_brackets.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G03_counting.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G04_fibonacci.pt` | 13821 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G05_primes.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G06_binary.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G07_the.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G08_period.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G09_space.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G10_newline.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G11_aaa.pt` | 13773 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G12_the_the.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G13_buffalo.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G14_nursery_acad.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G15_bible_code.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G16_nursery_vulgar.pt` | 13989 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G17_formal_slang.pt` | 13845 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G18_french.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G19_german.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G20_spanish.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G21_latin.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G22_japanese_rom.pt` | 13909 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G23_emoji.pt` | 13789 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G24_beatles.pt` | 13805 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G25_rickroll.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G26_bohemian.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G27_ignore.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G28_system.pt` | 13797 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G29_palindrome.pt` | 13829 | &mdash; | no run node |
+| `experiments/nu_sweep/output/checkpoints/m256_G30_alphabet.pt` | 13813 | &mdash; | no run node |
+| `experiments/nu_sweep/output/contract_check.json` | 316 | `experiments/nu_sweep/01_stage_a.py`, `experiments/nu_sweep/04_stage_c.py` | no run node |
+| `experiments/nu_sweep/output/shared_pin.json` | 4831 | `experiments/nu_sweep/04_stage_c.py` | no run node |
+| `experiments/nu_sweep/output/stage_a_results.pt` | 5166119 | `experiments/nu_sweep/01_stage_a.py`, `experiments/nu_sweep/03_strata_glitch_check.py` | no run node |
+| `experiments/nu_sweep/output/stage_b_results.pt` | 8115167 | `experiments/nu_sweep/02_stage_b.py` | no run node |
+| `experiments/nu_sweep/output/strata_alignment.json` | 32182 | `experiments/nu_sweep/03_strata_glitch_check.py` | no run node |
+| `experiments/renorm_probe/output/free_norm_results.pt` | 81253 | `experiments/renorm_probe/01_free_norm_growth.py` | no run node |
+| `experiments/renorm_probe/output/natural_arm_results.pt` | 529119 | `experiments/renorm_probe/02_natural_entry_norm_arm.py` | no run node |
 | `experiments/sink_geometry/output/masking_control.json` | 7826 | `experiments/sink_geometry/02_masking_control.py` | no run node |
 | `experiments/sink_geometry/output/sink_profile.json` | 3758 | `experiments/sink_geometry/01_sink_profile.py` | no run node |
 | `experiments/sink_geometry/output/trajectories.pt` | 4379241 | `experiments/sink_geometry/02_masking_control.py` | no run node |
 | `experiments/gpt2_small/output_head_loop_regen/REGENERATION_REPORT.md` | 7231 | `experiments/gpt2_small/spectral_resonance.ipynb` | `run-spectral-scaffold`: 144 heads, executed 2026-07-25 |
+| `experiments/nu_sweep/output/stage_a_report.md` | 2667 | `experiments/nu_sweep/01_stage_a.py` | no run node |
+| `experiments/nu_sweep/output/stage_b_report.md` | 1882 | `experiments/nu_sweep/02_stage_b.py` | no run node |
+| `experiments/nu_sweep/output/strata_alignment_report.md` | 2123 | `experiments/nu_sweep/03_strata_glitch_check.py` | no run node |
+| `experiments/renorm_probe/output/free_norm_report.md` | 2206 | `experiments/renorm_probe/01_free_norm_growth.py` | no run node |
+| `experiments/renorm_probe/output/natural_arm_report.md` | 2299 | `experiments/renorm_probe/02_natural_entry_norm_arm.py` | no run node |
 
 ### Sidecars of recorded output directories (41)
 
@@ -416,7 +1099,7 @@ Mostly the machine-readable twin of a report the graph does carry as an artefact
 
 </details>
 
-### Scripts in `experiments/` with no run node (8)
+### Scripts in `experiments/` with no run node (14)
 
 | Script | Executed | Code cells with outputs |
 |:---|:---|:---|
@@ -425,6 +1108,12 @@ Mostly the machine-readable twin of a report the graph does carry as an artefact
 | `experiments/contraction/03_rescale_factor.py` | not knowable | &mdash; |
 | `experiments/gpt2_small/head_resonance.ipynb` | yes | 10 of 10 (14 cells total) |
 | `experiments/gpt2_small/layer_resonance.ipynb` | no | 0 of 10 (15 cells total) |
+| `experiments/nu_sweep/01_stage_a.py` | not knowable | &mdash; |
+| `experiments/nu_sweep/02_stage_b.py` | not knowable | &mdash; |
+| `experiments/nu_sweep/03_strata_glitch_check.py` | not knowable | &mdash; |
+| `experiments/nu_sweep/04_stage_c.py` | not knowable | &mdash; |
+| `experiments/renorm_probe/01_free_norm_growth.py` | not knowable | &mdash; |
+| `experiments/renorm_probe/02_natural_entry_norm_arm.py` | not knowable | &mdash; |
 | `experiments/sink_geometry/01_sink_profile.py` | not knowable | &mdash; |
 | `experiments/sink_geometry/02_masking_control.py` | not knowable | &mdash; |
 | `experiments/strip_hypotheses.py` | not knowable | &mdash; |

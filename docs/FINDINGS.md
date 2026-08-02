@@ -982,6 +982,31 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
     "at the registered injection scale". Records and regenerating scripts:
     `experiments/renorm_probe/`.
 
+    **Resolved to a measured band (2026-08-02, run 18, the ν-sweep;
+    registered before execution in issues #113 and #116; wording ruled by
+    the operator in session).** The five-basin landscape holds at injection
+    scales from 64 to at least 256 times the model's natural entry scale;
+    the lower edge lies between 32 and 64 times and is sharp at full sweep
+    width (m032 0/125 trials in the five, m064 125/125, at each trial's
+    smallest passing lag per F15); the upper edge is unmeasured beyond 256
+    times (m256 84/125, 67 percent, with gradual dissolution toward
+    function tokens); below the band the landscape reorganises into
+    distinct strata (`arbit` at 2-4×, the horizontal bar at 8-16×,
+    fragmentation into 14 labels at 32×), the lowest of which point into
+    the anomalous-token cluster (archive-only check with F13's instruments
+    and matched nulls: at 4× the top-50 vocabulary alignment fraction is
+    0.90 against the geometric cluster, chance 0.005, and 0.18 against the
+    curated family, chance 0.001; the band itself anti-aligns, cosine
+    -0.45 to -0.54 against a null of 0.00). The historical pin sits inside
+    the band at roughly 70×, and the old noise arm's mis-calibrated norm
+    (397) sits inside the horizontal-bar stratum, which is consistent with
+    that run's dominant bar basin having been a genuine basin of its
+    stratum. Every basin-identity claim's qualifier tightens from "at the
+    registered injection scale" to "within the measured band"; the band's
+    interior boundaries, its upper edge, and the single-pass-gain
+    hypothesis are the registered Stage C questions (issue #116, running).
+    Records and regenerating scripts: `experiments/nu_sweep/`.
+
 ## 5. What ATR is, after this series
 
 A cheap, training-free probe of the stable states of a model's iterated forward map

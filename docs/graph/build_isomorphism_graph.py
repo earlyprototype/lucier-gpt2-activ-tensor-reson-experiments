@@ -214,6 +214,24 @@ RUNS = [
         "n": "125 Gaussian tensors, pair-matched, seed 42",
     },
     {
+        "id": "run-18-nu-sweep",
+        "label": "Run 18: the nu-sweep (2026-08-02)",
+        "type": "run",
+        "description": "The injection-scale scan (registered issues #113/#116): the pin nu "
+                       "swept over ten multipliers of each prompt's natural entry norm plus "
+                       "the exact historical pin (Stage A, 250 trials), then the crossing "
+                       "levels at all 125 prompts (Stage B, 650 trials total). The five-basin "
+                       "landscape is a band: 0/125 in the five at 32x, 125/125 at 64x, "
+                       "123/125 at 128x, 84/125 at 256x, so the lower edge is sharp inside "
+                       "(32x, 64x) and the upper edge lies beyond the swept range. Below the "
+                       "band: strata (arbit at 2-4x, the horizontal bar at 8-16x, "
+                       "fragmentation at 32x) whose lowest members point into the "
+                       "anomalous-token cluster (FINDINGS caveat 19, resolved wording).",
+        "script": "experiments/nu_sweep/01_stage_a.py",
+        "output_dir": "experiments/nu_sweep/output/",
+        "n": "1,025 trials over Stages A and B, gated, F15-classified",
+    },
+    {
         "id": "run-08-divine-motion",
         "label": "Run 8: Divine motion audit (lag-10 + lag-1 probe)",
         "type": "run",
@@ -621,8 +639,11 @@ RELS_RAW = [
      "eighteen different, non-semantic attractors), but the corrected matched-nu control "
      "(run 17, 2026-07-31) reverses it: noise raises the language arm's own five basins, "
      "so at the tested injection scale the analogy passes and the basins do belong to the "
-     "room. The edge is kept as the record of the correction; whether the analogy holds at "
-     "other injection scales is the nu-sweep's question.", 9),
+     "room. The edge is kept as the record of the correction; the nu-sweep (run 18, "
+     "2026-08-02) then answered the scale question: the analogy passes only inside a "
+     "measured band of injection scales, 64x to at least 256x the natural entry scale, "
+     "and below the band the room resolves different words entirely (FINDINGS caveat "
+     "19).", 9),
     ("concept-regime-dependence", "run-03-random-baseline", "evidenced-by",
      "The original evidence, now superseded and kept as the historical record: 125 "
      "mis-calibrated Gaussian tensors, counted "
@@ -633,6 +654,12 @@ RELS_RAW = [
      "lands in the language arm's own basins (all five at each trial's smallest passing "
      "lag, 97/125 trials), so at the tested injection scale the basins belong to the "
      "weights (FINDINGS F4).", 9),
+    ("concept-regime-dependence", "run-18-nu-sweep", "evidenced-by",
+     "The scale dimension of regime dependence, measured: the five-basin landscape holds "
+     "from 64x to at least 256x the natural entry scale (lower edge sharp at full sweep "
+     "width, 0/125 to 125/125 in one doubling), and below the band the iterated map "
+     "resolves stratified non-basin attractors, the lowest pointing into the "
+     "anomalous-token cluster (FINDINGS caveat 19, resolved).", 9),
 
     # ---- the apparatus difference
     ("ac-tape-recorder", "concept-readout-bypass", "breaks-down-at",
