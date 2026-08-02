@@ -228,6 +228,43 @@ def smallest_passing_lag(r):
     return None
 
 
+def level_stats(rows):
+    """Aggregate one level's trials under the F15 rule. Single definition of
+    the band statistic, shared by the Stage A and Stage B reports so the two
+    tables can never drift apart. ``nolock_lags`` histograms the smallest
+    passing lag of the trials the lag-1 gate never locked ("none" = no
+    scanned lag passed); ``mean_gain`` is None when metrics are absent."""
+    labels = {}
+    in_five = 0
+    locked = []
+    gains = []
+    nolock_lags = {}
+    for r in rows.values():
+        lag = smallest_passing_lag(r)
+        tok = r["terminal_token"].strip()
+        labels[tok] = labels.get(tok, 0) + 1
+        if lag is not None and tok in REAL_FIVE:
+            in_five += 1
+        if r["converged"]:
+            locked.append(r["lock_in_iter"])
+        else:
+            key = str(lag) if lag is not None else "none"
+            nolock_lags[key] = nolock_lags.get(key, 0) + 1
+        if r.get("metrics") and r["target_norm"]:
+            gains.append(r["metrics"][0]["tensor_norm"] / r["target_norm"])
+    return {
+        "n": len(rows),
+        "mean_pin": statistics.mean(r["target_norm"] for r in rows.values()),
+        "share_in_five": in_five / len(rows),
+        "n_in_five": in_five,
+        "locked": len(locked),
+        "median_lock_in": statistics.median(locked) if locked else None,
+        "labels": labels,
+        "nolock_lags": nolock_lags,
+        "mean_gain": statistics.mean(gains) if gains else None,
+    }
+
+
 def collect():
     """Load every checkpoint into {level: {pid: result}}, reporting gaps."""
     results = {level: {} for level in LEVELS}
@@ -269,34 +306,7 @@ def write_report():
         return statistics.mean(pins) if pins else float("inf")
 
     ordered = sorted((lv for lv in LEVELS if results[lv]), key=level_sort_key)
-    stats = {}
-    for level in ordered:
-        rows = results[level]
-        labels = {}
-        in_five = 0
-        locked = []
-        gains = []
-        for r in rows.values():
-            lag = smallest_passing_lag(r)
-            tok = r["terminal_token"].strip()
-            labels[tok] = labels.get(tok, 0) + 1
-            if lag is not None and tok in REAL_FIVE:
-                in_five += 1
-            if r["converged"]:
-                locked.append(r["lock_in_iter"])
-            if r["metrics"] and r["target_norm"]:
-                gains.append(r["metrics"][0]["tensor_norm"] / r["target_norm"])
-        stats[level] = {
-            "n": len(rows),
-            "mean_pin": statistics.mean(
-                r["target_norm"] for r in rows.values()),
-            "share_in_five": in_five / len(rows),
-            "n_in_five": in_five,
-            "locked": len(locked),
-            "median_lock_in": statistics.median(locked) if locked else None,
-            "labels": labels,
-            "mean_gain": statistics.mean(gains) if gains else None,
-        }
+    stats = {level: level_stats(results[level]) for level in ordered}
     band = [lv for lv in ordered
             if stats[lv]["share_in_five"] > BAND_THRESHOLD]
     crossings = [
@@ -353,9 +363,9 @@ def write_report():
         f"- Threshold crossings between adjacent levels (Stage B brackets "
         f"each at full sweep width): "
         f"{[f'{a} to {b}' for a, b in crossings] if crossings else 'none'}.",
-        f"- Lag-1 lock rate at the crossing levels (a fully locked level's "
-        f"labels carry no periodic single-phase ambiguity, so an edge "
-        f"between fully locked levels is independent of that caveat): "
+        "- Lag-1 lock rate at the crossing levels (a fully locked level's "
+        "labels carry no periodic single-phase ambiguity, so an edge "
+        "between fully locked levels is independent of that caveat): "
         + (", ".join(
             f"{lv} {stats[lv]['locked']}/{stats[lv]['n']}"
             for lv in dict.fromkeys(lv for pair in crossings for lv in pair))

@@ -161,6 +161,18 @@ def main():
            "clusters": {k: len(v) for k, v in clusters.items()},
            "levels": {}}
 
+    # The top-50 null depends only on the cluster and the vocabulary, not on
+    # the level's state direction, so draw it once per cluster (review round,
+    # PR #114). This changes the RNG draw sequence relative to the first
+    # committed run; the archived outputs are regenerated in the same commit.
+    cluster_null_frac = {}
+    for cname in clusters:
+        draws = []
+        for _ in range(N_NULL):
+            ridx = set(torch.randperm(V, generator=gen)[:TOP_K].tolist())
+            draws.append(len(ridx & cluster_sets[cname]) / TOP_K)
+        cluster_null_frac[cname] = torch.tensor(draws)
+
     for level in levels:
         trials = results[level]
         vecs = torch.stack([r["terminal_last_vec"].float()
@@ -185,13 +197,7 @@ def main():
             p_cos = float(((null_cos_t.abs() >= abs(cos_mean_dir))
                            .float().mean()))
             frac = len(top_ids & cluster_sets[cname]) / TOP_K
-            null_frac = []
-            for _ in range(N_NULL):
-                ridx = set(torch.randperm(
-                    V, generator=gen)[:TOP_K].tolist())
-                null_frac.append(
-                    len(ridx & cluster_sets[cname]) / TOP_K)
-            null_frac_t = torch.tensor(null_frac)
+            null_frac_t = cluster_null_frac[cname]
             p_frac = float((null_frac_t >= frac).float().mean())
             level_out["clusters"][cname] = {
                 "cos_mean_dir": cos_mean_dir,

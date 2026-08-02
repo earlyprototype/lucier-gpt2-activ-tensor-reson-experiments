@@ -27,7 +27,6 @@ Outputs (in experiments/nu_sweep/output/):
 import argparse
 import importlib.util
 import itertools
-import statistics
 import sys
 from pathlib import Path
 
@@ -58,6 +57,7 @@ def write_report():
     published number originates here."""
     import prompt_library
     results, missing = sa.collect()
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
     if missing:
         print(f"[report] WARNING: {len(missing)} trials missing; the report "
               f"marks itself partial. First few: {missing[:6]}")
@@ -75,32 +75,10 @@ def write_report():
     torch.save({"config": config, "results": results},
                OUT_DIR / "stage_b_results.pt")
 
-    stats = {}
-    for level in sa.LEVELS:
-        rows = results[level]
-        if not rows:
-            continue
-        labels = {}
-        in_five = 0
-        locked = []
-        for r in rows.values():
-            lag = sa.smallest_passing_lag(r)
-            tok = r["terminal_token"].strip()
-            labels[tok] = labels.get(tok, 0) + 1
-            if lag is not None and tok in sa.REAL_FIVE:
-                in_five += 1
-            if r["converged"]:
-                locked.append(r["lock_in_iter"])
-        stats[level] = {
-            "n": len(rows),
-            "mean_pin": statistics.mean(
-                r["target_norm"] for r in rows.values()),
-            "share_in_five": in_five / len(rows),
-            "n_in_five": in_five,
-            "locked": len(locked),
-            "median_lock_in": statistics.median(locked) if locked else None,
-            "labels": labels,
-        }
+    # One definition of the band statistic: Stage A's level_stats, so the
+    # two stages' tables cannot drift apart (review round, PR #114).
+    stats = {level: sa.level_stats(results[level])
+             for level in sa.LEVELS if results[level]}
     ordered = [lv for lv in sa.LEVELS if lv in stats]
     crossings = [
         (a, b) for a, b in itertools.pairwise(ordered)
@@ -126,18 +104,22 @@ def write_report():
     lines += [
         "## Per-level summary at full width",
         "",
-        "| level | mean pin | share in real five | locked (lag 1) "
-        "| median lock-in | distinct labels |",
-        "|:--|--:|--:|--:|--:|--:|",
+        "| level | mean pin | share in real five | locked (lag-1 gate) "
+        "| median lock-in | distinct labels | no-lock smallest lags |",
+        "|:--|--:|--:|--:|--:|--:|:--|",
     ]
     for level in ordered:
         s = stats[level]
         med = (f"{s['median_lock_in']:.0f}"
                if s["median_lock_in"] is not None else "n/a")
+        nolock = (", ".join(
+            f"lag {k}: {v}" for k, v in sorted(s["nolock_lags"].items()))
+            if s["nolock_lags"] else "all locked")
         lines.append(
             f"| {level} | {s['mean_pin']:.0f} | "
             f"{s['share_in_five']:.0%} ({s['n_in_five']}/{s['n']}) | "
-            f"{s['locked']}/{s['n']} | {med} | {len(s['labels'])} |")
+            f"{s['locked']}/{s['n']} | {med} | {len(s['labels'])} | "
+            f"{nolock} |")
     lines += ["", "## Basin table per level", ""]
     for level in ordered:
         s = stats[level]
