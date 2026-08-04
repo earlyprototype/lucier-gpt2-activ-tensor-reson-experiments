@@ -4,11 +4,13 @@
   "this_loop_lock_in": 120,
   "max_reconstruction_error": 2.4691246771153233e-07,
   "max_share_sum_error": 2.8421709430404007e-13,
+  "max_para_share_sum_error": 8.881784197001252e-16,
   "checks": {
     "lock_in_matches": true,
     "target_norm_matches": true,
     "reconstruction_exact": true,
-    "shares_sum_to_one": true
+    "direction_shares_sum_to_one": true,
+    "size_shares_sum_to_one": true
   },
   "passed": true,
   "torch": "2.13.0+cu130"

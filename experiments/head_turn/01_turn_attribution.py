@@ -164,11 +164,25 @@ def pass_writes(model, prompt, inject_tensor, hook_write, hook_read):
 
 
 def turn_shares(x_mean, y_mean, writes):
-    """Each component's signed share of the pass's realised turn.
+    """Each component's signed share of BOTH parts of the pass's motion.
 
-    Returns (shares, turn_degrees, perp_norm, reconstruction_error,
-    share_sum). The shares sum to 1 by construction; `share_sum` is kept and
-    asserted rather than assumed.
+    A pass moves the state in two ways: it turns the direction and it changes
+    the size. These are two coordinates of one motion, not rival
+    explanations, and reporting one without the other is what makes an
+    account look like it is see-sawing between them. So each component's
+    write is split into the part perpendicular to the injected direction,
+    which is what turns the state, and the part parallel to it, which is what
+    grows it. Both are returned as signed shares, and both sum to 1 by
+    construction.
+
+    Note which coordinate the apparatus controls. The loop rescales every
+    iterate to the pin, so across a run the size is held by hand and only the
+    direction is free; the size coordinate re-enters as the pin itself, which
+    is the sweep's axis. The parallel shares therefore describe what the
+    model would do to the size if the rescale were not undoing it each pass.
+
+    Returns (perp_shares, para_shares, turn_degrees, perp_norm, para_norm,
+    reconstruction_error, perp_share_sum, para_share_sum).
 
     Computed in float64. In float32 the identity held only to about 1e-4,
     because 168 component projections accumulate, which is the M1/M2 lesson
@@ -181,18 +195,29 @@ def turn_shares(x_mean, y_mean, writes):
     x_hat = x_mean / x_mean.norm()
     delta = y_mean - x_mean
     recon = float((delta - writes.sum(dim=0)).norm() / delta.norm())
-    perp = writes - (writes @ x_hat).unsqueeze(1) * x_hat.unsqueeze(0)
+    para_amounts = writes @ x_hat                    # signed, along x_hat
+    perp = writes - para_amounts.unsqueeze(1) * x_hat.unsqueeze(0)
     total_perp = perp.sum(dim=0)
     perp_norm = float(total_perp.norm())
-    if perp_norm == 0:
-        n = writes.shape[0]
-        return torch.zeros(n), 0.0, 0.0, recon, 0.0
-    u_hat = total_perp / total_perp.norm()
-    shares = (perp @ u_hat) / perp_norm
-    cos = float(torch.dot(x_mean, y_mean)
-                / (x_mean.norm() * y_mean.norm()))
+    para_total = float(para_amounts.sum())
+    n = writes.shape[0]
+    cos = float(torch.dot(x_mean, y_mean) / (x_mean.norm() * y_mean.norm()))
     turn = math.degrees(math.acos(max(-1.0, min(1.0, cos))))
-    return shares, turn, perp_norm, recon, float(shares.sum())
+
+    if perp_norm == 0:
+        perp_shares = torch.zeros(n, dtype=torch.float64)
+        perp_sum = 0.0
+    else:
+        perp_shares = (perp @ (total_perp / total_perp.norm())) / perp_norm
+        perp_sum = float(perp_shares.sum())
+    if para_total == 0:
+        para_shares = torch.zeros(n, dtype=torch.float64)
+        para_sum = 0.0
+    else:
+        para_shares = para_amounts / para_total
+        para_sum = float(para_shares.sum())
+    return (perp_shares, para_shares, turn, perp_norm, para_total,
+            recon, perp_sum, para_sum)
 
 
 def run_trial(model, prompt, pin, hook_write, hook_read):
@@ -219,12 +244,16 @@ def run_trial(model, prompt, pin, hook_write, hook_read):
         want = i <= EARLY_PASSES or (late_from is not None
                                      and late_from <= i < late_from + LATE_WINDOW)
         if want:
-            shares, turn, perp, recon, ssum = turn_shares(x_mean, y_mean, writes)
+            (perp_s, para_s, turn, perp, para, recon,
+             perp_sum, para_sum) = turn_shares(x_mean, y_mean, writes)
             records.append({"iteration": i, "turn_deg": turn,
-                            "perp_norm": perp, "recon_err": recon,
-                            "share_sum": ssum,
+                            "perp_norm": perp, "para_total": para,
+                            "size_ratio": float(y_mean.norm() / x_mean.norm()),
+                            "recon_err": recon,
+                            "share_sum": perp_sum, "para_share_sum": para_sum,
                             "phase": "early" if i <= EARLY_PASSES else "late",
-                            "shares": shares.to(torch.float32)})
+                            "shares": perp_s.to(torch.float32),
+                            "para_shares": para_s.to(torch.float32)})
         current = y.clone()
 
         if i >= CHECK_START and i % CHECK_EVERY == 0 and prev_mean is not None:
@@ -273,8 +302,10 @@ def run_contract(model):
                                    - mine["target_norm"]) < 1e-3,
         "reconstruction_exact": all(r["recon_err"] < 1e-4
                                     for r in mine["records"]),
-        "shares_sum_to_one": all(abs(r["share_sum"] - 1.0) < 1e-4
-                                 for r in mine["records"]),
+        "direction_shares_sum_to_one": all(abs(r["share_sum"] - 1.0) < 1e-4
+                                           for r in mine["records"]),
+        "size_shares_sum_to_one": all(abs(r["para_share_sum"] - 1.0) < 1e-4
+                                      for r in mine["records"]),
     }
     result = {"prompt": pid, "engine_lock_in": engine["lock_in_iter"],
               "this_loop_lock_in": mine["lock_in"],
@@ -282,6 +313,8 @@ def run_contract(model):
                                               for r in mine["records"]),
               "max_share_sum_error": max(abs(r["share_sum"] - 1.0)
                                          for r in mine["records"]),
+              "max_para_share_sum_error": max(abs(r["para_share_sum"] - 1.0)
+                                              for r in mine["records"]),
               "checks": checks, "passed": all(checks.values()),
               "torch": str(torch.__version__)}
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -365,15 +398,19 @@ def collect():
     return results, missing
 
 
-def level_shares(trials, phase):
+def level_shares(trials, phase, key="shares"):
     """Mean signed share per component over every recorded pass of one phase,
-    across a level's trials, with the cancellation measure."""
+    across a level's trials, with the cancellation measure.
+
+    `key` selects the coordinate: "shares" for the direction change,
+    "para_shares" for the size change. Both are reported everywhere, since
+    they are two coordinates of one motion."""
     total, count, abs_total = None, 0, None
     for r in trials.values():
         for rec in r["records"]:
             if rec["phase"] != phase:
                 continue
-            s = rec["shares"].to(torch.float64)
+            s = rec[key].to(torch.float64)
             total = s if total is None else total + s
             abs_total = s.abs() if abs_total is None else abs_total + s.abs()
             count += 1
@@ -408,10 +445,25 @@ def write_report():
         "`turn_attribution.pt` (per-trial checkpoints in `checkpoints/`).",
         "The residual stream is additive, so each pass's motion splits",
         "exactly into the writes of 144 attention heads, 12 feed-forward",
-        "blocks and 12 attention output biases. Each component's SIGNED",
-        "share of the pass's realised turn is its perpendicular write",
-        "projected onto the turn direction; shares sum to 1 by",
-        "construction and the script asserts it every pass.",
+        "blocks and 12 attention output biases.",
+        "",
+        "**Both coordinates of the motion are reported throughout.** A pass",
+        "moves the state in two ways: it turns the direction and it changes",
+        "the size. These are two coordinates of one motion, not competing",
+        "explanations, and run 18 found that the five-basin band's two edges",
+        "are dominated by one each, the lower by the turn and the upper by",
+        "the size. So every component gets both shares here: the share of",
+        "the direction change (its write perpendicular to the state,",
+        "projected onto the realised turn) and the share of the size change",
+        "(its write parallel to the state). Both are signed, and both sum",
+        "to 1 by construction, which the script asserts every pass.",
+        "",
+        "Which coordinate the apparatus controls matters for reading the",
+        "size column. The loop rescales every iterate to the pin, so within",
+        "a run the size is held by hand and only the direction is free; the",
+        "size coordinate re-enters as the pin itself, which is the sweep's",
+        "axis. The size shares below therefore describe what the model",
+        "would do to the size if the rescale were not undoing it each pass.",
         "",
         "**Direct contributions only.** A component's write also changes",
         "what later components read, so a small direct share does not mean",
@@ -423,36 +475,44 @@ def write_report():
         lines += [f"**PARTIAL: {len(missing)} of {len(grid())} trials "
                   "missing; numbers below cover completed trials only.**", ""]
 
-    lines += ["## Concentration, early passes and at lock-in", "",
-              "| level | phase | passes | mean turn | top 1 | top 5 | top 20 "
-              "| cancellation | top component |",
-              "|:--|:--|--:|--:|--:|--:|--:|--:|:--|"]
+    lines += ["## Concentration in both coordinates", "",
+              "| level | phase | passes | motion | size per pass | top 1 "
+              "| top 5 | top 20 | cancellation | top component |",
+              "|:--|:--|--:|--:|--:|--:|--:|--:|--:|:--|"]
     summary = {}
     for level in ordered:
         trials = results[level]
-        turns = {ph: [rec["turn_deg"] for r in trials.values()
-                      for rec in r["records"] if rec["phase"] == ph]
-                 for ph in ("early", "late")}
+        stat = {ph: {k: [rec[k] for r in trials.values()
+                         for rec in r["records"] if rec["phase"] == ph]
+                     for k in ("turn_deg", "size_ratio")}
+                for ph in ("early", "late")}
         for phase in ("early", "late"):
-            mean_share, mean_abs, count = level_shares(trials, phase)
-            if mean_share is None:
+            if not stat[phase]["turn_deg"]:
                 continue
-            order = torch.argsort(mean_share, descending=True)
-            cum = torch.cumsum(mean_share[order], dim=0)
-            cancel = float(mean_abs.sum())
-            summary[(level, phase)] = {
-                "top1": float(cum[0]), "top5": float(cum[4]),
-                "top20": float(cum[19]), "cancellation": cancel,
-                "top_names": [names[int(i)] for i in order[:10]],
-                "top_values": [float(mean_share[int(i)]) for i in order[:10]],
-                "passes": count,
-            }
-            lines.append(
-                f"| {level} | {phase} | {count} | "
-                f"{statistics.mean(turns[phase]):.1f}&deg; | "
-                f"{float(cum[0]):.1%} | {float(cum[4]):.1%} | "
-                f"{float(cum[19]):.1%} | {cancel:.2f} | "
-                f"`{names[int(order[0])]}` |")
+            size = statistics.mean(stat[phase]["size_ratio"])
+            for coord, key, shown in (("direction", "shares",
+                                       f"{statistics.mean(stat[phase]['turn_deg']):.1f}&deg;"),
+                                      ("size", "para_shares", f"x{size:.2f}")):
+                mean_share, mean_abs, count = level_shares(trials, phase, key)
+                if mean_share is None:
+                    continue
+                order = torch.argsort(mean_share, descending=True)
+                cum = torch.cumsum(mean_share[order], dim=0)
+                summary[(level, phase, coord)] = {
+                    "top1": float(cum[0]), "top5": float(cum[4]),
+                    "top20": float(cum[19]),
+                    "cancellation": float(mean_abs.sum()),
+                    "top_names": [names[int(i)] for i in order[:10]],
+                    "top_values": [float(mean_share[int(i)])
+                                   for i in order[:10]],
+                    "passes": count,
+                }
+                lines.append(
+                    f"| {level} | {phase} | {count} | {coord} | "
+                    f"{shown if coord == 'direction' else f'x{size:.2f}'} | "
+                    f"{float(cum[0]):.1%} | {float(cum[4]):.1%} | "
+                    f"{float(cum[19]):.1%} | {float(mean_abs.sum()):.2f} | "
+                    f"`{names[int(order[0])]}` |")
 
     lines += [
         "",
@@ -462,21 +522,26 @@ def write_report():
         "value means the net turn is a small residue of much larger",
         "opposing contributions.",
         "",
-        "## Ranked components per level (early passes)",
+        "## Ranked components per level (early passes), both coordinates",
         "",
     ]
     for level in ordered:
-        s = summary.get((level, "early"))
-        if not s:
-            continue
-        lines.append(f"- **{level}**: " + ", ".join(
-            f"`{n}` {v:+.1%}" for n, v in zip(s["top_names"][:6],
-                                              s["top_values"][:6])))
+        for coord in ("direction", "size"):
+            s = summary.get((level, "early", coord))
+            if not s:
+                continue
+            lines.append(f"- **{level}**, {coord}: " + ", ".join(
+                f"`{n}` {v:+.1%}" for n, v in zip(s["top_names"][:6],
+                                                  s["top_values"][:6])))
+    lines += ["", "Whether the same components lead in both coordinates is "
+              "itself informative: a component that grows the state without "
+              "turning it, or turns it without growing it, is doing a "
+              "different job from one that does both.", ""]
 
-    lines += ["", "## The pre-stated expectations (issue #119)", ""]
+    lines += ["## The pre-stated expectations (issue #119)", ""]
     inside = [lv for lv in ordered if lv in ("m056", "historical")]
-    conc = [summary[(lv, "early")]["top5"] for lv in inside
-            if (lv, "early") in summary]
+    conc = [summary[(lv, "early", "direction")]["top5"] for lv in inside
+            if (lv, "early", "direction") in summary]
     if conc:
         held = all(c > 0.5 for c in conc)
         lines.append(
@@ -484,9 +549,10 @@ def write_report():
             + ", ".join(f"{c:.1%} at {lv}" for c, lv in zip(conc, inside))
             + f" on early passes. The pre-stated threshold was more than "
               f"50 percent inside the band: {'MET' if held else 'NOT MET'}.")
-    if ("m040", "early") in summary and ("m056", "early") in summary:
-        a = summary[("m040", "early")]["top_names"][:5]
-        b = summary[("m056", "early")]["top_names"][:5]
+    if (("m040", "early", "direction") in summary
+            and ("m056", "early", "direction") in summary):
+        a = summary[("m040", "early", "direction")]["top_names"][:5]
+        b = summary[("m056", "early", "direction")]["top_names"][:5]
         shared = len(set(a) & set(b))
         lines.append(
             f"2. **The ranking across the lower edge**: {shared} of the top "
