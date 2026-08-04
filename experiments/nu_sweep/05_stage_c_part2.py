@@ -4,11 +4,17 @@ Stage C's fine scan moved both 50 percent crossings: the lower edge to
 (m040, m048) and the upper edge to (m256, m384). The registered Part 2 rule
 (issue #116, inherited from Stage B) runs BOTH endpoints of every crossing
 pair at all 125 library prompts, unless an endpoint is already at full
-width. m256 already is (Stage B), so this stage widens m040, m048 and m384.
+width. m256 already is (Stage B).
+
+The first pass widened m040, m048 and m384, and its own numbers moved the
+lower crossing again: m048 read 56 percent in the five on 25 prompts and 31
+percent on 125, so the crossing is now (m048, m056) and the same rule pulls
+m056 in. This file therefore widens m040, m048, m056 and m384. Re-running it
+is safe and cheap: completed trials are skipped by their checkpoints.
 
 Mechanically identical to Stage B: Stage A's engine call, gate, F15 rule,
 shared checkpoint directory and naming, and level_stats. The 25-prompt Stage
-C trials at these levels are reused verbatim; 300 trials compute fresh.
+C trials at these levels are reused verbatim.
 
 Run from the repo root:
 
@@ -40,13 +46,13 @@ _spec.loader.exec_module(sa)
 
 # The endpoints of Stage C's two crossings that are not already full width.
 sa.N_PROMPTS = 125
-sa.LEVELS = ["m040", "m048", "m384"]
-sa.MULTIPLIERS = [40, 48, 384]
+sa.LEVELS = ["m040", "m048", "m056", "m384"]
+sa.MULTIPLIERS = [40, 48, 56, 384]
 
 OUT_DIR = sa.OUT_DIR
 # The crossing pairs this stage tests, both endpoints included; m256 is
 # carried from Stage B's full-width run.
-CROSSING_PAIRS = [("m040", "m048"), ("m256", "m384")]
+CROSSING_PAIRS = [("m040", "m048"), ("m048", "m056"), ("m256", "m384")]
 
 
 def write_report():
@@ -79,7 +85,7 @@ def write_report():
     for ckpt in sorted(sa.CKPT_DIR.glob("*.pt")):
         r = torch.load(ckpt, map_location="cpu", weights_only=True)
         all_levels.setdefault(r["level"], {})[r["pid"]] = r
-    shown = ["m040", "m048", "m256", "m384"]
+    shown = ["m040", "m048", "m056", "m256", "m384"]
     stats = {lv: sa.level_stats(all_levels[lv])
              for lv in shown if all_levels.get(lv)}
 
