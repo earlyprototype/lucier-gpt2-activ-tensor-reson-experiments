@@ -179,16 +179,32 @@ def flip_axis(model):
     gate = {
         "d_norm": float(d_raw.norm()),
         "d_norm_committed": committed["d_norm_raw"],
+        "norm_ratio": float(d_raw.norm()) / committed["d_norm_raw"],
         "cos_d_M": cos_d_m,
         "cos_d_M_committed": committed["cos_d_M"],
+        "sign_flipped": cos_d_m * committed["cos_d_M"] < 0,
     }
-    # Loose tolerances: the committed values came from a different
-    # regeneration of the same state, so agreement to a few percent in norm
-    # and a few thousandths in cosine is the honest bar, and is stated.
+    # The gate tests the ORIENTATION, which is the only thing this script
+    # uses, and not the length, which it discards by normalising.
+    #
+    # Sign. d = (A - B)/2 depends on which phase of the period-2 cycle is
+    # called A, and the two phases are equally valid starting points, so the
+    # recomputed axis may come back as -d. An axis has no inherent direction
+    # and the ladder rotates by a signed angle along it either way, so a
+    # flipped sign is recorded but does not fail the gate. The magnitude of
+    # the cosine with the pivot is what identifies the axis, and it is
+    # required to match the committed value.
+    #
+    # Length. The recomputed norm differs from the committed one by a few
+    # percent, because the committed value came from a separately converged
+    # run of the same cycle and the two settle at slightly different points
+    # on it. That difference is reported rather than gated, since gating a
+    # quantity the script never uses would be theatre. If the ratio ever
+    # departed far from 1 it would mean a different state, so it is checked
+    # loosely, at a factor of two.
     gate["passed"] = bool(
-        abs(gate["d_norm"] - gate["d_norm_committed"])
-        / gate["d_norm_committed"] < 0.05
-        and abs(cos_d_m - committed["cos_d_M"]) < 0.02)
+        abs(abs(cos_d_m) - abs(committed["cos_d_M"])) < 0.02
+        and 0.5 < gate["norm_ratio"] < 2.0)
     return (d_raw / d_raw.norm()).float(), gate
 
 
@@ -214,9 +230,10 @@ def prepare():
     torch.save({"flip_axis": d_hat, "glitch": u_hat, "flip_axis_gate": gate,
                 "seed": SEED}, DIRECTIONS)
     print(f"[prepare] flip axis gate passed={gate['passed']} "
-          f"(norm {gate['d_norm']:.1f} against committed "
-          f"{gate['d_norm_committed']:.1f}; cos with pivot {gate['cos_d_M']:.4f} "
-          f"against committed {gate['cos_d_M_committed']:.4f})")
+          f"(|cos| with pivot {abs(gate['cos_d_M']):.4f} against committed "
+          f"{abs(gate['cos_d_M_committed']):.4f}"
+          f"{', sign flipped, which an axis permits' if gate['sign_flipped'] else ''}"
+          f"; norm ratio {gate['norm_ratio']:.3f}, reported not gated)")
     return gate["passed"]
 
 

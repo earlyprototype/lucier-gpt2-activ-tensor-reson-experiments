@@ -9,10 +9,15 @@ blocks and 12 attention output biases.
 **Both coordinates of the motion are reported throughout.** A pass
 moves the state in two ways: it turns the direction and it changes
 the size. These are two coordinates of one motion, not competing
-explanations, and run 18 found that the five-basin band's two edges
-are dominated by one each, the lower by the turn and the upper by
-the size. So every component gets both shares here: the share of
-the direction change (its write perpendicular to the state,
+explanations. Run 18 was read as showing the five-basin band's two
+edges dominated by one coordinate each, the lower by the turn and
+the upper by the size, and that reading motivated this experiment;
+it was withdrawn on 2026-08-04 as methodologically unsound
+(FINDINGS caveat 19), and which quantity governs either edge is
+now open. Both shares are reported here regardless, and neither
+column below bears on that open question. Every component gets
+both shares: the share of the direction change (its write
+perpendicular to the state,
 projected onto the realised turn) and the share of the size change
 (its write parallel to the state). Both are signed, and both sum
 to 1 by construction, which the script asserts every pass.

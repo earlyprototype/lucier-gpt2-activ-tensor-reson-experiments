@@ -1,13 +1,30 @@
 """Which parts of the model do the turning? (issue #119)
 
-Registered before execution in issue #119. Run 18 established that the lower
-edge of the five-basin band is governed by how far the state's DIRECTION
-rotates on each pass, not by how much its size grows. But the measured angle
-is one arrow: the sum of writes from 144 attention heads, 12 feed-forward
-blocks and their biases, collapsed together. That arrow cannot distinguish a
-concentrated cause (a few components doing nearly all of it, as F17 found for
-the Divine cycle's flip axis) from a diffuse one (every component nudging).
-This script splits the arrow into per-component shares.
+Registered before execution in issue #119.
+
+THE MOTIVATING PREMISE WAS WITHDRAWN AFTER THIS EXPERIMENT RAN. This script
+was registered on the reading that run 18 had established the lower edge of
+the five-basin band to be governed by how far the state's DIRECTION rotates
+on each pass rather than by how much its size grows. That reading was
+withdrawn on 2026-08-04 as methodologically unsound (FINDINGS caveat 19): it
+rested on comparing coefficients of variation across coordinates, which
+cannot support it. Which quantity governs either edge is now OPEN. What
+survives of run 18 is the descriptive profile, the per-pass turn rising
+through the strata below the band and peaking inside it, which is what the
+level choices below track.
+
+The withdrawal does not touch what this script measures. The per-component
+shares of the turn stand on their own, and this experiment's own finding,
+that the turn's COMPOSITION does not change across the lower edge, is
+consistent with that edge never having been shown to be directional. Nothing
+here should be read as evidence for or against a directional account of the
+edge.
+
+The measured angle is one arrow: the sum of writes from 144 attention heads,
+12 feed-forward blocks and their biases, collapsed together. That arrow
+cannot distinguish a concentrated cause (a few components doing nearly all of
+it, as F17 found for the Divine cycle's flip axis) from a diffuse one (every
+component nudging). This script splits the arrow into per-component shares.
 
 WHY THE SPLIT IS EXACT. The residual stream is additive: the tensor leaving
 the last block equals the tensor injected at the first, plus every
@@ -485,10 +502,15 @@ def write_report():
         "**Both coordinates of the motion are reported throughout.** A pass",
         "moves the state in two ways: it turns the direction and it changes",
         "the size. These are two coordinates of one motion, not competing",
-        "explanations, and run 18 found that the five-basin band's two edges",
-        "are dominated by one each, the lower by the turn and the upper by",
-        "the size. So every component gets both shares here: the share of",
-        "the direction change (its write perpendicular to the state,",
+        "explanations. Run 18 was read as showing the five-basin band's two",
+        "edges dominated by one coordinate each, the lower by the turn and",
+        "the upper by the size, and that reading motivated this experiment;",
+        "it was withdrawn on 2026-08-04 as methodologically unsound",
+        "(FINDINGS caveat 19), and which quantity governs either edge is",
+        "now open. Both shares are reported here regardless, and neither",
+        "column below bears on that open question. Every component gets",
+        "both shares: the share of the direction change (its write",
+        "perpendicular to the state,",
         "projected onto the realised turn) and the share of the size change",
         "(its write parallel to the state). Both are signed, and both sum",
         "to 1 by construction, which the script asserts every pass.",

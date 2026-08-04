@@ -230,10 +230,17 @@ RUNS = [
                        "inside (256x, 384x). Below the band: a periodic shelf at 40x (33/125 "
                        "lock, 92 pass only at lag 2) and then strata (arbit at 2-4x, the "
                        "horizontal bar at 6-8x and 16-24x, vertex at 12x, fragmentation at "
-                       "32x) whose lowest members point into the anomalous-token cluster. The "
-                       "two edges are governed by different quantities: the lower tracks the "
-                       "per-pass directional turn, the upper the per-pass magnitude gain "
-                       "(FINDINGS caveat 19, resolved).",
+                       "32x) whose lowest members point into the anomalous-token cluster. A "
+                       "further claim from this run, that the two edges are governed by "
+                       "different quantities (the lower by the per-pass directional turn, the "
+                       "upper by the per-pass magnitude gain), was WITHDRAWN on 2026-08-04: it "
+                       "rested on comparing coefficients of variation across coordinates, which "
+                       "cannot support it, since gain floors at 1 rather than 0, CV is not "
+                       "invariant under reparameterisation, each coordinate reads tight where "
+                       "its profile is flat, and the lower-edge number flips across averaging "
+                       "windows. What survives is the descriptive profile: the per-pass turn "
+                       "rises through the strata below the band and peaks inside it. Which "
+                       "quantity governs either edge is open (FINDINGS caveat 19).",
         "script": "experiments/nu_sweep/01_stage_a.py",
         "output_dir": "experiments/nu_sweep/output/",
         "n": "1,425 distinct trials across Stages A, B and C, gated, F15-classified",
@@ -667,9 +674,12 @@ RELS_RAW = [
      "all 125 prompts (39/125 to 125/125 across the lower edge, 84/125 to 47/125 across "
      "the upper). Below the band the iterated map resolves a periodic shelf and then "
      "stratified non-basin attractors, the lowest pointing into the anomalous-token "
-     "cluster. The two edges are governed by different quantities, the lower by the "
-     "per-pass directional turn and the upper by the per-pass magnitude gain (FINDINGS "
-     "caveat 19, resolved).", 9),
+     "cluster. The further claim that the two edges are governed by different "
+     "quantities, the lower by the per-pass directional turn and the upper by the "
+     "per-pass magnitude gain, was withdrawn on 2026-08-04 as methodologically "
+     "unsound; the descriptive profile survives, with the per-pass turn rising below "
+     "the band and peaking inside it, but which quantity governs either edge is open "
+     "(FINDINGS caveat 19).", 9),
 
     # ---- the apparatus difference
     ("ac-tape-recorder", "concept-readout-bypass", "breaks-down-at",
