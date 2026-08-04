@@ -413,14 +413,30 @@ def run_worker(worker, num_workers):
 def write_report():
     """Assemble the archive and regenerate the report."""
     states = sweep_states()
-    results, missing = [], []
+    results, missing, failed_control, no_control = [], [], [], []
     for level, mult, label, pid in states:
-        ckpt = CKPT_DIR / f"{level}_{label}_{pid}.pt"
-        if ckpt.exists():
-            results.append(torch.load(ckpt, map_location="cpu",
-                                      weights_only=True))
-        else:
-            missing.append(f"{level}_{label}_{pid}")
+        key = f"{level}_{label}_{pid}"
+        ckpt = CKPT_DIR / f"{key}.pt"
+        if not ckpt.exists():
+            missing.append(key)
+            continue
+        # A ladder is only interpretable if re-entering the loop with NO
+        # perturbation returns the attractor. Where it does not, every rung
+        # reads as an escape and the ladder measures the re-entry, not the
+        # basin. Such states are named and excluded, never averaged in.
+        ctrl_path = CONTROL_DIR / f"{key}.pt"
+        if not ctrl_path.exists():
+            no_control.append(key)
+            continue
+        ctrl = torch.load(ctrl_path, map_location="cpu", weights_only=True)
+        if not ctrl["passed"]:
+            failed_control.append(
+                f"{key} (settles {ctrl['home_token']!r}, "
+                f"re-entry gives {ctrl['control_token']!r})")
+            continue
+        r = torch.load(ckpt, map_location="cpu", weights_only=True)
+        r["control"] = ctrl
+        results.append(r)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     if missing:
         print(f"[report] WARNING: {len(missing)} states missing or skipped. "
@@ -450,21 +466,66 @@ def write_report():
         "settles on a different token from the unperturbed attractor.",
         "",
     ]
-    if missing:
-        lines += [f"**PARTIAL: {len(missing)} of {len(states)} states "
-                  "missing or skipped; numbers below cover the rest.**", ""]
-    lines += ["## Escape thresholds per state", "",
-              "| level | basin | prompt | random directions | flip axis "
-              "| glitch direction |", "|:--|:--|:--|:--|--:|--:|"]
+    if missing or no_control:
+        lines += [f"**PARTIAL: {len(missing) + len(no_control)} of "
+                  f"{len(states)} states missing a ladder or a control; "
+                  "numbers below cover the rest.**", ""]
+    lines += [
+        "## The zero-perturbation control",
+        "",
+        "This control was NOT in the registered protocol and was added "
+        "after the first ladders ran. A rung counts as an escape when the "
+        "re-entered run settles on a different token from the attractor, "
+        "which is only meaningful if re-entering with NO perturbation "
+        "returns that attractor. Without the control, a state whose "
+        "re-entry fails to reproduce its own settled point is "
+        "indistinguishable from a basin so shallow that one degree "
+        "dislodges it.",
+        "",
+        f"Of {len(results) + len(failed_control)} states with both a ladder "
+        f"and a control, {len(results)} passed and {len(failed_control)} "
+        "failed. Failed states are excluded from every number below and "
+        "named here:",
+        "",
+    ]
+    lines += ([f"- `{k}`" for k in failed_control] if failed_control
+              else ["- none"])
+    lines.append("")
+    if failed_control:
+        lines += [
+            "A failing control is itself informative: the state sits close "
+            "enough to a boundary that an identical tensor, re-entered "
+            "through a separate code path, lands elsewhere. That is a real "
+            "property of the state, not only a defect of the method, but it "
+            "cannot be read as an escape threshold.",
+            "",
+        ]
+    lines += [
+        "## Escape thresholds per state, in both coordinates",
+        "",
+        "Angles are the primary measure, because the pin removes the size",
+        "degree of freedom inside a run and only the direction is free.",
+        "But the same push has an exact size in the state's own units: a",
+        "rotation by theta moves the state a distance 2 sin(theta/2) times",
+        "its norm, so the displacement column below is that number, and the",
+        "two columns describe one push rather than two rival measures.",
+        "For reference 1 degree is 0.017 of the norm, 8 degrees 0.140,",
+        "64 degrees 1.060, and 90 degrees 1.414.",
+        "",
+        "| level | basin | prompt | random directions | flip axis "
+        "| glitch direction | median displacement |", "|:--|:--|:--|:--|--:|--:|--:|"]
     for r in results:
         rand = [v["threshold_deg"] for k, v in r["directions"].items()
                 if k.startswith("random")]
         fa = r["directions"].get("flip_axis", {}).get("threshold_deg")
         gl = r["directions"].get("glitch", {}).get("threshold_deg")
+        got = [v for v in [*rand, fa, gl] if v is not None]
+        disp = (f"{2 * math.sin(math.radians(statistics.median(got)) / 2):.3f}"
+                if got else "n/a")
         lines.append(
             f"| {r['level']} | `{r['label']}` | {r['pid']} | "
             f"{summarise(rand)} | {fa if fa is not None else '>90'} | "
-            f"{gl if gl is not None else '>90'} |")
+            f"{gl if gl is not None else '>90'} | {disp} |")
 
     lines += ["", "## The pre-stated expectations (issue #17)", ""]
     all_rand = [v["threshold_deg"] for r in results
