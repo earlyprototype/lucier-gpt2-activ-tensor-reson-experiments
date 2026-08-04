@@ -1008,14 +1008,50 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
     stratum, which is consistent with that run's dominant bar basin having
     been a genuine basin of its stratum.
 
-    **The two edges are governed by different quantities (same run;
-    archive-only re-analysis on the operator's objection that a magnitude
-    ratio cannot describe a directional system).** Measuring each prompt's
-    own transition point and comparing cross-prompt scatter in the two
-    measured coordinates: the lower edge tracks how far the state's
-    direction rotates per pass (coefficient of variation 0.082 in degrees
-    against 0.123 in magnitude gain, mean 70.8°), while the upper edge
-    tracks magnitude gain (0.091 against 0.510 in degrees, mean 1.206×).
+    **WITHDRAWN 2026-08-04: "the two edges are governed by different
+    quantities."** This paragraph previously claimed that the lower edge
+    tracks the per-pass directional turn (CV 0.082 against 0.123 in gain)
+    and the upper edge tracks magnitude gain (0.091 against 0.510). Both
+    halves are withdrawn. The arithmetic reproduces exactly; the
+    METHODOLOGY does not support the conclusion, for reasons that are
+    fatal rather than partial:
+
+    - **Gain has a floor at 1, not 0.** As the injected norm grows, the
+      model's own contribution becomes negligible against it and the gain
+      tends to 1 by construction. The upper-edge mean gain is 1.206, only
+      0.206 above that floor, so a CV taken about zero is deflated by an
+      offset that carries no information. Measured from the floor, the
+      upper edge reads 0.63 in gain against 0.60 in turn: the gap that the
+      whole claim rested on disappears. Independently recomputed twice.
+    - **CV is not invariant under reparameterisation.** The turn is an
+      arccosine of the archived quantity. Expressed in the raw cosine
+      instead of degrees, the upper edge's verdict reverses and the turn
+      becomes the tighter coordinate. Nothing privileges degrees.
+    - **Each coordinate looks tight exactly where it is flat.** CV is
+      proportional to a coordinate's local sensitivity to the swept axis.
+      The turn sits near its profile maximum at the lower edge (log-slope
+      +0.30) and the gain is nearly flat at the upper edge (-0.28), so
+      each is incapable of varying at the edge where it was reported as
+      tight.
+    - **The lower-edge number is an artefact of one arbitrary choice.**
+      The turn was averaged over passes 1-10. Over pass 1 alone the CV is
+      0.33, over 1-50 it is 0.059, over 1-100 it is 0.170. The ordering
+      against gain flips across those four equally defensible windows.
+    - **The multiplier column is a grid constant.** It takes only two
+      distinct values at the lower edge, being a function of the shared
+      level spacing rather than of any prompt, so it cannot serve as a
+      third comparison arm either.
+
+    What survives is the raw profile below, which is a description rather
+    than a discrimination. WHICH quantity governs either edge is OPEN, and
+    the CV-across-coordinates method cannot answer it: it mixes local
+    slope, distance from a non-zero asymptote, and choice of units, and
+    here each of those three alone suffices to flip the answer. A
+    defensible test needs coordinates with true zeros and comparable
+    sensitivity, and a level grid fine enough to resolve the edge; the
+    present grid spans factors of two to three at the upper edge and
+    resolves nothing there. See issue #17 for the successor design.
+
     In magnitude coordinates the sweep is one smooth decline from 54× to
     1.01× and both edges look like the same event; in angular coordinates
     the per-pass turn RISES through the strata and the lower edge (42° at

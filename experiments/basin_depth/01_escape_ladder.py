@@ -109,7 +109,7 @@ def converged_state(model, prompt, pin, expect_token=None):
         if norm > 0:
             current = current * (target / norm)
 
-        def hook(resid, h, tensor=current.clone()):
+        def hook(resid, hook, tensor=current.clone()):
             resid[0, :, :] = tensor
             return resid
 
@@ -158,7 +158,7 @@ def flip_axis(model):
     hook_write = f"blocks.{sa.LAYER_START}.hook_resid_pre"
     x = a_tensor * (target / a_tensor.norm().item())
 
-    def hook(resid, h, tensor=x.clone()):
+    def hook(resid, hook, tensor=x.clone()):
         resid[0, :, :] = tensor
         return resid
 
