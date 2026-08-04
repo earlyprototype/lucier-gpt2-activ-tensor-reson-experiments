@@ -13,6 +13,7 @@ m384). m256 was already at full width from Stage B.
 |:--|--:|--:|--:|--:|--:|:--|
 | m040 | 125 | 4% (5/125) | 33/125 | 130 | 10 | lag 2: 92 |
 | m048 | 125 | 31% (39/125) | 125/125 | 120 | 3 | all locked |
+| m056 | 125 | 100% (125/125) | 125/125 | 120 | 3 | all locked |
 | m256 | 125 | 67% (84/125) | 125/125 | 120 | 4 | all locked |
 | m384 | 125 | 38% (47/125) | 125/125 | 120 | 4 | all locked |
 
@@ -20,12 +21,14 @@ m384). m256 was already at full width from Stage B.
 
 - **m040**: `relat` 56, `abs` 35, `Rousse` 21, `Nath` 3, `prolet` 3, `till` 2, `―` 2, `Dh` 1, `Dig` 1, `Sorce` 1
 - **m048**: `Rousse` 85, `prolet` 39, `Sorce` 1
+- **m056**: `prolet` 122, `solidarity` 2, `Anarch` 1
 - **m256**: `solidarity` 84, `the` 22, `.` 17, `I` 2
 - **m384**: `the` 65, `solidarity` 47, `.` 8, `struggle` 5
 
 ## Crossing confirmation at full width
 
 - m040 to m048: 4% to 31% at full width, crossing NOT confirmed against the 50% rule.
+- m048 to m056: 31% to 100% at full width, crossing CONFIRMED against the 50% rule.
 - m256 to m384: 67% to 38% at full width, crossing CONFIRMED against the 50% rule.
 
 ## Reading

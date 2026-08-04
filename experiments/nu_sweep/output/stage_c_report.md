@@ -21,15 +21,15 @@ multiplier and the measured mean single-pass gain.
 | m016 | 25 | 16.0 | 9.61 | 0% (0/25) | 25/25 | 2 | `―` 23 |
 | m024 | 25 | 24.0 | 6.53 | 0% (0/25) | 20/25 | 3 | `―` 20 |
 | m032 | 125 | 32.0 | 4.78 | 0% (0/125) | 109/125 | 14 | `ND` 32 |
-| m040 | 25 | 40.0 | 4.19 | 0% (0/25) | 8/25 | 4 | `relat` 12 |
-| m048 | 25 | 48.0 | 3.42 | 56% (14/25) | 25/25 | 2 | `prolet` 14 |
-| m056 | 25 | 56.0 | 2.90 | 100% (25/25) | 25/25 | 1 | `prolet` 25 |
+| m040 | 125 | 40.0 | 3.87 | 4% (5/125) | 33/125 | 10 | `relat` 56 |
+| m048 | 125 | 48.0 | 3.20 | 31% (39/125) | 125/125 | 3 | `Rousse` 85 |
+| m056 | 125 | 56.0 | 2.74 | 100% (125/125) | 125/125 | 3 | `prolet` 122 |
 | m064 | 125 | 64.0 | 2.40 | 100% (125/125) | 123/125 | 4 | `prolet` 119 |
 | historical | 25 | 70.8 | 2.30 | 100% (25/25) | 19/25 | 3 | `prolet` 14 |
 | shared | 125 | 72.7 | 2.17 | 99% (124/125) | 73/125 | 6 | `Divine` 52 |
 | m128 | 125 | 128.0 | 1.41 | 98% (123/125) | 125/125 | 2 | `solidarity` 123 |
 | m256 | 125 | 256.0 | 1.11 | 67% (84/125) | 125/125 | 4 | `solidarity` 84 |
-| m384 | 25 | 384.0 | 1.06 | 16% (4/25) | 25/25 | 3 | `the` 18 |
+| m384 | 125 | 384.0 | 1.04 | 38% (47/125) | 125/125 | 4 | `the` 65 |
 | m512 | 25 | 512.0 | 1.03 | 12% (3/25) | 25/25 | 3 | `the` 21 |
 | m768 | 25 | 768.0 | 1.02 | 8% (2/25) | 25/25 | 4 | `the` 21 |
 | m1024 | 25 | 1024.0 | 1.01 | 8% (2/25) | 25/25 | 4 | `the` 21 |
@@ -39,18 +39,18 @@ multiplier and the measured mean single-pass gain.
 - **m006**: `―` 25
 - **m012**: `vertex` 14, `cond` 6, `―` 5
 - **m024**: `―` 20, `justified` 4, `abs` 1
-- **m040**: `relat` 12, `Rousse` 7, `abs` 5, `Dh` 1
-- **m048**: `prolet` 14, `Rousse` 11
-- **m056**: `prolet` 25
+- **m040**: `relat` 56, `abs` 35, `Rousse` 21, `Nath` 3, `prolet` 3, `till` 2, `―` 2, `Dh` 1, `Dig` 1, `Sorce` 1
+- **m048**: `Rousse` 85, `prolet` 39, `Sorce` 1
+- **m056**: `prolet` 122, `solidarity` 2, `Anarch` 1
 - **shared**: `Divine` 52, `prolet` 41, `Anarch` 17, `solidarity` 11, `till` 3, `Rousse` 1
-- **m384**: `the` 18, `solidarity` 4, `.` 3
+- **m384**: `the` 65, `solidarity` 47, `.` 8, `struggle` 5
 - **m512**: `the` 21, `solidarity` 3, `struggle` 1
 - **m768**: `the` 21, `solidarity` 2, `.` 1, `Fight` 1
 - **m1024**: `the` 21, `solidarity` 2, `` 1, `in` 1
 
 ## Band-statistic crossings over the combined profile
 
-- Crossing intervals (50 percent rule, pre-stated): ['m040 to m048', 'm256 to m384'].
+- Crossing intervals (50 percent rule, pre-stated): ['m048 to m056', 'm256 to m384'].
 
 ## Q2: transition scatter in the two coordinates (pre-stated test,
 corrected in execution)

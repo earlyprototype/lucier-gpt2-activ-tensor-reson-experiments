@@ -23,7 +23,7 @@ to degrees the mean vector rotated on that pass.
 | m032 | 125 | 32.0x | 4.78x | 31.3&deg; | 60.7&deg; | 43.6&deg; | 24.6&deg; | 0% | `ND` |
 | m040 | 125 | 40.0x | 3.87x | 27.1&deg; | 67.9&deg; | 58.8&deg; | 49.6&deg; | 4% | `relat` |
 | m048 | 125 | 48.0x | 3.20x | 24.7&deg; | 72.7&deg; | 59.3&deg; | 30.2&deg; | 31% | `Rousse` |
-| m056 | 71 | 56.0x | 2.78x | 20.7&deg; | 74.3&deg; | 57.1&deg; | 25.3&deg; | 100% | `prolet` |
+| m056 | 125 | 56.0x | 2.74x | 23.0&deg; | 75.2&deg; | 57.1&deg; | 25.4&deg; | 100% | `prolet` |
 | m064 | 125 | 64.0x | 2.40x | 21.6&deg; | 76.7&deg; | 53.2&deg; | 23.3&deg; | 100% | `prolet` |
 | historical | 25 | 70.8x | 2.30x | 18.4&deg; | 76.9&deg; | 49.5&deg; | 27.8&deg; | 100% | `prolet` |
 | shared | 125 | 72.7x | 2.17x | 19.6&deg; | 75.6&deg; | 48.6&deg; | 31.7&deg; | 99% | `Divine` |
