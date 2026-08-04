@@ -214,6 +214,31 @@ RUNS = [
         "n": "125 Gaussian tensors, pair-matched, seed 42",
     },
     {
+        "id": "run-18-nu-sweep",
+        "label": "Run 18: the nu-sweep (2026-08-02)",
+        "type": "run",
+        "description": "The injection-scale scan (registered issues #113/#116): the pin nu "
+                       "swept over twenty-one levels, expressed as multipliers of each "
+                       "prompt's natural entry norm, plus the exact historical pin and a "
+                       "shared-pin control. Stage A mapped ten levels on 25 prompts (250 "
+                       "trials); Stage B and the Part 2 brackets ran every crossing endpoint "
+                       "on all 125 prompts (500 trials each grid); Stage C added ten fine "
+                       "levels and the shared-pin control (375 trials). The five-basin "
+                       "landscape is a band, with both edges bracketed at full width: 39/125 "
+                       "in the five at 48x and 125/125 at 56x, so the lower edge lies inside "
+                       "(48x, 56x); 84/125 at 256x and 47/125 at 384x, so the upper edge lies "
+                       "inside (256x, 384x). Below the band: a periodic shelf at 40x (33/125 "
+                       "lock, 92 pass only at lag 2) and then strata (arbit at 2-4x, the "
+                       "horizontal bar at 6-8x and 16-24x, vertex at 12x, fragmentation at "
+                       "32x) whose lowest members point into the anomalous-token cluster. The "
+                       "two edges are governed by different quantities: the lower tracks the "
+                       "per-pass directional turn, the upper the per-pass magnitude gain "
+                       "(FINDINGS caveat 19, resolved).",
+        "script": "experiments/nu_sweep/01_stage_a.py",
+        "output_dir": "experiments/nu_sweep/output/",
+        "n": "1,425 distinct trials across Stages A, B and C, gated, F15-classified",
+    },
+    {
         "id": "run-08-divine-motion",
         "label": "Run 8: Divine motion audit (lag-10 + lag-1 probe)",
         "type": "run",
@@ -621,8 +646,11 @@ RELS_RAW = [
      "eighteen different, non-semantic attractors), but the corrected matched-nu control "
      "(run 17, 2026-07-31) reverses it: noise raises the language arm's own five basins, "
      "so at the tested injection scale the analogy passes and the basins do belong to the "
-     "room. The edge is kept as the record of the correction; whether the analogy holds at "
-     "other injection scales is the nu-sweep's question.", 9),
+     "room. The edge is kept as the record of the correction; the nu-sweep (run 18, "
+     "2026-08-02) then answered the scale question: the analogy passes only inside a "
+     "measured band of injection scales, roughly 50x to 300x the natural entry scale "
+     "with both edges bracketed at full width, and below the band the room resolves "
+     "different words entirely (FINDINGS caveat 19).", 9),
     ("concept-regime-dependence", "run-03-random-baseline", "evidenced-by",
      "The original evidence, now superseded and kept as the historical record: 125 "
      "mis-calibrated Gaussian tensors, counted "
@@ -633,6 +661,15 @@ RELS_RAW = [
      "lands in the language arm's own basins (all five at each trial's smallest passing "
      "lag, 97/125 trials), so at the tested injection scale the basins belong to the "
      "weights (FINDINGS F4).", 9),
+    ("concept-regime-dependence", "run-18-nu-sweep", "evidenced-by",
+     "The scale dimension of regime dependence, measured: the five-basin landscape holds "
+     "in a band roughly 50x to 300x the natural entry scale, with both edges bracketed at "
+     "all 125 prompts (39/125 to 125/125 across the lower edge, 84/125 to 47/125 across "
+     "the upper). Below the band the iterated map resolves a periodic shelf and then "
+     "stratified non-basin attractors, the lowest pointing into the anomalous-token "
+     "cluster. The two edges are governed by different quantities, the lower by the "
+     "per-pass directional turn and the upper by the per-pass magnitude gain (FINDINGS "
+     "caveat 19, resolved).", 9),
 
     # ---- the apparatus difference
     ("ac-tape-recorder", "concept-readout-bypass", "breaks-down-at",

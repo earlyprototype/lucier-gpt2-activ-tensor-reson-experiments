@@ -314,14 +314,20 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
     (``{lag: mean cosine}`` over the last 9 mean-vector iterates, for periodic
     -attractor census). ``inject_hook_name`` (default None) overrides the
     injection hook point (an injection-site sanity control). ``renorm``
-    (``"seed_j"`` default, ``"natural_i"``, or ``"none"``) selects the rescale
-    target: ``"seed_j"`` uses the seed norm at the extraction layer (the
-    historical path); ``"natural_i"`` uses the natural ``resid_pre`` norm at
-    the injection layer; ``"none"`` (issue #112's free-norm growth probe)
-    applies no rescale at all, so the norm evolves freely and ``target_norm``
-    is reported as None. These parameters were developed for the Stage 2
-    layer-window experiments (EXP_010c); the defaults reproduce the registered
-    single-window path exactly, so existing callers are unaffected.
+    (``"seed_j"`` default, ``"natural_i"``, ``"none"``, or a positive number)
+    selects the rescale target: ``"seed_j"`` uses the seed norm at the
+    extraction layer (the historical path); ``"natural_i"`` uses the natural
+    ``resid_pre`` norm at the injection layer; ``"none"`` (issue #112's
+    free-norm growth probe) applies no rescale at all, so the norm evolves
+    freely and ``target_norm`` is reported as None; a positive finite number
+    (issue #113's nu-sweep) pins every iterate to exactly that Frobenius
+    norm. The numeric path shares the string paths' arithmetic: a numeric
+    pin equal to the run's own seed norm reproduces ``renorm="seed_j"``
+    bit-identically, which is the sweep's pre-run contract check. These
+    parameters were developed for the Stage 2 layer-window experiments
+    (EXP_010c) and extended per registered protocols; the defaults reproduce
+    the registered single-window path exactly, so existing callers are
+    unaffected.
 
     ``prepend_bos`` (default None) decides whether TransformerLens prepends the
     BOS token when it tokenises a string ``prompt``. None defers to the model's
@@ -368,9 +374,17 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
         raise ValueError(
             f"check_start ({check_start}) must be >= gate_lag ({gate_lag}) "
             "for the lagged comparison to be well-formed")
-    if renorm not in ("seed_j", "natural_i", "none"):
+    numeric_pin = isinstance(renorm, (int, float)) and not isinstance(renorm, bool)
+    if numeric_pin:
+        renorm = float(renorm)
+        if not (renorm > 0 and renorm == renorm and renorm != float("inf")):
+            raise ValueError(
+                f"a numeric renorm must be a positive finite Frobenius norm "
+                f"target, got {renorm!r}")
+    elif renorm not in ("seed_j", "natural_i", "none"):
         raise ValueError(
-            f"renorm must be 'seed_j', 'natural_i' or 'none', got {renorm!r}")
+            f"renorm must be 'seed_j', 'natural_i', 'none' or a positive "
+            f"number, got {renorm!r}")
     if seed_tensor is not None:
         if renorm != "seed_j":
             raise ValueError(
@@ -410,7 +424,9 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
             )
         current_tensor = cache[hook_point_read][0].clone()
         initial_norm = current_tensor.norm().item()
-        if renorm == "natural_i":
+        if numeric_pin:
+            target_norm = renorm
+        elif renorm == "natural_i":
             target_norm = cache[natural_pre_name][0].norm().item()
         elif renorm == "none":
             target_norm = None
