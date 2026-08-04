@@ -141,11 +141,33 @@ def build_clusters(W_E, tok):
     }
 
 
+def load_all_levels():
+    """Every trial on disk, grouped by level and ordered by mean pin.
+
+    Originally this script read Stage A's archive alone. Stage C added ten
+    fine levels and the shared-pin control, so it now reads the shared
+    checkpoint directory, which is a strict superset: the Stage A levels
+    keep the same trials and the same numbers, and the new levels join the
+    table. The instruments and nulls are unchanged."""
+    ckpt_dir = ARCHIVE.parent / "checkpoints"
+    results = {}
+    if ckpt_dir.exists():
+        for ckpt in sorted(ckpt_dir.glob("*.pt")):
+            r = torch.load(ckpt, map_location="cpu", weights_only=True)
+            results.setdefault(r["level"], {})[r["pid"]] = r
+    if not results:  # no checkpoints in this checkout: fall back to Stage A
+        saved = torch.load(ARCHIVE, map_location="cpu", weights_only=True)
+        results = saved["results"]
+    levels = sorted(
+        (lv for lv in results if results[lv]),
+        key=lambda lv: sum(r["target_norm"] for r in results[lv].values())
+        / len(results[lv]))
+    return results, levels
+
+
 def main():
     """Compute the alignment table and write the report."""
-    saved = torch.load(ARCHIVE, map_location="cpu", weights_only=True)
-    results = saved["results"]
-    levels = [lv for lv in saved["config"]["levels"] if results.get(lv)]
+    results, levels = load_all_levels()
     W_E, tok = load_embeddings()
     V = W_E.shape[0]
     mu = W_E.mean(dim=0)
