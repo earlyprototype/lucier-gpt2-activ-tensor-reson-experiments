@@ -93,3 +93,9 @@ gpt2_local/
 # the container. Checkpoints stay ignored as the transient resume unit.
 !experiments/head_turn/output/turn_attribution.pt
 experiments/head_turn/output/checkpoints/
+
+# 2026-08-04: basin depth (#17). Same rule: the per-state escape ladders are
+# the experiment's evidence. Checkpoints stay ignored as the resume unit.
+!experiments/basin_depth/output/escape_ladder.pt
+!experiments/basin_depth/output/directions.pt
+experiments/basin_depth/output/checkpoints/
