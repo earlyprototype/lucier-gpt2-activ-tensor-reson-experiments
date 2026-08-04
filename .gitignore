@@ -87,3 +87,9 @@ experiments/nu_sweep/output/checkpoints/
 # 2026-08-02: local GPT-2 weights downloaded from the legacy S3 mirror for
 # offline loading (ATR_GPT2_LOCAL). Ephemeral, rebuilt per container.
 gpt2_local/
+
+# 2026-08-04: head-turn attribution (#119). Same rule as EXP_009 above: the
+# per-trial component shares are the experiment's evidence and must survive
+# the container. Checkpoints stay ignored as the transient resume unit.
+!experiments/head_turn/output/turn_attribution.pt
+experiments/head_turn/output/checkpoints/
