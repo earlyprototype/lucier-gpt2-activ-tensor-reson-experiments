@@ -190,16 +190,33 @@ def mean_multiplier(rows):
 
 
 def q2_scatter(results, ordered):
-    """The Q2 test (issue #116, pre-stated): for each of the first 25
-    prompts, locate the adjacent-level interval where its in-five membership
-    flips (scanning levels in pin order; prompts with zero or multiple flips
-    are reported and excluded), take the geometric midpoint of that
-    prompt's own interval endpoints in each coordinate (its pin multiplier;
-    its own single-pass gain), and compare cross-prompt coefficients of
-    variation. Smaller in gain supports the replacement-ratio hypothesis."""
+    """The Q2 test (issue #116), corrected in execution.
+
+    As registered this scan looked for a prompt with exactly ONE in-five
+    flip along the profile. That was wrong: the band has two edges, so every
+    prompt flips twice (out to in at the lower edge, in to out at the upper),
+    and the first run of this function discarded 23 of 25 prompts. The
+    corrected scan locates each edge separately: the LOWER crossing is the
+    first out-to-in adjacent pair, the UPPER crossing the last in-to-out
+    pair. For each edge and prompt, the transition point is the geometric
+    midpoint of that prompt's own interval endpoints, taken in each
+    coordinate (pin multiplier; the prompt's own measured single-pass gain),
+    and the cross-prompt coefficient of variation is compared.
+
+    Stated limitation, load-bearing for the reading: the level grid is
+    defined in MULTIPLIER units and shared by every prompt, so a prompt's
+    multiplier midpoint can only take one of the few discrete grid values,
+    while its gain midpoint varies continuously with the prompt. The
+    comparison is therefore biased toward the multiplier coordinate looking
+    tighter, and a coefficient of variation smaller in multiplier units is
+    NOT evidence against the replacement-ratio hypothesis. Only the reverse
+    finding (gain tighter despite the bias) would be evidence for it. A fair
+    test needs per-prompt bisection in gain units."""
     import prompt_library
     pids = list(prompt_library.PROMPT_LIBRARY)[:FINE_N_PROMPTS]
-    mids_mult, mids_gain, excluded = [], [], []
+    edges = {"lower": {"mult": [], "gain": []},
+             "upper": {"mult": [], "gain": []}}
+    excluded = []
     for pid in pids:
         seq = []
         for lv in ordered:
@@ -215,21 +232,36 @@ def q2_scatter(results, ordered):
             if mult:
                 seq.append((mult, gain, in_five))
         seq.sort(key=lambda t: t[0])
-        flips = [(a, b) for a, b in itertools.pairwise(seq) if a[2] != b[2]]
-        if len(flips) != 1:
-            excluded.append((pid, len(flips)))
+        ups = [(a, b) for a, b in itertools.pairwise(seq)
+               if not a[2] and b[2]]
+        downs = [(a, b) for a, b in itertools.pairwise(seq)
+                 if a[2] and not b[2]]
+        if not ups or not downs:
+            excluded.append((pid, f"{len(ups)} up, {len(downs)} down"))
             continue
-        (m0, g0, _), (m1, g1, _) = flips[0]
-        mids_mult.append((m0 * m1) ** 0.5)
-        mids_gain.append((g0 * g1) ** 0.5)
+        for name, pair in (("lower", ups[0]), ("upper", downs[-1])):
+            (m0, g0, _), (m1, g1, _) = pair
+            edges[name]["mult"].append((m0 * m1) ** 0.5)
+            edges[name]["gain"].append((g0 * g1) ** 0.5)
 
     def cv(vals):
         return (statistics.stdev(vals) / statistics.mean(vals)
                 if len(vals) > 1 else float("nan"))
 
-    return {"n_prompts_used": len(mids_mult), "excluded": excluded,
-            "cv_multiplier": cv(mids_mult), "cv_gain": cv(mids_gain),
-            "midpoints_multiplier": mids_mult, "midpoints_gain": mids_gain}
+    out = {"excluded": excluded, "edges": {}}
+    for name, d in edges.items():
+        out["edges"][name] = {
+            "n_prompts": len(d["mult"]),
+            "cv_multiplier": cv(d["mult"]), "cv_gain": cv(d["gain"]),
+            "mean_multiplier": (statistics.mean(d["mult"])
+                                if d["mult"] else float("nan")),
+            "mean_gain": (statistics.mean(d["gain"])
+                          if d["gain"] else float("nan")),
+            "distinct_multiplier_midpoints": len(set(
+                round(v, 6) for v in d["mult"])),
+            "midpoints_multiplier": d["mult"], "midpoints_gain": d["gain"],
+        }
+    return out
 
 
 def write_report():
@@ -304,16 +336,39 @@ def write_report():
         f"- Crossing intervals (50 percent rule, pre-stated): "
         f"{[f'{a} to {b}' for a, b in crossings] if crossings else 'none'}.",
         "",
-        "## Q2: transition scatter in the two coordinates (pre-stated test)",
+        "## Q2: transition scatter in the two coordinates (pre-stated test,",
+        "corrected in execution)",
         "",
-        f"- Prompts with exactly one in-five flip along the profile: "
-        f"{scatter['n_prompts_used']} of {FINE_N_PROMPTS}; excluded "
-        f"(zero or multiple flips): {scatter['excluded']}.",
-        f"- Coefficient of variation of the per-prompt transition midpoint: "
-        f"{scatter['cv_multiplier']:.4f} in multiplier units, "
-        f"{scatter['cv_gain']:.4f} in gain units.",
-        "- The registered prediction is smaller scatter in gain units;",
-        "  equal or larger refutes the replacement-ratio hypothesis.",
+        "The registered scan looked for prompts with exactly ONE in-five",
+        "flip. That was wrong: the band has two edges, so every prompt",
+        "flips twice, and the first run discarded 23 of 25 prompts. The",
+        "corrected scan measures each edge separately.",
+        "",
+        f"- Prompts excluded (no up-crossing or no down-crossing): "
+        f"{scatter['excluded'] if scatter['excluded'] else 'none'}.",
+        "",
+        "| edge | prompts | mean transition (multiplier) | CV multiplier "
+        "| mean transition (gain) | CV gain | distinct multiplier values |",
+        "|:--|--:|--:|--:|--:|--:|--:|",
+    ]
+    for name in ("lower", "upper"):
+        e = scatter["edges"][name]
+        lines.append(
+            f"| {name} | {e['n_prompts']} | {e['mean_multiplier']:.2f} | "
+            f"{e['cv_multiplier']:.4f} | {e['mean_gain']:.3f} | "
+            f"{e['cv_gain']:.4f} | {e['distinct_multiplier_midpoints']} |")
+    lines += [
+        "",
+        "**Reading the comparison, with its limitation stated first.** The",
+        "level grid is defined in MULTIPLIER units and shared by every",
+        "prompt, so a prompt's multiplier midpoint can take only one of the",
+        "few discrete grid values (the last column counts them), while its",
+        "gain midpoint varies continuously with the prompt. The comparison",
+        "is therefore biased toward multiplier looking tighter. A CV smaller",
+        "in multiplier units is NOT evidence against the replacement-ratio",
+        "hypothesis; only the reverse (gain tighter despite the bias) would",
+        "be evidence for it. A fair test needs per-prompt bisection in gain",
+        "units, which this grid cannot deliver.",
         "",
         "## Reading",
         "",
