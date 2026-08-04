@@ -85,7 +85,11 @@ def trial_turns(r):
     if not m:
         return None
     turns = [turn_degrees(x) for x in m]
-    windows = {w: statistics.mean(turns[:w]) for w in WINDOWS if len(turns) >= 2}
+    # Require a FULL window before averaging it, so a short trial cannot
+    # contribute a partial mean under a window's name. Every gated trial
+    # runs at least check_start (100) iterations, so this changes no
+    # committed number; it stops a shorter protocol from doing so silently.
+    windows = {w: statistics.mean(turns[:w]) for w in WINDOWS if len(turns) >= w}
     return turns[0], windows, statistics.mean(turns)
 
 

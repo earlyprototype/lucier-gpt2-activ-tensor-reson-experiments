@@ -44,8 +44,10 @@ import argparse
 import importlib.util
 import itertools
 import json
+import os
 import statistics
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -93,11 +95,17 @@ def calibrate():
         per_prompt[pid] = exit_norm(model, prompt_library.PROMPT_LIBRARY[pid])
     med = statistics.median(per_prompt.values())
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    tmp = SHARED_PIN.with_suffix(".tmp")
-    with open(tmp, "w", encoding="utf-8") as f:
+    # Unique temporary name, then an atomic replace: two concurrent
+    # --calibrate processes must not share one temporary inode, or a reader
+    # can observe the destination mid-write (review round, PR #114).
+    with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", dir=OUT_DIR,
+            prefix=f"{SHARED_PIN.name}.", suffix=".tmp", delete=False) as f:
         json.dump({"median": med, "n_prompts": len(per_prompt),
                    "per_prompt": per_prompt}, f, indent=2)
-    tmp.rename(SHARED_PIN)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(f.name, SHARED_PIN)
     print(f"[calibrate] shared pin = median exit norm = {med:.2f} "
           f"over {len(per_prompt)} prompts -> {SHARED_PIN}")
     return med
@@ -193,12 +201,17 @@ def q2_scatter(results, ordered):
     """The Q2 test (issue #116), corrected in execution.
 
     As registered this scan looked for a prompt with exactly ONE in-five
-    flip along the profile. That was wrong: the band has two edges, so every
-    prompt flips twice (out to in at the lower edge, in to out at the upper),
-    and the first run of this function discarded 23 of 25 prompts. The
-    corrected scan locates each edge separately: the LOWER crossing is the
-    first out-to-in adjacent pair, the UPPER crossing the last in-to-out
-    pair. For each edge and prompt, the transition point is the geometric
+    flip along the profile. That was wrong: the band has two edges, so a
+    prompt that both enters and leaves it flips twice (out to in at the
+    lower edge, in to out at the upper), and the first run of this function
+    discarded 23 of 25 prompts on that criterion. The corrected scan locates
+    each edge separately: the LOWER crossing is the first out-to-in adjacent
+    pair, the UPPER crossing the last in-to-out pair. Prompts lacking either
+    crossing within the swept range are excluded and listed by name in the
+    report rather than silently dropped; two prompts are excluded on this
+    data, both for having an up-crossing and no down-crossing, so "flips
+    twice" is the common case and not a universal one. For each edge and
+    prompt that has both, the transition point is the geometric
     midpoint of that prompt's own interval endpoints, taken in each
     coordinate (pin multiplier; the prompt's own measured single-pass gain),
     and the cross-prompt coefficient of variation is compared.
@@ -340,9 +353,13 @@ def write_report():
         "corrected in execution)",
         "",
         "The registered scan looked for prompts with exactly ONE in-five",
-        "flip. That was wrong: the band has two edges, so every prompt",
-        "flips twice, and the first run discarded 23 of 25 prompts. The",
-        "corrected scan measures each edge separately.",
+        "flip. That was wrong: the band has two edges, so a prompt that",
+        "both enters and leaves it flips twice, and the first run",
+        "discarded 23 of 25 prompts on that criterion. The corrected scan",
+        "measures each edge separately and excludes, by name below, any",
+        "prompt that lacks one of the two crossings within the swept",
+        "range; two prompts are excluded here, so crossing twice is the",
+        "common case rather than a universal one.",
         "",
         f"- Prompts excluded (no up-crossing or no down-crossing): "
         f"{scatter['excluded'] if scatter['excluded'] else 'none'}.",

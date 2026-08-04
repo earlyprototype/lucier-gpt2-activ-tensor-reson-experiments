@@ -1793,7 +1793,7 @@ Everything under `experiments/` that looks like a run output and appears nowhere
 | `experiments/nu_sweep/output/stage_b_results.pt` | 8115167 | `experiments/nu_sweep/02_stage_b.py` | no run node |
 | `experiments/nu_sweep/output/stage_c_part2_results.pt` | 11999091 | `experiments/nu_sweep/05_stage_c_part2.py` | no run node |
 | `experiments/nu_sweep/output/stage_c_results.pt` | 18839209 | `experiments/nu_sweep/04_stage_c.py` | no run node |
-| `experiments/nu_sweep/output/strata_alignment.json` | 67236 | `experiments/nu_sweep/03_strata_glitch_check.py` | no run node |
+| `experiments/nu_sweep/output/strata_alignment.json` | 67570 | `experiments/nu_sweep/03_strata_glitch_check.py` | no run node |
 | `experiments/renorm_probe/output/free_norm_results.pt` | 81253 | `experiments/renorm_probe/01_free_norm_growth.py` | no run node |
 | `experiments/renorm_probe/output/natural_arm_results.pt` | 529119 | `experiments/renorm_probe/02_natural_entry_norm_arm.py` | no run node |
 | `experiments/sink_geometry/output/masking_control.json` | 7826 | `experiments/sink_geometry/02_masking_control.py` | no run node |
@@ -1804,8 +1804,8 @@ Everything under `experiments/` that looks like a run output and appears nowhere
 | `experiments/nu_sweep/output/stage_a_report.md` | 2667 | `experiments/nu_sweep/01_stage_a.py` | no run node |
 | `experiments/nu_sweep/output/stage_b_report.md` | 1882 | `experiments/nu_sweep/02_stage_b.py` | no run node |
 | `experiments/nu_sweep/output/stage_c_part2_report.md` | 1874 | `experiments/nu_sweep/05_stage_c_part2.py` | no run node |
-| `experiments/nu_sweep/output/stage_c_report.md` | 4588 | `experiments/nu_sweep/04_stage_c.py` | no run node |
-| `experiments/nu_sweep/output/strata_alignment_report.md` | 3377 | `experiments/nu_sweep/03_strata_glitch_check.py` | no run node |
+| `experiments/nu_sweep/output/stage_c_report.md` | 4829 | `experiments/nu_sweep/04_stage_c.py` | no run node |
+| `experiments/nu_sweep/output/strata_alignment_report.md` | 3572 | `experiments/nu_sweep/03_strata_glitch_check.py` | no run node |
 | `experiments/renorm_probe/output/free_norm_report.md` | 2206 | `experiments/renorm_probe/01_free_norm_growth.py` | no run node |
 | `experiments/renorm_probe/output/natural_arm_report.md` | 2299 | `experiments/renorm_probe/02_natural_entry_norm_arm.py` | no run node |
 

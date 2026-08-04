@@ -151,6 +151,7 @@ def load_all_levels():
     table. The instruments and nulls are unchanged."""
     ckpt_dir = ARCHIVE.parent / "checkpoints"
     results = {}
+    source = "checkpoints"
     if ckpt_dir.exists():
         for ckpt in sorted(ckpt_dir.glob("*.pt")):
             r = torch.load(ckpt, map_location="cpu", weights_only=True)
@@ -158,16 +159,26 @@ def load_all_levels():
     if not results:  # no checkpoints in this checkout: fall back to Stage A
         saved = torch.load(ARCHIVE, map_location="cpu", weights_only=True)
         results = saved["results"]
+        source = "stage_a_archive"
     levels = sorted(
         (lv for lv in results if results[lv]),
         key=lambda lv: sum(r["target_norm"] for r in results[lv].values())
         / len(results[lv]))
-    return results, levels
+    # The runners are resumable, so a checkout can hold a partly finished
+    # sweep. Say so rather than reporting whatever happens to be on disk as
+    # if it were the level's full trial set (review round, PR #114).
+    widest = max((len(results[lv]) for lv in levels), default=0)
+    partial = {lv: len(results[lv]) for lv in levels
+               if len(results[lv]) < widest}
+    for lv, n in partial.items():
+        print(f"[warn] level {lv} has {n}/{widest} trials")
+    return results, levels, {"source": source, "widest_level_n": widest,
+                             "levels_below_widest": partial}
 
 
 def main():
     """Compute the alignment table and write the report."""
-    results, levels = load_all_levels()
+    results, levels, coverage = load_all_levels()
     W_E, tok = load_embeddings()
     V = W_E.shape[0]
     mu = W_E.mean(dim=0)
@@ -180,6 +191,7 @@ def main():
                       "rule": "points into cluster if top-50 fraction "
                               "empirical p < 0.001 vs matched random null",
                       "chance_cos_768": 0.0288},
+           "coverage": coverage,
            "clusters": {k: len(v) for k, v in clusters.items()},
            "levels": {}}
 
@@ -242,7 +254,10 @@ def main():
     lines = [
         "# Strata alignment vs the anomalous-token cluster",
         "",
-        "Archive-only analysis of the Stage A terminal states against the",
+        "Archive-only analysis of the terminal states at every swept level",
+        "on disk (Stages A, B and C, including the fine levels and the",
+        "shared-pin control; per-level trial counts and any level short of",
+        "the widest are recorded under `coverage` in the JSON) against the",
         "six cluster definitions of 07_glitch_alignment.py (F13's",
         "instrument). Pre-stated rule: a level points into a cluster if its",
         "top-50 alignment fraction clears empirical p < 0.001 against a",

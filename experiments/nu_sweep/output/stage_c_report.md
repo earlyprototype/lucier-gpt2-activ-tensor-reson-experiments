@@ -56,9 +56,13 @@ multiplier and the measured mean single-pass gain.
 corrected in execution)
 
 The registered scan looked for prompts with exactly ONE in-five
-flip. That was wrong: the band has two edges, so every prompt
-flips twice, and the first run discarded 23 of 25 prompts. The
-corrected scan measures each edge separately.
+flip. That was wrong: the band has two edges, so a prompt that
+both enters and leaves it flips twice, and the first run
+discarded 23 of 25 prompts on that criterion. The corrected scan
+measures each edge separately and excludes, by name below, any
+prompt that lacks one of the two crossings within the swept
+range; two prompts are excluded here, so crossing twice is the
+common case rather than a universal one.
 
 - Prompts excluded (no up-crossing or no down-crossing): [('A13_networking', '1 up, 0 down'), ('A16_wittgenstein', '1 up, 0 down')].
 

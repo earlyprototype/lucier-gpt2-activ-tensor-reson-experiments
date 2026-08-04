@@ -24,7 +24,7 @@ Run from the repo root:
 
 Outputs (in experiments/nu_sweep/output/):
     checkpoints/<level>_<pid>.pt   shared with Stages A, B and C
-    stage_c_part2_results.pt       archive for the three widened levels
+    stage_c_part2_results.pt       archive for the four widened levels
     stage_c_part2_report.md        every headline number, from the data
 """
 
@@ -56,7 +56,7 @@ CROSSING_PAIRS = [("m040", "m048"), ("m048", "m056"), ("m256", "m384")]
 
 
 def write_report():
-    """Assemble the archive and regenerate the report over the three widened
+    """Assemble the archive and regenerate the report over the four widened
     levels plus m256 (already full width, needed to state both crossings);
     every published number originates here."""
     import prompt_library
@@ -65,6 +65,7 @@ def write_report():
     if missing:
         print(f"[report] WARNING: {len(missing)} trials missing; the report "
               f"marks itself partial. First few: {missing[:6]}")
+    expected_pids = set(list(prompt_library.PROMPT_LIBRARY)[:sa.N_PROMPTS])
     config = {
         "experiment": "nu_sweep_stage_c_part2", "registration": "issue #116",
         "prompts": list(prompt_library.PROMPT_LIBRARY)[:sa.N_PROMPTS],
@@ -86,8 +87,14 @@ def write_report():
         r = torch.load(ckpt, map_location="cpu", weights_only=True)
         all_levels.setdefault(r["level"], {})[r["pid"]] = r
     shown = ["m040", "m048", "m056", "m256", "m384"]
-    stats = {lv: sa.level_stats(all_levels[lv])
-             for lv in shown if all_levels.get(lv)}
+    # Restrict each level to the expected prompt set and track completeness:
+    # a crossing may only be called "at full width" when BOTH endpoints hold
+    # every expected trial, otherwise a half-finished level could silently
+    # produce a confident-looking verdict (review round, PR #114).
+    rows = {lv: {pid: r for pid, r in all_levels.get(lv, {}).items()
+                 if pid in expected_pids} for lv in shown}
+    stats = {lv: sa.level_stats(rows[lv]) for lv in shown if rows[lv]}
+    complete = {lv: set(rows[lv]) == expected_pids for lv in shown}
 
     lines = [
         "# Nu-sweep Stage C Part 2: full-width brackets at the new crossings",
@@ -115,7 +122,7 @@ def write_report():
             f"lag {k}: {v}" for k, v in sorted(s["nolock_lags"].items()))
             if s["nolock_lags"] else "all locked")
         lines.append(
-            f"| {lv} | {s['n']} | "
+            f"| {lv} | {s['n']}{'' if complete[lv] else ' (PARTIAL)'} | "
             f"{s['share_in_five']:.0%} ({s['n_in_five']}/{s['n']}) | "
             f"{s['locked']}/{s['n']} | {med} | {len(s['labels'])} | "
             f"{nolock} |")
@@ -130,8 +137,13 @@ def write_report():
                         if len(top) > 10 else ""))
     lines += ["", "## Crossing confirmation at full width", ""]
     for a, b in CROSSING_PAIRS:
-        if a not in stats or b not in stats:
-            lines.append(f"- {a} to {b}: incomplete, not stated.")
+        if not (complete.get(a) and complete.get(b)):
+            missing_ends = [lv for lv in (a, b) if not complete.get(lv)]
+            lines.append(
+                f"- {a} to {b}: NOT STATED. A crossing is only called at "
+                f"full width when both endpoints hold all "
+                f"{sa.N_PROMPTS} expected trials; incomplete here: "
+                f"{', '.join(missing_ends)}.")
             continue
         sa_, sb = stats[a], stats[b]
         crossed = ((sa_["share_in_five"] > sa.BAND_THRESHOLD)

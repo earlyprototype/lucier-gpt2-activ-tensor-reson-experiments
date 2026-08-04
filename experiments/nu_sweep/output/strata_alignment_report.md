@@ -1,6 +1,9 @@
 # Strata alignment vs the anomalous-token cluster
 
-Archive-only analysis of the Stage A terminal states against the
+Archive-only analysis of the terminal states at every swept level
+on disk (Stages A, B and C, including the fine levels and the
+shared-pin control; per-level trial counts and any level short of
+the widest are recorded under `coverage` in the JSON) against the
 six cluster definitions of 07_glitch_alignment.py (F13's
 instrument). Pre-stated rule: a level points into a cluster if its
 top-50 alignment fraction clears empirical p < 0.001 against a

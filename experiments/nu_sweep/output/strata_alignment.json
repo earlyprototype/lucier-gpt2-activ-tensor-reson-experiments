@@ -6,6 +6,24 @@
     "rule": "points into cluster if top-50 fraction empirical p < 0.001 vs matched random null",
     "chance_cos_768": 0.0288
   },
+  "coverage": {
+    "source": "checkpoints",
+    "widest_level_n": 125,
+    "levels_below_widest": {
+      "m001": 25,
+      "m002": 25,
+      "m004": 25,
+      "m006": 25,
+      "m008": 25,
+      "m012": 25,
+      "m016": 25,
+      "m024": 25,
+      "historical": 25,
+      "m512": 25,
+      "m768": 25,
+      "m1024": 25
+    }
+  },
   "clusters": {
     "geom_0p1": 50,
     "geom_0p5": 251,

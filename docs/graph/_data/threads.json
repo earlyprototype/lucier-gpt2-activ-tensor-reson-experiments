@@ -17203,7 +17203,7 @@
       },
       {
         "path": "experiments/nu_sweep/output/strata_alignment.json",
-        "size": 67236,
+        "size": 67570,
         "kind": "data",
         "classification": "orphan-directory",
         "directory": "experiments/nu_sweep/output",
@@ -17342,7 +17342,7 @@
       },
       {
         "path": "experiments/nu_sweep/output/stage_c_report.md",
-        "size": 4588,
+        "size": 4829,
         "kind": "report",
         "classification": "orphan-directory",
         "directory": "experiments/nu_sweep/output",
@@ -17354,7 +17354,7 @@
       },
       {
         "path": "experiments/nu_sweep/output/strata_alignment_report.md",
-        "size": 3377,
+        "size": 3572,
         "kind": "report",
         "classification": "orphan-directory",
         "directory": "experiments/nu_sweep/output",
