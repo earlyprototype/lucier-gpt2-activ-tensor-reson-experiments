@@ -97,6 +97,10 @@ LEVELS = [("m008", 8), ("m040", 40), ("m056", 56),
 N_PROMPTS = 10
 EARLY_PASSES = 20          # the opening transient
 LATE_WINDOW = 20           # passes centred on lock-in, or on the ceiling
+# Below this net turn, a "share of the turn" is a ratio with a vanishing
+# denominator: the identity still holds, but it describes the composition of
+# a quantity that is not there. Reported as undefined rather than as a number.
+TURN_FLOOR_DEGREES = 1.0
 MAX_ITER = sa.MAX_ITER
 THRESHOLD, PATIENCE = sa.THRESHOLD, sa.PATIENCE
 CHECK_EVERY, CHECK_START = sa.CHECK_EVERY, sa.CHECK_START
@@ -385,16 +389,39 @@ def run_worker(worker, num_workers):
     print(f"[w{worker}] slice complete ({time.time() - t0:.0f}s)")
 
 
+REQUIRED_RECORD_FIELDS = {"iteration", "turn_deg", "perp_norm", "para_total",
+                          "size_ratio", "recon_err", "share_sum",
+                          "para_share_sum", "phase", "shares", "para_shares"}
+
+
 def collect():
-    """Every checkpoint on disk, grouped by level, with the missing list."""
-    results, missing = {}, []
+    """Every checkpoint on disk, grouped by level, with the missing list.
+
+    Refuses to return a mixed archive. The runners are resumable and this
+    experiment's record schema changed once mid-run, when the size
+    coordinate was added; seventeen trials written under the older schema
+    survived a failed cleanup and were silently mixed with the new ones.
+    The report only failed because the older records lacked a field it
+    happened to read, which was luck rather than a check. So the field set
+    is now verified explicitly, and any trial that does not carry it is
+    named and the assembly stops, rather than being averaged in."""
+    results, missing, stale = {}, [], []
     for level, _, pid in grid():
         ckpt = CKPT_DIR / f"{level}_{pid}.pt"
-        if ckpt.exists():
-            results.setdefault(level, {})[pid] = torch.load(
-                ckpt, map_location="cpu", weights_only=True)
-        else:
+        if not ckpt.exists():
             missing.append(f"{level}_{pid}")
+            continue
+        r = torch.load(ckpt, map_location="cpu", weights_only=True)
+        absent = REQUIRED_RECORD_FIELDS - set(r["records"][0])
+        if absent:
+            stale.append(f"{level}_{pid} (missing {sorted(absent)})")
+            continue
+        results.setdefault(level, {})[pid] = r
+    if stale:
+        sys.exit("[report] REFUSING to assemble a mixed archive. These "
+                 "trials were written under an older record schema and must "
+                 "be deleted and re-run before any number is reported:\n  "
+                 + "\n  ".join(stale))
     return results, missing
 
 
@@ -405,18 +432,26 @@ def level_shares(trials, phase, key="shares"):
     `key` selects the coordinate: "shares" for the direction change,
     "para_shares" for the size change. Both are reported everywhere, since
     they are two coordinates of one motion."""
-    total, count, abs_total = None, 0, None
+    total, count, abs_total, dropped = None, 0, None, 0
     for r in trials.values():
         for rec in r["records"]:
             if rec["phase"] != phase:
+                continue
+            # Filter per PASS, not on the phase's average. A share of the
+            # turn divides by that pass's own net turn, so a single
+            # near-motionless pass inside an otherwise moving window
+            # contributes exploded shares to the mean. Averaging first and
+            # filtering after would let one such pass dominate the row.
+            if key == "shares" and rec["turn_deg"] < TURN_FLOOR_DEGREES:
+                dropped += 1
                 continue
             s = rec[key].to(torch.float64)
             total = s if total is None else total + s
             abs_total = s.abs() if abs_total is None else abs_total + s.abs()
             count += 1
     if not count:
-        return None, None, 0
-    return total / count, abs_total / count, count
+        return None, None, 0, dropped
+    return total / count, abs_total / count, count, dropped
 
 
 def write_report():
@@ -490,10 +525,28 @@ def write_report():
             if not stat[phase]["turn_deg"]:
                 continue
             size = statistics.mean(stat[phase]["size_ratio"])
+            turn = statistics.mean(stat[phase]["turn_deg"])
             for coord, key, shown in (("direction", "shares",
-                                       f"{statistics.mean(stat[phase]['turn_deg']):.1f}&deg;"),
+                                       f"{turn:.1f}&deg;"),
                                       ("size", "para_shares", f"x{size:.2f}")):
-                mean_share, mean_abs, count = level_shares(trials, phase, key)
+                # A share of the turn is a ratio whose denominator is the net
+                # turn. Once a trial has settled the net turn is essentially
+                # zero, so the ratio explodes and means nothing: the identity
+                # still holds, but it is describing the composition of a
+                # quantity that is not there. Below a floor of one degree the
+                # direction column is reported as undefined rather than as a
+                # number. The size column has no such problem, because the
+                # model keeps growing the state at every level.
+                if coord == "direction" and turn < TURN_FLOOR_DEGREES:
+                    lines.append(
+                        f"| {level} | {phase} | "
+                        f"{len(stat[phase]['turn_deg'])} | direction | "
+                        f"{shown} | undefined | undefined | undefined | "
+                        f"undefined | net turn below "
+                        f"{TURN_FLOOR_DEGREES:g} deg |")
+                    continue
+                mean_share, mean_abs, count, dropped = level_shares(
+                    trials, phase, key)
                 if mean_share is None:
                     continue
                 order = torch.argsort(mean_share, descending=True)
@@ -512,7 +565,7 @@ def write_report():
                     f"{shown if coord == 'direction' else f'x{size:.2f}'} | "
                     f"{float(cum[0]):.1%} | {float(cum[4]):.1%} | "
                     f"{float(cum[19]):.1%} | {float(mean_abs.sum()):.2f} | "
-                    f"`{names[int(order[0])]}` |")
+                    f"`{names[int(order[0])]}`{f' ({dropped} passes dropped)' if dropped else ''} |")
 
     lines += [
         "",
