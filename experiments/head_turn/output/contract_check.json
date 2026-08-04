@@ -1,0 +1,15 @@
+{
+  "prompt": "A01_physics",
+  "engine_lock_in": 120,
+  "this_loop_lock_in": 120,
+  "max_reconstruction_error": 2.4691246771153233e-07,
+  "max_share_sum_error": 2.8421709430404007e-13,
+  "checks": {
+    "lock_in_matches": true,
+    "target_norm_matches": true,
+    "reconstruction_exact": true,
+    "shares_sum_to_one": true
+  },
+  "passed": true,
+  "torch": "2.13.0+cu130"
+}

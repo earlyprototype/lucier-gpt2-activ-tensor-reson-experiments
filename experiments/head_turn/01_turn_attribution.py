@@ -168,7 +168,16 @@ def turn_shares(x_mean, y_mean, writes):
 
     Returns (shares, turn_degrees, perp_norm, reconstruction_error,
     share_sum). The shares sum to 1 by construction; `share_sum` is kept and
-    asserted rather than assumed."""
+    asserted rather than assumed.
+
+    Computed in float64. In float32 the identity held only to about 1e-4,
+    because 168 component projections accumulate, which is the M1/M2 lesson
+    restated: at this many terms the rounding error is the same size as the
+    quantity being checked. Nothing about the decomposition changes; the
+    check simply becomes able to see whether it is right."""
+    x_mean = x_mean.to(torch.float64)
+    y_mean = y_mean.to(torch.float64)
+    writes = writes.to(torch.float64)
     x_hat = x_mean / x_mean.norm()
     delta = y_mean - x_mean
     recon = float((delta - writes.sum(dim=0)).norm() / delta.norm())
