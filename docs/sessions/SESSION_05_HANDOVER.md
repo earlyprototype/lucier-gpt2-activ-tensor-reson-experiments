@@ -2,6 +2,15 @@
 
 *Date: 2026-08-02. Continuation context for the next session, human or AI. Read `SESSION_03_HANDOVER.md` first for the deep state, the environment notes and the working agreements (no em dashes anywhere; plain language with the technical terms defined on first use and no decorative metaphors; CodeRabbit for independent review). `SESSION_04_HANDOVER.md` covers the mechanism series and the pause, which was lifted on 2026-07-31. This document covers what changed since PR #103.*
 
+## Start here: the two live experiments
+
+Both are registered, both run on the committed engine, neither is blocked, and neither has started. Take them in this order unless TC says otherwise.
+
+1. **[#119](https://github.com/earlyprototype/lucier-gpt2-activ-tensor-reson-experiments/issues/119), which parts of the model do the turning.** Run 18 established that the band's lower edge is governed by how far the state's direction swings on each pass. That swing is the sum of writes from 144 attention heads and 12 feed-forward blocks, collapsed into one arrow by the current measurement, so it cannot tell a concentrated cause from a diffuse one. The issue splits the arrow into per-component shares. The residual stream is additive, so the split is exact rather than heuristic; the limit is that it captures direct contributions only. Cheaper of the two, and it addresses the mechanism question the sweep opened.
+2. **[#17](https://github.com/earlyprototype/lucier-gpt2-activ-tensor-reson-experiments/issues/17), basin geometry.** How hard you have to push a settled state to knock it out of its basin, which the project has never measured despite using the word "basin" throughout. **Read the 2026-08-04 comment before the body:** the body's original motivation, comparing language basin depth against noise basin depth, was refuted by run 17, since there are no separate noise basins. The comment supplies a replacement motivation and one mandatory design parameter, that every escape threshold must state the injection scale it was measured at.
+
+Also open but gated: [#116](https://github.com/earlyprototype/lucier-gpt2-activ-tensor-reson-experiments/issues/116) holds a cross-model prediction for Pythia 160M, recorded before any such run and executing only if TC reopens the cross-model track (standing rule 8).
+
 ## What landed
 
 Three PRs merged this session, in order.
@@ -36,10 +45,9 @@ FINDINGS caveat 19 carries all of this. Records and regenerating scripts: `exper
 
 ## Open, in the order I would take them
 
-1. **Find out which parts of the model do the turning.** Every pass, the state's direction swings by some angle, and that angle is what governs the band's lower edge. But the model is not one thing doing the swinging: it is 144 attention heads and 12 feed-forward blocks, each writing its own vector into the running state every pass, and the measured angle is the sum of all of them. Our measure collapses that into a single arrow, so it cannot distinguish two heads doing nearly all the work from 156 components each nudging slightly. Splitting the arrow back into per-component shares would say which. It is worth doing because the project has precedent for a concentrated answer: experiment 11 found one head, layer 11 head 8, doing about 99 percent of the work that sustains the `Divine` cycle. If the turn is similarly concentrated, that is the mechanism behind the lower edge. This is the unanswered half of TC's objection; the machinery exists from experiments 08 and 11. Not yet registered.
-2. **#17, basin geometry (escape thresholds).** Annotated this session with corrected context: its original motivation (comparing language basin depth against noise basin depth) is refuted by run 17, since there are no separate noise basins. Replacement motivation supplied, plus one new mandatory design parameter, namely that every threshold must state the injection scale it was measured at. Ready to run as annotated.
-3. **#116 holds the parked cross-model prediction** for Pythia 160M, recorded before any such run: the architectural features should transfer, the glitch strata should not. Executes only on TC reopening the cross-model track (standing rule 8).
-4. The rest of the Tier 2 queue in `ALIGNMENT_REVIEW.md` section 5, with #94 Part A next.
+The two live experiments are #119 and #17, described at the top of this document. Both are registered and ready; #119 first, because it is cheaper and answers the mechanism question run 18 opened, and because its pre-stated expectations include a genuine chance of a reportable negative.
+
+After those: #116's cross-model prediction if TC reopens that track (standing rule 8), then the rest of the Tier 2 queue in `ALIGNMENT_REVIEW.md` section 5, with #94 Part A next in line.
 
 ## Environment notes for a fresh container
 
