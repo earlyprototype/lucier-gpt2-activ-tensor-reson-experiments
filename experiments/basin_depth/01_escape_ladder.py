@@ -74,6 +74,7 @@ from atr_engine import get_top_tokens, run_atr_gated  # noqa: E402
 
 OUT_DIR = HERE / "output"
 CKPT_DIR = OUT_DIR / "checkpoints"
+CONTROL_DIR = OUT_DIR / "controls"
 DIRECTIONS = OUT_DIR / "directions.pt"
 SWEEP_CKPT = (REPO_ROOT / "experiments" / "nu_sweep" / "output" / "checkpoints")
 GLITCH = (REPO_ROOT / "experiments" / "gpt2_small" / "output_glitch"
@@ -311,6 +312,55 @@ def run_ladder(model, prompt, state, target, direction, home_token):
     return rungs, (min(escaped) if escaped else None)
 
 
+def run_control(worker, num_workers):
+    """The zero-perturbation control, which the first design omitted.
+
+    A ladder rung counts as an escape when the re-entered run settles on a
+    different token from the unperturbed attractor. That comparison is only
+    meaningful if re-entering with NO perturbation returns the attractor.
+    If it does not, every rung reads as an escape and the state's whole
+    ladder is an artifact of the re-entry rather than a measurement of
+    depth. Worker 2's first state escaped at the smallest rung in all six
+    directions, which is the signature of exactly that failure, so the
+    control is no longer optional.
+
+    Run as a separate cheap pass, one run per state instead of eight, so
+    the ladders already computed are salvaged rather than recomputed."""
+    import prompt_library
+    named = torch.load(DIRECTIONS, map_location="cpu", weights_only=False)
+    model = sa.load_model()
+    naturals = {}
+    states = sweep_states()
+    todo = [s for i, s in enumerate(states) if i % num_workers == worker]
+    CONTROL_DIR.mkdir(parents=True, exist_ok=True)
+    for level, mult, label, pid in todo:
+        key = f"{level}_{label}_{pid}"
+        out = CONTROL_DIR / f"{key}.pt"
+        if out.exists() or not (CKPT_DIR / f"{key}.pt").exists():
+            continue
+        prompt = prompt_library.PROMPT_LIBRARY[pid]
+        if pid not in naturals:
+            naturals[pid] = sa.natural_norm(model, prompt)
+        pin = None if mult is None else mult * naturals[pid]
+        state, target, _, home, _ = converged_state(model, prompt, pin)
+        # Identical re-entry path to a ladder rung, with zero rotation.
+        moved = state * (target / state.norm().item())
+        r = run_atr_gated(model, prompt, sa.LAYER_START, sa.LAYER_END,
+                          max_iter=ESCAPE_MAX_ITER, threshold=sa.THRESHOLD,
+                          patience=sa.PATIENCE, check_every=sa.CHECK_EVERY,
+                          check_start=min(sa.CHECK_START, ESCAPE_MAX_ITER),
+                          seed_tensor=moved, capture_terminal=True)
+        rec = {"key": key, "home_token": home.strip(),
+               "control_token": r["terminal_token"].strip(),
+               "converged": r["converged"],
+               "passed": r["terminal_token"].strip() == home.strip()}
+        torch.save(rec, out)
+        print(f"[c{worker}] {key}: control "
+              f"{'PASS' if rec['passed'] else 'FAIL'} "
+              f"(home {rec['home_token']!r}, re-entry "
+              f"{rec['control_token']!r})", flush=True)
+
+
 def run_worker(worker, num_workers):
     """Run this worker's slice of the (state, direction) grid."""
     import prompt_library
@@ -484,11 +534,15 @@ if __name__ == "__main__":
     ap.add_argument("--worker", type=int, default=None)
     ap.add_argument("--num-workers", type=int, default=1)
     ap.add_argument("--report-only", action="store_true")
+    ap.add_argument("--control", action="store_true",
+                    help="run the zero-perturbation control for each state")
     args = ap.parse_args()
     if args.prepare:
         sys.exit(0 if prepare() else 1)
     elif args.report_only:
         write_report()
+    elif args.control and args.worker is not None:
+        run_control(args.worker, args.num_workers)
     elif args.worker is not None:
         run_worker(args.worker, args.num_workers)
     else:
