@@ -42,6 +42,12 @@ canvas:focus-visible{outline:2px solid var(--sodium);outline-offset:-2px}
   font-size:11px;letter-spacing:.06em;color:var(--ink-faint);line-height:1.8}
 .hud b{color:var(--ink-dim);font-weight:400;font-variant-numeric:tabular-nums}
 .ctl{position:absolute;right:14px;top:14px;display:flex;gap:6px;flex-wrap:wrap}
+@media (max-width:640px){
+  .stage{display:flex;flex-direction:column}
+  .ctl{position:static;order:2;padding:10px 12px 4px;justify-content:flex-start}
+  .hud{position:static;order:3;padding:2px 12px 12px}
+  .scrub{position:static;order:4}
+}
 button{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
   background:transparent;color:var(--ink-dim);border:1px solid var(--rule);padding:6px 11px;
   cursor:pointer;transition:color .15s,border-color .15s}
@@ -163,7 +169,7 @@ function icosphere(sub){
   }
   return {pos:new Float32Array(v.flat()), idx:new Uint16Array(f.flat()), n:v.length};
 }
-const SPH=icosphere(4);   /* 2562 vertices */
+const SPH=icosphere(5);   /* 10242 vertices; the silhouette is the whole image here */
 
 /* ---------- fixed shape basis: frequencies and phases, seeded, never changes ---------- */
 const K=DATA.K||48;
@@ -196,7 +202,7 @@ void main(){
   vec3 u=normalize(aPos);
   vec3 t1=normalize(abs(u.y)<0.9 ? cross(u,vec3(0.0,1.0,0.0)) : cross(u,vec3(1.0,0.0,0.0)));
   vec3 t2=cross(u,t1);
-  float e=0.035;
+  float e=0.018;
   vec3 p0=disp(u), pa=disp(normalize(u+t1*e)), pb=disp(normalize(u+t2*e));
   vN = normalize(uRot*normalize(cross(pa-p0,pb-p0)));
   vD = field(u);
@@ -284,8 +290,15 @@ cv.addEventListener("keydown",e=>{const k=e.key;
   if(k===" "){$("play").click();e.preventDefault();}});
 
 let W,H,dpr;
-function size(){ dpr=Math.min(devicePixelRatio||1,2);
-  W=cv.parentElement.clientWidth; H=Math.round(W*0.30);
+let COLS=5, RATIO=0.30;
+function size(){ dpr=Math.min(devicePixelRatio||1,3);
+  W=cv.parentElement.clientWidth;
+  // A five-wide frieze needs width. Below that, reflow to a grid so each
+  // body keeps enough pixels to read as a surface rather than a blob.
+  COLS = W<520 ? 2 : (W<860 ? 3 : 5);
+  const RowsN = Math.ceil(5/COLS);
+  RATIO = COLS===5 ? 0.30 : (COLS===3 ? 0.62 : 1.02);
+  H=Math.round(W*RATIO);
   cv.style.height=H+"px"; cv.width=W*dpr; cv.height=H*dpr; gl.viewport(0,0,cv.width,cv.height); }
 size(); addEventListener("resize",size);
 
@@ -299,7 +312,11 @@ function frame(){
   const bg = g>0.5 ? [0.835,0.851,0.871] : [0.027,0.035,0.047];
   gl.clearColor(bg[0],bg[1],bg[2],1); gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
   gl.uniform1f(U("uLit"),g);
-  const P=persp(0.435,(cv.width/cv.height),0.1,60), Vm=lookZ(5.2), MVP=mul(P,Vm);
+    const rowsN=Math.ceil(5/COLS);
+  const pitch = COLS===5 ? 1.19 : (COLS===3 ? 1.30 : 1.36);
+  const halfH = (rowsN-1)/2*pitch*1.05 + 0.98;
+  const fov = 2*Math.atan(halfH/5.2);
+  const P=persp(fov,(cv.width/cv.height),0.1,60), Vm=lookZ(5.2), MVP=mul(P,Vm);
   gl.uniformMatrix4fv(U("uMVP"),false,MVP);
   gl.uniformMatrix3fv(U("uRot"),false,rotM(ax,ay));
   const i0=Math.floor(t), i1=Math.min(N-1,i0+1), f=t-i0;
@@ -308,8 +325,13 @@ function frame(){
     for(let k=0;k<K;k++) cbuf[k]=run[i0][k]*(1-f)+run[i1][k]*f;
     gl.uniform1fv(U("uC[0]"),cbuf);
     gl.uniform1f(U("uAmp"),M.amp*0.68); gl.uniform1f(U("uScale"),0.42);
-    const x=(ri/span-0.5)*4.75;
-    gl.uniform3f(U("uOffset"),x,0,0);
+    const rowsN=Math.ceil(5/COLS);
+    const col=ri%COLS, row=Math.floor(ri/COLS);
+    const inRow=Math.min(COLS, 5-row*COLS);
+    const pitch = COLS===5 ? 1.19 : (COLS===3 ? 1.30 : 1.36);
+    const x=(col-(inRow-1)/2)*pitch;
+    const y=-(row-(rowsN-1)/2)*pitch*1.05;
+    gl.uniform3f(U("uOffset"),x,y,0);
     const c=LAMP_RGB[ri%LAMP_RGB.length];
     gl.uniform3f(U("uTint"),c[0],c[1],c[2]);
     gl.drawElements(gl.TRIANGLES,SPH.idx.length,gl.UNSIGNED_SHORT,0);
