@@ -34,7 +34,12 @@ h1{font-family:var(--serif);font-weight:400;font-style:italic;
 .rule{width:100%;height:1px;background:var(--rule);margin-top:6px}
 
 .frame{position:relative;background:var(--prussian);border:1px solid var(--rule);
-  padding:16px;margin-top:26px}
+  padding:16px;margin-top:26px;overflow-x:auto;overflow-y:hidden;
+  -webkit-overflow-scrolling:touch}
+.frame canvas{min-width:744px}
+.scrollnote{display:none;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--print-faint);margin-top:8px}
+@media (max-width:800px){.scrollnote{display:block}}
 .frame::after{content:"";position:absolute;inset:7px;border:1px solid var(--rule);
   pointer-events:none;opacity:.55}
 canvas{display:block;width:100%;height:auto;cursor:crosshair}
@@ -80,6 +85,7 @@ aside p{margin:0;color:var(--print-faint)}
   <div class="frame">
     <canvas id="pl" tabindex="0" aria-label="A plate of 144 specimen forms, one per attention head of GPT-2 small, arranged in twelve rows by layer."></canvas>
   </div>
+  <div class="scrollnote">Scroll the plate sideways to reach layers 0 to 11 across all twelve heads</div>
   <div class="tools">
     <div class="filters" id="filters"></div>
     <div class="inspect" id="ins">Hover a specimen</div>
@@ -165,10 +171,12 @@ $("filters").querySelectorAll("button").forEach(b=>b.onclick=()=>{
   draw();
 });
 
+const MIN_CELL=62;   /* below this a specimen stops being readable */
 function size(){
-  dpr=Math.min(devicePixelRatio||1,2);
-  W=cv.parentElement.clientWidth-32;
+  dpr=Math.min(devicePixelRatio||1,3);
+  W=Math.max(cols*MIN_CELL, cv.parentElement.clientWidth-32);
   cell=W/cols; H=cell*rows;
+  cv.style.width=W+"px";
   cv.style.height=H+"px"; cv.width=W*dpr; cv.height=H*dpr;
   ctx.setTransform(dpr,0,0,dpr,0,0);
   draw();
@@ -188,7 +196,7 @@ function outline(h, steps){
 }
 
 function specimen(h, cx, cy, R, dim){
-  const steps=320, o=outline(h,steps);
+  const steps=560, o=outline(h,steps);
   const norm=R/Math.max(0.85, o.peak);
   const ink=css("--print"), neg=parseFloat(css("--neg"))||0;
   const path=(scale)=>{
@@ -203,19 +211,19 @@ function specimen(h, cx, cy, R, dim){
   /* halo: leading eigenvalue above one, the disturbance grows */
   if(h.lam>1){
     ctx.strokeStyle=hexA(css("--accent"), dim?0.12:0.42);
-    ctx.lineWidth=0.7; path(1.16); ctx.stroke();
+    ctx.lineWidth=Math.max(0.6,cell*0.011); path(1.16); ctx.stroke();
   }
   /* the photogram: solid where the specimen blocked the light */
   ctx.fillStyle=hexA(ink, dim?0.06:(neg?0.90:0.82));
   path(1); ctx.fill();
   /* interior contours, the density of the print */
-  ctx.lineWidth=0.55;
+  ctx.lineWidth=Math.max(0.45,cell*0.0085);
   for(let i=1;i<=4;i++){
     ctx.strokeStyle=hexA(neg?css("--prussian"):css("--prussian-deep"), dim?0.10:0.34);
     path(1-i*0.185); ctx.stroke();
   }
   /* class mark: a rotating head gets a chord, a sign-flip gets an axis */
-  ctx.lineWidth=0.6; ctx.strokeStyle=hexA(neg?css("--prussian"):css("--prussian-deep"), dim?0.10:0.5);
+  ctx.lineWidth=Math.max(0.5,cell*0.009); ctx.strokeStyle=hexA(neg?css("--prussian"):css("--prussian-deep"), dim?0.10:0.5);
   if(h.cls==="rotating" && h.rot!=null){
     ctx.beginPath(); ctx.arc(cx,cy,R*0.20,0, 6.283185*Math.min(1,h.rot)); ctx.stroke();
   } else if(h.cls==="sign-flip"){
