@@ -292,8 +292,40 @@ def rotate(state, direction, degrees):
     return rotated.reshape(state.shape)
 
 
-def run_ladder(model, prompt, state, target, direction, home_token):
-    """Walk the ladder for one (state, direction) pair and return the rungs."""
+SAME_ATTRACTOR_COS = 0.999
+"""Cosine above which a settled state counts as the SAME attractor.
+
+Applied at report time to stored cosines, so it can be varied without
+recomputing. A returning trajectory lands on the same fixed point, so its
+cosine should be 1 to numerical precision; 0.999 is about 2.6 degrees, loose
+enough to absorb convergence slack and far tighter than any real basin
+crossing."""
+
+
+def threshold_of(rungs, cutoff=SAME_ATTRACTOR_COS):
+    """Smallest rung at which the run did not return to the attractor."""
+    out = [r["degrees"] for r in rungs if r["cos_mean"] < cutoff]
+    return min(out) if out else None
+
+
+def run_ladder(model, prompt, state, target, direction, home_token,
+               home_mean, home_last):
+    """Walk the ladder for one (state, direction) pair and return the rungs.
+
+    ESCAPE IS JUDGED ON THE STATE, NOT THE PRINTED TOKEN. The first version
+    of this experiment asked whether the perturbed run printed a different
+    word. That is a poor proxy for "did it come home", because the word is
+    read from the last position alone, about a tenth of the state, and
+    reports only which logit is largest, so a run can settle on a genuinely
+    different attractor and still print the same word. Scored that way, a
+    real escape is recorded as no escape and the threshold comes out too
+    large.
+
+    So each rung now records the cosine between where the run settled and
+    the original attractor. The cosines are stored raw and the escape
+    threshold is applied at report time, which means the cutoff can be
+    varied in analysis without recomputing anything. The token is kept
+    alongside as a label, which is what it always was."""
     rungs = []
     for deg in LADDER_DEGREES:
         moved = rotate(state, direction, deg)
@@ -303,13 +335,16 @@ def run_ladder(model, prompt, state, target, direction, home_token):
                           patience=sa.PATIENCE, check_every=sa.CHECK_EVERY,
                           check_start=min(sa.CHECK_START, ESCAPE_MAX_ITER),
                           seed_tensor=moved, capture_terminal=True)
-        token = r["terminal_token"].strip()
-        rungs.append({"degrees": deg, "token": token,
-                      "escaped": token != home_token,
+        cos_mean = float(torch.nn.functional.cosine_similarity(
+            r["terminal_mean_vec"].unsqueeze(0), home_mean.unsqueeze(0)))
+        cos_last = float(torch.nn.functional.cosine_similarity(
+            r["terminal_last_vec"].unsqueeze(0), home_last.unsqueeze(0)))
+        rungs.append({"degrees": deg, "token": r["terminal_token"].strip(),
+                      "cos_mean": cos_mean, "cos_last": cos_last,
+                      "token_changed": r["terminal_token"].strip() != home_token,
                       "converged": r["converged"],
                       "lock_in": r["lock_in_iter"]})
-    escaped = [x["degrees"] for x in rungs if x["escaped"]]
-    return rungs, (min(escaped) if escaped else None)
+    return rungs
 
 
 def run_control(worker, num_workers):
@@ -395,15 +430,17 @@ def run_worker(worker, num_workers):
         result = {"level": level, "multiplier": mult, "label": label,
                   "pid": pid, "target_norm": target, "lock_in": lock_in,
                   "home_token": token.strip(), "directions": {}}
+        home_mean, home_last = state.mean(dim=0).clone(), state[-1, :].clone()
+        result["home_mean"] = home_mean
+        result["home_last"] = home_last
         for dname, direction in directions_for(state, named, gen):
-            rungs, threshold = run_ladder(model, prompt, state, target,
-                                          direction, token.strip())
-            result["directions"][dname] = {"rungs": rungs,
-                                           "threshold_deg": threshold}
+            rungs = run_ladder(model, prompt, state, target, direction,
+                               token.strip(), home_mean, home_last)
+            result["directions"][dname] = {"rungs": rungs}
         tmp = ckpt.with_suffix(".tmp")
         torch.save(result, tmp)
         tmp.rename(ckpt)
-        ths = [v["threshold_deg"] for v in result["directions"].values()]
+        ths = [threshold_of(v["rungs"]) for v in result["directions"].values()]
         shown = [str(t) if t is not None else ">90" for t in ths]
         print(f"[w{worker}] {n + 1}/{len(todo)} {key}: thresholds "
               f"{', '.join(shown)} deg ({time.time() - t0:.0f}s)", flush=True)
@@ -515,10 +552,10 @@ def write_report():
         "| level | basin | prompt | random directions | flip axis "
         "| glitch direction | median displacement |", "|:--|:--|:--|:--|--:|--:|--:|"]
     for r in results:
-        rand = [v["threshold_deg"] for k, v in r["directions"].items()
+        rand = [threshold_of(v["rungs"]) for k, v in r["directions"].items()
                 if k.startswith("random")]
-        fa = r["directions"].get("flip_axis", {}).get("threshold_deg")
-        gl = r["directions"].get("glitch", {}).get("threshold_deg")
+        fa = threshold_of(r["directions"]["flip_axis"]["rungs"])
+        gl = threshold_of(r["directions"]["glitch"]["rungs"])
         got = [v for v in [*rand, fa, gl] if v is not None]
         disp = (f"{2 * math.sin(math.radians(statistics.median(got)) / 2):.3f}"
                 if got else "n/a")
@@ -528,11 +565,17 @@ def write_report():
             f"{gl if gl is not None else '>90'} | {disp} |")
 
     lines += ["", "## The pre-stated expectations (issue #17)", ""]
-    all_rand = [v["threshold_deg"] for r in results
+    all_rand = [threshold_of(v["rungs"]) for r in results
                 for k, v in r["directions"].items() if k.startswith("random")]
-    named_th = [v["threshold_deg"] for r in results
+    named_th = [threshold_of(v["rungs"]) for r in results
                 for k, v in r["directions"].items()
                 if k in ("flip_axis", "glitch")]
+    # How often the token proxy would have disagreed with the state test.
+    disagree = sum(1 for r in results for v in r["directions"].values()
+                   for x in v["rungs"]
+                   if (x["cos_mean"] < SAME_ATTRACTOR_COS) != x["token_changed"])
+    total_rungs = sum(len(v["rungs"]) for r in results
+                      for v in r["directions"].values())
     got_r = [v for v in all_rand if v is not None]
     got_n = [v for v in named_th if v is not None]
     if got_r:
@@ -551,11 +594,19 @@ def write_report():
             f"named median would mean escape is easiest along structure the "
             f"record already identified (F13, F14); parity means that "
             f"connection is absent and is reported as absent.")
+    lines.append(
+        f"4. **The token proxy against the state test**: of {total_rungs} "
+        f"rungs, {disagree} ({disagree / max(total_rungs, 1):.0%}) are "
+        "classified differently by the printed token than by the settled "
+        "state. The first version of this experiment used the token, which "
+        "sees one position of about ten and reports only which logit is "
+        "largest; this figure is how much that proxy cost.")
     per_level = {}
     for r in results:
         for v in r["directions"].values():
-            if v["threshold_deg"] is not None:
-                per_level.setdefault(r["level"], []).append(v["threshold_deg"])
+            t = threshold_of(v["rungs"])
+            if t is not None:
+                per_level.setdefault(r["level"], []).append(t)
     if per_level:
         lines.append(
             "3. **Across the band**: median threshold by level, "
