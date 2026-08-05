@@ -1054,13 +1054,23 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
 
     In magnitude coordinates the sweep is one smooth decline from 54× to
     1.01× and both edges look like the same event; in angular coordinates
-    the per-pass turn RISES through the strata and the lower edge (42° at
-    8×, 64° at 32×, 80° at 56×), peaks INSIDE the band at 83.4° at the
-    historical pin, then collapses above it (9° at 256×). Below the band
+    the per-pass turn RISES through the strata and the lower edge (44.9° at
+    8×, 60.7° at 32×, 75.2° at 56×), peaks INSIDE the band at 76.9° at the
+    historical pin, then collapses above it (9.4° at 256×). Below the band
     the loop is not failing to move; it is moving as much as it ever does.
+
+    **Figures corrected 2026-08-05.** This paragraph previously read 42°,
+    64°, 80° and a peak of 83.4°. Those numbers match no column of the
+    committed profile (`angular_profile.json`) in any averaging window and
+    appear to come from a superseded computation. The values above are the
+    ten-pass window as committed, and agree with the session handover, which
+    had them right. The shape of the profile, rising through the strata,
+    peaking inside the band, collapsing above it, is unchanged; only the
+    numbers were wrong.
+
     Stated limit: this cosine is computed on the mean vector across
-    positions, one summary arrow per pass, and does not decompose the turn
-    across the 144 heads and 12 MLP blocks that produce it.
+    positions, one summary arrow per pass. Run 21 has since decomposed it
+    across the 144 heads and 12 MLP blocks; see the head-turn attribution.
 
     **The split inside the band is content-borne (shared-pin control).**
     Pinning all 125 prompts to one identical value (1393.70, the median
