@@ -105,3 +105,6 @@ experiments/basin_depth/output/checkpoints/
 !experiments/basin_depth/output/spectrum.pt
 !experiments/basin_depth/output/verify.json
 experiments/basin_depth/output/spectrum_checkpoints/
+
+# 2026-08-05: plate build byproducts
+docs/plates/__pycache__/

@@ -1,4 +1,4 @@
-"""Rebuild the five plates from committed run archives (no model needed).
+"""Rebuild the six plates from committed run archives (no model needed).
 
 The plates are visual work drawn from this project's data. Nothing here runs
 the model or produces new measurements: every number comes from archives
@@ -12,6 +12,9 @@ plus a JSON payload under data/. The build inlines the payload and writes the
 self-contained page. Templates and payloads are both committed, so a plate can
 be edited without recomputing its data and its data can be recomputed without
 touching its design.
+
+See README.md in this directory for the full log: what each plate is, where
+each is published, and what each got wrong before it got it right.
 
 WHAT EACH PLATE DRAWS, and where its honesty limits are stated:
 
@@ -32,18 +35,18 @@ WHAT EACH PLATE DRAWS, and where its honesty limits are stated:
                        An earlier version measured separation in the display's
                        own coordinates and reported the opposite conclusion.
 
+  v_cyanotypes.html    Plate V. All 144 attention heads as specimen outlines
+                       built from their own singular spectra, with the
+                       stability class and leading eigenvalue from the earlier
+                       per-head census. Each head was looped in isolation,
+                       which is not what a head does inside the working model.
+
   vi_river.html        Plate VI. The token flow across a thousand passes as a
                        braided cable, six models including a noise control.
                        The only plate with no projection at all: nodes carry
                        their own pass number, so nothing is distorted. The
                        arrangement within each column is a drawing choice and
                        carries no measurement.
-
-  v_cyanotypes.html    Plate V. All 144 attention heads as specimen outlines
-                       built from their own singular spectra, with the
-                       stability class and leading eigenvalue from the earlier
-                       per-head census. Each head was looped in isolation,
-                       which is not what a head does inside the working model.
 
 The 1024-dimensional models cannot share a projection basis with the
 768-dimensional ones, so each model is projected separately in every plate
@@ -56,6 +59,12 @@ import pathlib
 import sys
 
 import torch
+
+# torch.pca_lowrank uses randomised SVD, so without this the same archive
+# produces a different projection on every build: axes flip sign, points move,
+# and the committed payloads churn. A plate must be reproducible from its
+# inputs or it is not evidence of anything.
+torch.manual_seed(20260805)
 
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
