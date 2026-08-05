@@ -51,6 +51,7 @@ Outputs (in experiments/basin_depth/output/):
 
 import argparse
 import importlib.util
+import zlib
 import json
 import math
 import statistics
@@ -426,7 +427,14 @@ def run_worker(worker, num_workers):
             print(f"[w{worker}] SKIP {key}: regenerated state reads "
                   f"{token!r}, sweep recorded {label!r}", flush=True)
             continue
-        gen = torch.Generator().manual_seed(SEED + hash(key) % 10000)
+        # zlib.crc32, not hash(). Python salts str hashing per process, so
+        # hash(key) returns a different value in every worker and in every
+        # rerun: the "random" directions would be unreproducible by anyone,
+        # including a rerun of this same script. crc32 is stable across
+        # processes and versions. The directions are also archived below, so
+        # the experiment does not depend on regenerating them at all.
+        gen = torch.Generator().manual_seed(
+            SEED + zlib.crc32(key.encode("utf-8")) % 10_000_000)
         result = {"level": level, "multiplier": mult, "label": label,
                   "pid": pid, "target_norm": target, "lock_in": lock_in,
                   "home_token": token.strip(), "directions": {}}
@@ -436,7 +444,11 @@ def run_worker(worker, num_workers):
         for dname, direction in directions_for(state, named, gen):
             rungs = run_ladder(model, prompt, state, target, direction,
                                token.strip(), home_mean, home_last)
-            result["directions"][dname] = {"rungs": rungs}
+            # Archive the direction itself. Without it no later analysis can
+            # ask what these directions were, which blocks comparing escape
+            # thresholds against eigenvectors of the local map.
+            result["directions"][dname] = {"rungs": rungs,
+                                           "vector": direction.clone()}
         tmp = ckpt.with_suffix(".tmp")
         torch.save(result, tmp)
         tmp.rename(ckpt)
