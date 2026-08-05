@@ -99,3 +99,9 @@ experiments/head_turn/output/checkpoints/
 !experiments/basin_depth/output/escape_ladder.pt
 !experiments/basin_depth/output/directions.pt
 experiments/basin_depth/output/checkpoints/
+
+# 2026-08-05: local Jacobian spectrum (#17 successor). Eigenvalues and
+# eigenvectors are the evidence; per-state checkpoints stay ignored.
+!experiments/basin_depth/output/spectrum.pt
+!experiments/basin_depth/output/verify.json
+experiments/basin_depth/output/spectrum_checkpoints/
