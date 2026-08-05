@@ -19,6 +19,28 @@ Of 17 states with both a ladder and a control, 16 passed and 1 failed. Failed st
 
 A failing control is itself informative: the state sits close enough to a boundary that an identical tensor, re-entered through a separate code path, lands elsewhere. That is a real property of the state, not only a defect of the method, but it cannot be read as an escape threshold.
 
+## How much the cutoff matters
+
+Escape is judged by whether the settled state returns to the
+attractor, measured as a cosine. Choosing where to put that cutoff
+is a judgement, and the returned cosines do NOT fall into two clean
+clusters with a gap to cut in: about half land within a hair of
+exactly 1 and the rest trail away continuously. So rather than
+defend one number, here is the whole answer at four cutoffs. The
+cosines are stored raw in the archive, so any other cutoff can be
+applied without recomputing anything.
+
+| cutoff | as an angle | median threshold | probes that never escaped |
+|--:|--:|--:|--:|
+| 0.9999 | 0.8 deg | 1 deg | 17 of 96 |
+| 0.999 | 2.6 deg | 1 deg | 21 of 96 |
+| 0.99 | 8.1 deg | 24 deg | 22 of 96 |
+| 0.9 | 25.8 deg | 90 deg | 33 of 96 |
+
+The tables below use 0.999. **If the median moves a
+lot across those rows, no single depth figure from this experiment
+should be quoted without its cutoff.**
+
 ## Escape thresholds per state, in both coordinates
 
 Angles are the primary measure, because the pin removes the size
@@ -33,27 +55,28 @@ For reference 1 degree is 0.017 of the norm, 8 degrees 0.140,
 | level | basin | prompt | random directions | flip axis | glitch direction | median displacement |
 |:--|:--|:--|:--|--:|--:|--:|
 | m056 | `prolet` | A01_physics | 90 to 90 deg, median 90 | >90 | >90 | 1.414 |
-| m056 | `prolet` | A02_medical | 90 to 90 deg, median 90 | >90 | >90 | 1.414 |
-| m056 | `solidarity` | G09_space | 2 to 90 deg, median 2 | >90 | 90 | 0.781 |
-| m056 | `Anarch` | G07_the | 64 to 64 deg, median 64 | >90 | >90 | 1.060 |
-| historical | `prolet` | A01_physics | 64 to 90 deg, median 90 | >90 | >90 | 1.414 |
-| historical | `prolet` | A02_medical | 90 to 90 deg, median 90 | >90 | >90 | 1.414 |
-| historical | `Divine` | A08_linguistics | 90 to 90 deg, median 90 | 90 | >90 | 1.414 |
-| historical | `Divine` | A14_kant | 64 to 90 deg, median 90 | 90 | >90 | 1.414 |
-| historical | `Anarch` | A03_neuro | 32 to 64 deg, median 64 | >90 | 8 | 1.060 |
+| m056 | `prolet` | A02_medical | 64 to 90 deg, median 77 | >90 | >90 | 1.245 |
+| m056 | `solidarity` | G09_space | 1 to 8 deg, median 2 | 1 | 4 | 0.044 |
+| m056 | `Anarch` | G07_the | 64 to 90 deg, median 64 | >90 | >90 | 1.060 |
+| historical | `prolet` | A01_physics | 90 to 90 deg, median 90 | >90 | >90 | 1.414 |
+| historical | `prolet` | A02_medical | 64 to 90 deg, median 90 | >90 | >90 | 1.414 |
+| historical | `Divine` | A08_linguistics | 64 to 90 deg, median 77 | 90 | 16 | 1.245 |
+| historical | `Divine` | A14_kant | 16 to 64 deg, median 48 | 16 | 16 | 0.416 |
+| historical | `Anarch` | A03_neuro | 90 to 90 deg, median 90 | >90 | >90 | 1.414 |
 | historical | `Anarch` | A05_evolution | 90 to 90 deg, median 90 | >90 | >90 | 1.414 |
-| m256 | `solidarity` | A02_medical | 64 to 90 deg, median 64 | >90 | >90 | 1.060 |
-| m256 | `solidarity` | A04_climate | 64 to 90 deg, median 64 | >90 | >90 | 1.060 |
-| m256 | `the` | A03_neuro | 16 to 64 deg, median 64 | 32 | 8 | 0.551 |
-| m256 | `the` | A05_evolution | 64 to 64 deg, median 64 | 32 | 8 | 0.813 |
-| m256 | `.` | A01_physics | 16 to 64 deg, median 32 | 32 | 32 | 0.551 |
-| m256 | `.` | A06_epistemology | 64 to 90 deg, median 64 | 32 | 8 | 1.060 |
+| m256 | `solidarity` | A02_medical | 1 to 1 deg, median 1 | 1 | 1 | 0.017 |
+| m256 | `solidarity` | A04_climate | 1 to 1 deg, median 1 | 1 | 1 | 0.017 |
+| m256 | `the` | A03_neuro | 1 to 1 deg, median 1 | 1 | 1 | 0.017 |
+| m256 | `the` | A05_evolution | 1 to 1 deg, median 1 | 1 | 1 | 0.017 |
+| m256 | `.` | A01_physics | 1 to 1 deg, median 1 | 1 | 1 | 0.017 |
+| m256 | `.` | A06_epistemology | 1 to 1 deg, median 1 | 1 | 1 | 0.017 |
 
 ## The pre-stated expectations (issue #17)
 
-1. **Spread across directions within a state**: random-direction thresholds run 2 to 90 degrees overall, median 64. 15 of 64 random probes did not escape at any rung up to 90 degrees.
-2. **Named against random directions**: median threshold 32 degrees along the flip axis and the anomalous-cluster direction, against 64 along random ones. A lower named median would mean escape is easiest along structure the record already identified (F13, F14); parity means that connection is absent and is reported as absent.
-3. **Across the band**: median threshold by level, m056 90 deg, historical 90 deg, m256 64 deg. The two outer levels sit near the band's edges and the historical pin sits mid-band, so smaller thresholds at the outer levels would mean the edges are basins growing shallow, and flat thresholds would mean the basins do not thin out but simply stop.
+1. **Spread across directions within a state**: random-direction thresholds run 1 to 90 degrees overall, median 16. 7 of 64 random probes did not escape at any rung up to 90 degrees.
+2. **Named against random directions**: median threshold 1 degrees along the flip axis and the anomalous-cluster direction, against 16 along random ones. A lower named median would mean escape is easiest along structure the record already identified (F13, F14); parity means that connection is absent and is reported as absent.
+4. **The token proxy against the state test**: of 768 rungs, 284 (37%) are classified differently by the printed token than by the settled state. The first version of this experiment used the token, which sees one position of about ten and reports only which logit is largest; this figure is how much that proxy cost.
+3. **Across the band**: median threshold by level, m056 64 deg, historical 90 deg, m256 1 deg. The two outer levels sit near the band's edges and the historical pin sits mid-band, so smaller thresholds at the outer levels would mean the edges are basins growing shallow, and flat thresholds would mean the basins do not thin out but simply stop.
 
 ## Reading
 

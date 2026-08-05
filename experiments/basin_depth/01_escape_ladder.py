@@ -386,7 +386,19 @@ def run_control(worker, num_workers):
                           patience=sa.PATIENCE, check_every=sa.CHECK_EVERY,
                           check_start=min(sa.CHECK_START, ESCAPE_MAX_ITER),
                           seed_tensor=moved, capture_terminal=True)
-        rec = {"key": key, "home_token": home.strip(),
+        # THE BASELINE THE LADDER NEEDS. Every rung is scored by how close
+        # the perturbed run lands to the attractor, but nothing established
+        # how close an UNPERTURBED run lands. If the loop does not return a
+        # state to itself, then small-angle "escapes" are just that baseline
+        # drift and the ladder is measuring the apparatus, not the basin.
+        cos_mean = float(torch.nn.functional.cosine_similarity(
+            r["terminal_mean_vec"].unsqueeze(0),
+            state.mean(dim=0).unsqueeze(0)))
+        cos_last = float(torch.nn.functional.cosine_similarity(
+            r["terminal_last_vec"].unsqueeze(0),
+            state[-1, :].unsqueeze(0)))
+        rec = {"key": key, "cos_mean": cos_mean, "cos_last": cos_last,
+               "home_token": home.strip(),
                "control_token": r["terminal_token"].strip(),
                "converged": r["converged"],
                "passed": r["terminal_token"].strip() == home.strip()}
@@ -394,7 +406,7 @@ def run_control(worker, num_workers):
         print(f"[c{worker}] {key}: control "
               f"{'PASS' if rec['passed'] else 'FAIL'} "
               f"(home {rec['home_token']!r}, re-entry "
-              f"{rec['control_token']!r})", flush=True)
+              f"{rec['control_token']!r}, cos {cos_mean:.6f})", flush=True)
 
 
 def run_worker(worker, num_workers):
