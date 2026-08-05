@@ -1,0 +1,267 @@
+<title>Cyanotypes of the Attention Heads</title>
+<style>
+:root{
+  --prussian:#0E2A47; --prussian-deep:#081B30; --prussian-mid:#16436C;
+  --print:#E8F1F7; --print-dim:#9FC2DA; --print-faint:#5F8CB0;
+  --rule:#1D4468; --accent:#F2C879;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --neg:0;
+}
+@media (prefers-color-scheme: light){
+  :root{--prussian:#DCE6EE; --prussian-deep:#CBD9E5; --prussian-mid:#A8C0D4;
+        --print:#0A2038; --print-dim:#2E5677; --print-faint:#6C8FAC;
+        --rule:#A8BACB; --accent:#8A5A0B; --neg:1;}
+}
+:root[data-theme="light"]{--prussian:#DCE6EE; --prussian-deep:#CBD9E5; --prussian-mid:#A8C0D4;
+  --print:#0A2038; --print-dim:#2E5677; --print-faint:#6C8FAC; --rule:#A8BACB; --accent:#8A5A0B; --neg:1;}
+:root[data-theme="dark"]{--prussian:#0E2A47; --prussian-deep:#081B30; --prussian-mid:#16436C;
+  --print:#E8F1F7; --print-dim:#9FC2DA; --print-faint:#5F8CB0; --rule:#1D4468; --accent:#F2C879; --neg:0;}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--prussian-deep);color:var(--print);
+  font-family:var(--serif);font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.sheet{max-width:1160px;margin:0 auto;padding:0 26px 90px}
+
+.head{padding:74px 0 30px;display:grid;gap:20px;justify-items:center;text-align:center}
+.plateno{font-family:var(--mono);font-size:10.5px;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--print-faint)}
+h1{font-family:var(--serif);font-weight:400;font-style:italic;
+  font-size:clamp(1.9rem,4.6vw,3.2rem);line-height:1.1;margin:0;letter-spacing:-.01em;
+  max-width:22ch;text-wrap:balance}
+.sub{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--print-dim);display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.rule{width:100%;height:1px;background:var(--rule);margin-top:6px}
+
+.frame{position:relative;background:var(--prussian);border:1px solid var(--rule);
+  padding:16px;margin-top:26px}
+.frame::after{content:"";position:absolute;inset:7px;border:1px solid var(--rule);
+  pointer-events:none;opacity:.55}
+canvas{display:block;width:100%;height:auto;cursor:crosshair}
+canvas:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center;
+  margin-top:14px}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+button{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;
+  background:transparent;color:var(--print-dim);border:1px solid var(--rule);padding:6px 10px;
+  cursor:pointer;transition:color .15s,border-color .15s,background .15s}
+button:hover{color:var(--print);border-color:var(--print-faint)}
+button[aria-pressed="true"]{background:var(--print);color:var(--prussian);border-color:var(--print)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.inspect{font-family:var(--mono);font-size:11px;color:var(--print-dim);min-height:1.6em;
+  letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.inspect b{color:var(--print);font-weight:400}
+
+.body{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:36px;
+  margin-top:44px;padding-top:26px;border-top:1px solid var(--rule)}
+.body p{margin:0 0 1em;max-width:62ch;color:var(--print-dim)}
+.body p:last-child{margin-bottom:0}
+.body strong{color:var(--print);font-weight:400}
+.body em{color:var(--print);font-style:italic}
+aside{font-family:var(--mono);font-size:11px;line-height:1.95;color:var(--print-faint)}
+aside h3{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--print-faint);
+  font-weight:400;margin:0 0 10px}
+aside table{border-collapse:collapse;width:100%;margin-bottom:22px}
+aside td{padding:1px 0}
+aside td:last-child{text-align:right;color:var(--print-dim);font-variant-numeric:tabular-nums}
+aside p{margin:0;color:var(--print-faint)}
+@media (max-width:820px){.body{grid-template-columns:1fr;gap:22px}.head{padding:52px 0 22px}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.001ms !important}}
+</style>
+
+<div class="sheet">
+  <header class="head">
+    <div class="plateno">Plate IV</div>
+    <h1>Cyanotypes of the attention heads</h1>
+    <div class="sub"><span>GPT-2 Small</span><span>144 specimens</span><span>4 classes</span></div>
+    <div class="rule"></div>
+  </header>
+
+  <div class="frame">
+    <canvas id="pl" tabindex="0" aria-label="A plate of 144 specimen forms, one per attention head of GPT-2 small, arranged in twelve rows by layer."></canvas>
+  </div>
+  <div class="tools">
+    <div class="filters" id="filters"></div>
+    <div class="inspect" id="ins">Hover a specimen</div>
+  </div>
+
+  <div class="body">
+    <div>
+      <p>Every attention head in this model was set running on its own, fed its own output
+        over and over, and watched until it settled. What it settled into has a spectrum, and
+        that spectrum is drawn here as a form: <strong>the leading modes set the lobes, the
+        tail sets the fineness of the edge, and the strength of the head's dominant direction
+        sets the phase of every lobe.</strong> One head, one specimen. Nothing is stylised;
+        two heads look alike when their spectra are alike.</p>
+      <p>They sort themselves into four kinds, and the sorting was done by earlier
+        measurement rather than by eye. Fifty-two settle onto a single point and stay.
+        Fifty-seven <em>rotate</em>, turning forever without arriving. Twenty-nine
+        <em>flip sign</em> every pass, which is the same two-beat oscillation that drives the
+        one cycle we have studied closely elsewhere in this work. Six are still slowly moving
+        when the observation stops.</p>
+      <p>One specimen does not belong, and you will find it without being told: last row,
+        ninth along. That is layer 11, head 8. Where every other head opens into spikes, it
+        stays closed and dense, and it is <strong>rank one of 144</strong> on that measure,
+        the least spiky form on the plate.</p>
+      <p>Three separate measurements meet on that one square, and none of them knew about the
+        others. Its leading eigenvalue is <strong>86.7, the largest of all 144</strong>, where
+        the next-largest is a small fraction of it and the median sits near one. It is
+        classified a sign-flipper, which is the two-beat oscillation that drives the one limit
+        cycle we have studied in detail. And it is the head that, in the full feedback loop
+        with all 144 running together, contributes most of the per-pass turn at every
+        injection level we tested. A spectral census, a stability class, and an attribution
+        experiment, all pointing at the same square of the plate.</p>
+      <p>The halo marks a head whose leading eigenvalue exceeds one, so a disturbance along
+        its dominant direction grows rather than shrinks. There are far more of those than I
+        expected, which is worth sitting with: most of these parts, run alone, do not settle
+        down.</p>
+    </div>
+    <aside>
+      <h3>The plate</h3>
+      <table>
+        <tr><td>specimens</td><td>144</td></tr>
+        <tr><td>rows, by layer</td><td>12</td></tr>
+        <tr><td>modes drawn</td><td>20</td></tr>
+        <tr><td>fixed-point</td><td>52</td></tr>
+        <tr><td>rotating</td><td>57</td></tr>
+        <tr><td>sign-flip</td><td>29</td></tr>
+        <tr><td>slow-converging</td><td>6</td></tr>
+        <tr><td>halo, growth</td><td id="ngrow">&mdash;</td></tr>
+      </table>
+      <h3>Process</h3>
+      <p>After Anna Atkins, <i>Photographs of British Algae: Cyanotype Impressions</i>, 1843,
+        the first book illustrated by photography and a book of specimens. White where the
+        light was blocked, Prussian blue where it was not.</p>
+      <h3 style="margin-top:22px">Honesty</h3>
+      <p>Each head was looped in isolation, which is not what any head does inside the working
+        model. These are portraits of parts removed from the whole. The class labels come from
+        the earlier measurement and are reproduced, not recomputed. The mapping from spectrum
+        to outline is a drawing convention; the spectra are not.</p>
+    </aside>
+  </div>
+</div>
+
+<script>
+const D=__DATA__;
+const $=i=>document.getElementById(i);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const cv=$("pl"), ctx=cv.getContext("2d");
+const CLASSES=["fixed-point","rotating","sign-flip","slow-converging"];
+let active=new Set(CLASSES), hover=-1, W,H,dpr,cell,cols=12,rows=12;
+
+$("ngrow").textContent = D.heads.filter(h=>h.lam>1).length;
+$("filters").innerHTML = CLASSES.map(c=>
+  `<button data-c="${c}" aria-pressed="true">${c}</button>`).join("")
+  + `<button data-c="__all" aria-pressed="false">all</button>`;
+$("filters").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+  const c=b.dataset.c;
+  if(c==="__all"){ active=new Set(CLASSES);
+    $("filters").querySelectorAll("button[data-c]").forEach(x=>
+      x.setAttribute("aria-pressed", x.dataset.c!=="__all")); }
+  else { active.has(c)?active.delete(c):active.add(c);
+    if(!active.size){active=new Set(CLASSES);}
+    $("filters").querySelectorAll("button[data-c]").forEach(x=>
+      x.setAttribute("aria-pressed", x.dataset.c==="__all" ? false : active.has(x.dataset.c))); }
+  draw();
+});
+
+function size(){
+  dpr=Math.min(devicePixelRatio||1,2);
+  W=cv.parentElement.clientWidth-32;
+  cell=W/cols; H=cell*rows;
+  cv.style.height=H+"px"; cv.width=W*dpr; cv.height=H*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  draw();
+}
+
+/* outline of one specimen: r(t) = 1 + sum_k a_k cos(k t + p_k) */
+function outline(h, steps){
+  const pts=[], A=h.a, P=h.p, n=A.length;
+  let peak=0;
+  for(let s=0;s<steps;s++){
+    const t=s/steps*6.283185;
+    let r=1;
+    for(let k=0;k<n;k++) r += A[k]*Math.cos((k+1)*t + P[k]);
+    pts.push(r); peak=Math.max(peak,Math.abs(r));
+  }
+  return {r:pts, peak};
+}
+
+function specimen(h, cx, cy, R, dim){
+  const steps=320, o=outline(h,steps);
+  const norm=R/Math.max(0.85, o.peak);
+  const ink=css("--print"), neg=parseFloat(css("--neg"))||0;
+  const path=(scale)=>{
+    ctx.beginPath();
+    for(let s=0;s<steps;s++){
+      const t=s/steps*6.283185, rr=o.r[s]*norm*scale;
+      const x=cx+Math.cos(t)*rr, y=cy+Math.sin(t)*rr;
+      s?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    }
+    ctx.closePath();
+  };
+  /* halo: leading eigenvalue above one, the disturbance grows */
+  if(h.lam>1){
+    ctx.strokeStyle=hexA(css("--accent"), dim?0.12:0.42);
+    ctx.lineWidth=0.7; path(1.16); ctx.stroke();
+  }
+  /* the photogram: solid where the specimen blocked the light */
+  ctx.fillStyle=hexA(ink, dim?0.06:(neg?0.90:0.82));
+  path(1); ctx.fill();
+  /* interior contours, the density of the print */
+  ctx.lineWidth=0.55;
+  for(let i=1;i<=4;i++){
+    ctx.strokeStyle=hexA(neg?css("--prussian"):css("--prussian-deep"), dim?0.10:0.34);
+    path(1-i*0.185); ctx.stroke();
+  }
+  /* class mark: a rotating head gets a chord, a sign-flip gets an axis */
+  ctx.lineWidth=0.6; ctx.strokeStyle=hexA(neg?css("--prussian"):css("--prussian-deep"), dim?0.10:0.5);
+  if(h.cls==="rotating" && h.rot!=null){
+    ctx.beginPath(); ctx.arc(cx,cy,R*0.20,0, 6.283185*Math.min(1,h.rot)); ctx.stroke();
+  } else if(h.cls==="sign-flip"){
+    ctx.beginPath(); ctx.moveTo(cx-R*0.30,cy); ctx.lineTo(cx+R*0.30,cy); ctx.stroke();
+  } else if(h.cls==="slow-converging"){
+    ctx.beginPath(); ctx.arc(cx,cy,R*0.09,0,6.283185); ctx.stroke();
+  }
+}
+function hexA(hex,a){const h=hex.replace("#","");
+  return `rgba(${parseInt(h.slice(0,2),16)},${parseInt(h.slice(2,4),16)},${parseInt(h.slice(4,6),16)},${a})`;}
+
+function draw(){
+  if(!W) return;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=css("--prussian"); ctx.fillRect(0,0,W,H);
+  /* faint register grid, as on a contact sheet */
+  ctx.strokeStyle=hexA(css("--rule"),0.55); ctx.lineWidth=0.5;
+  for(let i=1;i<cols;i++){ctx.beginPath();ctx.moveTo(i*cell,0);ctx.lineTo(i*cell,H);ctx.stroke();}
+  for(let j=1;j<rows;j++){ctx.beginPath();ctx.moveTo(0,j*cell);ctx.lineTo(W,j*cell);ctx.stroke();}
+  D.heads.forEach((h,i)=>{
+    const cx=(h.H+0.5)*cell, cy=(h.L+0.5)*cell;
+    specimen(h, cx, cy, cell*0.355, !active.has(h.cls));
+  });
+  /* row labels */
+  ctx.font='9px ui-monospace,SFMono-Regular,Menlo,monospace';
+  ctx.fillStyle=hexA(css("--print-faint"),0.75);
+  for(let j=0;j<rows;j++) ctx.fillText("L"+j, 4, j*cell+11);
+  if(hover>=0){
+    const h=D.heads[hover], cx=(h.H+0.5)*cell, cy=(h.L+0.5)*cell;
+    ctx.strokeStyle=css("--accent"); ctx.lineWidth=1;
+    ctx.strokeRect(h.H*cell+1.5, h.L*cell+1.5, cell-3, cell-3);
+  }
+}
+cv.addEventListener("pointermove",e=>{
+  const r=cv.getBoundingClientRect();
+  const c=Math.floor((e.clientX-r.left)/cell), l=Math.floor((e.clientY-r.top)/cell);
+  const i=(c>=0&&c<cols&&l>=0&&l<rows)? l*12+c : -1;
+  if(i!==hover){ hover=i; draw();
+    if(i>=0){ const h=D.heads[i];
+      $("ins").innerHTML=`<b>${h.k}</b> &nbsp; ${h.cls} &nbsp;·&nbsp; leading eigenvalue `
+        +`<b>${h.lam.toFixed(3)}</b>${h.lam>1?" (grows)":""} &nbsp;·&nbsp; spectral gap `
+        +`<b>${h.gap.toFixed(2)}</b> &nbsp;·&nbsp; reads as <b>${h.tok.replace(/</g,"&lt;")}</b>`; }
+    else $("ins").textContent="Hover a specimen"; }
+});
+cv.addEventListener("pointerleave",()=>{hover=-1;draw();$("ins").textContent="Hover a specimen";});
+addEventListener("resize",size);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>setTimeout(draw,50));
+size();
+</script>
