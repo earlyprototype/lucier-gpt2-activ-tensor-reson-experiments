@@ -550,6 +550,34 @@ def write_report():
             "",
         ]
     lines += [
+        "## How much the cutoff matters",
+        "",
+        "Escape is judged by whether the settled state returns to the",
+        "attractor, measured as a cosine. Choosing where to put that cutoff",
+        "is a judgement, and the returned cosines do NOT fall into two clean",
+        "clusters with a gap to cut in: about half land within a hair of",
+        "exactly 1 and the rest trail away continuously. So rather than",
+        "defend one number, here is the whole answer at four cutoffs. The",
+        "cosines are stored raw in the archive, so any other cutoff can be",
+        "applied without recomputing anything.",
+        "",
+        "| cutoff | as an angle | median threshold | probes that never escaped |",
+        "|--:|--:|--:|--:|",
+    ]
+    for cut in (0.9999, 0.999, 0.99, 0.9):
+        th = [threshold_of(v["rungs"], cut) for r in results
+              for v in r["directions"].values()]
+        got = [t for t in th if t is not None]
+        med = f"{statistics.median(got):.0f} deg" if got else "n/a"
+        lines.append(
+            f"| {cut} | {math.degrees(math.acos(cut)):.1f} deg | {med} | "
+            f"{len(th) - len(got)} of {len(th)} |")
+    lines += [
+        "",
+        f"The tables below use {SAME_ATTRACTOR_COS}. **If the median moves a",
+        "lot across those rows, no single depth figure from this experiment",
+        "should be quoted without its cutoff.**",
+        "",
         "## Escape thresholds per state, in both coordinates",
         "",
         "Angles are the primary measure, because the pin removes the size",
