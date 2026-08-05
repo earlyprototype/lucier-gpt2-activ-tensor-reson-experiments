@@ -32,6 +32,13 @@ WHAT EACH PLATE DRAWS, and where its honesty limits are stated:
                        An earlier version measured separation in the display's
                        own coordinates and reported the opposite conclusion.
 
+  vi_river.html        Plate VI. The token flow across a thousand passes as a
+                       braided cable, six models including a noise control.
+                       The only plate with no projection at all: nodes carry
+                       their own pass number, so nothing is distorted. The
+                       arrangement within each column is a drawing choice and
+                       carries no measurement.
+
   v_cyanotypes.html    Plate V. All 144 attention heads as specimen outlines
                        built from their own singular spectra, with the
                        stability class and leading eigenvalue from the earlier
@@ -59,6 +66,7 @@ NU_CKPT = ROOT / "experiments" / "nu_sweep" / "output" / "checkpoints"
 TRAJ = ROOT / "experiments" / "sink_geometry" / "output" / "trajectories.pt"
 ANGULAR = ROOT / "experiments" / "nu_sweep" / "output" / "angular_profile.json"
 SPECTRAL = ROOT / "experiments" / "_DATA" / "EXP_009" / "009c_spectral_data.pt"
+DISSOLUTION = ROOT / "docs" / "graph" / "_data" / "dissolution.json"
 CENSUS = (ROOT / "experiments" / "gpt2_small" / "output_eigen_rescore"
           / "results.json")
 
@@ -196,6 +204,112 @@ def build_heads():
     return {"H": H_MODES, "heads": heads}
 
 
+def build_river():
+    """Plate VI: the token flow as an alluvial diagram.
+
+    First attempt arranged each pass on a ring in three dimensions. It was
+    unreadable: on a ring, strands wrap behind the cable and cross each other
+    regardless of how the nodes are ordered, so the picture said "tangle" when
+    the data says "narrowing". Barycentre ordering reduced the crossings and
+    did not fix the form. The form was the problem, so this is flat.
+
+    Horizontal position is the pass number and is read straight from the
+    archive. Vertical position is a drawing choice: nodes are stacked in each
+    column with height proportional to how many prompts hold that word, sorted
+    by basin so a strand keeps its neighbours, then relaxed by barycentre
+    ordering to reduce crossings. The stack height therefore shows the
+    surviving population directly, which is the narrowing the piece is about.
+    """
+    basins = ["prolet", "Divine", "Anarch", "till", "solidarity"]
+    with open(DISSOLUTION, encoding="utf-8") as f:
+        d = json.load(f)
+    out = {}
+    for name, m in d["models"].items():
+        nodes, edges = m["nodes"], m["edges"]
+        iters = sorted({n["iter"] for n in nodes})
+        idx = {it: i for i, it in enumerate(iters)}
+        cols = {}
+        for n in nodes:
+            cols.setdefault(n["iter"], []).append(n)
+        for it in cols:
+            cols[it].sort(key=lambda n: (basins.index(n["basin"])
+                                         if n["basin"] in basins else 9,
+                                         -n.get("count", 1), n["token"]))
+        nbr = {}
+        for e in edges:
+            nbr.setdefault(e["from"], []).append(e["to"])
+            nbr.setdefault(e["to"], []).append(e["from"])
+        rank = {n["id"]: j for it in cols for j, n in enumerate(cols[it])}
+        for sweep in range(30):
+            for it in (iters if sweep % 2 == 0 else list(reversed(iters))):
+                ns = cols[it]
+                keyed = []
+                for j, n in enumerate(ns):
+                    xs = [rank[o] / max(len(cols[int(o.split("|")[1])]) - 1, 1)
+                          for o in nbr.get(n["id"], []) if o in rank]
+                    keyed.append((sum(xs) / len(xs) if xs
+                                  else rank[n["id"]] / max(len(ns) - 1, 1), n))
+                keyed.sort(key=lambda t: t[0])
+                cols[it] = [n for _, n in keyed]
+                for j, n in enumerate(cols[it]):
+                    rank[n["id"]] = j
+
+        # widest column sets the scale, so every column is comparable
+        weight = {it: sum(n.get("count", 1) for n in ns) for it, ns in cols.items()}
+        gap = 0.012
+        widest = max(weight[it] + gap * max(len(cols[it]) - 1, 0) * 40
+                     for it in cols)
+        band = {}
+        for it, ns in cols.items():
+            total = weight[it] / widest + gap * max(len(ns) - 1, 0)
+            y = -total / 2
+            for n in ns:
+                h = (n.get("count", 1) / widest)
+                band[n["id"]] = [round(y, 5), round(y + h, 5)]
+                y += h + gap
+        pos = {nid: round(idx[int(nid.split("|")[1])]
+                          / max(len(iters) - 1, 1), 5) for nid in band}
+        # each node's outgoing flows partition its band, so ribbons meet cleanly
+        offs_out, offs_in = {}, {}
+        drawn = []
+        for e in sorted(edges, key=lambda e: (e["from"], e["to"])):
+            if e["from"] not in band or e["to"] not in band:
+                continue
+            c = e.get("count", 1) / widest
+            a0 = offs_out.get(e["from"], band[e["from"]][0])
+            b0 = offs_in.get(e["to"], band[e["to"]][0])
+            drawn.append({"x0": pos[e["from"]], "x1": pos[e["to"]],
+                          "y0": round(a0, 5), "y1": round(a0 + c, 5),
+                          "z0": round(b0, 5), "z1": round(b0 + c, 5),
+                          "c": e.get("count", 1), "bs": e.get("basin", "")})
+            offs_out[e["from"]] = a0 + c
+            offs_in[e["to"]] = b0 + c
+        # colour by basin RANK within this model, since the models do not
+        # share a basin vocabulary: GPT-2 small ends in five words, GPT-2
+        # medium in one letter, Pythia 410M in nothing at all.
+        shares = m.get("basin_shares") or {}
+        ranked = sorted(shares, key=lambda k: -shares[k])[:5]
+        rank_of = {b: i for i, b in enumerate(ranked)}
+        for f in drawn:
+            f["r"] = rank_of.get(f["bs"], -1)
+        out[name] = {
+            "label": m.get("label", name), "kind": m.get("kind", ""),
+            "note": m.get("note", ""),
+            "iters": iters, "basins": m.get("basins", {}),
+            "shares": {k: round(v, 1) for k, v in shares.items()},
+            "ranked": ranked, "n_basins": len(m.get("basins") or {}),
+            "n_nodes": len(nodes),
+            "cols": [{"it": it, "x": idx[it] / max(len(iters) - 1, 1),
+                      "n": len(cols[it])} for it in iters],
+            "nodes": [{"t": n["token"], "x": pos[n["id"]],
+                       "y": band[n["id"]], "c": n.get("count", 1),
+                       "b": n["basin"], "r": rank_of.get(n["basin"], -1),
+                       "term": bool(n.get("terminal"))}
+                      for it in iters for n in cols[it]],
+            "flows": drawn}
+    return out
+
+
 PLATES = [
     ("_tpl_room.html", "i-iii_room.html",
      lambda: {"cloud": build_cloud(), "traj": build_traj(),
@@ -203,6 +317,7 @@ PLATES = [
     ("_tpl_bodies.html", "iv_bodies.html",
      lambda: {"K": K_SHAPE, "m": build_morph()}),
     ("_tpl_cyanotypes.html", "v_cyanotypes.html", build_heads),
+    ("_tpl_river.html", "vi_river.html", build_river),
 ]
 
 
