@@ -13,11 +13,25 @@ settles on a different token from the unperturbed attractor.
 
 This control was NOT in the registered protocol and was added after the first ladders ran. A rung counts as an escape when the re-entered run settles on a different token from the attractor, which is only meaningful if re-entering with NO perturbation returns that attractor. Without the control, a state whose re-entry fails to reproduce its own settled point is indistinguishable from a basin so shallow that one degree dislodges it.
 
-Of 17 states with both a ladder and a control, 16 passed and 1 failed. Failed states are excluded from every number below and named here:
+Of 10 states with both a ladder and a control, 10 passed and 0 failed. Failed states are excluded from every number below and named here:
 
-- `m056_solidarity_G08_period (settles 'solidarity', re-entry gives 'till')`
+- none
 
-A failing control is itself informative: the state sits close enough to a boundary that an identical tensor, re-entered through a separate code path, lands elsewhere. That is a real property of the state, not only a defect of the method, but it cannot be read as an escape threshold.
+### States the apparatus cannot resolve
+
+The control also measures HOW EXACTLY the loop returns an unperturbed state, and that floor is not the same everywhere. Inside the band a state comes back to five or six decimal places. Near the upper edge it does not. Where the floor is worse than 0.999, a basin crossing cannot be told apart from the loop's own drift, so those states are excluded and named here rather than given a number that would only reflect the apparatus:
+
+- `m056_solidarity_G08_period (returns only to 0.9017)`
+- `m256_solidarity_A02_medical (returns only to 0.9923)`
+- `m256_solidarity_A04_climate (returns only to 0.9898)`
+- `m256_the_A03_neuro (returns only to 0.7619)`
+- `m256_the_A05_evolution (returns only to 0.9734)`
+- `m256_._A01_physics (returns only to 0.9890)`
+- `m256_._A06_epistemology (returns only to 0.9937)`
+
+**This is a result, not only a nuisance.** The convergence gate asks only that consecutive passes be similar. Approaching the upper edge the loop tends toward the identity map, so consecutive passes are similar whether or not anything has settled, and the gate stops being informative exactly there. A state can pass it while still drifting. Any claim that trials lock in at high injection should be read with that in mind.
+
+Escape elsewhere is judged against each state's own floor: a rung escapes when it lands more than 10 times further from the attractor than the unperturbed control does. A single fixed cutoff cannot serve both groups, since 0.999 is a hundred times looser than the floor for one and tighter than the floor for the other.
 
 ## How much the cutoff matters
 
@@ -32,10 +46,10 @@ applied without recomputing anything.
 
 | cutoff | as an angle | median threshold | probes that never escaped |
 |--:|--:|--:|--:|
-| 0.9999 | 0.8 deg | 1 deg | 17 of 96 |
-| 0.999 | 2.6 deg | 1 deg | 21 of 96 |
-| 0.99 | 8.1 deg | 24 deg | 22 of 96 |
-| 0.9 | 25.8 deg | 90 deg | 33 of 96 |
+| 0.9999 | 0.8 deg | 64 deg | 17 of 60 |
+| 0.999 | 2.6 deg | 90 deg | 21 of 60 |
+| 0.99 | 8.1 deg | 90 deg | 21 of 60 |
+| 0.9 | 25.8 deg | 90 deg | 25 of 60 |
 
 The tables below use 0.999. **If the median moves a
 lot across those rows, no single depth figure from this experiment
@@ -56,27 +70,21 @@ For reference 1 degree is 0.017 of the norm, 8 degrees 0.140,
 |:--|:--|:--|:--|--:|--:|--:|
 | m056 | `prolet` | A01_physics | 90 to 90 deg, median 90 | >90 | >90 | 1.414 |
 | m056 | `prolet` | A02_medical | 64 to 90 deg, median 77 | >90 | >90 | 1.245 |
-| m056 | `solidarity` | G09_space | 1 to 8 deg, median 2 | 1 | 4 | 0.044 |
-| m056 | `Anarch` | G07_the | 64 to 90 deg, median 64 | >90 | >90 | 1.060 |
+| m056 | `solidarity` | G09_space | 1 to 16 deg, median 5 | 2 | 16 | 0.087 |
+| m056 | `Anarch` | G07_the | 32 to 90 deg, median 64 | >90 | >90 | 1.060 |
 | historical | `prolet` | A01_physics | 90 to 90 deg, median 90 | >90 | >90 | 1.414 |
 | historical | `prolet` | A02_medical | 64 to 90 deg, median 90 | >90 | >90 | 1.414 |
-| historical | `Divine` | A08_linguistics | 64 to 90 deg, median 77 | 90 | 16 | 1.245 |
-| historical | `Divine` | A14_kant | 16 to 64 deg, median 48 | 16 | 16 | 0.416 |
+| historical | `Divine` | A08_linguistics | 32 to 90 deg, median 64 | 90 | 16 | 1.060 |
+| historical | `Divine` | A14_kant | 4 to 8 deg, median 6 | 8 | 16 | 0.140 |
 | historical | `Anarch` | A03_neuro | 90 to 90 deg, median 90 | >90 | >90 | 1.414 |
 | historical | `Anarch` | A05_evolution | 90 to 90 deg, median 90 | >90 | >90 | 1.414 |
-| m256 | `solidarity` | A02_medical | 1 to 1 deg, median 1 | 1 | 1 | 0.017 |
-| m256 | `solidarity` | A04_climate | 1 to 1 deg, median 1 | 1 | 1 | 0.017 |
-| m256 | `the` | A03_neuro | 1 to 1 deg, median 1 | 1 | 1 | 0.017 |
-| m256 | `the` | A05_evolution | 1 to 1 deg, median 1 | 1 | 1 | 0.017 |
-| m256 | `.` | A01_physics | 1 to 1 deg, median 1 | 1 | 1 | 0.017 |
-| m256 | `.` | A06_epistemology | 1 to 1 deg, median 1 | 1 | 1 | 0.017 |
 
 ## The pre-stated expectations (issue #17)
 
-1. **Spread across directions within a state**: random-direction thresholds run 1 to 90 degrees overall, median 16. 7 of 64 random probes did not escape at any rung up to 90 degrees.
-2. **Named against random directions**: median threshold 1 degrees along the flip axis and the anomalous-cluster direction, against 16 along random ones. A lower named median would mean escape is easiest along structure the record already identified (F13, F14); parity means that connection is absent and is reported as absent.
-4. **The token proxy against the state test**: of 768 rungs, 284 (37%) are classified differently by the printed token than by the settled state. The first version of this experiment used the token, which sees one position of about ten and reports only which logit is largest; this figure is how much that proxy cost.
-3. **Across the band**: median threshold by level, m056 64 deg, historical 90 deg, m256 1 deg. The two outer levels sit near the band's edges and the historical pin sits mid-band, so smaller thresholds at the outer levels would mean the edges are basins growing shallow, and flat thresholds would mean the basins do not thin out but simply stop.
+1. **Spread across directions within a state**: random-direction thresholds run 1 to 90 degrees overall, median 90. 6 of 40 random probes did not escape at any rung up to 90 degrees.
+2. **Named against random directions**: median threshold 16 degrees along the flip axis and the anomalous-cluster direction, against 90 along random ones. A lower named median would mean escape is easiest along structure the record already identified (F13, F14); parity means that connection is absent and is reported as absent.
+4. **The token proxy against the state test**: of 480 rungs, 65 (14%) are classified differently by the printed token than by the settled state. The first version of this experiment used the token, which sees one position of about ten and reports only which logit is largest; this figure is how much that proxy cost.
+3. **Across the band**: median threshold by level, m056 64 deg, historical 90 deg. The two outer levels sit near the band's edges and the historical pin sits mid-band, so smaller thresholds at the outer levels would mean the edges are basins growing shallow, and flat thresholds would mean the basins do not thin out but simply stop.
 
 ## Reading
 

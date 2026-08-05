@@ -293,19 +293,42 @@ def rotate(state, direction, degrees):
     return rotated.reshape(state.shape)
 
 
-SAME_ATTRACTOR_COS = 0.999
-"""Cosine above which a settled state counts as the SAME attractor.
+SAME_ATTRACTOR_COS = 0.999   # kept only for the cutoff-sensitivity table
+ESCAPE_FACTOR = 10.0
+MEASURABLE_BASELINE = 0.999
+"""How an escape is decided, and which states can be asked at all.
 
-Applied at report time to stored cosines, so it can be varied without
-recomputing. A returning trajectory lands on the same fixed point, so its
-cosine should be 1 to numerical precision; 0.999 is about 2.6 degrees, loose
-enough to absorb convergence slack and far tighter than any real basin
-crossing."""
+A fixed cutoff cannot work here, and the data says so. The zero-perturbation
+control measures how exactly the loop returns an UNPERTURBED state, and that
+floor is not a constant: inside the band states come back at 0.99998 or
+better, while near the upper edge they come back at 0.989 and in one case
+0.762. A cutoff of 0.999 is a hundred times looser than the floor for the
+first group and TIGHTER than the floor for the second, so it reads every rung
+of those states as an escape no matter what was done to them.
+
+So escape is judged against each state's own floor: a rung escapes when it
+lands more than ESCAPE_FACTOR times further from the attractor than the
+unperturbed control does. And a state whose floor is worse than
+MEASURABLE_BASELINE is not asked at all, because at that point the apparatus
+cannot resolve a basin crossing from its own drift. Those states are named in
+the report rather than dropped silently.
+
+Note what the second group means beyond this experiment. The convergence gate
+asks only that consecutive passes be similar. Near the upper edge the loop is
+close to the identity map, so consecutive passes are similar whether or not
+anything has settled, and the gate stops being informative exactly there."""
 
 
-def threshold_of(rungs, cutoff=SAME_ATTRACTOR_COS):
-    """Smallest rung at which the run did not return to the attractor."""
-    out = [r["degrees"] for r in rungs if r["cos_mean"] < cutoff]
+def threshold_of(rungs, baseline=None, factor=ESCAPE_FACTOR, cutoff=None):
+    """Smallest rung that left the attractor, judged against its own floor.
+
+    Pass `cutoff` instead for the fixed-cutoff sensitivity table."""
+    if cutoff is not None:
+        out = [r["degrees"] for r in rungs if r["cos_mean"] < cutoff]
+        return min(out) if out else None
+    floor = max(1.0 - (baseline if baseline is not None else 1.0), 1e-6)
+    out = [r["degrees"] for r in rungs
+           if (1.0 - r["cos_mean"]) > factor * floor]
     return min(out) if out else None
 
 
@@ -475,6 +498,7 @@ def write_report():
     """Assemble the archive and regenerate the report."""
     states = sweep_states()
     results, missing, failed_control, no_control = [], [], [], []
+    unresolvable = []
     for level, mult, label, pid in states:
         key = f"{level}_{label}_{pid}"
         ckpt = CKPT_DIR / f"{key}.pt"
@@ -490,6 +514,10 @@ def write_report():
             no_control.append(key)
             continue
         ctrl = torch.load(ctrl_path, map_location="cpu", weights_only=True)
+        if ctrl.get("cos_mean", 1.0) < MEASURABLE_BASELINE:
+            unresolvable.append(
+                f"{key} (returns only to {ctrl['cos_mean']:.4f})")
+            continue
         if not ctrl["passed"]:
             failed_control.append(
                 f"{key} (settles {ctrl['home_token']!r}, "
@@ -551,7 +579,39 @@ def write_report():
     ]
     lines += ([f"- `{k}`" for k in failed_control] if failed_control
               else ["- none"])
-    lines.append("")
+    lines += [
+        "",
+        "### States the apparatus cannot resolve",
+        "",
+        "The control also measures HOW EXACTLY the loop returns an "
+        "unperturbed state, and that floor is not the same everywhere. "
+        "Inside the band a state comes back to five or six decimal places. "
+        "Near the upper edge it does not. Where the floor is worse than "
+        f"{MEASURABLE_BASELINE}, a basin crossing cannot be told apart from "
+        "the loop's own drift, so those states are excluded and named here "
+        "rather than given a number that would only reflect the apparatus:",
+        "",
+    ]
+    lines += ([f"- `{k}`" for k in unresolvable] if unresolvable
+              else ["- none"])
+    lines += [
+        "",
+        "**This is a result, not only a nuisance.** The convergence gate "
+        "asks only that consecutive passes be similar. Approaching the "
+        "upper edge the loop tends toward the identity map, so consecutive "
+        "passes are similar whether or not anything has settled, and the "
+        "gate stops being informative exactly there. A state can pass it "
+        "while still drifting. Any claim that trials lock in at high "
+        "injection should be read with that in mind.",
+        "",
+        "Escape elsewhere is judged against each state's own floor: a rung "
+        f"escapes when it lands more than {ESCAPE_FACTOR:g} times further "
+        "from the attractor than the unperturbed control does. A single "
+        "fixed cutoff cannot serve both groups, since 0.999 is a hundred "
+        "times looser than the floor for one and tighter than the floor "
+        "for the other.",
+        "",
+    ]
     if failed_control:
         lines += [
             "A failing control is itself informative: the state sits close "
@@ -577,7 +637,7 @@ def write_report():
         "|--:|--:|--:|--:|",
     ]
     for cut in (0.9999, 0.999, 0.99, 0.9):
-        th = [threshold_of(v["rungs"], cut) for r in results
+        th = [threshold_of(v["rungs"], cutoff=cut) for r in results
               for v in r["directions"].values()]
         got = [t for t in th if t is not None]
         med = f"{statistics.median(got):.0f} deg" if got else "n/a"
@@ -604,10 +664,11 @@ def write_report():
         "| level | basin | prompt | random directions | flip axis "
         "| glitch direction | median displacement |", "|:--|:--|:--|:--|--:|--:|--:|"]
     for r in results:
-        rand = [threshold_of(v["rungs"]) for k, v in r["directions"].items()
-                if k.startswith("random")]
-        fa = threshold_of(r["directions"]["flip_axis"]["rungs"])
-        gl = threshold_of(r["directions"]["glitch"]["rungs"])
+        base = r["control"]["cos_mean"]
+        rand = [threshold_of(v["rungs"], base)
+                for k, v in r["directions"].items() if k.startswith("random")]
+        fa = threshold_of(r["directions"]["flip_axis"]["rungs"], base)
+        gl = threshold_of(r["directions"]["glitch"]["rungs"], base)
         got = [v for v in [*rand, fa, gl] if v is not None]
         disp = (f"{2 * math.sin(math.radians(statistics.median(got)) / 2):.3f}"
                 if got else "n/a")
@@ -617,10 +678,11 @@ def write_report():
             f"{gl if gl is not None else '>90'} | {disp} |")
 
     lines += ["", "## The pre-stated expectations (issue #17)", ""]
-    all_rand = [threshold_of(v["rungs"]) for r in results
+    all_rand = [threshold_of(v["rungs"], r["control"]["cos_mean"])
+                for r in results
                 for k, v in r["directions"].items() if k.startswith("random")]
-    named_th = [threshold_of(v["rungs"]) for r in results
-                for k, v in r["directions"].items()
+    named_th = [threshold_of(v["rungs"], r["control"]["cos_mean"])
+                for r in results for k, v in r["directions"].items()
                 if k in ("flip_axis", "glitch")]
     # How often the token proxy would have disagreed with the state test.
     disagree = sum(1 for r in results for v in r["directions"].values()
@@ -656,7 +718,7 @@ def write_report():
     per_level = {}
     for r in results:
         for v in r["directions"].values():
-            t = threshold_of(v["rungs"])
+            t = threshold_of(v["rungs"], r["control"]["cos_mean"])
             if t is not None:
                 per_level.setdefault(r["level"], []).append(t)
     if per_level:
