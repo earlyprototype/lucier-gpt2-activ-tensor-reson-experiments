@@ -238,5 +238,5 @@ is the largest CANCELLING contributor, not the least active one.
 Direct contributions only; no ablation, so no causal claim about
 any component. The turn is measured on the mean vector across
 positions, matching run 18's instrument. Five levels and ten
-prompts is a probe, not a sweep. Interpretation lands in issue
-#119 and the findings record, not here.
+prompts is a probe, not a sweep. Interpretation lands in issue #119
+and the findings record, not here.

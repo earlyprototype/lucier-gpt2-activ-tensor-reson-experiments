@@ -87,9 +87,9 @@ TURN_FLOOR_REL = 1e-3
 
 def component_labels(model):
     """156 component labels + the attention-bias bucket, in share order."""
-    labels = [f"L{l}.H{h}" for l in range(LAYER_START, LAYER_END + 1)
+    labels = [f"L{layer}.H{h}" for layer in range(LAYER_START, LAYER_END + 1)
               for h in range(model.cfg.n_heads)]
-    labels += [f"L{l}.MLP" for l in range(LAYER_START, LAYER_END + 1)]
+    labels += [f"L{layer}.MLP" for layer in range(LAYER_START, LAYER_END + 1)]
     labels.append("attn-bias")
     return labels
 
@@ -97,9 +97,9 @@ def component_labels(model):
 def probe_hook_names(model):
     """Per-head result and per-block MLP write hooks for the window."""
     names = []
-    for l in range(LAYER_START, LAYER_END + 1):
-        names.append(f"blocks.{l}.attn.hook_result")
-        names.append(f"blocks.{l}.hook_mlp_out")
+    for layer in range(LAYER_START, LAYER_END + 1):
+        names.append(f"blocks.{layer}.attn.hook_result")
+        names.append(f"blocks.{layer}.hook_mlp_out")
     return names
 
 
@@ -126,12 +126,12 @@ class TurnProbe:
             (LAYER_END - LAYER_START + 1) * (self.model.cfg.n_heads + 1) + 1,
             dtype=torch.float64)
         k = 0
-        for l in range(LAYER_START, LAYER_END + 1):
-            res = cache[f"blocks.{l}.attn.hook_result"][0].to(torch.float64).mean(0)
+        for layer in range(LAYER_START, LAYER_END + 1):
+            res = cache[f"blocks.{layer}.attn.hook_result"][0].to(torch.float64).mean(0)
             shares[k:k + self.model.cfg.n_heads] = res @ t_hat
             k += self.model.cfg.n_heads
-        for l in range(LAYER_START, LAYER_END + 1):
-            mlp = cache[f"blocks.{l}.hook_mlp_out"][0].to(torch.float64).mean(0)
+        for layer in range(LAYER_START, LAYER_END + 1):
+            mlp = cache[f"blocks.{layer}.hook_mlp_out"][0].to(torch.float64).mean(0)
             shares[k] = mlp @ t_hat
             k += 1
         shares[k] = self._bias @ t_hat
@@ -388,8 +388,8 @@ def write_report(config, results):
         "Direct contributions only; no ablation, so no causal claim about",
         "any component. The turn is measured on the mean vector across",
         "positions, matching run 18's instrument. Five levels and ten",
-        "prompts is a probe, not a sweep. Interpretation lands in issue",
-        "#119 and the findings record, not here.",
+        "prompts is a probe, not a sweep. Interpretation lands in issue #119",
+        "and the findings record, not here.",
     ]
     with open(OUT_DIR / "turn_report.md", "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
