@@ -87,3 +87,6 @@ experiments/nu_sweep/output/checkpoints/
 # 2026-08-02: local GPT-2 weights downloaded from the legacy S3 mirror for
 # offline loading (ATR_GPT2_LOCAL). Ephemeral, rebuilt per container.
 gpt2_local/
+
+# 2026-08-05: plate build byproducts
+docs/plates/__pycache__/
