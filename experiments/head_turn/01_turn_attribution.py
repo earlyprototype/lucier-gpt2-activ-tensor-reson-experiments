@@ -266,7 +266,9 @@ def _aggregate(rows_by_trial, n_components):
     """Mean share fraction per component, mean top-k concentrations, and the
     number of passes skipped for a near-zero turn."""
     frac_sum = torch.zeros(n_components, dtype=torch.float64)
+    abs_frac_sum = torch.zeros(n_components, dtype=torch.float64)
     top_counts = {1: [], 5: [], 20: []}
+    cancel = []
     used = skipped = 0
     for rows in rows_by_trial:
         for row in rows:
@@ -275,6 +277,8 @@ def _aggregate(rows_by_trial, n_components):
                 continue
             frac = row["shares"] / row["turn"]
             frac_sum += frac
+            abs_frac_sum += frac.abs()
+            cancel.append(frac.abs().sum().item())
             used += 1
             ranked = torch.sort(frac, descending=True).values
             for k in top_counts:
@@ -283,7 +287,9 @@ def _aggregate(rows_by_trial, n_components):
         return None
     return {
         "mean_frac": frac_sum / used,
+        "mean_abs_frac": abs_frac_sum / used,
         "top": {k: sum(v) / len(v) for k, v in top_counts.items()},
+        "cancel": sum(cancel) / len(cancel),
         "used": used, "skipped": skipped,
     }
 
@@ -300,6 +306,16 @@ def write_report(config, results):
         "A component's share fraction is its signed share divided by that",
         "pass's total turn, so fractions sum to 1 per pass; the closure",
         "assert held on every instrumented pass.",
+        "",
+        "How to read the two windows. In passes 1-20 the state is moving and",
+        "the net turn is of the same order as the individual writes, so a",
+        "share fraction reads as ordinary dominance. In the 20 passes around",
+        "lock-in the net turn is a small residual of large writes that nearly",
+        "cancel, so fractions there are amplified by the shrinking",
+        "denominator: the cancellation ratio line (the sum of every",
+        "component's absolute share, over the net turn) states that",
+        "amplification directly, and a component ranked last by signed share",
+        "is the largest CANCELLING contributor, not the least active one.",
         "",
     ]
     top10_by_key = {}
@@ -319,16 +335,24 @@ def write_report(config, results):
             top10_by_key[(level, window)] = [t for t, _ in top10]
             l11h8_rank = next(i for i, idx in enumerate(order.tolist())
                               if labels[idx] == "L11.H8") + 1
+            abs_order = torch.argsort(agg["mean_abs_frac"], descending=True)
+            top_abs = ", ".join(
+                f"`{labels[i]}` {agg['mean_abs_frac'][i].item():.1%}"
+                for i in abs_order[:3].tolist())
             lines += [
                 f"## {level}, {name}",
                 "",
                 f"- Passes used {agg['used']}, skipped for near-zero turn "
                 f"{agg['skipped']}.",
+                f"- Mean cancellation ratio: {agg['cancel']:.1f} "
+                "(1.0 would mean no cancellation at all).",
                 f"- Mean concentration of the total turn: top 1 component "
                 f"{agg['top'][1]:.1%}, top 5 {agg['top'][5]:.1%}, "
                 f"top 20 {agg['top'][20]:.1%}.",
-                f"- L11.H8's rank by mean share fraction: {l11h8_rank} "
-                f"of {len(labels)}.",
+                f"- Largest components by mean absolute share: {top_abs}.",
+                f"- L11.H8's rank by mean SIGNED share fraction: {l11h8_rank} "
+                f"of {len(labels)} (last place means largest cancelling "
+                "contributor).",
                 "",
                 "| rank | component | mean share of the turn |",
                 "|--:|:--|--:|",

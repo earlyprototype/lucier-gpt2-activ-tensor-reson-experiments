@@ -87,3 +87,9 @@ experiments/nu_sweep/output/checkpoints/
 # 2026-08-02: local GPT-2 weights downloaded from the legacy S3 mirror for
 # offline loading (ATR_GPT2_LOCAL). Ephemeral, rebuilt per container.
 gpt2_local/
+
+# 2026-08-06: turn attribution (#119). Same rule: per-pass share archives and
+# the fresh stage-C gated runs are the probe's evidence and must survive the
+# container.
+!experiments/head_turn/output/turn_results.pt
+!experiments/head_turn/output/plain_gated_results.pt
