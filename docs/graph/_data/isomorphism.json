@@ -409,8 +409,7 @@
       "description": "As first recorded: pure noise seemed to converge into eighteen non-semantic attractors with no overlap with the five, so the basins looked like properties of the model as driven by language. Inverted 2026-07-31 (run 17): that noise arm was mis-calibrated and counted before convergence; at matched injection scale and gated convergence, noise falls into the language arm's own basins, all five reappearing at the trials' smallest passing lag. At the tested scale the basins belong to the weights; other scales await the nu-sweep.",
       "evidence": [
         "run-03-random-baseline",
-        "run-17-matched-nu-noise",
-        "run-18-nu-sweep"
+        "run-17-matched-nu-noise"
       ]
     },
     {
@@ -477,15 +476,6 @@
       "script": "experiments/noise_rerun/01_matched_nu_noise_baseline.py",
       "output_dir": "experiments/noise_rerun/output/",
       "n": "125 Gaussian tensors, pair-matched, seed 42"
-    },
-    {
-      "id": "run-18-nu-sweep",
-      "label": "Run 18: the nu-sweep (2026-08-02)",
-      "type": "run",
-      "description": "The injection-scale scan (registered issues #113/#116): the pin nu swept over twenty-one levels, expressed as multipliers of each prompt's natural entry norm, plus the exact historical pin and a shared-pin control. Stage A mapped ten levels on 25 prompts (250 trials); Stage B and the Part 2 brackets ran every crossing endpoint on all 125 prompts (500 trials each grid); Stage C added ten fine levels and the shared-pin control (375 trials). The five-basin landscape is a band, with both edges bracketed at full width: 39/125 in the five at 48x and 125/125 at 56x, so the lower edge lies inside (48x, 56x); 84/125 at 256x and 47/125 at 384x, so the upper edge lies inside (256x, 384x). Below the band: a periodic shelf at 40x (33/125 lock, 92 pass only at lag 2) and then strata (arbit at 2-4x, the horizontal bar at 6-8x and 16-24x, vertex at 12x, fragmentation at 32x) whose lowest members point into the anomalous-token cluster. The two edges are governed by different quantities: the lower tracks the per-pass directional turn, the upper the per-pass magnitude gain (FINDINGS caveat 19, resolved).",
-      "script": "experiments/nu_sweep/01_stage_a.py",
-      "output_dir": "experiments/nu_sweep/output/",
-      "n": "1,425 distinct trials across Stages A, B and C, gated, F15-classified"
     },
     {
       "id": "run-08-divine-motion",
@@ -750,7 +740,7 @@
       "from": "ac-resonant-frequency",
       "to": "concept-regime-dependence",
       "type": "breaks-down-at",
-      "description": "Excite a room with anything broadband and the same modes rise: they are a property of the space. The five basins first seemed to fail that test (noise appeared to raise eighteen different, non-semantic attractors), but the corrected matched-nu control (run 17, 2026-07-31) reverses it: noise raises the language arm's own five basins, so at the tested injection scale the analogy passes and the basins do belong to the room. The edge is kept as the record of the correction; the nu-sweep (run 18, 2026-08-02) then answered the scale question: the analogy passes only inside a measured band of injection scales, roughly 50x to 300x the natural entry scale with both edges bracketed at full width, and below the band the room resolves different words entirely (FINDINGS caveat 19).",
+      "description": "Excite a room with anything broadband and the same modes rise: they are a property of the space. The five basins first seemed to fail that test (noise appeared to raise eighteen different, non-semantic attractors), but the corrected matched-nu control (run 17, 2026-07-31) reverses it: noise raises the language arm's own five basins, so at the tested injection scale the analogy passes and the basins do belong to the room. The edge is kept as the record of the correction; whether the analogy holds at other injection scales is the nu-sweep's question.",
       "weight": 9
     },
     {
@@ -765,13 +755,6 @@
       "to": "run-17-matched-nu-noise",
       "type": "evidenced-by",
       "description": "The current evidence for the corrected reading: pair-matched, convergence-gated noise lands in the language arm's own basins (all five at each trial's smallest passing lag, 97/125 trials), so at the tested injection scale the basins belong to the weights (FINDINGS F4).",
-      "weight": 9
-    },
-    {
-      "from": "concept-regime-dependence",
-      "to": "run-18-nu-sweep",
-      "type": "evidenced-by",
-      "description": "The scale dimension of regime dependence, measured: the five-basin landscape holds in a band roughly 50x to 300x the natural entry scale, with both edges bracketed at all 125 prompts (39/125 to 125/125 across the lower edge, 84/125 to 47/125 across the upper). Below the band the iterated map resolves a periodic shelf and then stratified non-basin attractors, the lowest pointing into the anomalous-token cluster. The two edges are governed by different quantities, the lower by the per-pass directional turn and the upper by the per-pass magnitude gain (FINDINGS caveat 19, resolved).",
       "weight": 9
     },
     {

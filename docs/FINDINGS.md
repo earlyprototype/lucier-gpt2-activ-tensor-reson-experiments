@@ -982,68 +982,6 @@ head suppresses in contexts not sampled here. Record: `suppression_report.md`.
     "at the registered injection scale". Records and regenerating scripts:
     `experiments/renorm_probe/`.
 
-    **Resolved to a measured band with both edges bracketed at full sweep
-    width (2026-08-02, run 18, the ν-sweep; registered before execution in
-    issues #113 and #116; wording ruled by the operator in session).** The
-    five-basin landscape holds between roughly 50× and roughly 300× the
-    model's natural entry scale. Both edges are bracketed at all 125
-    prompts, classified at each trial's smallest passing lag (F15): the
-    lower edge lies inside (48×, 56×), where the share in the five goes
-    from 39/125 to 125/125; the upper edge lies inside (256×, 384×), where
-    it goes from 84/125 to 47/125. Immediately below the lower edge the
-    loop does not settle at all: at 40× only 33/125 lock and 92 pass only
-    at lag 2, so that stratum is predominantly periodic. Below that the
-    landscape reorganises into distinct strata (`arbit` at 2-4×, the
-    horizontal bar at 6-8× and again at 16-24×, `vertex` at 12×,
-    fragmentation into 14 labels at 32×, `relat`/`Rousse` at 40-48×), the
-    lowest of which point into the anomalous-token cluster (archive-only
-    check with F13's instruments and matched nulls: at 4× the top-50
-    vocabulary alignment fraction is 0.90 against the geometric cluster,
-    chance 0.005, and 0.18 against the curated family, chance 0.001; the
-    band itself anti-aligns, cosine -0.45 to -0.54 against a null of
-    0.00). Above the band the dissolution is gradual, not an edge, ending
-    in function tokens (`the` dominant from 384× out to 1024×). The
-    historical pin sits inside the band at roughly 70×, and the old noise
-    arm's mis-calibrated norm (397) sits inside the horizontal-bar
-    stratum, which is consistent with that run's dominant bar basin having
-    been a genuine basin of its stratum.
-
-    **The two edges are governed by different quantities (same run;
-    archive-only re-analysis on the operator's objection that a magnitude
-    ratio cannot describe a directional system).** Measuring each prompt's
-    own transition point and comparing cross-prompt scatter in the two
-    measured coordinates: the lower edge tracks how far the state's
-    direction rotates per pass (coefficient of variation 0.082 in degrees
-    against 0.123 in magnitude gain, mean 70.8°), while the upper edge
-    tracks magnitude gain (0.091 against 0.510 in degrees, mean 1.206×).
-    In magnitude coordinates the sweep is one smooth decline from 54× to
-    1.01× and both edges look like the same event; in angular coordinates
-    the per-pass turn RISES through the strata and the lower edge (42° at
-    8×, 64° at 32×, 80° at 56×), peaks INSIDE the band at 83.4° at the
-    historical pin, then collapses above it (9° at 256×). Below the band
-    the loop is not failing to move; it is moving as much as it ever does.
-    Stated limit: this cosine is computed on the mean vector across
-    positions, one summary arrow per pass, and does not decompose the turn
-    across the 144 heads and 12 MLP blocks that produce it.
-
-    **The split inside the band is content-borne (shared-pin control).**
-    Pinning all 125 prompts to one identical value (1393.70, the median
-    library exit norm) does not collapse the multi-basin split but widens
-    it to six labels (`Divine` 52, `prolet` 41, `Anarch` 17, `solidarity`
-    11, `till` 3, `Rousse` 1) with 99 percent in the five, so the split
-    near 70× is carried by prompt content, not by the per-prompt pin value
-    the historical protocol used.
-
-    Every basin-identity claim's qualifier tightens from "at the
-    registered injection scale" to "within the measured band, roughly 50×
-    to 300× natural entry scale". Open: the per-head decomposition of the
-    turn, and the measured depth of the basins (#17, never run). A
-    methodological note the sweep earned twice: of three soft boundaries
-    tested at both widths, two moved materially between 25 and 125 prompts
-    (256× from 44 to 67 percent, 48× from 56 to 31 percent), so
-    quarter-width sampling near a boundary is not load-bearing. Records
-    and regenerating scripts: `experiments/nu_sweep/`.
-
 ## 5. What ATR is, after this series
 
 A cheap, training-free probe of the stable states of a model's iterated forward map
