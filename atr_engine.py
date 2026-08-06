@@ -291,7 +291,8 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
                   threshold=0.999, patience=3, check_every=10, check_start=100,
                   verbose=False, gate_lag=1, capture_terminal=False,
                   inject_hook_name=None, renorm="seed_j", prepend_bos=None,
-                  seed_tensor=None, record_metrics=False):
+                  seed_tensor=None, record_metrics=False,
+                  pass_probe=None, probe_names=None):
     """Convergence-gated ATR loop (early-stop variant of run_atr_loop).
 
     Iterates the full-tensor re-injection until the tensor stops moving, then
@@ -348,6 +349,17 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
     dynamically comparable, which the original notebook's inline loop got wrong
     by ~1/sqrt(pos). Requires ``renorm="seed_j"`` (a natural_i noise arm has no
     defined natural norm without a content prompt).
+
+    ``pass_probe`` (default None; issue #119's turn attribution) is a callable
+    invoked after every re-injection pass as
+    ``pass_probe(i, inject_tensor, current_tensor, cache)``, where ``i`` is
+    the iteration, ``inject_tensor`` the rescaled tensor that was injected,
+    ``current_tensor`` the tensor read back at the extraction layer, and
+    ``cache`` the pass's activation cache. ``probe_names`` (default None) is
+    an iterable of extra hook names to include in that cache; without it the
+    cache holds only the extraction-layer read. The probe's return value is
+    ignored and the engine stores nothing for it: the caller owns all storage,
+    so per-component write tensors never accumulate in the return dict.
 
     ``record_metrics`` (default False) records per-iteration scalars, appended
     to the return dict as ``metrics``: a list of
@@ -433,6 +445,8 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
         else:
             target_norm = initial_norm
     metrics = [] if record_metrics else None
+    loop_cache_names = {hook_point_read} | (
+        set(probe_names) if probe_names else set())
     # Oldest-first buffer of the last gate_lag mean vectors: entry 0 is the
     # iterate gate_lag steps back once i >= gate_lag.
     mean_history = [current_tensor.mean(dim=0).clone()]
@@ -458,12 +472,15 @@ def run_atr_gated(model, prompt, layer_start, layer_end, max_iter=1000,
         try:
             with torch.no_grad():
                 _, cache = model.run_with_cache(
-                    prompt, names_filter=lambda n: n == hook_point_read, **bos_kwargs
+                    prompt, names_filter=lambda n: n in loop_cache_names,
+                    **bos_kwargs
                 )
         finally:
             model.reset_hooks()
 
         current_tensor = cache[hook_point_read][0].clone()
+        if pass_probe is not None:
+            pass_probe(i, inject_tensor, current_tensor, cache)
         mean_vec = current_tensor.mean(dim=0).clone()
         if record_metrics:
             t64 = current_tensor.to(torch.float64)
