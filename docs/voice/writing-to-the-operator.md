@@ -1,8 +1,8 @@
 # Writing to the operator
 
 Voice prompt received 2026-07-31. Saved verbatim as this project's standing
-guide for how to write to the operator, matching the copy kept in the
-ATR_plasticity repository (docs/voice/writing-to-the-operator.md). It
+guide for how to write to the operator, at the same path as the copy kept in
+the ATR_plasticity repository (docs/voice/writing-to-the-operator.md). It
 supersedes the older working agreements in
 docs/sessions/SESSION_03_HANDOVER.md where the two differ, most notably on
 the founding analogy: the room and its echo may be used where they genuinely
