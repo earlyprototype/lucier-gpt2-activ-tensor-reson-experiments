@@ -1,5 +1,11 @@
 # Activation Tensor Resonance (ATR)
 
+<p align="center">
+  <img src="docs/assets/plates/atr_form.gif" width="260" alt="A sentence's internal state in GPT-2 Small, read as a three-dimensional surface, deforming as the loop feeds it back through the model"/>
+</p>
+
+<p align="center"><em>One sentence inside GPT-2 Small, its internal state read as a surface, reshaped by each pass of the loop.</em></p>
+
 ### *What remains of a language model's voice when you play it back into itself until the words are gone*
 
 > **Status:** Complete as an experimental series (Stages 0–5, five models, null-model control). The full quantitative record lives in [FINDINGS.md](docs/FINDINGS.md)
@@ -13,6 +19,36 @@ NOTE: What started as a moment of curiosity turned up a rather unexpected result
 </p>
 
 <p align="center"><em>GPT-2 Small: 125 prompts × cosine similarity after iteration. The block structure is five attractor basins.</em></p>
+
+---
+
+## Data is Beautiful
+
+*Three visual works drawn entirely from this project's committed archives. Nothing here runs the model: each piece rebuilds deterministically from data already in the repository (`python3 docs/plates/build_plates.py`). The interactive pages live in [`docs/plates/`](docs/plates/), with sources, corrections and limits logged in [the plates README](docs/plates/README.md).*
+
+### The form: five sentences becoming one shape
+
+<p align="center">
+  <img src="docs/assets/plates/bodies_frieze.png" alt="Five sentences rendered as five deforming three-dimensional bodies, converging toward one shape in GPT-2 Small" width="800"/>
+</p>
+
+Five unrelated sentences, each fed back through GPT-2 Small sixty times, drawn as five three-dimensional bodies. Each surface is a fixed linear reading of the sentence's internal state, so the same numbers always push the same places: two bodies look alike exactly when the states are alike, and by the final passes the five have arrived at essentially one form (mean separation falls from 0.043 to 0.0002 on a 0-to-2 scale). Its value in this form is that convergence stops being a statistic and becomes something you can watch happen. Interactive version with all four models: [`iv_bodies.html`](docs/plates/iv_bodies.html).
+
+### The spectral portraits: 144 attention heads as specimens
+
+<p align="center">
+  <img src="docs/assets/plates/head_spectra_grid.png" alt="All 144 attention heads of GPT-2 Small drawn as specimen outlines from their singular spectra, arranged 12 layers by 12 heads" width="700"/>
+</p>
+
+Every attention head in GPT-2 Small, all 144 of them arranged by layer and position, each outline drawn from that head's own singular spectrum: the set of numbers describing how strongly it stretches its input in each direction. Rendered in the style of a nineteenth-century botanical photogram plate (the process is digital; nothing here is an actual cyanotype). Its value in this form is immediacy: a table of 144 spectra is unreadable, but on the wall of specimens the one aberrant head is visible at a glance, the closed round form in the bottom row, and it is layer 11 head 8, the head the record had already flagged twice by other measurements. Interactive version: [`v_cyanotypes.html`](docs/plates/v_cyanotypes.html).
+
+### The dissolving maps: six ways of settling
+
+<p align="center">
+  <img src="docs/assets/plates/dissolving_river.png" alt="Alluvial flow of every word a run passes through on the way to settling, one strand per word, for GPT-2 Small" width="800"/>
+</p>
+
+Every word a run passes through on its way to settling, drawn as a braided flow: time runs left to right, one strand per word, and a strand's thickness is how many prompts are still saying that word. Six runs share the page, five models plus a pure-noise control, built from the committed dissolution graph with no projection at all, so nothing in the picture is distorted. Its value in this form is that it shows *how* the narrowing happens rather than only where it ends: GPT-2 Small braids down to five words, GPT-2 Medium funnels 52 words to one, Pythia-410M never consolidates, and the noise control also collapses, which is why collapse alone proves nothing semantic. Interactive version: [`vi_river.html`](docs/plates/vi_river.html).
 
 ---
 
