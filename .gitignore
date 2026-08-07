@@ -90,3 +90,9 @@ gpt2_local/
 
 # 2026-08-05: plate build byproducts
 docs/plates/__pycache__/
+
+# 2026-08-06: turn attribution (#119). Same rule: per-pass share archives and
+# the fresh stage-C gated runs are the probe's evidence and must survive the
+# container.
+!experiments/head_turn/output/turn_results.pt
+!experiments/head_turn/output/plain_gated_results.pt
