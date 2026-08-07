@@ -1,0 +1,523 @@
+<title>Three Plates from a Room Made of Weights</title>
+<style>
+:root{
+  --ground:#0B0D10; --ground2:#0E1116; --rule:#20262E;
+  --ink:#C9D0D8; --ink-dim:#7C8794; --ink-faint:#4A535E;
+  --sodium:#FFB35C; --mercury:#9FD8D0; --neon:#FF6B4A;
+  --argon:#8AA8E8; --xenon:#DDE6F0; --dark-matter:#333B45;
+  --blend:lighter; --trace-alpha:0.85; --paper-grain:0;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme: light){
+  :root{
+    --ground:#E9EBEE; --ground2:#E1E4E9; --rule:#C2C8D0;
+    --ink:#14181E; --ink-dim:#4E5761; --ink-faint:#8A929C;
+    --sodium:#A85E00; --mercury:#0E6E63; --neon:#B22F12;
+    --argon:#2A4C9B; --xenon:#5A6672; --dark-matter:#B9BFC7;
+    --blend:multiply; --trace-alpha:0.9; --paper-grain:1;
+  }
+}
+:root[data-theme="light"]{
+  --ground:#E9EBEE; --ground2:#E1E4E9; --rule:#C2C8D0;
+  --ink:#14181E; --ink-dim:#4E5761; --ink-faint:#8A929C;
+  --sodium:#A85E00; --mercury:#0E6E63; --neon:#B22F12;
+  --argon:#2A4C9B; --xenon:#5A6672; --dark-matter:#B9BFC7;
+  --blend:multiply; --trace-alpha:0.9; --paper-grain:1;
+}
+:root[data-theme="dark"]{
+  --ground:#0B0D10; --ground2:#0E1116; --rule:#20262E;
+  --ink:#C9D0D8; --ink-dim:#7C8794; --ink-faint:#4A535E;
+  --sodium:#FFB35C; --mercury:#9FD8D0; --neon:#FF6B4A;
+  --argon:#8AA8E8; --xenon:#DDE6F0; --dark-matter:#333B45;
+  --blend:lighter; --trace-alpha:0.85; --paper-grain:0;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--serif); font-size:17px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px; margin:0 auto; padding:0 28px 96px}
+
+/* ---- masthead ---- */
+.mast{padding:96px 0 56px; display:grid; gap:34px}
+.slug{
+  font-family:var(--mono); font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink-faint);
+  display:flex; gap:18px; flex-wrap:wrap;
+}
+h1{
+  font-family:var(--serif); font-weight:400; font-size:clamp(2.1rem,5.4vw,3.9rem);
+  line-height:1.06; margin:0; letter-spacing:-.018em; text-wrap:balance; max-width:19ch;
+}
+h1 em{font-style:italic; color:var(--sodium)}
+.statement{
+  max-width:62ch; font-size:1.06rem; color:var(--ink); margin:0;
+  display:grid; gap:1.05em;
+}
+.statement span{display:block; color:var(--ink-dim)}
+.statement span:first-child{color:var(--ink)}
+
+/* ---- plates ---- */
+.plate{
+  border-top:1px solid var(--rule); padding-top:26px; margin-top:80px;
+  display:grid; gap:22px;
+}
+.plate-head{display:flex; align-items:baseline; gap:20px; flex-wrap:wrap}
+.plate-no{
+  font-family:var(--mono); font-size:11px; letter-spacing:.18em;
+  color:var(--ink-faint); text-transform:uppercase; white-space:nowrap;
+}
+h2{
+  font-family:var(--serif); font-weight:400; font-size:clamp(1.4rem,2.9vw,2rem);
+  margin:0; letter-spacing:-.012em; text-wrap:balance;
+}
+.stage{
+  position:relative; background:var(--ground2);
+  border:1px solid var(--rule); overflow:hidden;
+}
+canvas{display:block; width:100%; height:auto; touch-action:none; cursor:grab}
+canvas:active{cursor:grabbing}
+canvas:focus-visible{outline:2px solid var(--sodium); outline-offset:-2px}
+.readout{
+  position:absolute; left:14px; bottom:12px; pointer-events:none;
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.06em;
+  color:var(--ink-faint); line-height:1.75;
+}
+.controls{
+  position:absolute; right:12px; top:12px; display:flex; gap:6px; flex-wrap:wrap;
+}
+button{
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+  background:transparent; color:var(--ink-dim); border:1px solid var(--rule);
+  padding:6px 11px; cursor:pointer; transition:color .15s,border-color .15s;
+}
+button:hover{color:var(--ink); border-color:var(--ink-faint)}
+button[aria-pressed="true"]{color:var(--ground); background:var(--ink); border-color:var(--ink)}
+button:focus-visible{outline:2px solid var(--sodium); outline-offset:2px}
+
+.caption{
+  display:grid; grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);
+  gap:34px; align-items:start;
+}
+.caption p{margin:0; max-width:60ch; color:var(--ink-dim)}
+.caption p strong{color:var(--ink); font-weight:400}
+.meta{
+  font-family:var(--mono); font-size:11px; line-height:2.0; color:var(--ink-faint);
+  border-left:1px solid var(--rule); padding-left:18px;
+}
+.meta b{color:var(--ink-dim); font-weight:400; font-variant-numeric:tabular-nums}
+.legend{display:flex; gap:16px; flex-wrap:wrap; font-family:var(--mono); font-size:11px;
+  letter-spacing:.05em; color:var(--ink-faint)}
+.legend i{display:inline-block; width:9px; height:9px; margin-right:6px; font-style:normal;
+  border-radius:50%; vertical-align:baseline}
+
+/* ---- colophon ---- */
+.colophon{
+  border-top:1px solid var(--rule); margin-top:88px; padding-top:26px;
+  display:grid; grid-template-columns:minmax(0,1.55fr) minmax(0,1fr); gap:34px;
+}
+.colophon h3{
+  font-family:var(--mono); font-size:11px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--ink-faint); font-weight:400; margin:0 0 14px;
+}
+.colophon p{margin:0 0 1em; max-width:60ch; color:var(--ink-dim)}
+.colophon .meta p{max-width:none; margin:0}
+
+@media (max-width:760px){
+  .caption,.colophon{grid-template-columns:1fr; gap:22px}
+  .meta{border-left:0; border-top:1px solid var(--rule); padding-left:0; padding-top:14px}
+  .mast{padding:64px 0 40px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important; transition-duration:.001ms !important}
+}
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <div class="slug">
+      <span>GPT-2 Small</span><span>1,425 runs</span><span>21 injection levels</span>
+      <span>4 architectures</span>
+    </div>
+    <h1>Three plates from a room made of <em>weights</em></h1>
+    <div class="statement">
+      <span>I am feeding a sentence into a language model and stopping it halfway,
+        before it has said anything. What I take out is not a word but a state: some
+        seven thousand numbers, the shape the sentence has made inside the machine.</span>
+      <span>I set that state to a chosen loudness and feed it back in as though it were
+        the sentence. Then again. Then again, some hundreds of times.</span>
+      <span>What the sentence said stops mattering rather quickly. What survives is
+        whatever the room resonates at. These are pictures of the room.</span>
+    </div>
+  </header>
+
+  <section class="plate">
+    <div class="plate-head">
+      <span class="plate-no">Plate I</span>
+      <h2>Where every run ended</h2>
+    </div>
+    <div class="stage">
+      <canvas id="c1" tabindex="0" aria-label="Rotating three-dimensional point cloud of 1,425 settled states, coloured by the word each one resolved to."></canvas>
+      <div class="controls">
+        <button id="b1a" aria-pressed="true">By word</button>
+        <button id="b1b" aria-pressed="false">By loudness</button>
+      </div>
+      <div class="readout" id="r1"></div>
+    </div>
+    <div class="legend" id="leg1"></div>
+    <div class="caption">
+      <p>Every one of the 1,425 runs, each a single point placed where it came to rest.
+        Five of these resting places are lit. <strong>Those five are the whole finding:
+        across hundreds of unrelated prompts, at the right loudness, the loop lands on one
+        of five words and no others.</strong> Everything unlit ended somewhere outside that
+        set, and there are a great many of those. Turn the loudness colouring on and the
+        cloud reorganises: the lit five occupy a band in the middle, with the failures
+        stacked below and above it.</p>
+      <div class="meta">
+        <p><b>1,425</b> runs<br>
+        <b>768</b> dimensions reduced to 3<br>
+        <b>94.7%</b> of variance retained<br>
+        <b>21</b> injection levels<br>
+        <b>125</b> prompts at the widest<br>
+        drag to turn the cloud</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="plate">
+    <div class="plate-head">
+      <span class="plate-no">Plate II</span>
+      <h2>Sixty passes, four architectures</h2>
+    </div>
+    <div class="stage">
+      <canvas id="c2" tabindex="0" aria-label="Animated three-dimensional traces showing states settling over sixty iterations, across four model architectures."></canvas>
+      <div class="controls" id="ctl2"></div>
+      <div class="readout" id="r2"></div>
+    </div>
+    <div class="caption">
+      <p>The settling itself, drawn one pass at a time. Each trace is one prompt; the
+        head of the trace is where the state is now. They begin scattered and end
+        arriving. <strong>This is the part that is genuinely like the tape piece: the
+        opening passes still carry the sentence, and by the end the trace has stopped
+        moving because nothing is left but the resonance.</strong> Four different models
+        are shown, two families and two sizes. They are not measured against each other
+        here, only put side by side.</p>
+      <div class="meta">
+        <p><b>61</b> consecutive passes<br>
+        <b>5</b> prompts per model<br>
+        <b>76-98%</b> variance retained<br>
+        per-model projection<br>
+        traces fade behind the head</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="plate">
+    <div class="plate-head">
+      <span class="plate-no">Plate III</span>
+      <h2>The band, as a curve</h2>
+    </div>
+    <div class="stage">
+      <canvas id="c3" tabindex="0" aria-label="Three-dimensional curve of the injection sweep, plotting loudness against growth and turn per pass."></canvas>
+      <div class="readout" id="r3"></div>
+    </div>
+    <div class="caption">
+      <p>The knob itself, all twenty-one settings, drawn as one continuous path. Left to
+        right is loudness. The two other axes are the only two things a pass can do to a
+        state: change its size, and change its direction. <strong>The path rises,
+        arcs over, and falls away, and the five-word band sits exactly on the crest.</strong>
+        Nodes swell where more of the runs landed in the five. Note the far end: the curve
+        flattens onto the floor, because at that loudness the loop has stopped doing
+        anything at all and simply hands back what it was given.</p>
+      <div class="meta">
+        <p><b>21</b> levels, 1x to 1024x<br>
+        <b>x</b> loudness, log scale<br>
+        <b>y</b> growth per pass<br>
+        <b>z</b> turn per pass, degrees<br>
+        node size, share in the five</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="colophon">
+    <div>
+      <h3>On what these pictures are not</h3>
+      <p>The states live in roughly seven thousand dimensions. Every plate here is a
+        shadow cast into three, chosen so that the shadow keeps as much of the motion as
+        possible. Plate I keeps 94.7 per cent of it, which is unusually generous and
+        means the clustering you see is close to real. Plate II keeps between 76 and 98
+        per cent depending on the model, so the Pythia 410M traces are the least
+        trustworthy of the four.</p>
+      <p>A shadow can still flatter. Two points that look adjacent may be far apart along
+        the discarded directions, and no rotation of these plates will reveal it. Nothing
+        here is evidence on its own; the numbers behind it are.</p>
+      <p>The five lit words are the ones the loop settles on inside the band. What sets
+        the edges of that band is an open question, and an earlier claim to have answered
+        it was withdrawn.</p>
+    </div>
+    <div class="meta">
+      <p>Drawn from committed run archives, no new computation.<br><br>
+      Plate I &mdash; nu-sweep terminal states<br>
+      Plate II &mdash; sink-geometry trajectories<br>
+      Plate III &mdash; angular profile<br><br>
+      Projection by principal components.<br>
+      Dark: phosphor, additive.<br>
+      Light: plotter ink on paper.<br><br>
+      After Alvin Lucier, <i>I Am Sitting<br>in a Room</i>, 1969.</p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const DATA = __DATA__;
+
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const BASIN = {prolet:"--sodium", solidarity:"--mercury", Divine:"--neon",
+               Anarch:"--argon", till:"--xenon"};
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- tiny 3d ---------- */
+function rot(p, ax, ay){
+  const [x,y,z] = p;
+  const cx=Math.cos(ax), sx=Math.sin(ax), cy=Math.cos(ay), sy=Math.sin(ay);
+  const x1 =  x*cy + z*sy,  z1 = -x*sy + z*cy;
+  const y1 =  y*cx - z1*sx, z2 =  y*sx + z1*cx;
+  return [x1, y1, z2];
+}
+function project(p, w, h, zoom){
+  const d = 3.4, s = d / (d - p[2]);
+  return [w/2 + p[0]*s*zoom, h/2 - p[1]*s*zoom, s];
+}
+function fit(cv, ratio){
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const w = cv.parentElement.clientWidth, h = Math.round(w * ratio);
+  cv.style.height = h + "px";
+  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  const g = cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0);
+  return [w, h, g];
+}
+function dragger(cv, st){
+  let on=false, px=0, py=0;
+  const down=e=>{on=true; px=e.clientX; py=e.clientY; cv.setPointerCapture(e.pointerId);};
+  const move=e=>{ if(!on) return;
+    st.ay += (e.clientX-px)*0.006; st.ax += (e.clientY-py)*0.006;
+    st.ax = Math.max(-1.3, Math.min(1.3, st.ax));
+    px=e.clientX; py=e.clientY; st.idle=0; };
+  const up=()=>{on=false;};
+  cv.addEventListener("pointerdown",down); cv.addEventListener("pointermove",move);
+  cv.addEventListener("pointerup",up); cv.addEventListener("pointercancel",up);
+  cv.addEventListener("keydown",e=>{
+    if(e.key==="ArrowLeft"){st.ay-=0.09; e.preventDefault();}
+    if(e.key==="ArrowRight"){st.ay+=0.09; e.preventDefault();}
+    if(e.key==="ArrowUp"){st.ax=Math.max(-1.3,st.ax-0.09); e.preventDefault();}
+    if(e.key==="ArrowDown"){st.ax=Math.min(1.3,st.ax+0.09); e.preventDefault();}
+  });
+}
+function visible(el, fn){
+  new IntersectionObserver(es=>es.forEach(e=>fn(e.isIntersecting)),{threshold:0.01}).observe(el);
+}
+function hexA(hex, a){
+  const h = hex.replace("#","");
+  const n = h.length===3 ? h.split("").map(c=>c+c).join("") : h;
+  const r=parseInt(n.slice(0,2),16), g=parseInt(n.slice(2,4),16), b=parseInt(n.slice(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+/* warm-to-cool ramp for the loudness colouring, sodium through xenon */
+function ramp(t){
+  const stops = [css("--neon"), css("--sodium"), css("--mercury"), css("--argon"), css("--xenon")];
+  const i = Math.min(stops.length-2, Math.floor(t*(stops.length-1)));
+  const f = t*(stops.length-1) - i;
+  const pa = stops[i].replace("#",""), pb = stops[i+1].replace("#","");
+  const mix = k => Math.round(parseInt(pa.substr(k,2),16)*(1-f) + parseInt(pb.substr(k,2),16)*f);
+  return `rgb(${mix(0)},${mix(2)},${mix(4)})`;
+}
+
+/* ================= PLATE I : the cloud ================= */
+(function(){
+  const cv=document.getElementById("c1"), out=document.getElementById("r1");
+  const C=DATA.cloud, st={ax:-0.24, ay:0.5, idle:1, mode:"word"};
+  const mults=C.mult.map(m=>Math.log10(m||1));
+  const lo=Math.min(...mults), hi=Math.max(...mults);
+  let W,H,g, live=true;
+  const size=()=>{[W,H,g]=fit(cv,0.60);};
+  size(); addEventListener("resize",size); dragger(cv,st); visible(cv,v=>live=v);
+
+  const leg=document.getElementById("leg1");
+  leg.innerHTML = Object.entries(BASIN).map(([k,v])=>
+    `<span><i style="background:${css(v)}"></i>${k}</span>`).join("")
+    + `<span><i style="background:${css("--dark-matter")}"></i>outside the five</span>`;
+
+  const b=[document.getElementById("b1a"), document.getElementById("b1b")];
+  b[0].onclick=()=>setMode("word"); b[1].onclick=()=>setMode("mult");
+  function setMode(m){ st.mode=m;
+    b[0].setAttribute("aria-pressed", m==="word"); b[1].setAttribute("aria-pressed", m==="mult");
+    leg.style.opacity = m==="word" ? "1" : "0.28";
+  }
+
+  const order=new Array(C.n);
+  function frame(){
+    requestAnimationFrame(frame);
+    if(!live) return;
+    if(!reduced && st.idle) st.ay += 0.0016;
+    g.clearRect(0,0,W,H);
+    g.fillStyle=css("--ground2"); g.fillRect(0,0,W,H);
+    const zoom = Math.min(W,H)*0.40;
+    for(let i=0;i<C.n;i++){
+      const p=rot(C.pts[i], st.ax, st.ay);
+      order[i]=[p[2], i, project(p,W,H,zoom)];
+    }
+    order.sort((a,b)=>a[0]-b[0]);
+    g.globalCompositeOperation = css("--blend");
+    let lit=0;
+    for(const [z,i,q] of order){
+      const key=BASIN[C.tok[i]];
+      const inFive = !!key;
+      if(inFive) lit++;
+      let col;
+      if(st.mode==="word") col = inFive ? css(key) : css("--dark-matter");
+      else col = ramp((mults[i]-lo)/(hi-lo));
+      const depth = (q[2]-0.72)/0.62;
+      const r = (inFive||st.mode==="mult" ? 1.85 : 1.15) * (0.62+depth*0.75);
+      const a = (inFive||st.mode==="mult" ? 0.80 : 0.42) * (0.42+depth*0.62);
+      g.fillStyle = hexA(col, Math.min(0.95,a));
+      g.beginPath(); g.arc(q[0], q[1], Math.max(0.6,r), 0, 6.2832); g.fill();
+    }
+    g.globalCompositeOperation="source-over";
+    out.textContent = st.mode==="word"
+      ? `1425 states  ·  ${lit} in the five  ·  ${C.n-lit} outside`
+      : `1425 states  ·  coloured 1x to 1024x  ·  warm = quiet, cool = loud`;
+  }
+  setMode("word"); frame();
+})();
+
+/* ================= PLATE II : settling ================= */
+(function(){
+  const cv=document.getElementById("c2"), out=document.getElementById("r2"), ctl=document.getElementById("ctl2");
+  const T=DATA.traj, models=Object.keys(T);
+  const st={ax:-0.2, ay:0.62, idle:1}; let cur=models[0], head=0, W,H,g, live=true;
+  const size=()=>{[W,H,g]=fit(cv,0.60);}; size(); addEventListener("resize",size);
+  dragger(cv,st); visible(cv,v=>live=v);
+
+  ctl.innerHTML = models.map((m,i)=>
+    `<button data-m="${m}" aria-pressed="${i===0}">${m}</button>`).join("");
+  ctl.querySelectorAll("button").forEach(btn=>btn.onclick=()=>{
+    cur=btn.dataset.m; head=0;
+    ctl.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed", b===btn));
+  });
+  const LAMP=[css("--sodium"),css("--mercury"),css("--neon"),css("--argon"),css("--xenon")];
+
+  function frame(){
+    requestAnimationFrame(frame);
+    if(!live) return;
+    const runs=T[cur].traj, N=runs[0].length;
+    if(!reduced){ head += 0.34; if(head>N+52) head=0; }
+    else head = N;
+    if(st.idle) st.ay += 0.0011;
+    g.clearRect(0,0,W,H); g.fillStyle=css("--ground2"); g.fillRect(0,0,W,H);
+    const zoom=Math.min(W,H)*0.40, hd=Math.min(N, Math.floor(head));
+    g.globalCompositeOperation=css("--blend");
+    g.lineCap="round"; g.lineJoin="round";
+    runs.forEach((run,ri)=>{
+      const col=LAMP[ri%LAMP.length];
+      for(let i=1;i<hd;i++){
+        const a=rot(run[i-1],st.ax,st.ay), b=rot(run[i],st.ax,st.ay);
+        const pa=project(a,W,H,zoom), pb=project(b,W,H,zoom);
+        const age=(i/Math.max(1,hd));
+        g.strokeStyle=hexA(col, (0.10+0.72*age*age)*parseFloat(css("--trace-alpha")));
+        g.lineWidth=0.5+1.5*age;
+        g.beginPath(); g.moveTo(pa[0],pa[1]); g.lineTo(pb[0],pb[1]); g.stroke();
+      }
+      if(hd>0){
+        const h=project(rot(run[hd-1],st.ax,st.ay),W,H,zoom);
+        g.fillStyle=hexA(col,0.95);
+        g.beginPath(); g.arc(h[0],h[1],2.6,0,6.2832); g.fill();
+        g.fillStyle=hexA(col,0.18);
+        g.beginPath(); g.arc(h[0],h[1],7.5,0,6.2832); g.fill();
+      }
+    });
+    g.globalCompositeOperation="source-over";
+    out.textContent = `${cur}  ·  ${T[cur].d_model}d, ${T[cur].n_layers} layers  ·  `
+      + `pass ${hd} of ${N-1}  ·  ${Math.round(T[cur].var*100)}% of variance shown`;
+  }
+  frame();
+})();
+
+/* ================= PLATE III : the band ================= */
+(function(){
+  const cv=document.getElementById("c3"), out=document.getElementById("r3");
+  const S=DATA.sweep, st={ax:-0.30, ay:0.66, idle:1};
+  let W,H,g, live=true;
+  const size=()=>{[W,H,g]=fit(cv,0.56);}; size(); addEventListener("resize",size);
+  dragger(cv,st); visible(cv,v=>live=v);
+
+  const lx=S.map(r=>Math.log10(r.multiplier)), gz=S.map(r=>r.gain), tz=S.map(r=>r.turn_mean_10);
+  const nm=(v,a,b)=>((v-a)/(b-a))*2-1;
+  const x0=Math.min(...lx),x1=Math.max(...lx);
+  const g0=Math.min(...gz),g1=Math.max(...gz);
+  const t0=Math.min(...tz),t1=Math.max(...tz);
+  const P=S.map((r,i)=>[nm(lx[i],x0,x1), nm(Math.log10(gz[i]),Math.log10(g0),Math.log10(g1)), nm(tz[i],t0,t1)]);
+
+  function frame(){
+    requestAnimationFrame(frame);
+    if(!live) return;
+    if(!reduced && st.idle) st.ay += 0.0013;
+    g.clearRect(0,0,W,H); g.fillStyle=css("--ground2"); g.fillRect(0,0,W,H);
+    const zoom=Math.min(W,H)*0.38;
+    /* floor grid, so the fall at the far end is legible */
+    g.strokeStyle=hexA(css("--rule"),0.9); g.lineWidth=1;
+    for(let i=0;i<=6;i++){
+      const u=-1+2*i/6;
+      const a=project(rot([u,-1,-1],st.ax,st.ay),W,H,zoom);
+      const b=project(rot([u,-1, 1],st.ax,st.ay),W,H,zoom);
+      const c=project(rot([-1,-1,u],st.ax,st.ay),W,H,zoom);
+      const d=project(rot([ 1,-1,u],st.ax,st.ay),W,H,zoom);
+      g.beginPath(); g.moveTo(a[0],a[1]); g.lineTo(b[0],b[1]); g.stroke();
+      g.beginPath(); g.moveTo(c[0],c[1]); g.lineTo(d[0],d[1]); g.stroke();
+    }
+    /* droplines */
+    g.globalCompositeOperation=css("--blend");
+    P.forEach((p,i)=>{
+      const a=project(rot(p,st.ax,st.ay),W,H,zoom);
+      const b=project(rot([p[0],-1,p[2]],st.ax,st.ay),W,H,zoom);
+      g.strokeStyle=hexA(css("--ink-faint"),0.34); g.lineWidth=1;
+      g.beginPath(); g.moveTo(a[0],a[1]); g.lineTo(b[0],b[1]); g.stroke();
+    });
+    /* the path */
+    g.lineWidth=2; g.lineCap="round";
+    for(let i=1;i<P.length;i++){
+      const a=project(rot(P[i-1],st.ax,st.ay),W,H,zoom);
+      const b=project(rot(P[i],  st.ax,st.ay),W,H,zoom);
+      const sh=(S[i-1].share_in_five+S[i].share_in_five)/2;
+      g.strokeStyle=hexA(sh>0.5?css("--sodium"):css("--ink-dim"), 0.35+0.6*sh);
+      g.beginPath(); g.moveTo(a[0],a[1]); g.lineTo(b[0],b[1]); g.stroke();
+    }
+    /* nodes */
+    P.forEach((p,i)=>{
+      const q=project(rot(p,st.ax,st.ay),W,H,zoom), sh=S[i].share_in_five;
+      const key=BASIN[S[i].dominant];
+      const col = sh>0.5 ? (key?css(key):css("--sodium")) : css("--ink-faint");
+      g.fillStyle=hexA(col, 0.42+0.55*sh);
+      g.beginPath(); g.arc(q[0],q[1], 1.9+5.4*sh, 0, 6.2832); g.fill();
+    });
+    g.globalCompositeOperation="source-over";
+    /* label the crest and the two ends */
+    g.font='10.5px ui-monospace,SFMono-Regular,Menlo,monospace';
+    g.fillStyle=css("--ink-faint");
+    [[0,"1x"],[P.length-1,"1024x"]].forEach(([i,txt])=>{
+      const q=project(rot(P[i],st.ax,st.ay),W,H,zoom);
+      g.fillText(txt, q[0]+8, q[1]+3);
+    });
+    let best=0; S.forEach((r,i)=>{ if(r.turn_mean_10>S[best].turn_mean_10) best=i; });
+    const qb=project(rot(P[best],st.ax,st.ay),W,H,zoom);
+    g.fillStyle=css("--sodium");
+    g.fillText(`crest ${S[best].turn_mean_10.toFixed(1)}deg`, qb[0]+9, qb[1]-6);
+    out.textContent = `21 levels  ·  x loudness  ·  y growth per pass  ·  z turn per pass  ·  lit where most runs land in the five`;
+  }
+  frame();
+})();
+</script>

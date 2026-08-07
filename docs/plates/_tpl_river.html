@@ -1,0 +1,235 @@
+<title>Six Ways of Dissolving</title>
+<style>
+:root{
+  --void:#06080B; --stage:#090C11; --rule:#1A222C;
+  --ink:#C6CFD9; --ink-dim:#7C8895; --ink-faint:#4A5460;
+  --r0:#FFB35C; --r1:#FF6B4A; --r2:#8AA8E8; --r3:#8FD6C9; --r4:#E4ECF5;
+  --stray:#333B45; --accent:#FFB35C; --glow:1;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme: light){
+  :root{--void:#E5E8EC; --stage:#DCE1E7; --rule:#BFC7D0;
+        --ink:#0D1219; --ink-dim:#4A535F; --ink-faint:#838D99;
+        --r0:#8A4A00; --r1:#A6290C; --r2:#22417F; --r3:#0A5C52; --r4:#4A5561;
+        --stray:#B7BEC6; --accent:#8A4A00; --glow:0;}
+}
+:root[data-theme="light"]{--void:#E5E8EC; --stage:#DCE1E7; --rule:#BFC7D0;
+  --ink:#0D1219; --ink-dim:#4A535F; --ink-faint:#838D99;
+  --r0:#8A4A00; --r1:#A6290C; --r2:#22417F; --r3:#0A5C52; --r4:#4A5561;
+  --stray:#B7BEC6; --accent:#8A4A00; --glow:0;}
+:root[data-theme="dark"]{--void:#06080B; --stage:#090C11; --rule:#1A222C;
+  --ink:#C6CFD9; --ink-dim:#7C8895; --ink-faint:#4A5460;
+  --r0:#FFB35C; --r1:#FF6B4A; --r2:#8AA8E8; --r3:#8FD6C9; --r4:#E4ECF5;
+  --stray:#333B45; --accent:#FFB35C; --glow:1;}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--void);color:var(--ink);font-family:var(--serif);
+  font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px 88px}
+.mast{padding:78px 0 28px;display:grid;gap:22px}
+.slug{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-faint);display:flex;gap:18px;flex-wrap:wrap}
+h1{font-weight:400;font-size:clamp(2rem,5vw,3.6rem);line-height:1.05;margin:0;
+  letter-spacing:-.02em;max-width:20ch;text-wrap:balance}
+h1 em{font-style:italic;color:var(--r0)}
+.lede{max-width:64ch;margin:0;color:var(--ink-dim)}
+.lede b{color:var(--ink);font-weight:400}
+
+.stage{position:relative;background:var(--stage);border:1px solid var(--rule);overflow:hidden}
+canvas{display:block;width:100%;height:auto}
+.ctl{display:flex;gap:5px;flex-wrap:wrap;padding:12px 12px 0}
+.hud{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--ink-faint);
+  padding:8px 12px 12px;line-height:1.8}
+.hud b{color:var(--ink-dim);font-weight:400}
+button{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  background:transparent;color:var(--ink-dim);border:1px solid var(--rule);padding:5px 9px;
+  cursor:pointer;transition:color .15s,border-color .15s}
+button:hover{color:var(--ink);border-color:var(--ink-faint)}
+button[aria-pressed="true"]{background:var(--ink);color:var(--void);border-color:var(--ink)}
+button.ctrl[aria-pressed="true"]{background:var(--stray);color:var(--ink);border-color:var(--ink-faint)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:36px;
+  margin-top:34px;padding-top:26px;border-top:1px solid var(--rule)}
+.grid p{margin:0 0 1em;max-width:62ch;color:var(--ink-dim)}
+.grid p:last-child{margin-bottom:0}
+.grid strong{color:var(--ink);font-weight:400}
+.grid code{font-family:var(--mono);font-size:.88em;color:var(--ink)}
+aside{font-family:var(--mono);font-size:11px;line-height:1.9;color:var(--ink-faint)}
+aside h3{font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin:0 0 10px;
+  font-weight:400;color:var(--ink-faint)}
+aside table{border-collapse:collapse;width:100%;margin-bottom:18px}
+aside td{padding:1px 0;vertical-align:baseline}
+aside td:last-child{text-align:right;color:var(--ink-dim);font-variant-numeric:tabular-nums}
+aside p{margin:0}
+@media (max-width:820px){.grid{grid-template-columns:1fr;gap:22px}.mast{padding:54px 0 22px}}
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div class="slug"><span>Plate VI</span><span>6 runs</span><span>up to 1,000 passes</span>
+      <span>one noise control</span></div>
+    <h1>Six ways of <em>dissolving</em></h1>
+    <p class="lede">Feed a sentence back through a language model until it stops changing, and
+      track every word it passes through on the way. Time runs left to right; the stack is how
+      many distinct words are still alive. <b>All six runs below use the same procedure. What
+      they leave behind could hardly be more different.</b></p>
+  </header>
+
+  <div class="stage">
+    <div class="ctl" id="ctl"></div>
+    <canvas id="rv" aria-label="An alluvial diagram of tokens flowing across passes, narrowing from many to few."></canvas>
+    <div class="hud" id="hud"></div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <p>Start with <strong>GPT-2 Small</strong>. Fifty-three distinct words at the first
+        pass, five at the last, and those five are the basins this whole project is named
+        after: <code>prolet</code>, <code>Divine</code>, <code>Anarch</code>,
+        <code>till</code>, <code>solidarity</code>. Seventy prompts about physics, weather,
+        medicine and nursery rhymes, and they end in one of five words.</p>
+      <p>Now press <strong>GPT-2 Medium</strong>. Fifty-two words down to <strong>one</strong>.
+        Every single prompt ends at the letter <code>D</code>. The larger model of the same
+        family does not find five rooms; it finds one, and everything falls into it.</p>
+      <p><strong>Pythia 160M</strong> is nearly the same story with a different word:
+        <code>questioned</code> takes 93 per cent of everything. Then press <strong>Pythia
+        410M</strong> and the pattern breaks completely. It starts at 45 distinct words and
+        <strong>ends at 34</strong>. It never consolidates. Run it ten times longer, as the
+        deep arm does, and it still does not. One model in this set simply refuses to settle.</p>
+      <p>Finally the control, which is noise fed through the same loop instead of sentences.
+        It collapses too, mostly onto a typographic dash. <strong>So collapse by itself proves
+        nothing.</strong> It is not evidence that the model is doing something semantic, and
+        anyone who reads a funnel as meaning must reckon with the fact that random tensors
+        funnel as well. What differs between these six is not whether they collapse. It is how
+        far, how fast, and onto what.</p>
+    </div>
+    <aside>
+      <h3>This run</h3>
+      <table id="stats"></table>
+      <h3>Where it ends</h3>
+      <table id="ends"></table>
+      <h3>Reading</h3>
+      <p>Horizontal position is the pass number, read straight from the archive. Vertical
+        position is a drawing choice: words are stacked by how many prompts hold them, sorted
+        so a strand keeps its neighbours, then relaxed to reduce crossings. Stack height is
+        therefore the surviving population and is the one vertical fact worth reading.
+        <br><br>Passes sampled are 0, 2, 3, 5, 10, 20, 25, 50, 100 and beyond, so the
+        horizontal axis is an ordering of observations, not a clock.
+        <br><br>Colour is the rank of the ending, since the runs do not share a vocabulary.
+        Grey led somewhere outside the top five endings of that run.</p>
+    </aside>
+  </div>
+</div>
+
+<script>
+const D=__DATA__;
+const $=i=>document.getElementById(i);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const RANK=["--r0","--r1","--r2","--r3","--r4"];
+const cv=$("rv"), g=cv.getContext("2d");
+const models=Object.keys(D);
+let cur=models[0], W,H,dpr;
+
+$("ctl").innerHTML=models.map((m,i)=>{
+  const c=(D[m].kind==="control")||m.indexOf("noise")>=0;
+  return `<button data-m="${m}" class="${c?'ctrl':''}" aria-pressed="${i===0}">${D[m].label||m}</button>`;
+}).join("");
+$("ctl").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+  cur=b.dataset.m;
+  $("ctl").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  info(); draw();});
+
+function info(){
+  const m=D[cur], c=m.cols;
+  $("stats").innerHTML=
+     `<tr><td>words at first pass</td><td>${c[0].n}</td></tr>`
+    +`<tr><td>words at last pass</td><td>${c[c.length-1].n}</td></tr>`
+    +`<tr><td>distinct endings</td><td>${m.n_basins}</td></tr>`
+    +`<tr><td>passes sampled</td><td>${m.iters.length}</td></tr>`
+    +`<tr><td>last pass</td><td>${m.iters[m.iters.length-1]}</td></tr>`;
+  const sh=m.shares||{};
+  const top=(m.ranked||[]).slice(0,5);
+  $("ends").innerHTML = top.length
+    ? top.map((k,i)=>`<tr><td><span style="color:${css(RANK[i])}">&#9632;</span> ${esc(k)}</td>`
+        +`<td>${sh[k]!==undefined?sh[k]+"%":""}</td></tr>`).join("")
+      + (m.n_basins>5?`<tr><td>and ${m.n_basins-5} more</td><td></td></tr>`:"")
+    : "<tr><td>none</td><td></td></tr>";
+  $("hud").innerHTML=`<b>${m.label||cur}</b> &nbsp;·&nbsp; ${c[0].n} words in, `
+    +`<b>${c[c.length-1].n}</b> out &nbsp;·&nbsp; ${m.n_basins} distinct ending`
+    +`${m.n_basins===1?"":"s"} &nbsp;·&nbsp; ${esc(m.note||"")}`;
+}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+function hexA(hex,a){const h=hex.replace("#","");
+  return `rgba(${parseInt(h.slice(0,2),16)},${parseInt(h.slice(2,4),16)},${parseInt(h.slice(4,6),16)},${a})`;}
+
+function size(){dpr=Math.min(devicePixelRatio||1,3);
+  W=cv.parentElement.clientWidth; H=Math.round(Math.max(300,Math.min(W*0.46,560)));
+  cv.style.height=H+"px"; cv.width=W*dpr; cv.height=H*dpr; g.setTransform(dpr,0,0,dpr,0,0);
+  draw();}
+
+function draw(){
+  if(!W) return;
+  const m=D[cur], lit=parseFloat(css("--glow"))||0;
+  const padL=54, padR=126, padY=26;
+  const iw=W-padL-padR, ih=H-padY*2;
+  const X=x=>padL+x*iw, Y=y=>H/2+y*ih*0.94;
+  g.clearRect(0,0,W,H); g.fillStyle=css("--stage"); g.fillRect(0,0,W,H);
+
+  /* pass markers */
+  g.font='9.5px ui-monospace,SFMono-Regular,Menlo,monospace';
+  g.textAlign="center";
+  m.cols.forEach(c=>{
+    g.strokeStyle=hexA(css("--rule"),0.85); g.lineWidth=1;
+    g.beginPath(); g.moveTo(X(c.x),padY*0.55); g.lineTo(X(c.x),H-padY*0.55); g.stroke();
+    g.fillStyle=hexA(css("--ink-faint"),0.9);
+    g.fillText(String(c.it), X(c.x), padY*0.40);
+  });
+
+  /* flows, widest first so thin strands stay visible on top */
+  g.globalCompositeOperation = lit ? "lighter" : "multiply";
+  const fl=[...m.flows].sort((a,b)=>b.c-a.c);
+  for(const f of fl){
+    const col = f.r>=0 ? css(RANK[f.r]) : css("--stray");
+    const x0=X(f.x0), x1=X(f.x1), cxa=x0+(x1-x0)*0.45, cxb=x1-(x1-x0)*0.45;
+    g.beginPath();
+    g.moveTo(x0,Y(f.y0));
+    g.bezierCurveTo(cxa,Y(f.y0),cxb,Y(f.z0),x1,Y(f.z0));
+    g.lineTo(x1,Y(f.z1));
+    g.bezierCurveTo(cxb,Y(f.z1),cxa,Y(f.y1),x0,Y(f.y1));
+    g.closePath();
+    g.fillStyle=hexA(col, f.r>=0 ? (lit?0.30:0.42) : (lit?0.13:0.22));
+    g.fill();
+  }
+  /* the words themselves */
+  for(const n of m.nodes){
+    const col = n.r>=0 ? css(RANK[n.r]) : css("--stray");
+    g.fillStyle=hexA(col, n.term?(lit?0.95:0.9):(lit?0.5:0.6));
+    const y0=Y(n.y[0]), y1=Y(n.y[1]);
+    g.fillRect(X(n.x)-1.6, y0, 3.2, Math.max(1.6,y1-y0));
+  }
+  g.globalCompositeOperation="source-over";
+
+  /* label what survives, on the right */
+  const last=m.cols[m.cols.length-1];
+  const enders=m.nodes.filter(n=>Math.abs(n.x-last.x)<1e-6)
+                      .sort((a,b)=>a.y[0]-b.y[0]).slice(0,14);
+  g.textAlign="left"; g.font='10.5px ui-monospace,SFMono-Regular,Menlo,monospace';
+  enders.forEach(n=>{
+    const col=n.r>=0?css(RANK[n.r]):css("--ink-faint");
+    const my=(Y(n.y[0])+Y(n.y[1]))/2;
+    g.strokeStyle=hexA(col,0.5); g.lineWidth=1;
+    g.beginPath(); g.moveTo(X(n.x)+3,my); g.lineTo(X(n.x)+11,my); g.stroke();
+    g.fillStyle=hexA(col,0.95);
+    g.fillText(esc(n.t).slice(0,13), X(n.x)+15, my+3.4);
+  });
+  g.textAlign="left"; g.fillStyle=hexA(css("--ink-faint"),0.85);
+  g.font='9.5px ui-monospace,SFMono-Regular,Menlo,monospace';
+  g.fillText("pass", 8, padY*0.40+0);
+  g.fillText("words", 8, H/2-4); g.fillText("alive", 8, H/2+8);
+}
+addEventListener("resize",size);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>setTimeout(draw,60));
+info(); size();
+</script>
