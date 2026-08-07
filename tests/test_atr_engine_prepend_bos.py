@@ -101,6 +101,10 @@ SANCTIONED_ADDITIONS = {
     "run_atr_loop": [("prepend_bos", None)],
     "run_atr_gated": [
         ("prepend_bos", None), ("seed_tensor", None), ("record_metrics", False),
+        # Issue #119 (turn attribution) appended the pass-probe pair: a
+        # per-pass callback plus the extra hook names it wants cached. The
+        # engine stores nothing for the probe; the caller owns all storage.
+        ("pass_probe", None), ("probe_names", None),
     ],
 }
 
