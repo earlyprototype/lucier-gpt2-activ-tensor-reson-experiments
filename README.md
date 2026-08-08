@@ -48,7 +48,7 @@ All 144 attention heads in GPT-2 Small, arranged 12 layers by 12 heads. Each out
   <img src="docs/assets/plates/dissolving_river.png" alt="Alluvial flow of every word a run passes through on the way to settling, one strand per word, for GPT-2 Small" width="800"/>
 </p>
 
-Every word a run passes through on its way to settling. Time runs left to right, one strand per word, and a strand's thickness is how many prompts are still saying that word. Six runs share the page: five models plus a pure-noise control. The flow shows *how* the narrowing happens, not just where it ends — GPT-2 Small braids down to five words, GPT-2 Medium funnels 52 into one, Pythia-410M never settles, and even the noise control collapses, which is why collapse on its own proves nothing. Interactive version: [`vi_river.html`](docs/plates/vi_river.html).
+Every word a run passes through on its way to settling. Time runs left to right, one strand per word, and a strand's thickness is how many prompts are still saying that word. Six runs share the interactive page: five models plus a pure-noise control. The flow shows *how* the narrowing happens, not just where it ends — GPT-2 Small braids down to five words, GPT-2 Medium funnels 52 into one, Pythia-410M never settles, and even the noise control collapses, which is why collapse on its own proves nothing. Interactive version: [`vi_river.html`](docs/plates/vi_river.html).
 
 ---
 
