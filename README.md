@@ -1,10 +1,10 @@
 # Activation Tensor Resonance (ATR)
 
 <p align="center">
-  <img src="docs/assets/plates/atr_form.gif" width="260" alt="A sentence's internal state in GPT-2 Small, read as a three-dimensional surface, deforming as the loop feeds it back through the model"/>
+  <img src="docs/assets/plates/atr_form.gif" width="260" alt="GPT-2 Small's internal state on one sentence, read as a three-dimensional surface, deforming as the loop feeds it back through the model"/>
 </p>
 
-<p align="center"><em>One sentence inside GPT-2 Small, its internal state read as a surface, reshaped by each pass of the loop.</em></p>
+<p align="center"><em>One sentence fed back through GPT-2 Small, the model's internal state read as a surface, reshaped by each pass of the loop.</em></p>
 
 ### *What remains of a language model's voice when you play it back into itself until the words are gone*
 
@@ -32,7 +32,7 @@ NOTE: What started as a moment of curiosity turned up a rather unexpected result
   <img src="docs/assets/plates/bodies_frieze.png" alt="Five sentences rendered as five deforming three-dimensional bodies, converging toward one shape in GPT-2 Small" width="800"/>
 </p>
 
-Five unrelated sentences, each fed back through GPT-2 Small sixty times, drawn as five three-dimensional bodies. Each body is plotted straight from the sentence's internal state — the same state always produces the same shape, with no artistic choices in between — so watching the five bodies deform is watching the five states change. By the final passes the five have arrived at essentially one form (mean separation falls from 0.043 to 0.0002 on a 0-to-2 scale). Its value in this form is that convergence stops being a statistic and becomes something you can watch happen. Interactive version with all four models: [`iv_bodies.html`](docs/plates/iv_bodies.html).
+Five unrelated sentences, each fed back through GPT-2 Small sixty times, drawn as five three-dimensional bodies. Each body is plotted straight from the model's internal state on that sentence — the same state always produces the same shape, with no artistic choices in between — so watching the five bodies deform is watching the five states change. By the final passes the five have arrived at essentially one form (mean separation falls from 0.043 to 0.0002 on a 0-to-2 scale). Its value in this form is that convergence stops being a statistic and becomes something you can watch happen. Interactive version with all four models: [`iv_bodies.html`](docs/plates/iv_bodies.html).
 
 ### The spectral portraits: 144 attention heads as specimens
 
