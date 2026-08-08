@@ -12,7 +12,7 @@
 
 Inspired by Alvin Lucier's iterative feedback composition *I Am Sitting in a Room*, this project applies an analogous operation to small open-weight language models. Where Lucier's process dissolved speech into a room's resonant frequencies through looped excitation, **Activation Tensor Resonance** dissolves semantic content into a model's stable states — and then asks what those states are made of.
 
-NOTE: What started as a moment of curiosity turned up a rather unexpected result. This result posed a number of questions, some of which have been answered with further experiment and some left unexplained. The recent publication of Anthropic's [J-space paper](https://transformer-circuits.pub/2026/workspace/index.html) has opened a new route into some of these questions, and is now the focus of a separate follow-up investigation. (A reading primer for that paper, and its bridge to this project's open questions, lives in [JSPACE_PRIMER.md](docs/JSPACE_PRIMER.md).)
+NOTE: What started as a moment of curiosity turned up a rather unexpected result. This result posed a number of questions, some of which have been answered with further experiment and some left unexplained. The recent publication of Anthropic's [J-space paper](https://transformer-circuits.pub/2026/workspace/index.html) has created a new path to travel with some of these open questions, and is currently the focus of a further, separate investigation. (A reading primer for that paper, and its bridge to this project's open questions, lives in [JSPACE_PRIMER.md](docs/JSPACE_PRIMER.md).)
 
 <p align="center">
   <img src="experiments/gpt2_small/output/convergence_matrix.png" alt="Cross-prompt convergence matrix — 125 prompts, block structure showing distinct attractor basins in GPT-2 Small" width="800"/>
@@ -99,6 +99,8 @@ This is a nonlinear analogue of power iteration: where the classical version con
 
 ## Act I — The Dissolution
 
+*The Body without Organs is a Marxist [?]*
+
 Five prompts were chosen for their diversity: a question, a fact, a nursery-grammar sentence, nonsense, a command.
 
 📓 [`lucier_total_resonance.ipynb`](experiments/gpt2_small/lucier_total_resonance.ipynb)
@@ -121,7 +123,7 @@ The fifth prompt — *"The cat sat on the mat and then the"* — followed the sa
 
 But five hand-picked prompts converging is an anecdote, and an easy one to distrust: perhaps the selection, not the model, chose the destination. So the experiment was scaled up. A library of **125 prompts** was generated across seven registers (simple, narrative, complex, chemical, acronyms, vulgarity, wild) and swept through the same loop, taking the choice of starting point out of any one person's hands.
 
-At scale, the pattern holds: the 125 prompts collapse into **five basins**, classified at convergence (not at an arbitrary stopping time; see the [gated re-sweep](docs/FINDINGS.md#run-5)):
+At scale, the pattern holds: the model's languagespace collapses into **five basins**, classified at convergence (not at an arbitrary stopping time; see the [gated re-sweep](docs/FINDINGS.md#run-5)):
 
 | Basin | Share at convergence | Semantic neighbourhood (W_E) |
 |:---|:---:|:---|
@@ -159,23 +161,23 @@ The same operation, four models, 125 prompts each:
 | ![Pythia-410m convergence matrix](experiments/pythia_410m/output/convergence_matrix.png) | ![GPT-2 Small convergence matrix](experiments/gpt2_small/output/convergence_matrix.png) |
 | *Pythia-410m: no blocks. The room never settles.* | *GPT-2 Small: five blocks. The anomaly.* |
 
-The fingerprint hypothesis does not survive this table. GPT-2 Medium heard the same Reddit as GPT-2 Small, and all it says is `D`.
+The fingerprint hypothesis does not survive this table. GPT-2 Medium heard the same Reddit as GPT-2 Small; its body without organs just says `D`.
 
-And a control that should unsettle any remaining certainty: iterate **pure noise** — no prompt at all — through GPT-2 Small. The first count recorded *eighteen* scattered punctuation basins at iteration 100, none of them the five, which made it look as if real language funnels into fewer, more semantic attractors than noise does. That count did not survive its own audit: the control had run at roughly a third of the intended injection scale and was tallied before it had settled ([FINDINGS.md caveat 18](docs/FINDINGS.md#caveats), issue #97). The corrected re-run (2026-07-31, run 17: each noise tensor matched to a real prompt's exact length and starting norm, counted only at convergence) says the opposite. The trials that settle converge into **seven** basins, four of them among the language arm's own five, with `prolet` dominant in both arms; the eighteen punctuation basins are gone. The trials that never settle oscillate on a two-beat like `Divine`'s, and read at that two-beat, five of them *are* `Divine`. All five of the language arm's basins come back under pure noise, and 97 of the 125 trials land in them. At this injection scale the room sings largely the same notes whether or not a voice has been in it: the basins belong to the weights ([FINDINGS.md](docs/FINDINGS.md) F4). What a voice contributes at other scales was the registered follow-up question.
+And a control that should unsettle any remaining certainty: iterate **pure noise** — no prompt at all — through GPT-2 Small. The initial count recorded *eighteen* scattered punctuation basins at iteration 100, none of them the five, and on that count real language seemed to funnel into fewer, semantic attractors than noise. That count did not survive its own audit. The control had run at roughly a third of the intended injection scale and was tallied before it had settled ([FINDINGS.md caveat 18](docs/FINDINGS.md#caveats), issue #97), and the corrected re-run (2026-07-31, run 17: each noise tensor matched to a real prompt's exact length and starting norm, counted only at convergence) says the opposite: the trials that settle fully converge into **seven** basins, and four of them are the language arm's own five, with `prolet` dominant in both arms and the eighteen punctuation basins gone. The trials that never settle ring with a two-beat oscillation like `Divine`'s, and read at that two-beat, five of them *are* `Divine`: all five of the language arm's basins come back under pure noise, and 97 of the 125 trials land in them. At this injection scale, the room sings largely the same notes whether or not a voice has been in it; the basins belong to the weights ([FINDINGS.md](docs/FINDINGS.md) F4). What a voice contributes at other scales is now the registered follow-up question.
 
 That follow-up ran (2026-08-02, run 18: the ν-sweep, 1,425 trials across twenty-one playback levels). Turn the level and the answer arrives in strata: the five notes exist only in a band, from about fifty to about three hundred times the loudness the room naturally receives, and the level our recordings always used sits inside it. Played quieter, the room does not go silent; it steps through entirely different words, one per stratum (`arbit`, then a bar of punctuation, then `vertex`, then a splintering into fourteen), and the quietest strata point into the model's least-trained corner of the vocabulary, the same anomalous-token cluster the flip axis found. Just below the band it stops settling altogether and oscillates. Played louder, the sound thins into `the` and full stops.
 
 The two edges of that band turn out to be different events. Above it, each pass changes the tensor less and less until the loop is merely copying, and the fade tracks that. Below it the loop is not quiet at all: measured as the angle the state swings on each pass, it is turning harder as the band approaches, close to a right angle every time round, and the band is exactly where that swinging peaks. Whatever shuts the five notes off from below, it is not stillness. The room's tone depends on the gain, and on two different properties of the gain at its two ends ([FINDINGS.md caveat 19](docs/FINDINGS.md#caveats)).
 
-The 34 prompts that never pass the lag-1 convergence gate are exactly the 34 `Divine` prompts: a tensor caught in an exact two-step oscillation, decoding to the same word in both phases forever. Not a room that will not settle: a room ringing between two configurations, saying *Divine, Divine, Divine*. (Resolved in [FINDINGS.md](docs/FINDINGS.md) F9; the re-gate that recognises the cycle is F15.)
+One more image from the far side of the study. The 34 prompts that never pass the lag-1 convergence gate are exactly the 34 `Divine` prompts: a tensor caught in an exact two-step oscillation, decoding to the same word in both phases forever. Not a room that will not settle: a room ringing between two configurations, saying *Divine, Divine, Divine*. (Resolved in [FINDINGS.md](docs/FINDINGS.md) F9; the re-gate that recognises the cycle is F15.)
 
-Every run, every number and every hypothesis from Acts I and II — including the refuted ones — is in [FINDINGS.md](docs/FINDINGS.md).
+The full record of Acts I and II — every run, every number, every hypothesis disposition including the refuted ones — is in [FINDINGS.md](docs/FINDINGS.md).
 
 ---
 
 ## What This Is Now
 
-ATR never set out to be a technique. It began as an homage to Lucier carried out on a language model to see what would happen, and only earned a name once the results demanded one. The bias-audit reading arrived later, as a working hypothesis the first results seemed to insist on — and it was that hypothesis, not the project, that got refuted. The cross-model evidence killed the general fingerprint claim, and the corrected null-model re-run put the basins in the weights rather than in language (at matched injection scale, noise lands in the language arm's own basins, all five reappearing; F4). What the operation actually measures is stranger and more interesting:
+ATR never set out to be a technique at all. It began as a thought experiment, an homage to Lucier carried out on a language model to see what would happen, and only earned its name once the results demanded one. The bias-audit reading arrived later, as a working hypothesis the first results seemed to insist on, and it was that hypothesis, not the project, that got refuted: the cross-model evidence killed the general fingerprint claim, and the null model first appeared to relocate the basins from "the weights" to "the language-driven regime of the weights", a relocation the corrected 2026-07-31 re-run then reversed (at matched injection scale, noise lands in the language arm's own basins, all five reappearing; F4). What the operation actually turned out to measure is stranger and, we think, more interesting:
 
 - **A cheap dynamical probe.** No labelled data, no training, seconds-to-minutes per run on consumer hardware. It answers: *what are the stable states of this model's iterated forward map, and how do they depend on where you start?*
 - **A regime detector.** Four models produced four qualitatively different landscapes — few-semantic-basins / single-funnel / single-funnel / no-consolidation. The differences are intrinsic to the models (tensor-level, not decoding artefacts — see [SCALING_ARTEFACT_ANALYSIS.md](docs/SCALING_ARTEFACT_ANALYSIS.md)).
@@ -186,7 +188,7 @@ ATR never set out to be a technique. It began as an homage to Lucier carried out
 ## Repository Structure
 
 ```
-├── README.md                        ← you are here
+├── README.md                        ← the piece (you are here)
 ├── atr_engine.py                    ← core ATR engine (hooks, metrics, gated runs)
 ├── prompt_library.py                ← 125 prompts across 7 categories
 ├── requirements.txt
@@ -224,15 +226,23 @@ ATR never set out to be a technique. It began as an homage to Lucier carried out
 
 ## The Knowledge Graph
 
-Everything above is linear; the study is not. `docs/graph/` holds three interactive graphs that draw what the prose can only list:
-
-- an **evidence graph** — every hypothesis, finding and run is a node, and the arrows are the epistemic relations between them. The founding hypothesis shows up as what it is: a red node with two independent refutations pointing at it and nothing leading out.
-- a **dissolution graph** — the descent itself, prompts on the left, terminal basins on the right.
-- an **isomorphism graph** — Lucier's apparatus set against the transformer's, with the five places the analogy stops holding marked.
-
-A fourth view, **Threads**, re-colours the evidence graph by readiness instead of truth: not whether a claim is right, but whether it can move and what moving it would cost. It has already caught two things the prose hid — a finding (H4) whose notebook had been run but whose result went unrecorded until issue #54 settled it, and a single blocker gating several threads at once, visible as one hub instead of sentences eight findings apart.
-
-Serve the repository root and open `docs/graph/viewer.html`, or read [docs/graph/README.md](docs/graph/README.md) first.
+Everything above is linear, and the study is not. `docs/graph/` holds three interactive
+graphs that draw what the prose can only list: an *evidence* graph, in which every hypothesis,
+finding and run is a node and the arrows between them are the actual epistemic relations — so
+that the founding hypothesis appears as what it is, a red node with two independent refutations
+converging on it and nothing leading out; a *dissolution* graph, which draws the descent itself,
+prompts on the left and terminal basins on the right; and an *isomorphism* graph, which sets
+Lucier's apparatus against the transformer's and marks the five places the analogy stops holding.
+The selector carries a fourth entry, *Threads*, which is not a fourth graph but the evidence
+graph re-coloured — readiness in place of epistemic status, arrived at by reading the graph
+against the working tree. It answers a different question: not whether a claim is true but
+whether it can move, and what moving it would cost. Two things surfaced there that prose keeps
+hidden. The first was a claim the record had fallen behind on: H4, whose notebook had been run
+and whose result went unwritten until the 2026-07-31 ruling in issue #54 settled the
+disposition. The second is a blocker gating several separate threads at once, drawn as
+one hub with an arm to each rather than as sentences eight findings apart.
+Serve the repository root and open `docs/graph/viewer.html`, or read
+[docs/graph/README.md](docs/graph/README.md) first.
 
 ## Notebooks — Quick Reference
 
@@ -288,7 +298,7 @@ If this project is useful in your research or writing, please cite it:
 
 ## Caveats
 
-The full list — sample sizes, pending statistics, what "reproducible" does and doesn't mean here — is maintained in one place: [FINDINGS.md § Caveats](docs/FINDINGS.md#caveats). Headline items: single-seed sweeps, N=2 same-machine repeatability, an 8-prompt subset for the deep-convergence run, the W_E permutation test resolved **negative** (the all-warm matrix is an anisotropy artifact; caveat 4), and the first random-noise control was confounded and superseded by the corrected run 17 (caveat 18).
+The honest list — sample sizes, pending statistics, what "reproducible" does and doesn't mean here — is maintained in one place: [FINDINGS.md § Caveats](docs/FINDINGS.md#caveats). Headline items: single-seed sweeps, N=2 same-machine repeatability, the deep-convergence run used an 8-prompt subset, the W_E permutation test resolved **negative** (the all-warm matrix is an anisotropy artifact; caveat 4), and the random-noise control is confounded pending a corrected re-run (caveat 18).
 
 ## References
 
