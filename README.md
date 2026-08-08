@@ -32,7 +32,7 @@ NOTE: What started as a moment of curiosity turned up a rather unexpected result
   <img src="docs/assets/plates/bodies_frieze.png" alt="Five sentences rendered as five deforming three-dimensional bodies, converging toward one shape in GPT-2 Small" width="800"/>
 </p>
 
-Five unrelated sentences, each fed back through GPT-2 Small sixty times, drawn as five three-dimensional bodies. Each surface is a fixed linear reading of the sentence's internal state, so the same numbers always push the same places: identical states produce identical bodies, though the reverse does not hold, since the surface reads 48 components of a much larger state. By the final passes the five have arrived at essentially one form (mean separation falls from 0.043 to 0.0002 on a 0-to-2 scale). Its value in this form is that convergence stops being a statistic and becomes something you can watch happen. Interactive version with all four models: [`iv_bodies.html`](docs/plates/iv_bodies.html).
+Five unrelated sentences, each fed back through GPT-2 Small sixty times, drawn as five three-dimensional bodies. Each body is plotted straight from the sentence's internal state — the same state always produces the same shape, with no artistic choices in between — so watching the five bodies deform is watching the five states change. By the final passes the five have arrived at essentially one form (mean separation falls from 0.043 to 0.0002 on a 0-to-2 scale). Its value in this form is that convergence stops being a statistic and becomes something you can watch happen. Interactive version with all four models: [`iv_bodies.html`](docs/plates/iv_bodies.html).
 
 ### The spectral portraits: 144 attention heads as specimens
 
