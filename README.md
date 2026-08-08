@@ -24,31 +24,31 @@ NOTE: What started as a moment of curiosity turned up a rather unexpected result
 
 ## Data is Beautiful
 
-*Three visual works drawn entirely from this project's committed archives. Nothing here runs the model: each piece rebuilds deterministically from data already in the repository (`python3 docs/plates/build_plates.py`). The interactive pages live in [`docs/plates/`](docs/plates/).*
+*Three visualisations, all built from data already committed in this repository — every image regenerates deterministically with `python3 docs/plates/build_plates.py`. Interactive versions live in [`docs/plates/`](docs/plates/).*
 
-### The form: five sentences becoming one shape
+### Five sentences becoming one shape
 
 <p align="center">
   <img src="docs/assets/plates/bodies_frieze.png" alt="Five sentences rendered as five deforming three-dimensional bodies, converging toward one shape in GPT-2 Small" width="800"/>
 </p>
 
-Five unrelated sentences, each fed back through GPT-2 Small sixty times, drawn as five three-dimensional bodies. Each body is plotted straight from the model's internal state on that sentence — the same state always produces the same shape, with no artistic choices in between — so watching the five bodies deform is watching the five states change. By the final passes the five have arrived at essentially one form (mean separation falls from 0.043 to 0.0002 on a 0-to-2 scale). Its value in this form is that convergence stops being a statistic and becomes something you can watch happen. Interactive version with all four models: [`iv_bodies.html`](docs/plates/iv_bodies.html).
+Five unrelated sentences, each fed back through GPT-2 Small sixty times, drawn as five three-dimensional shapes. Each shape is plotted directly from the model's internal state — nothing is hand-drawn — so as the states converge, the shapes do too. By the final passes the five are nearly identical: mean separation falls from 0.043 to 0.0002 on a 0-to-2 scale. Convergence stops being a statistic; you can watch it happen. Interactive version with all four models: [`iv_bodies.html`](docs/plates/iv_bodies.html).
 
-### The spectral portraits: 144 attention heads as specimens
+### 144 attention heads at a glance
 
 <p align="center">
   <img src="docs/assets/plates/head_spectra_grid.png" alt="All 144 attention heads of GPT-2 Small drawn as specimen outlines from their singular spectra, arranged 12 layers by 12 heads" width="700"/>
 </p>
 
-Every attention head in GPT-2 Small, all 144 of them arranged by layer and position, each outline drawn from that head's own singular spectrum: the set of numbers describing how strongly it stretches its input in each direction. Each specimen is generated directly from the committed per-head spectral data, one outline per head, with no styling decision touching the numbers. Its value in this form is immediacy: a table of 144 spectra is unreadable, but on a wall of specimens the one aberrant head is visible at a glance, the closed round form in the bottom row, and it is layer 11 head 8, the head the record had already flagged twice by other measurements. [Open the interactive plate](docs/plates/v_cyanotypes.html).
+All 144 attention heads in GPT-2 Small, arranged 12 layers by 12 heads. Each outline is drawn from that head's singular spectrum — the numbers describing how strongly it stretches its input in each direction. A table of 144 spectra is unreadable; as a grid of shapes, the odd one out is obvious. The closed round form in the bottom row is layer 11 head 8, the same head this project had already flagged twice by other measurements. [Open the interactive plate](docs/plates/v_cyanotypes.html).
 
-### The dissolving maps: six ways of settling
+### Six runs settling, word by word
 
 <p align="center">
   <img src="docs/assets/plates/dissolving_river.png" alt="Alluvial flow of every word a run passes through on the way to settling, one strand per word, for GPT-2 Small" width="800"/>
 </p>
 
-Every word a run passes through on its way to settling, drawn as a braided flow: time runs left to right, one strand per word, and a strand's thickness is how many prompts are still saying that word. Six runs share the page, five models plus a pure-noise control, built from the committed dissolution graph with no dimensional projection: every node carries its own pass number, and the layout choices that remain (strand ordering and routing) are documented with the plate's limits. Its value in this form is that it shows *how* the narrowing happens rather than only where it ends: GPT-2 Small braids down to five words, GPT-2 Medium funnels 52 words to one, Pythia-410M never consolidates, and the noise control also collapses, which is why collapse alone proves nothing semantic. Interactive version: [`vi_river.html`](docs/plates/vi_river.html).
+Every word a run passes through on its way to settling. Time runs left to right, one strand per word, and a strand's thickness is how many prompts are still saying that word. Six runs share the page: five models plus a pure-noise control. The flow shows *how* the narrowing happens, not just where it ends — GPT-2 Small braids down to five words, GPT-2 Medium funnels 52 into one, Pythia-410M never settles, and even the noise control collapses, which is why collapse on its own proves nothing. Interactive version: [`vi_river.html`](docs/plates/vi_river.html).
 
 ---
 
