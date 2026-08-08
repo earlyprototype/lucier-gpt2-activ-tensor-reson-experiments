@@ -24,7 +24,7 @@ NOTE: What started as a moment of curiosity turned up a rather unexpected result
 
 ## Data is Beautiful
 
-*Three visual works drawn entirely from this project's committed archives. Nothing here runs the model: each piece rebuilds deterministically from data already in the repository (`python3 docs/plates/build_plates.py`). The interactive pages live in [`docs/plates/`](docs/plates/), with sources, corrections and limits logged in [the plates README](docs/plates/README.md).*
+*Three visual works drawn entirely from this project's committed archives. Nothing here runs the model: each piece rebuilds deterministically from data already in the repository (`python3 docs/plates/build_plates.py`). The interactive pages live in [`docs/plates/`](docs/plates/).*
 
 ### The form: five sentences becoming one shape
 
