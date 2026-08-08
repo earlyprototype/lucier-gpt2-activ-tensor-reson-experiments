@@ -52,9 +52,9 @@ Every word a run passes through on its way to settling, drawn as a braided flow:
 
 ---
 
-## The Findings, Briefly
+## Findings - Overview
 
-*For readers who want the results before the piece. The full record, every number and every caveat: [FINDINGS.md](docs/FINDINGS.md).*
+*A summary of the main results. Full details and caveats are in [FINDINGS.md](docs/FINDINGS.md).*
 
 - GPT-2 Small resolves 125 language prompts into **five attractor basins**, classified at convergence: `prolet` 43.2%, `Divine` 27.2%, `till` 15.2%, `Anarch` 13.6%, `solidarity` 0.8% — four of the five semantically coherent in embedding space (the statistical form of that coherence claim is under re-examination: [FINDINGS.md caveat 18b](docs/FINDINGS.md#caveats), issue #98).
 - The founding hypothesis — basins as a **thematic fingerprint of the training corpus**, readable from any model — was **refuted by its own validation programme**: GPT-2 Medium, trained on the *same* corpus, collapses every prompt to the single token `D`; Pythia-160m funnels into `questioned`; Pythia-410m never consolidates at all.
