@@ -91,6 +91,16 @@ jobs:
           # which is what makes a link recorded as `docs/FINDINGS.md` resolve.
           find docs -name '*.md' -exec cp --parents {} "$SITE/" \;
           find docs/assets -type f -exec cp --parents {} "$SITE/" \;
+
+          # The plates: the built, self-contained pages only. The templates
+          # carry a bare __DATA__ token and are not viewable, so they stay
+          # out. Published under docs/plates/, the same repo-relative path
+          # the READMEs link to, which is the plates' permanent home now
+          # that the original claude.ai artifact links have died with the
+          # account that published them (docs/plates/README.md logs this).
+          find docs/plates -maxdepth 1 -name '*.html' ! -name '_tpl_*' \
+            -exec cp --parents {} "$SITE/" \;
+
           find experiments \( -name '*.md' -o -name '*.png' \) \
             -exec cp --parents {} "$SITE/" \;
           cp README.md "$SITE/README.md"
