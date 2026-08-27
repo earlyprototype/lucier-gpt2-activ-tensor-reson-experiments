@@ -76,13 +76,15 @@ button:focus-visible{outline:2px solid var(--sodium);outline-offset:2px}
 
 <div class="wrap">
   <header class="mast">
-    <div class="slug"><span>Plate IV</span><span>GPT-2 &amp; Pythia</span><span>5 prompts</span><span>61 passes</span>
+    <div class="slug"><span>Plate IV</span><span>4 models, GPT-2 &amp; Pythia</span><span>5 prompts</span><span>60 passes</span>
       <span>48 shape components</span></div>
     <h1>Five sentences becoming one <em>shape</em></h1>
     <p class="lede">Each body is one sentence, fed back through a language model over and over.
-      The numbers of its internal state are read as a shape: every component pushes the surface
-      out or pulls it in, through a fixed mapping that never changes. Press play. <b>Five
-      unrelated sentences walk into the same form.</b></p>
+      Its internal state is summarised as 48 numbers, the directions along which that model's
+      states vary most, and each of the 48 pushes the surface out or pulls it in through a
+      fixed mapping that never changes; the table on the right records how much of the state's
+      variation the 48 carry. The film plays on its own; pause it to look. <b>In three of the
+      four models, five unrelated sentences walk into the same form.</b></p>
   </header>
 
   <div class="stage">
@@ -91,23 +93,29 @@ button:focus-visible{outline:2px solid var(--sodium);outline-offset:2px}
     <div class="hud" id="hud"></div>
     <div class="scrub"><i id="bar"></i></div>
   </div>
+  <p class="lede" style="font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ink-faint);max-width:none;margin:10px 0 0">Reading it: the five surfaces are the five sentences, all drawn at the same pass, and the thin line along the bottom is progress through the sixty passes. The buttons name the four models and switch all five bodies at once; play and pause stop the passes, not the slow rotation. Drag or use the arrow keys to turn the bodies, and the space bar pauses.</p>
 
   <div class="grid">
     <div>
       <p>Five unrelated sentences, each fed back through the same model sixty times.
-        <strong>They arrive at the same body.</strong> The mean angular separation between the
-        five states halves in GPT-2 small, falls by three quarters in Pythia 160M, and in GPT-2
-        medium collapses from 0.043 to 0.0002, which is to say the five states end up
-        indistinguishable. Whatever the sentences were about stops mattering. What is left is
-        the shape of the model.</p>
+        <strong>In three of the four models they arrive at the same body.</strong> The
+        separation quoted here is a score of the angle between two states: 0 when they point
+        the same way, 2 when they point opposite ways, and close to 1 for two unrelated
+        directions. That separation halves in GPT-2 small, from 0.16 to 0.08, falls by three
+        quarters in Pythia 160M, from 0.038 to 0.009, and in GPT-2 medium collapses from
+        0.043 to 0.0002, which is to say the five states end up pointing the same way to
+        within the width of the measurement. Whatever the sentences were about stops
+        mattering. What is left is the shape of the model.</p>
       <p>Pythia 410M is the exception and is worth watching for that reason. Its five bodies
         start further apart than any other model's and end further apart still. One
         architecture out of four does not do this, which is a caution against reading the
         other three as a law.</p>
-      <p>The lamp colours are arbitrary labels, one per sentence, held constant so you can
-        follow an individual body through its development. The rotation is mine; the
-        deformation is entirely the model's.</p>
-      <p>Watch the silhouette and the ripple separately. They do not settle together: the
+      <p>The lamp colours are arbitrary labels, one per sentence, held constant so an
+        individual body can be followed through its development. The rotation is a display
+        choice; the deformation is entirely the model's.</p>
+      <p>Watch the silhouette and the ripple separately: the strongest of the 48 components
+        are drawn as the broad swells of the body, and the weakest as its fine surface
+        ripple. They do not settle together: the
         gross form stops changing well before the fine detail does, which is the geometric
         face of something the numbers already said, that these states fix their direction
         early and keep adjusting quietly for a long time after.</p>
@@ -116,8 +124,9 @@ button:focus-visible{outline:2px solid var(--sodium);outline-offset:2px}
       <h3>Reading</h3>
       <table>
         <tr><td>shape components</td><td>48</td></tr>
-        <tr><td>variance in the 48</td><td id="mv">&mdash;</td></tr>
-        <tr><td>passes</td><td>61</td></tr>
+        <tr><td>variation the 48 carry</td><td id="mv">&mdash;</td></tr>
+        <tr><td>passes</td><td>60</td></tr>
+        <tr><td>states drawn</td><td>61</td></tr>
         <tr><td>bodies</td><td>5</td></tr>
         <tr><td>verdict</td><td id="vd">&mdash;</td></tr>
       </table>
@@ -126,14 +135,23 @@ button:focus-visible{outline:2px solid var(--sodium);outline-offset:2px}
         <tr><td>first three passes</td><td id="se">&mdash;</td></tr>
         <tr><td>last three passes</td><td id="sl">&mdash;</td></tr>
       </table>
+      <p style="font-family:var(--mono);color:var(--ink-faint);line-height:1.8;margin:8px 0 0">
+        Each figure pools the five sentences' states across those three passes, fifteen
+        states in all, and averages a score over every pair: 0 means two states point the
+        same way, 2 means opposite ways, and two unrelated directions would score close
+        to 1.</p>
       <h3 style="margin-top:22px">Honesty</h3>
       <p style="font-family:var(--mono);color:var(--ink-faint);line-height:1.8;margin:0">
-        A body is 48 components rendered through a fixed basis, with each component given
-        equal weight so the shape shows all of them rather than only the loudest two.
+        A body is 48 numbers rendered through a fixed set of 48 surface patterns, one
+        pattern per number, and every number is given equal weight so the shape shows all
+        of them rather than only the loudest two. The 48 are each model's own directions
+        of greatest variation, so bodies compare fairly within one model and not across
+        models.
         <br><br>That equalising is a display choice and it changes apparent distances, so the
         separation figures above are measured on the raw state vectors instead, not on
-        anything drawn here. An earlier version of this page reported the opposite result
-        because it measured separation in the display's own coordinates.
+        anything drawn here. Two earlier versions of this page reported the opposite
+        result, because each measured separation in its own display coordinates, and two
+        different display choices gave two opposite conclusions.
         <br><br>Bodies that look alike may still differ along the directions not drawn.</p>
     </div>
   </div>
@@ -260,10 +278,12 @@ function rotM(ax,ay){const cx=Math.cos(ax),sx=Math.sin(ax),cy=Math.cos(ay),sy=Ma
 
 /* ---------- state ---------- */
 const models=Object.keys(DATA.m);
+const NAME={"gpt2":"GPT-2 small","gpt2-medium":"GPT-2 medium",
+            "pythia-160m":"Pythia 160M","pythia-410m":"Pythia 410M"};
 let cur=models[0], t=0, playing=!reduced, ax=-0.12, ay=0.4, idle=1;
 const LAMP_RGB=[[1.000,0.702,0.361],[0.561,0.839,0.788],[1.000,0.420,0.290],
                 [0.541,0.659,0.910],[0.894,0.925,0.961]];
-$("ctl").innerHTML = models.map((m,i)=>`<button data-m="${m}" aria-pressed="${i===0}">${m}</button>`).join("")
+$("ctl").innerHTML = models.map((m,i)=>`<button data-m="${m}" aria-pressed="${i===0}">${NAME[m]||m}</button>`).join("")
   + `<button id="play" aria-pressed="${playing}">${playing?"pause":"play"}</button>`;
 $("ctl").querySelectorAll("button[data-m]").forEach(b=>b.onclick=()=>{
   cur=b.dataset.m; t=0; info();
@@ -271,10 +291,10 @@ $("ctl").querySelectorAll("button[data-m]").forEach(b=>b.onclick=()=>{
 $("play").onclick=()=>{playing=!playing; $("play").textContent=playing?"pause":"play";
   $("play").setAttribute("aria-pressed",playing);};
 function info(){ const M=DATA.m[cur];
-  $("mv").textContent=Math.round(M.var*100)+"%";
+  $("mv").textContent=(M.var*100).toFixed(2)+"%";
   $("se").textContent=M.spread_early.toFixed(4);
   $("sl").textContent=M.spread_late.toFixed(4);
-  $("vd").textContent = M.spread_late < M.spread_early ? "converges" : "diverges"; }
+  $("vd").textContent = M.spread_late < M.spread_early ? "draws together" : "drifts apart"; }
 info();
 
 let drag=false,px=0,py=0;
@@ -337,9 +357,10 @@ function frame(){
     gl.drawElements(gl.TRIANGLES,SPH.idx.length,gl.UNSIGNED_SHORT,0);
   });
   $("bar").style.width=(100*t/(N-1))+"%";
-  $("hud").innerHTML=`${cur} &nbsp;·&nbsp; <b>pass ${String(i0).padStart(2,"0")}</b> of ${N-1}`
-    +` &nbsp;·&nbsp; ${M.d_model}d, ${M.n_layers} layers &nbsp;·&nbsp; separation `
-    +`<b>${(M.curve[i0]).toFixed(4)}</b>`;
+  const pd=Math.min(N-1,Math.round(t));
+  $("hud").innerHTML=`${NAME[cur]||cur} &nbsp;·&nbsp; <b>pass ${String(pd).padStart(2,"0")}</b> of ${N-1}`
+    +` &nbsp;·&nbsp; ${M.d_model} numbers per state, ${M.n_layers} layers &nbsp;·&nbsp; separation `
+    +`<b>${(M.curve[pd]).toFixed(4)}</b>, raw states, 0 same to 2 opposite`;
 }
 if(gl) frame();
 </script>

@@ -53,7 +53,7 @@ themselves survive anything short of losing the repository:
 ### Plates I to III, *Three Plates from a Room Made of Weights*
 `i-iii_room.html` · https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/i-iii_room.html
 
-Every settled state as a point cloud (1,425 runs, 21 injection levels, five
+Every settled state as a point cloud (1,425 runs, 21 loudness settings, five
 basins lit and everything else dark); the settling itself as traces across four
 architectures; the sweep as a curve in loudness, growth and turn.
 
@@ -69,8 +69,10 @@ additive accumulation, light as plotter ink on paper.
 `iv_bodies.html` · https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/iv_bodies.html
 
 Five prompts as deforming bodies over sixty passes, in four models. The surface
-is a fixed linear reading of the state, so two bodies look alike exactly when
-the states do.
+is a fixed linear reading of the state: identical states give identical bodies.
+The reading equalises its 48 components for legibility, so apparent distances
+between bodies are not raw distances, which is why the reported figures come
+from the raw vectors.
 
 Source: `experiments/sink_geometry/output/trajectories.pt`.
 
@@ -167,6 +169,8 @@ the form was wrong, so it is flat.
 
 The palette is gas-discharge lamps, which are physical light sources rather
 than a picked spectrum: sodium amber, mercury cyan, neon, argon, xenon. Plates
-I to IV hold one colour per basin throughout so a basin is recognisable across
-the set. Plate VI cannot, because the six arms do not share a vocabulary, so it
-colours by rank of ending instead and says so.
+I and III hold one colour per basin so a basin is recognisable across the
+pair. Plates II and IV reuse the same five lamps to label the five prompts
+instead, and each page says so in its reading text. Plate VI cannot hold
+either scheme, because the six arms do not share a vocabulary, so it colours
+by rank of ending instead and says so.
