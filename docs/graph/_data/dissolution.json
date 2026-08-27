@@ -3,7 +3,7 @@
     "domain": "dissolution",
     "version": "1.0",
     "title": "Dissolution pathways: prompts funnelling into terminal attractor basins",
-    "generated": "2026-07-25",
+    "generated": "2026-08-27",
     "generated_from": [
       "experiments/gpt2_small/output/dissolution_pathways.md",
       "experiments/gpt2_medium/output/dissolution_pathways.md",

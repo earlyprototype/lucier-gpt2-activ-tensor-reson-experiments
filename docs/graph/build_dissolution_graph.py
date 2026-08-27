@@ -55,7 +55,7 @@ OUT_PATH = OUT_DIR / "dissolution.json"
 # regeneration rewrote metadata.generated and showed up as a diff.  The sibling
 # build_isomorphism_graph.py pins the same way (GENERATED).  Bump this by hand
 # when the graph's content actually changes.
-GENERATED = "2026-07-25"
+GENERATED = "2026-08-27"
 
 # Token used to display a decoded token that is the empty string (the tables
 # contain literal empty backtick cells for tokens that decode to "").

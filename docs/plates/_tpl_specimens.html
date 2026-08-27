@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <title>One Head, One Specimen</title>
 <style>
 :root{
@@ -127,7 +128,7 @@ aside p{margin:0;color:var(--print-faint)}
   </header>
 
   <div class="frame">
-    <canvas id="pl" tabindex="0" aria-label="A plate of 144 specimen forms, one per attention head of GPT-2 small. Layers 0 to 11 run top to bottom, one row per layer; heads 0 to 11 run left to right, one column per head. Click a specimen to enlarge it."></canvas>
+    <canvas id="pl" tabindex="0" aria-label="A plate of 144 specimen forms, one per attention head of GPT-2 small. Layers 0 to 11 run top to bottom, one row per layer; heads 0 to 11 run left to right, one column per head. Click a specimen to enlarge it, or move the selection with the arrow keys and press Enter."></canvas>
   </div>
   <div class="scrollnote">Scroll the plate sideways to reach heads 0 to 11; layers 0 to 11 run down the page</div>
 
@@ -407,21 +408,31 @@ function cellAt(e){
   const c=Math.floor((e.clientX-r.left)/cell), l=Math.floor((e.clientY-r.top)/cell);
   return (c>=0&&c<cols&&l>=0&&l<rows)? l*12+c : -1;
 }
+function inspect(i, enter){
+  if(i>=0){ const h=D.heads[i];
+    $("ins").innerHTML=`<b>layer ${h.L}, head ${h.H}</b> &nbsp; ${h.cls} &nbsp;·&nbsp; `
+      +`eigenvalue size <b>${h.lam.toFixed(2)}</b>`
+      +`${h.lam>1?" (halo: a disturbance grows)":" (a disturbance fades)"} &nbsp;·&nbsp; `
+      +`strongest stretch over second <b>${h.gap.toFixed(2)}&times;</b> &nbsp;·&nbsp; `
+      +`decodes to <b>&#8216;${esc(h.tok)}&#8217;</b> &nbsp;·&nbsp; `
+      +(enter?"press Enter to enlarge":"click to enlarge"); }
+  else $("ins").textContent="Hover a specimen for its numbers · click any specimen to enlarge";
+}
 cv.addEventListener("pointermove",e=>{
   const i=cellAt(e);
-  if(i!==hover){ hover=i; draw();
-    if(i>=0){ const h=D.heads[i];
-      $("ins").innerHTML=`<b>layer ${h.L}, head ${h.H}</b> &nbsp; ${h.cls} &nbsp;·&nbsp; `
-        +`eigenvalue size <b>${h.lam.toFixed(2)}</b>`
-        +`${h.lam>1?" (halo: a disturbance grows)":" (a disturbance fades)"} &nbsp;·&nbsp; `
-        +`strongest stretch over second <b>${h.gap.toFixed(2)}&times;</b> &nbsp;·&nbsp; `
-        +`decodes to <b>&#8216;${esc(h.tok)}&#8217;</b> &nbsp;·&nbsp; click to enlarge`; }
-    else $("ins").textContent="Hover a specimen for its numbers · click any specimen to enlarge"; }
+  if(i!==hover){ hover=i; draw(); inspect(i, false); }
 });
-cv.addEventListener("pointerleave",()=>{hover=-1;draw();
-  $("ins").textContent="Hover a specimen for its numbers · click any specimen to enlarge";});
+cv.addEventListener("pointerleave",()=>{hover=-1;draw();inspect(-1,false);});
 cv.addEventListener("click",e=>{const i=cellAt(e); if(i>=0){sel=i; openModal();}});
 cv.addEventListener("keydown",e=>{
+  /* arrow keys walk the grid so the enlarge path works without a pointer */
+  const step={ArrowLeft:-1,ArrowRight:1,ArrowUp:-cols,ArrowDown:cols}[e.key];
+  if(step!==undefined){
+    e.preventDefault();
+    const next = hover<0 ? 0 : hover+step;
+    if(next>=0 && next<D.heads.length){ hover=next; draw(); inspect(next, true); }
+    return;
+  }
   if((e.key==="Enter"||e.key===" ") && hover>=0){e.preventDefault(); sel=hover; openModal();}
 });
 
