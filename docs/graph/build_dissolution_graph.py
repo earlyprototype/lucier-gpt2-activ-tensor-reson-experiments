@@ -84,7 +84,7 @@ MODEL_SPECS = [
         "corpus": "WebText",
         "path": "experiments/gpt2_medium/output/dissolution_pathways.md",
         "kind": "model",
-        "note": "Single funnel: every prompt collapses to `D`, locked by iter 10 (F3).",
+        "note": "Single funnel: all 70 runs collapse to `D`, locked by pass 10 (F3).",
     },
     {
         "key": "pythia-160m",
@@ -94,7 +94,8 @@ MODEL_SPECS = [
         "corpus": "The Pile",
         "path": "experiments/pythia_160m/output/dissolution_pathways.md",
         "kind": "model",
-        "note": "Single funnel: `questioned`, saturated by iter 10 (F3).",
+        "note": "Near-single funnel: `questioned` takes 65 of these 70 runs; "
+                "`sight` and `asked` hold the other five (F3).",
     },
     {
         "key": "pythia-410m",
@@ -109,12 +110,13 @@ MODEL_SPECS = [
     {
         "key": "pythia-410m-deep",
         "prefix": "p410d",
-        "label": "Pythia-410m (deep, 1000 iters)",
+        "label": "Pythia-410m (deep, 1,000 passes)",
         "params": "410M",
         "corpus": "The Pile",
         "path": "experiments/pythia_410m/output_deep/dissolution_pathways.md",
         "kind": "model",
-        "note": "8-prompt deep-convergence subset run out to 1000 iterations.",
+        "note": "Eight runs only, a CPU constraint (caveat 3), carried to pass "
+                "1,000; at the last pass the eight hold eight different words.",
     },
     {
         "key": "noise-null",
@@ -126,10 +128,10 @@ MODEL_SPECS = [
         "kind": "null-model",
         "register_override": "Noise",
         "note": "Null control, ORIGINAL arm (run 3): its pathways are kept as the "
-                "historical record. Superseded 2026-07-31 by the matched-nu re-run "
-                "(run 17), which inverted F4: at matched injection scale noise "
-                "lands in the language arm's own basins, all five reappearing at "
-                "the trials' smallest passing lag.",
+                "historical record. Superseded 2026-07-31 by the strength-matched "
+                "re-run (run 17), which inverted F4: at matched injection strength "
+                "noise lands mostly in the language arm's own five basins, with "
+                "all five reappearing.",
     },
 ]
 

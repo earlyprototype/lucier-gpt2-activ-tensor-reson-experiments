@@ -68,42 +68,56 @@ aside p{margin:0}
 
 <div class="wrap">
   <header class="mast">
-    <div class="slug"><span>Plate VI</span><span>6 runs</span><span>up to 1,000 passes</span>
-      <span>one noise control</span></div>
+    <div class="slug"><span>Plate VI</span><span>six arms</span><span>8 to 70 runs each</span>
+      <span>up to 1,000 passes</span><span>one noise control</span></div>
     <h1>Six ways of <em>dissolving</em></h1>
-    <p class="lede">Feed a sentence back through a language model until it stops changing, and
-      track every word it passes through on the way. Time runs left to right; the stack is how
-      many distinct words are still alive. <b>All six runs below use the same procedure. What
-      they leave behind could hardly be more different.</b></p>
+    <p class="lede">A sentence's internal state is fed back through a language model, pass
+      after pass, and the one word the model would say is recorded at each pass. The procedure
+      is repeated for many prompts at once and the runs are stacked: the stack is the number
+      of distinct words the runs hold between them, and time runs left to right. <b>All six
+      arms below use the same procedure. What remains at the last pass differs from arm to
+      arm, from five words, to one, to no consolidation at all.</b></p>
   </header>
 
   <div class="stage">
     <div class="ctl" id="ctl"></div>
-    <canvas id="rv" aria-label="An alluvial diagram of tokens flowing across passes, narrowing from many to few."></canvas>
+    <canvas id="rv" aria-label="An alluvial diagram of the words a fixed set of runs hold across passes. Four arms narrow from many distinct words to few; the two Pythia-410m arms stay scattered."></canvas>
     <div class="hud" id="hud"></div>
   </div>
 
   <div class="grid">
     <div>
-      <p>Start with <strong>GPT-2 Small</strong>. Fifty-three distinct words at the first
-        pass, five at the last, and those five are the basins this whole project is named
-        after: <code>prolet</code>, <code>Divine</code>, <code>Anarch</code>,
-        <code>till</code>, <code>solidarity</code>. Seventy prompts about physics, weather,
-        medicine and nursery rhymes, and they end in one of five words.</p>
-      <p>Now press <strong>GPT-2 Medium</strong>. Fifty-two words down to <strong>one</strong>.
-        Every single prompt ends at the letter <code>D</code>. The larger model of the same
-        family does not find five rooms; it finds one, and everything falls into it.</p>
-      <p><strong>Pythia 160M</strong> is nearly the same story with a different word:
-        <code>questioned</code> takes 93 per cent of everything. Then press <strong>Pythia
-        410M</strong> and the pattern breaks completely. It starts at 45 distinct words and
-        <strong>ends at 34</strong>. It never consolidates. Run it ten times longer, as the
-        deep arm does, and it still does not. One model in this set simply refuses to settle.</p>
-      <p>Finally the control, which is noise fed through the same loop instead of sentences.
-        It collapses too, mostly onto a typographic dash. <strong>So collapse by itself proves
-        nothing.</strong> It is not evidence that the model is doing something semantic, and
-        anyone who reads a funnel as meaning must reckon with the fact that random tensors
-        funnel as well. What differs between these six is not whether they collapse. It is how
-        far, how fast, and onto what.</p>
+      <p><strong>GPT-2 Small</strong>: 53 distinct words at the first pass, five at the
+        last, and those five are the five basin words of finding F1:
+        <code>prolet</code>, <code>Divine</code>, <code>Anarch</code>,
+        <code>till</code>, <code>solidarity</code>. The arm tracks 70 prompts about physics,
+        weather, medicine and nursery rhymes, and every one ends in one of the five. A limit
+        applies to every model arm on this page: each draws the 70 runs, one per prompt,
+        whose full word-by-word pathways were archived out of that model's 125-prompt sweep,
+        so every share here is a share of those 70. The findings log's canonical count,
+        taken over all 125 prompts at lock-in, puts <code>prolet</code> at 43.2 per cent
+        where these 70 show 38.6.</p>
+      <p><strong>GPT-2 Medium</strong>: 52 distinct words down to <strong>one</strong>. All
+        70 runs end at the letter <code>D</code>. The larger model of the same family does
+        not produce five basins; it produces one, and everything falls into it.</p>
+      <p><strong>Pythia 160M</strong> is nearly the same shape with a different word:
+        <code>questioned</code> takes 65 of the arm's 70 runs, about 93 per cent, and two
+        other words, <code>sight</code> and <code>asked</code>, hold the remaining five.
+        <strong>Pythia 410M</strong> breaks the pattern. Its 70 runs start spread across 45
+        distinct words, narrow to 19 by pass 2, scatter back to 40 by pass 20, and
+        <strong>end on 34 at pass 250</strong>; the count never consolidates. The deep arm
+        carries eight of its runs to pass 1,000, four times the span of the main panel, and
+        at the last pass the eight runs hold eight different words. One model in the set
+        does not settle.</p>
+      <p>The control is noise fed through the same loop in place of sentences: 20 of its
+        125 trials are drawn, and 14 of the 20 collapse onto a typographic dash. One
+        correction stands on this panel: it draws the original noise arm, kept as the
+        historical record, which was later found to have been injected more weakly than the
+        language runs. The strength-matched re-run also collapses, and lands mostly in the
+        language arm's own five basins. <strong>Collapse by itself is therefore not
+        evidence of anything semantic</strong>: random tensors funnel as well. What differs
+        across the six arms is not whether they collapse but how far, how fast, and onto
+        what.</p>
     </div>
     <aside>
       <h3>This run</h3>
@@ -111,14 +125,28 @@ aside p{margin:0}
       <h3>Where it ends</h3>
       <table id="ends"></table>
       <h3>Reading</h3>
-      <p>Horizontal position is the pass number, read straight from the archive. Vertical
-        position is a drawing choice: words are stacked by how many prompts hold them, sorted
-        so a strand keeps its neighbours, then relaxed to reduce crossings. Stack height is
-        therefore the surviving population and is the one vertical fact worth reading.
-        <br><br>Passes sampled are 0, 2, 3, 5, 10, 20, 25, 50, 100 and beyond, so the
-        horizontal axis is an ordering of observations, not a clock.
-        <br><br>Colour is the rank of the ending, since the runs do not share a vocabulary.
-        Grey led somewhere outside the top five endings of that run.</p>
+      <p>Each arm tracks a fixed set of runs, one per prompt, and every run holds exactly
+        one word at every pass, so the population never grows or shrinks. Each vertical bar
+        is one word, its height the number of runs holding that word at that pass; a
+        strand's thickness is the number of runs making that word-to-word step. The total
+        inked thickness in a column is therefore constant within an arm. What changes is
+        the number of separate bars, the count of distinct words the runs are spread
+        across: a column that sprouts more bars is fragmenting, not gaining population.
+        Vertical order is a drawing choice: bars are sorted so a strand keeps its
+        neighbours, then relaxed to reduce crossings.
+        <br><br>Horizontal position is the order of the sampled passes, evenly spaced, so
+        the axis is an ordering of observations, not a clock. The 100-pass arms sample
+        passes 0, 2, 3, 5, 10, 20, 50 and 100; the long Pythia-410m arm continues to 150,
+        200 and 250; the deep arm samples 0, 5, 10, 25, 50, 100, 200, 300, 500, 750 and
+        1,000.
+        <br><br>Colour follows the rank of the ending word within its own arm, counted by
+        how many runs finish on it: amber for the largest share, then flame, blue, teal and
+        pale. The six arms do not share a vocabulary, so a colour never means the same word
+        in two arms. Grey marks a path that led outside the arm's top five endings, and
+        grey strands are drawn fainter. In the deep arm all eight endings hold one run
+        each, so its five colours are an arbitrary tie-break. Brighter ticks in the final
+        column are the ending words themselves; the right edge names at most the fourteen
+        topmost survivors, so the Pythia-410m arm's 34 endings are not all labelled.</p>
     </aside>
   </div>
 </div>
@@ -143,22 +171,27 @@ $("ctl").querySelectorAll("button").forEach(b=>b.onclick=()=>{
 
 function info(){
   const m=D[cur], c=m.cols;
+  const runs=Object.values(m.basins||{}).reduce((a,b)=>a+b,0);
   $("stats").innerHTML=
-     `<tr><td>words at first pass</td><td>${c[0].n}</td></tr>`
-    +`<tr><td>words at last pass</td><td>${c[c.length-1].n}</td></tr>`
-    +`<tr><td>distinct endings</td><td>${m.n_basins}</td></tr>`
-    +`<tr><td>passes sampled</td><td>${m.iters.length}</td></tr>`
+     `<tr><td>runs tracked</td><td>${runs}</td></tr>`
+    +`<tr><td>distinct words, first pass</td><td>${c[0].n}</td></tr>`
+    +`<tr><td>distinct words, last pass</td><td>${c[c.length-1].n}</td></tr>`
+    +`<tr><td>distinct ending words</td><td>${m.n_basins}</td></tr>`
+    +`<tr><td>passes drawn</td><td>${m.iters.length}</td></tr>`
     +`<tr><td>last pass</td><td>${m.iters[m.iters.length-1]}</td></tr>`;
   const sh=m.shares||{};
   const top=(m.ranked||[]).slice(0,5);
-  $("ends").innerHTML = top.length
+  $("ends").innerHTML = (top.length
     ? top.map((k,i)=>`<tr><td><span style="color:${css(RANK[i])}">&#9632;</span> ${esc(k)}</td>`
         +`<td>${sh[k]!==undefined?sh[k]+"%":""}</td></tr>`).join("")
       + (m.n_basins>5?`<tr><td>and ${m.n_basins-5} more</td><td></td></tr>`:"")
-    : "<tr><td>none</td><td></td></tr>";
-  $("hud").innerHTML=`<b>${m.label||cur}</b> &nbsp;·&nbsp; ${c[0].n} words in, `
-    +`<b>${c[c.length-1].n}</b> out &nbsp;·&nbsp; ${m.n_basins} distinct ending`
-    +`${m.n_basins===1?"":"s"} &nbsp;·&nbsp; ${esc(m.note||"")}`;
+    : "<tr><td>none</td><td></td></tr>")
+    + `<tr><td colspan="2">each share is a percentage of this arm's ${runs} runs</td></tr>`;
+  $("hud").innerHTML=`<b>${esc(m.label||cur)}</b> &nbsp;·&nbsp; ${runs} runs, one word each `
+    +`per pass &nbsp;·&nbsp; ${c[0].n} distinct words among them at pass 0, `
+    +`<b>${c[c.length-1].n}</b> at pass ${m.iters[m.iters.length-1]} &nbsp;·&nbsp; `
+    +`${m.n_basins} distinct ending word${m.n_basins===1?"":"s"} &nbsp;·&nbsp; `
+    +`${esc(m.note||"")}`;
 }
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
 function hexA(hex,a){const h=hex.replace("#","");
@@ -227,7 +260,7 @@ function draw(){
   g.textAlign="left"; g.fillStyle=hexA(css("--ink-faint"),0.85);
   g.font='9.5px ui-monospace,SFMono-Regular,Menlo,monospace';
   g.fillText("pass", 8, padY*0.40+0);
-  g.fillText("words", 8, H/2-4); g.fillText("alive", 8, H/2+8);
+  g.fillText("distinct", 8, H/2-4); g.fillText("words", 8, H/2+8);
 }
 addEventListener("resize",size);
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>setTimeout(draw,60));

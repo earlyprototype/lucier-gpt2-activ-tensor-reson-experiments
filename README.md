@@ -42,13 +42,13 @@ Five unrelated sentences, each fed back through GPT-2 Small sixty times, drawn a
 
 All 144 attention heads in GPT-2 Small, arranged 12 layers by 12 heads. Each outline is drawn from that head's singular spectrum, the numbers describing how strongly it stretches its input in each direction. A table of 144 spectra is unreadable; as a grid of shapes, the odd one out is obvious. The closed round form in the bottom row is layer 11 head 8, the same head this project had already flagged twice by other measurements. [Open the interactive plate](https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/v_specimens.html).
 
-### Six runs settling, word by word
+### Six arms settling, word by word
 
 <p align="center">
   <img src="docs/assets/plates/dissolving_river.png" alt="Alluvial flow of every word a run passes through on the way to settling, one strand per word, for GPT-2 Small" width="800"/>
 </p>
 
-Every word a run passes through on its way to settling. Time runs left to right, one strand per word, and a strand's thickness is how many prompts are still saying that word. Six runs share the interactive page: five models plus a pure-noise control. The flow shows *how* the narrowing happens, not just where it ends — GPT-2 Small braids down to five words, GPT-2 Medium funnels 52 into one, Pythia-410M never settles, and even the noise control collapses, which is why collapse on its own proves nothing. [Open the interactive plate](https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/vi_river.html).
+Every archived word the runs pass through on the way to settling. Time runs left to right, one strand per word, and a strand's thickness is how many runs are saying that word. Six arms of 8 to 70 runs each share the interactive page: five model arms plus a pure-noise control. The flow shows *how* the narrowing happens, not just where it ends: GPT-2 Small braids down to five words, GPT-2 Medium funnels 52 into one, Pythia-410M never settles, and even the noise control collapses, which is why collapse on its own proves nothing. [Open the interactive plate](https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/vi_river.html).
 
 ### Where every run ended
 

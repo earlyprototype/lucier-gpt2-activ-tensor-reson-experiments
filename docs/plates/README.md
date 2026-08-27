@@ -124,10 +124,12 @@ address above.
 ### Plate VI, *Six Ways of Dissolving*
 `vi_river.html` · https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/vi_river.html
 
-Every word six runs pass through on the way to settling, as an alluvial flow,
-including a noise control.
+Every archived word six arms of runs pass through, as an alluvial flow,
+including a noise control; one arm never settles at all.
 
-Source: `docs/graph/_data/dissolution.json`.
+Source: `docs/graph/_data/dissolution.json` (the 70 prompts per model whose
+full pathways were archived, of each 125-prompt sweep; 8 runs in the deep arm,
+20 in the noise arm).
 
 The only plate with no projection at all: nodes carry their own pass number, so
 nothing is distorted. GPT-2 Small ends in five words; GPT-2 Medium funnels 52
@@ -166,5 +168,5 @@ the form was wrong, so it is flat.
 The palette is gas-discharge lamps, which are physical light sources rather
 than a picked spectrum: sodium amber, mercury cyan, neon, argon, xenon. Plates
 I to IV hold one colour per basin throughout so a basin is recognisable across
-the set. Plate VI cannot, because the six runs do not share a vocabulary, so it
+the set. Plate VI cannot, because the six arms do not share a vocabulary, so it
 colours by rank of ending instead and says so.
