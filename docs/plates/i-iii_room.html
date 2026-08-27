@@ -89,6 +89,11 @@ canvas:focus-visible{outline:2px solid var(--sodium); outline-offset:-2px}
 .controls{
   position:absolute; right:12px; top:12px; display:flex; gap:6px; flex-wrap:wrap;
 }
+.howto{
+  margin:-8px 0 0; font-family:var(--mono); font-size:11px; letter-spacing:.05em;
+  color:var(--ink-faint); line-height:1.8; max-width:78ch;
+}
+.howto b{color:var(--ink-dim); font-weight:400; text-transform:uppercase; letter-spacing:.14em; font-size:10px}
 button{
   font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
   background:transparent; color:var(--ink-dim); border:1px solid var(--rule);
@@ -168,6 +173,7 @@ button:focus-visible{outline:2px solid var(--sodium); outline-offset:2px}
       </div>
       <div class="readout" id="r1"></div>
     </div>
+    <p class="howto"><b>Reading it&nbsp;&nbsp;</b> each dot is one run's final state; nearby dots are similar states, far-apart dots different ones. A lit colour means that run settled on one of the five words; grey means it ended anywhere else. Drag to turn the cloud.</p>
     <div class="legend" id="leg1"></div>
     <div class="caption">
       <p>Every one of the 1,425 runs, each a single point placed where it came to rest.
@@ -198,6 +204,7 @@ button:focus-visible{outline:2px solid var(--sodium); outline-offset:2px}
       <div class="controls" id="ctl2"></div>
       <div class="readout" id="r2"></div>
     </div>
+    <p class="howto"><b>Reading it&nbsp;&nbsp;</b> one line per sentence, one step per pass through the model; the bright dot is where that sentence's state is right now. The five start scattered and, where a model converges, arrive at one spot and stop.</p>
     <div class="caption">
       <p>The settling itself, drawn one pass at a time. Each trace is one prompt; the
         head of the trace is where the state is now. They begin scattered and end
@@ -225,6 +232,7 @@ button:focus-visible{outline:2px solid var(--sodium); outline-offset:2px}
       <canvas id="c3" tabindex="0" aria-label="Three-dimensional curve of the injection sweep, plotting loudness against growth and turn per pass."></canvas>
       <div class="readout" id="r3"></div>
     </div>
+    <p class="howto"><b>Reading it&nbsp;&nbsp;</b> one node per loudness setting, joined in order from 1x to 1024x the natural level. Height is how much a single pass grows the state; depth is how far a pass turns it. The big lit nodes are the settings where most runs end in the five words.</p>
     <div class="caption">
       <p>The knob itself, all twenty-one settings, drawn as one continuous path. Left to
         right is loudness. The two other axes are the only two things a pass can do to a
@@ -382,8 +390,13 @@ function ramp(t){
       if(st.mode==="word") col = inFive ? css(key) : css("--dark-matter");
       else col = ramp((mults[i]-lo)/(hi-lo));
       const depth = (q[2]-0.72)/0.62;
-      const r = (inFive||st.mode==="mult" ? 1.85 : 1.15) * (0.62+depth*0.75);
-      const a = (inFive||st.mode==="mult" ? 0.80 : 0.42) * (0.42+depth*0.62);
+      const r = (inFive||st.mode==="mult" ? 2.4 : 1.25) * (0.62+depth*0.75);
+      const a = (inFive||st.mode==="mult" ? 0.85 : 0.42) * (0.42+depth*0.62);
+      if(inFive && st.mode==="word"){
+        /* halo, so the five basins read at arm's length */
+        g.fillStyle = hexA(col, 0.10*(0.42+depth*0.62));
+        g.beginPath(); g.arc(q[0], q[1], Math.max(3.2, r*3.1), 0, 6.2832); g.fill();
+      }
       g.fillStyle = hexA(col, Math.min(0.95,a));
       g.beginPath(); g.arc(q[0], q[1], Math.max(0.6,r), 0, 6.2832); g.fill();
     }
@@ -516,6 +529,14 @@ function ramp(t){
     const qb=project(rot(P[best],st.ax,st.ay),W,H,zoom);
     g.fillStyle=css("--sodium");
     g.fillText(`crest ${S[best].turn_mean_10.toFixed(1)}deg`, qb[0]+9, qb[1]-6);
+    /* axis words, attached to the scene so they turn with it */
+    g.fillStyle=css("--ink-faint");
+    const axl=project(rot([1.14,-1,-1],st.ax,st.ay),W,H,zoom);
+    g.fillText("louder \u2192", axl[0]-10, axl[1]+14);
+    const axg=project(rot([-1,1.12,-1],st.ax,st.ay),W,H,zoom);
+    g.fillText("growth per pass", axg[0]-34, axg[1]-8);
+    const axt=project(rot([-1,-1,1.16],st.ax,st.ay),W,H,zoom);
+    g.fillText("turn per pass", axt[0]+5, axt[1]+4);
     out.textContent = `21 levels  ·  x loudness  ·  y growth per pass  ·  z turn per pass  ·  lit where most runs land in the five`;
   }
   frame();

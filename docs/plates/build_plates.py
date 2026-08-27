@@ -58,13 +58,19 @@ import math
 import pathlib
 import sys
 
-import torch
+# The full rebuild needs torch (archives + the seeded projection below);
+# --inline-only re-inlines committed payloads and must work without it.
+try:
+    import torch
+except ModuleNotFoundError:
+    torch = None
 
 # torch.pca_lowrank uses randomised SVD, so without this the same archive
 # produces a different projection on every build: axes flip sign, points move,
 # and the committed payloads churn. A plate must be reproducible from its
 # inputs or it is not evidence of anything.
-torch.manual_seed(20260805)
+if torch is not None:
+    torch.manual_seed(20260805)
 
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
@@ -331,6 +337,24 @@ PLATES = [
 
 
 if __name__ == "__main__":
+    # --inline-only: re-inline the COMMITTED payloads (data/*.json) into the
+    # templates without recomputing anything. This is the path for editing a
+    # plate's design: no torch, no archives, byte-identical data. The full
+    # build below remains the path when the numbers themselves change.
+    if "--inline-only" in sys.argv:
+        for tpl, out, _fn in PLATES:
+            blob = (DATA / (out.rsplit(".", 1)[0] + ".json")).read_text(
+                encoding="utf-8")
+            html = (HERE / tpl).read_text(encoding="utf-8")
+            if "__DATA__" not in html:
+                sys.exit(f"[plates] {tpl} has no __DATA__ token")
+            (HERE / out).write_text(html.replace("__DATA__", blob),
+                                    encoding="utf-8")
+            print(f"[plates] {out}  (re-inlined committed payload)")
+        sys.exit(0)
+    if torch is None:
+        sys.exit("[plates] the full rebuild needs torch; "
+                 "use --inline-only to re-inline the committed payloads")
     DATA.mkdir(parents=True, exist_ok=True)
     for tpl, out, fn in PLATES:
         payload = fn()
