@@ -1,0 +1,487 @@
+<title>One Head, One Specimen</title>
+<style>
+:root{
+  --plate:#0E2A47; --plate-deep:#081B30; --plate-mid:#16436C;
+  --print:#E8F1F7; --print-dim:#9FC2DA; --print-faint:#5F8CB0;
+  --rule:#1D4468; --accent:#F2C879;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --neg:0;
+}
+@media (prefers-color-scheme: light){
+  :root{--plate:#FFFFFF; --plate-deep:#CBD9E5; --plate-mid:#A8C0D4;
+        --print:#0A2038; --print-dim:#2E5677; --print-faint:#6C8FAC;
+        --rule:#A8BACB; --accent:#8A5A0B; --neg:1;}
+}
+:root[data-theme="light"]{--plate:#FFFFFF; --plate-deep:#CBD9E5; --plate-mid:#A8C0D4;
+  --print:#0A2038; --print-dim:#2E5677; --print-faint:#6C8FAC; --rule:#A8BACB; --accent:#8A5A0B; --neg:1;}
+:root[data-theme="dark"]{--plate:#0E2A47; --plate-deep:#081B30; --plate-mid:#16436C;
+  --print:#E8F1F7; --print-dim:#9FC2DA; --print-faint:#5F8CB0; --rule:#1D4468; --accent:#F2C879; --neg:0;}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--plate-deep);color:var(--print);
+  font-family:var(--serif);font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.sheet{max-width:1160px;margin:0 auto;padding:0 26px 90px}
+
+.head{padding:74px 0 30px;display:grid;gap:20px;justify-items:center;text-align:center}
+.plateno{font-family:var(--mono);font-size:10.5px;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--print-faint)}
+h1{font-family:var(--serif);font-weight:400;font-style:italic;
+  font-size:clamp(1.9rem,4.6vw,3.2rem);line-height:1.1;margin:0;letter-spacing:-.01em;
+  max-width:22ch;text-wrap:balance}
+.sub{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--print-dim);display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.rule{width:100%;height:1px;background:var(--rule);margin-top:6px}
+
+.frame{position:relative;background:var(--plate);border:1px solid var(--rule);
+  padding:16px;margin-top:26px;overflow-x:auto;overflow-y:hidden;
+  -webkit-overflow-scrolling:touch}
+.frame canvas{min-width:744px}
+.scrollnote{display:none;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--print-faint);margin-top:8px}
+@media (max-width:800px){.scrollnote{display:block}}
+.frame::after{content:"";position:absolute;inset:7px;border:1px solid var(--rule);
+  pointer-events:none;opacity:.55}
+canvas{display:block;width:100%;height:auto;cursor:crosshair}
+canvas:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.leghead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  margin-top:22px}
+.leghead span{font-family:var(--mono);font-size:10px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--print-faint)}
+.classes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+@media (max-width:900px){.classes{grid-template-columns:1fr 1fr}}
+@media (max-width:480px){.classes{grid-template-columns:1fr}}
+button{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;
+  background:transparent;color:var(--print-dim);border:1px solid var(--rule);padding:6px 10px;
+  cursor:pointer;transition:color .15s,border-color .15s,background .15s,opacity .15s}
+button:hover{color:var(--print);border-color:var(--print-faint)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.ccard{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;
+  text-align:left;padding:10px 12px;text-transform:none;letter-spacing:0}
+button.ccard[aria-pressed="true"]{background:transparent;color:inherit;
+  border-color:var(--print-faint)}
+button.ccard[aria-pressed="false"]{opacity:.38}
+.ccard svg{display:block}
+.ccard .blob{fill:none;stroke:var(--print-faint);opacity:.6;stroke-width:1.2}
+.ccard .mark{fill:none;stroke:var(--print);stroke-width:1.6}
+.cname{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--print)}
+.cdef{display:block;font-family:var(--serif);font-size:13px;line-height:1.45;
+  color:var(--print-dim);margin-top:3px}
+.halonote{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;
+  line-height:1.6;color:var(--print-dim);margin:10px 0 0;border:1px solid var(--rule);
+  padding:8px 12px}
+.halonote svg{flex:none}
+.halonote .blob{fill:none;stroke:var(--print-faint);opacity:.6;stroke-width:1.2}
+
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.inspect{font-family:var(--mono);font-size:11px;color:var(--print-dim);min-height:1.6em;
+  letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.inspect b{color:var(--print);font-weight:400}
+
+.body{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:36px;
+  margin-top:44px;padding-top:26px;border-top:1px solid var(--rule)}
+.body p{margin:0 0 1em;max-width:62ch;color:var(--print-dim)}
+.body p:last-child{margin-bottom:0}
+.body strong{color:var(--print);font-weight:400}
+.body em{color:var(--print);font-style:italic}
+aside{font-family:var(--mono);font-size:11px;line-height:1.95;color:var(--print-faint)}
+aside h3{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--print-faint);
+  font-weight:400;margin:0 0 10px}
+aside table{border-collapse:collapse;width:100%;margin-bottom:22px}
+aside td{padding:1px 0}
+aside td:last-child{text-align:right;color:var(--print-dim);font-variant-numeric:tabular-nums}
+aside p{margin:0;color:var(--print-faint)}
+
+.modal{position:fixed;inset:0;background:rgba(4,12,20,.66);display:flex;
+  align-items:center;justify-content:center;padding:20px;z-index:50}
+.modal[hidden]{display:none}
+.mbox{background:var(--plate);border:1px solid var(--rule);max-width:980px;width:100%;
+  max-height:92vh;overflow:auto;display:grid;grid-template-columns:auto minmax(260px,1fr);
+  gap:26px;padding:24px;position:relative}
+@media (max-width:880px){.mbox{grid-template-columns:1fr;justify-items:center}}
+.mbox canvas{cursor:default;width:auto}
+.mclose{position:absolute;top:12px;right:12px}
+.mmeta{font-family:var(--serif);min-width:0}
+.mmeta h2{font-family:var(--serif);font-weight:400;font-size:1.6rem;margin:0;
+  letter-spacing:-.01em}
+.mclass{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent);margin:6px 0 4px}
+.mmeta dl{margin:0}
+.mmeta dt{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--print-faint);margin-top:16px}
+.mmeta dd{margin:3px 0 0;font-size:15px;line-height:1.55;color:var(--print-dim)}
+.mmeta dd b{color:var(--print);font-weight:400;font-size:19px}
+
+@media (max-width:820px){.body{grid-template-columns:1fr;gap:22px}.head{padding:52px 0 22px}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.001ms !important}}
+</style>
+
+<div class="sheet">
+  <header class="head">
+    <div class="plateno">Plate V</div>
+    <h1>One head, one specimen</h1>
+    <div class="sub"><span>GPT-2 Small</span><span>144 heads, one specimen each</span><span>4 classes</span></div>
+    <div class="rule"></div>
+  </header>
+
+  <div class="frame">
+    <canvas id="pl" tabindex="0" aria-label="A plate of 144 specimen forms, one per attention head of GPT-2 small. Layers 0 to 11 run top to bottom, one row per layer; heads 0 to 11 run left to right, one column per head. Click a specimen to enlarge it."></canvas>
+  </div>
+  <div class="scrollnote">Scroll the plate sideways to reach heads 0 to 11; layers 0 to 11 run down the page</div>
+
+  <div class="leghead">
+    <span>The four classes, from the eigenvalue census · each entry filters the plate</span>
+    <button id="allbtn">show all</button>
+  </div>
+  <div class="classes" id="classes">
+    <button class="ccard" data-c="fixed-point" aria-pressed="true">
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+        <circle class="blob" cx="20" cy="20" r="13"/>
+      </svg>
+      <span><span class="cname">fixed-point · <b id="n-fixed-point">52</b> of 144</span>
+      <span class="cdef">Run on its own output, the head settles to one state and stays
+        there. No centre mark.</span></span>
+    </button>
+    <button class="ccard" data-c="rotating" aria-pressed="true">
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+        <circle class="blob" cx="20" cy="20" r="13"/>
+        <path class="mark" d="M27 20 A7 7 0 1 1 20 13"/>
+      </svg>
+      <span><span class="cname">rotating · <b id="n-rotating">57</b> of 144</span>
+      <span class="cdef">The state never settles; it keeps turning at a steady rate, pass
+        after pass. Mark: an open arc.</span></span>
+    </button>
+    <button class="ccard" data-c="sign-flip" aria-pressed="true">
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+        <circle class="blob" cx="20" cy="20" r="13"/>
+        <line class="mark" x1="12" y1="20" x2="28" y2="20"/>
+      </svg>
+      <span><span class="cname">sign-flip · <b id="n-sign-flip">29</b> of 144</span>
+      <span class="cdef">The state lands on one axis and reverses along it every pass, a
+        two-beat alternation. Mark: a horizontal bar.</span></span>
+    </button>
+    <button class="ccard" data-c="slow-converging" aria-pressed="true">
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+        <circle class="blob" cx="20" cy="20" r="13"/>
+        <circle class="mark" cx="20" cy="20" r="4"/>
+      </svg>
+      <span><span class="cname">slow-converging · <b id="n-slow-converging">6</b> of 144</span>
+      <span class="cdef">Still moving toward a settle point when observation stopped at
+        pass 500. Mark: a small ring.</span></span>
+    </button>
+  </div>
+  <p class="halonote">
+    <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+      <circle class="blob" cx="20" cy="20" r="11"/>
+      <circle cx="20" cy="20" r="15.5" fill="none" stroke="var(--accent)" stroke-width="1.4"/>
+    </svg>
+    <span>Halo: a thin gold ring outside a form marks a head whose leading eigenvalue size
+    is above one, so a disturbance along the head's dominant direction grows on each pass.
+    <b id="nhalo">113</b> of 144 heads carry it.</span>
+  </p>
+
+  <div class="tools">
+    <div class="inspect" id="ins">Hover a specimen for its numbers · click any specimen to enlarge</div>
+  </div>
+
+  <div class="body">
+    <div>
+      <p>Each of the 144 attention heads in GPT-2 Small was run in isolation: the head was
+        applied to its own output repeatedly and observed for 500 passes. The form in each
+        square is drawn from that head's weights. A head stretches some directions of the
+        model's internal space more than others, and the ordered list of those stretch
+        factors, strongest first, is the head's spectrum. <strong>The first twenty stretch
+        factors after the strongest set the lobes of the form, the tail of smaller ones sets
+        the fineness of the edge, and the head's dominant direction, the one it stretches
+        most, sets where every lobe falls.</strong> The mapping from spectrum to form is
+        fixed and identical for all 144 heads, so two forms agree only when both the spectra
+        and the dominant directions agree. Every form is scaled to fill its own square; size
+        therefore carries no information on this plate, only shape does.</p>
+      <p>The heads fall into four classes, assigned by prior measurement rather than by eye:
+        52 of the 144 are fixed-point, 57 rotating, 29 sign-flip and 6 slow-converging. The
+        legend beneath the plate defines each class and its centre mark, and each legend
+        entry filters the plate.</p>
+      <p>One specimen is visibly unlike the other 143: layer 11, head 8, in the bottom row,
+        ninth column. Where other forms open into spikes, it stays closed and dense. Spikes
+        are the lesser stretch factors drawn relative to the strongest, so a closed form
+        means one stretch factor far above all the rest. For this head the strongest stretch
+        is <strong>11.5 times the second</strong>; the runner-up across the plate reaches
+        3.6, and the median head sits at 1.2. On this measure the head ranks first of 144.</p>
+      <p>Three independent measurements meet on that square. The head's leading eigenvalue,
+        the factor by which one pass grows or shrinks a disturbance along its dominant
+        direction, has size <strong>86.7, the largest of all 144</strong>; the next largest
+        is 9.6 and the median is 1.9. The eigenvalue's sign is negative, which is why the
+        head is classified a sign-flipper: its state lands on one axis and reverses along it
+        every pass. In the separate attribution experiment on the full model, with all 144
+        heads running together, the same head carries 99 per cent of the attention
+        contribution to the direction reversal that drives the two-beat limit cycle
+        documented in the findings log, and removing the head collapses that cycle. A
+        spectral census, a stability classification and an attribution experiment converge
+        on the same square.</p>
+      <p>113 of the 144 heads carry the halo, a leading eigenvalue size above one. Growth
+        along one direction does not prevent settling: the iteration holds the state's
+        overall size fixed, and 45 of the 52 fixed-point heads carry the halo yet settle in
+        direction. The halo records that without that constraint, motion along the dominant
+        direction would diverge.</p>
+    </div>
+    <aside>
+      <h3>The plate</h3>
+      <table>
+        <tr><td>specimens</td><td>144</td></tr>
+        <tr><td>rows, by layer</td><td>12</td></tr>
+        <tr><td>columns, by head</td><td>12</td></tr>
+        <tr><td>stretch factors drawn per form</td><td>20</td></tr>
+        <tr><td>fixed-point</td><td>52</td></tr>
+        <tr><td>rotating</td><td>57</td></tr>
+        <tr><td>sign-flip</td><td>29</td></tr>
+        <tr><td>slow-converging</td><td>6</td></tr>
+        <tr><td>halo, eigenvalue above one</td><td id="ngrow">&mdash;</td></tr>
+      </table>
+      <h3>Marks</h3>
+      <p>The figure at a specimen's centre is its class mark, defined in the legend above
+        the text. For a rotating head the arc's sweep is the fraction of the head's turning
+        that stays in the flat plane its own wiring predicts: all but two of the 57 rotating
+        heads earn the full circle, layer 0 head 1 shows about half, and layer 6 head 8
+        falls just short. The gold ring outside a form is the halo. A class switched off in
+        the legend stays in place but fades.</p>
+      <h3 style="margin-top:22px">Limitations</h3>
+      <p>Each head was looped in isolation, with none of the machinery that surrounds it in
+        the working model: no attention weighting over a real context, no re-balancing of
+        the residual stream, no bias terms. The plate therefore claims nothing about heads
+        at work together. Observation stopped at pass 500. The class labels come from the
+        earlier census and are reproduced here, not recomputed. The mapping from spectrum to
+        outline is a drawing convention, and the four nested contour lines inside each form
+        are shading, not data; the spectra themselves are measured. The token in the readout
+        is what the head's dominant direction spells when pushed directly to the vocabulary;
+        it is a property of the weights, not of the settled state, and for most heads the
+        settled state points elsewhere (median agreement between the two directions is 0.16
+        on a scale of 0 to 1).</p>
+    </aside>
+  </div>
+</div>
+
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mtitle">
+  <div class="mbox">
+    <button class="mclose" id="mclose" aria-label="Close the enlarged specimen">close</button>
+    <canvas id="mc" aria-label="The selected specimen, enlarged"></canvas>
+    <div class="mmeta">
+      <h2 id="mtitle"></h2>
+      <div class="mclass" id="mclass"></div>
+      <dl id="mrows"></dl>
+    </div>
+  </div>
+</div>
+
+<script>
+const D=__DATA__;
+const $=i=>document.getElementById(i);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const cv=$("pl"), ctx=cv.getContext("2d");
+const CLASSES=["fixed-point","rotating","sign-flip","slow-converging"];
+const DEF={
+  "fixed-point":"run on its own output, the head settles to one state and stays there",
+  "rotating":"the state never settles; it keeps turning at a steady rate, pass after pass",
+  "sign-flip":"the state lands on one axis and reverses along it every pass, a two-beat alternation",
+  "slow-converging":"the state was still moving toward a settle point when observation stopped at pass 500"
+};
+let active=new Set(CLASSES), hover=-1, sel=-1, W,H,dpr,cell,cols=12,rows=12;
+
+const med=a=>{const s=[...a].sort((x,y)=>x-y);const n=s.length;
+  return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;};
+const MEDGAP=med(D.heads.map(h=>h.gap)), MEDLAM=med(D.heads.map(h=>h.lam));
+
+CLASSES.forEach(c=>{const el=$("n-"+c); if(el) el.textContent=D.heads.filter(h=>h.cls===c).length;});
+const NHALO=D.heads.filter(h=>h.lam>1).length;
+$("nhalo").textContent=NHALO;
+$("ngrow").textContent=NHALO+" of 144";
+
+function syncCards(){document.querySelectorAll(".ccard").forEach(x=>
+  x.setAttribute("aria-pressed", active.has(x.dataset.c)));}
+document.querySelectorAll(".ccard").forEach(b=>b.onclick=()=>{
+  const c=b.dataset.c;
+  active.has(c)?active.delete(c):active.add(c);
+  if(!active.size) active=new Set(CLASSES);
+  syncCards(); draw();
+});
+$("allbtn").onclick=()=>{active=new Set(CLASSES); syncCards(); draw();};
+
+const MIN_CELL=62;   /* below this a specimen stops being readable */
+function size(){
+  dpr=Math.min(devicePixelRatio||1,3);
+  W=Math.max(cols*MIN_CELL, cv.parentElement.clientWidth-32);
+  cell=W/cols; H=cell*rows;
+  cv.style.width=W+"px";
+  cv.style.height=H+"px"; cv.width=W*dpr; cv.height=H*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  draw();
+  if(sel>=0 && !$("modal").hidden) drawModal();
+}
+
+/* outline of one specimen: r(t) = 1 + sum_k a_k cos(k t + p_k) */
+function outline(h, steps){
+  const pts=[], A=h.a, P=h.p, n=A.length;
+  let peak=0;
+  for(let s=0;s<steps;s++){
+    const t=s/steps*6.283185;
+    let r=1;
+    for(let k=0;k<n;k++) r += A[k]*Math.cos((k+1)*t + P[k]);
+    pts.push(r); peak=Math.max(peak,Math.abs(r));
+  }
+  return {r:pts, peak};
+}
+
+/* draws one specimen into any context; line widths scale with R so the same
+   code serves the plate's cells and the enlarged view */
+function specimen(g, h, cx, cy, R, dim){
+  const steps=560, o=outline(h,steps);
+  const norm=R/Math.max(0.85, o.peak);
+  const ink=css("--print"), neg=parseFloat(css("--neg"))||0;
+  const path=(scale)=>{
+    g.beginPath();
+    for(let s=0;s<steps;s++){
+      const t=s/steps*6.283185, rr=o.r[s]*norm*scale;
+      const x=cx+Math.cos(t)*rr, y=cy+Math.sin(t)*rr;
+      s?g.lineTo(x,y):g.moveTo(x,y);
+    }
+    g.closePath();
+  };
+  /* halo: leading eigenvalue above one, the disturbance grows */
+  if(h.lam>1){
+    g.strokeStyle=hexA(css("--accent"), dim?0.12:0.42);
+    g.lineWidth=Math.max(0.6,R*0.031); path(1.16); g.stroke();
+  }
+  /* the filled body of the specimen, drawn from the head's own numbers */
+  g.fillStyle=hexA(ink, dim?0.06:(neg?0.90:0.82));
+  path(1); g.fill();
+  /* interior contours: scaled copies of the outline; rendering only, they carry no data */
+  g.lineWidth=Math.max(0.45,R*0.024);
+  for(let i=1;i<=4;i++){
+    g.strokeStyle=hexA(neg?css("--plate"):css("--plate-deep"), dim?0.10:0.34);
+    path(1-i*0.185); g.stroke();
+  }
+  /* class mark: a rotating head gets an arc, a sign-flip gets an axis */
+  g.lineWidth=Math.max(0.5,R*0.0253);
+  g.strokeStyle=hexA(neg?css("--plate"):css("--plate-deep"), dim?0.10:0.5);
+  if(h.cls==="rotating" && h.rot!=null){
+    g.beginPath(); g.arc(cx,cy,R*0.20,0, 6.283185*Math.min(1,h.rot)); g.stroke();
+  } else if(h.cls==="sign-flip"){
+    g.beginPath(); g.moveTo(cx-R*0.30,cy); g.lineTo(cx+R*0.30,cy); g.stroke();
+  } else if(h.cls==="slow-converging"){
+    g.beginPath(); g.arc(cx,cy,R*0.09,0,6.283185); g.stroke();
+  }
+}
+function hexA(hex,a){const h=hex.replace("#","");
+  return `rgba(${parseInt(h.slice(0,2),16)},${parseInt(h.slice(2,4),16)},${parseInt(h.slice(4,6),16)},${a})`;}
+
+function draw(){
+  if(!W) return;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=css("--plate"); ctx.fillRect(0,0,W,H);
+  /* faint register grid between cells */
+  ctx.strokeStyle=hexA(css("--rule"),0.55); ctx.lineWidth=0.5;
+  for(let i=1;i<cols;i++){ctx.beginPath();ctx.moveTo(i*cell,0);ctx.lineTo(i*cell,H);ctx.stroke();}
+  for(let j=1;j<rows;j++){ctx.beginPath();ctx.moveTo(0,j*cell);ctx.lineTo(W,j*cell);ctx.stroke();}
+  D.heads.forEach((h,i)=>{
+    const cx=(h.H+0.5)*cell, cy=(h.L+0.5)*cell;
+    specimen(ctx, h, cx, cy, cell*0.355, !active.has(h.cls));
+  });
+  /* row and column labels */
+  ctx.font='9px ui-monospace,SFMono-Regular,Menlo,monospace';
+  ctx.fillStyle=hexA(css("--print-faint"),0.75);
+  for(let j=0;j<rows;j++) ctx.fillText("L"+j, 4, j*cell+11);
+  ctx.textAlign="right";
+  for(let i=0;i<cols;i++) ctx.fillText("H"+i, (i+1)*cell-4, 11);
+  ctx.textAlign="left";
+  if(hover>=0){
+    const h=D.heads[hover];
+    ctx.strokeStyle=css("--accent"); ctx.lineWidth=1;
+    ctx.strokeRect(h.H*cell+1.5, h.L*cell+1.5, cell-3, cell-3);
+  }
+}
+
+function cellAt(e){
+  const r=cv.getBoundingClientRect();
+  const c=Math.floor((e.clientX-r.left)/cell), l=Math.floor((e.clientY-r.top)/cell);
+  return (c>=0&&c<cols&&l>=0&&l<rows)? l*12+c : -1;
+}
+cv.addEventListener("pointermove",e=>{
+  const i=cellAt(e);
+  if(i!==hover){ hover=i; draw();
+    if(i>=0){ const h=D.heads[i];
+      $("ins").innerHTML=`<b>layer ${h.L}, head ${h.H}</b> &nbsp; ${h.cls} &nbsp;·&nbsp; `
+        +`eigenvalue size <b>${h.lam.toFixed(2)}</b>`
+        +`${h.lam>1?" (halo: a disturbance grows)":" (a disturbance fades)"} &nbsp;·&nbsp; `
+        +`strongest stretch over second <b>${h.gap.toFixed(2)}&times;</b> &nbsp;·&nbsp; `
+        +`decodes to <b>&#8216;${esc(h.tok)}&#8217;</b> &nbsp;·&nbsp; click to enlarge`; }
+    else $("ins").textContent="Hover a specimen for its numbers · click any specimen to enlarge"; }
+});
+cv.addEventListener("pointerleave",()=>{hover=-1;draw();
+  $("ins").textContent="Hover a specimen for its numbers · click any specimen to enlarge";});
+cv.addEventListener("click",e=>{const i=cellAt(e); if(i>=0){sel=i; openModal();}});
+cv.addEventListener("keydown",e=>{
+  if((e.key==="Enter"||e.key===" ") && hover>=0){e.preventDefault(); sel=hover; openModal();}
+});
+
+function fillModal(h){
+  $("mtitle").textContent=`Layer ${h.L}, head ${h.H}`;
+  $("mclass").textContent=h.cls+(h.lam>1?" · halo":" · no halo");
+  const rank=1+D.heads.filter(x=>x.gap>h.gap).length;
+  const growth=h.lam>1
+    ?"Above one: a disturbance along the dominant direction grows on each pass, which is what the gold halo marks."
+    :"Below one: a disturbance along the dominant direction fades on each pass, so the form carries no halo.";
+  const sign=h.cls==="sign-flip"
+    ?" The eigenvalue's sign is negative, which is what makes the state reverse along its axis each pass."
+    :"";
+  const rot=(h.cls==="rotating" && h.rot!=null)
+    ?`<dt>turning held in one plane</dt><dd><b>${Math.round(h.rot*100)}%</b> of the head's `
+      +`turning stays in the flat plane its wiring predicts; the centre arc's sweep draws `
+      +`this share.</dd>`
+    :"";
+  $("mrows").innerHTML=
+     `<dt>class</dt><dd><b>${h.cls}</b>: ${DEF[h.cls]}.</dd>`
+    +`<dt>leading eigenvalue, size</dt><dd><b>${h.lam.toFixed(2)}</b>. The factor by which `
+      +`one pass grows or shrinks a disturbance along the head's dominant direction. `
+      +`${growth}${sign} Median size across the plate is ${MEDLAM.toFixed(2)}.</dd>`
+    +`<dt>spectral gap</dt><dd><b>${h.gap.toFixed(2)}&times;</b>. The strongest stretch `
+      +`factor over the second; a larger gap draws a more closed form. Median across the `
+      +`plate is ${MEDGAP.toFixed(2)}; this head ranks ${rank} of 144.</dd>`
+    +rot
+    +`<dt>dominant direction decodes to</dt><dd><b>&#8216;${esc(h.tok)}&#8217;</b>. The token the head's `
+      +`most-stretched direction spells when pushed directly to the vocabulary. A property `
+      +`of the weights, not of the settled state.</dd>`;
+}
+function drawModal(){
+  if(sel<0) return;
+  const h=D.heads[sel], mc=$("mc"), g=mc.getContext("2d");
+  const sz=Math.max(240, Math.min(480, innerWidth-120, innerHeight-160));
+  const d=Math.min(devicePixelRatio||1,3);
+  mc.style.width=sz+"px"; mc.style.height=sz+"px";
+  mc.width=sz*d; mc.height=sz*d;
+  g.setTransform(d,0,0,d,0,0);
+  g.fillStyle=css("--plate"); g.fillRect(0,0,sz,sz);
+  g.strokeStyle=hexA(css("--rule"),0.55); g.lineWidth=1;
+  g.strokeRect(0.5,0.5,sz-1,sz-1);
+  specimen(g, h, sz/2, sz/2, sz*0.40, false);
+}
+function openModal(){
+  fillModal(D.heads[sel]);
+  $("modal").hidden=false;
+  drawModal();
+  $("mclose").focus();
+}
+function closeModal(){
+  $("modal").hidden=true; sel=-1; cv.focus();
+}
+$("mclose").onclick=closeModal;
+$("modal").addEventListener("click",e=>{if(e.target===$("modal")) closeModal();});
+addEventListener("keydown",e=>{if(e.key==="Escape" && !$("modal").hidden) closeModal();});
+
+addEventListener("resize",size);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>setTimeout(()=>{
+  draw(); if(sel>=0 && !$("modal").hidden) drawModal();
+},50));
+size();
+</script>

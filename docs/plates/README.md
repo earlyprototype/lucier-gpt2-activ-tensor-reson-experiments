@@ -45,7 +45,7 @@ themselves survive anything short of losing the repository:
 
 - Plates I to III: https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/i-iii_room.html
 - Plate IV: https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/iv_bodies.html
-- Plate V: https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/v_cyanotypes.html
+- Plate V: https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/v_specimens.html
 - Plate VI: https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/vi_river.html
 
 ## The plates
@@ -84,24 +84,42 @@ different display choices gave two opposite conclusions. The reported figures
 now come from the raw state vectors and never from anything drawn. The page
 says so, and the warning is kept rather than tidied away.
 
-### Plate V, *Cyanotypes of the Attention Heads*
-`v_cyanotypes.html` · https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/v_cyanotypes.html
+### Plate V, *One Head, One Specimen*
+`v_specimens.html` · https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/v_specimens.html
 
 All 144 attention heads as specimen outlines built from their own singular
-spectra, after Anna Atkins, *Photographs of British Algae: Cyanotype
-Impressions*, 1843.
+spectra, one square per head, with the four stability classes defined in a
+legend beneath the plate and any specimen enlargeable by clicking it.
 
 Sources: `experiments/_DATA/EXP_009/009c_spectral_data.pt`,
 `experiments/gpt2_small/output_eigen_rescore/results.json`.
 
 The plate found something unplanned: one specimen is visibly unlike the other
-143, and it is layer 11 head 8. Rank one of 144 for the most closed form,
-leading eigenvalue 86.7 which is the largest in the model, classified a
-sign-flipper, and separately known from the attribution run to contribute most
-of the per-pass turn. Three independent measurements on one square.
+143, and it is layer 11 head 8. Rank one of 144 for the most closed form (its
+strongest stretch factor is 11.5 times its second, where the runner-up manages
+3.6), a leading eigenvalue of size 86.7 and negative sign, the largest in the
+model, classified a sign-flipper, and separately known from the attribution
+run to carry 99 per cent of the attention side of the direction reversal that
+drives the studied two-beat cycle. Three independent measurements on one
+square.
 
 Limit: each head was looped in isolation, which is not what a head does inside
 the working model. These are portraits of parts removed from the whole.
+
+**Renamed and corrected (2026-08-27).** This plate first went out under a
+title borrowed from an early photographic printing process, and its page
+credited that process as the working method. The claim did not hold: the
+borrowed process makes its image by physical contact with the specimen, and
+this plate's forms are drawn through a mapping the page itself calls a
+convention, so the borrowed title and its process note were removed rather
+than defended, and the page was renamed from the plate's own words. Two
+numeric claims were corrected at the same time, against the committed payload:
+the median leading-eigenvalue size across the 144 heads is 1.9, not "near
+one", and the attribution result is 99 per cent of the attention side of the
+studied cycle's direction reversal, not "most of the per-pass turn", which was
+never measured per head. The renaming changed the page's filename, so the
+plate's previous published address no longer resolves; the plate lives at the
+address above.
 
 ### Plate VI, *Six Ways of Dissolving*
 `vi_river.html` · https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/vi_river.html

@@ -35,7 +35,7 @@ WHAT EACH PLATE DRAWS, and where its honesty limits are stated:
                        An earlier version measured separation in the display's
                        own coordinates and reported the opposite conclusion.
 
-  v_cyanotypes.html    Plate V. All 144 attention heads as specimen outlines
+  v_specimens.html    Plate V. All 144 attention heads as specimen outlines
                        built from their own singular spectra, with the
                        stability class and leading eigenvalue from the earlier
                        per-head census. Each head was looped in isolation,
@@ -331,7 +331,7 @@ PLATES = [
               "sweep": build_sweep()}),
     ("_tpl_bodies.html", "iv_bodies.html",
      lambda: {"K": K_SHAPE, "m": build_morph()}),
-    ("_tpl_cyanotypes.html", "v_cyanotypes.html", build_heads),
+    ("_tpl_specimens.html", "v_specimens.html", build_heads),
     ("_tpl_river.html", "vi_river.html", build_river),
 ]
 

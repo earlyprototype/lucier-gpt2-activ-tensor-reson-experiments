@@ -40,7 +40,7 @@ Five unrelated sentences, each fed back through GPT-2 Small sixty times, drawn a
   <img src="docs/assets/plates/head_spectra_grid.png" alt="All 144 attention heads of GPT-2 Small drawn as specimen outlines from their singular spectra, arranged 12 layers by 12 heads" width="700"/>
 </p>
 
-All 144 attention heads in GPT-2 Small, arranged 12 layers by 12 heads. Each outline is drawn from that head's singular spectrum — the numbers describing how strongly it stretches its input in each direction. A table of 144 spectra is unreadable; as a grid of shapes, the odd one out is obvious. The closed round form in the bottom row is layer 11 head 8, the same head this project had already flagged twice by other measurements. [Open the interactive plate](https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/v_cyanotypes.html).
+All 144 attention heads in GPT-2 Small, arranged 12 layers by 12 heads. Each outline is drawn from that head's singular spectrum, the numbers describing how strongly it stretches its input in each direction. A table of 144 spectra is unreadable; as a grid of shapes, the odd one out is obvious. The closed round form in the bottom row is layer 11 head 8, the same head this project had already flagged twice by other measurements. [Open the interactive plate](https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/v_specimens.html).
 
 ### Six runs settling, word by word
 
