@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <title>Three Plates from a Room Made of Weights</title>
 <style>
 :root{
@@ -11,7 +12,7 @@
 }
 @media (prefers-color-scheme: light){
   :root{
-    --ground:#E9EBEE; --ground2:#E1E4E9; --rule:#C2C8D0;
+    --ground:#E9EBEE; --ground2:#FFFFFF; --rule:#C2C8D0;
     --ink:#14181E; --ink-dim:#4E5761; --ink-faint:#8A929C;
     --sodium:#A85E00; --mercury:#0E6E63; --neon:#B22F12;
     --argon:#2A4C9B; --xenon:#5A6672; --dark-matter:#B9BFC7;
@@ -19,7 +20,7 @@
   }
 }
 :root[data-theme="light"]{
-  --ground:#E9EBEE; --ground2:#E1E4E9; --rule:#C2C8D0;
+  --ground:#E9EBEE; --ground2:#FFFFFF; --rule:#C2C8D0;
   --ink:#14181E; --ink-dim:#4E5761; --ink-faint:#8A929C;
   --sodium:#A85E00; --mercury:#0E6E63; --neon:#B22F12;
   --argon:#2A4C9B; --xenon:#5A6672; --dark-matter:#B9BFC7;
@@ -89,6 +90,11 @@ canvas:focus-visible{outline:2px solid var(--sodium); outline-offset:-2px}
 .controls{
   position:absolute; right:12px; top:12px; display:flex; gap:6px; flex-wrap:wrap;
 }
+.howto{
+  margin:-8px 0 0; font-family:var(--mono); font-size:11px; letter-spacing:.05em;
+  color:var(--ink-faint); line-height:1.8; max-width:78ch;
+}
+.howto b{color:var(--ink-dim); font-weight:400; text-transform:uppercase; letter-spacing:.14em; font-size:10px}
 button{
   font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
   background:transparent; color:var(--ink-dim); border:1px solid var(--rule);
@@ -140,18 +146,22 @@ button:focus-visible{outline:2px solid var(--sodium); outline-offset:2px}
 
   <header class="mast">
     <div class="slug">
-      <span>GPT-2 Small</span><span>1,425 runs</span><span>21 injection levels</span>
-      <span>4 architectures</span>
+      <span>GPT-2 Small</span><span>1,425 runs</span><span>21 loudness settings</span>
+      <span>4 architectures in plate II</span>
     </div>
     <h1>Three plates from a room made of <em>weights</em></h1>
     <div class="statement">
-      <span>I am feeding a sentence into a language model and stopping it halfway,
-        before it has said anything. What I take out is not a word but a state: some
+      <span>A sentence is fed into a language model and stopped halfway, before the
+        model has said anything. What comes out is not a word but a state: some
         seven thousand numbers, the shape the sentence has made inside the machine.</span>
-      <span>I set that state to a chosen loudness and feed it back in as though it were
-        the sentence. Then again. Then again, some hundreds of times.</span>
+      <span>That state is set to a chosen loudness, anywhere from 1x, the overall size
+        a sentence naturally has when it reaches the model, up to 1,024 times that
+        size, and fed back in as though it were the sentence. Then again. Then again,
+        some hundreds of times.</span>
       <span>What the sentence said stops mattering rather quickly. What survives is
-        whatever the room resonates at. These are pictures of the room.</span>
+        whatever the room resonates at. The room is the model's learned numbers, its
+        weights, which never change during any of this; only the state moves. These
+        are pictures of the room.</span>
     </div>
   </header>
 
@@ -161,28 +171,33 @@ button:focus-visible{outline:2px solid var(--sodium); outline-offset:2px}
       <h2>Where every run ended</h2>
     </div>
     <div class="stage">
-      <canvas id="c1" tabindex="0" aria-label="Rotating three-dimensional point cloud of 1,425 settled states, coloured by the word each one resolved to."></canvas>
+      <canvas id="c1" tabindex="0" aria-label="Rotating three-dimensional point cloud of 1,425 settled states, coloured by settled word or by loudness according to the buttons."></canvas>
       <div class="controls">
         <button id="b1a" aria-pressed="true">By word</button>
         <button id="b1b" aria-pressed="false">By loudness</button>
       </div>
       <div class="readout" id="r1"></div>
     </div>
+    <p class="howto"><b>Reading it&nbsp;&nbsp;</b> each dot is one run's final state. Dots far apart are genuinely different states; dots sitting together are usually similar, though the flattening can also park distant states side by side, as the note at the foot of the page explains. In the word colouring, a dot that glows settled on one of the five words and a grey dot ended anywhere else; the two buttons switch between that colouring and colouring by loudness. A dot grows and brightens as it comes nearer while the cloud turns, and where many runs pile up their marks reinforce, so denser places read stronger. Drag or use the arrow keys to turn the cloud.</p>
     <div class="legend" id="leg1"></div>
     <div class="caption">
       <p>Every one of the 1,425 runs, each a single point placed where it came to rest.
         Five of these resting places are lit. <strong>Those five are the whole finding:
-        across hundreds of unrelated prompts, at the right loudness, the loop lands on one
-        of five words and no others.</strong> Everything unlit ended somewhere outside that
-        set, and there are a great many of those. Turn the loudness colouring on and the
-        cloud reorganises: the lit five occupy a band in the middle, with the failures
-        stacked below and above it.</p>
+        across a library of 125 unrelated prompts, at the right loudness, the loop lands
+        on one of five words and no others.</strong> Everything unlit ended somewhere
+        outside that set, and there are a great many of those. The three directions of
+        the picture are not physical axes: they are the three directions along which
+        these 1,425 states differ most, and together they keep 94.7 per cent of the
+        total spread, so about one part in twenty of the variation is out of view. Turn
+        the loudness colouring on and the same positions read differently: the runs that
+        reached the five carry the mid-range colours, with the too-quiet failures at one
+        end of the ramp and the too-loud at the other.</p>
       <div class="meta">
         <p><b>1,425</b> runs<br>
         <b>768</b> dimensions reduced to 3<br>
         <b>94.7%</b> of variance retained<br>
-        <b>21</b> injection levels<br>
-        <b>125</b> prompts at the widest<br>
+        <b>21</b> loudness settings<br>
+        <b>125</b> prompts at the widest settings, <b>25</b> at the rest<br>
         drag to turn the cloud</p>
       </div>
     </div>
@@ -194,22 +209,28 @@ button:focus-visible{outline:2px solid var(--sodium); outline-offset:2px}
       <h2>Sixty passes, four architectures</h2>
     </div>
     <div class="stage">
-      <canvas id="c2" tabindex="0" aria-label="Animated three-dimensional traces showing states settling over sixty iterations, across four model architectures."></canvas>
+      <canvas id="c2" tabindex="0" aria-label="Animated three-dimensional traces showing states settling over sixty passes, across four model architectures."></canvas>
       <div class="controls" id="ctl2"></div>
       <div class="readout" id="r2"></div>
     </div>
+    <p class="howto"><b>Reading it&nbsp;&nbsp;</b> one line per sentence, one step per pass through the model; the bright dot is where that sentence's state is right now. The colours are the same five lamps as plate I, but here they only tell the five sentences apart and say nothing about words. The five start scattered and, where a model converges, arrive at one spot and stop. Drag or use the arrow keys to turn it.</p>
     <div class="caption">
       <p>The settling itself, drawn one pass at a time. Each trace is one prompt; the
-        head of the trace is where the state is now. They begin scattered and end
-        arriving. <strong>This is the part that is genuinely like the tape piece: the
-        opening passes still carry the sentence, and by the end the trace has stopped
-        moving because nothing is left but the resonance.</strong> Four different models
-        are shown, two families and two sizes. They are not measured against each other
-        here, only put side by side.</p>
+        head of the trace is where the state is now. In three of the four models they
+        begin scattered and end arriving; in Pythia 410M they begin scattered and never
+        quite arrive, and the panel is shown all the same. <strong>This is the part that
+        is genuinely like the tape piece: the opening passes still carry the sentence,
+        and by the end, where the model converges, the trace has stopped moving because
+        nothing is left but the resonance.</strong> Four different models are shown, two
+        families and two sizes. Each is flattened onto its own three directions of
+        greatest spread, because a 1,024-number state cannot share axes with a 768-number
+        one, and the percentage in the readout says how much of that model's spread the
+        picture keeps. They are not measured against each other here, only put side by
+        side.</p>
       <div class="meta">
-        <p><b>61</b> consecutive passes<br>
+        <p><b>61</b> states drawn, the seed plus 60 passes<br>
         <b>5</b> prompts per model<br>
-        <b>76-98%</b> variance retained<br>
+        <b>75-98%</b> variance retained, per model<br>
         per-model projection<br>
         traces fade behind the head</p>
       </div>
@@ -222,23 +243,32 @@ button:focus-visible{outline:2px solid var(--sodium); outline-offset:2px}
       <h2>The band, as a curve</h2>
     </div>
     <div class="stage">
-      <canvas id="c3" tabindex="0" aria-label="Three-dimensional curve of the injection sweep, plotting loudness against growth and turn per pass."></canvas>
+      <canvas id="c3" tabindex="0" aria-label="Three-dimensional curve of the loudness sweep, plotting loudness against growth and turn per pass."></canvas>
       <div class="readout" id="r3"></div>
     </div>
+    <p class="howto"><b>Reading it&nbsp;&nbsp;</b> one node per loudness setting, joined in order from 1x, the size the model naturally receives, to 1024x that size. Height is how much one pass grows the state; depth is how far one pass turns its direction, in degrees averaged over each run's first ten passes. A node swells with the share of runs that end in the five words, and where that share passes half, the node takes the colour of the word most runs settled on, the same colours as plate I. The thin vertical lines only drop each node to the floor so its height can be read.</p>
     <div class="caption">
-      <p>The knob itself, all twenty-one settings, drawn as one continuous path. Left to
-        right is loudness. The two other axes are the only two things a pass can do to a
-        state: change its size, and change its direction. <strong>The path rises,
-        arcs over, and falls away, and the five-word band sits exactly on the crest.</strong>
-        Nodes swell where more of the runs landed in the five. Note the far end: the curve
-        flattens onto the floor, because at that loudness the loop has stopped doing
-        anything at all and simply hands back what it was given.</p>
+      <p>The knob itself, all twenty-one settings, drawn as one continuous path. The
+        axis running from the node marked 1x to the node marked 1024x is loudness,
+        however the figure is turned. The two other axes are the only two things a pass
+        can do to a state: change its size, and change its direction. <strong>The path
+        rises, arcs over, and falls away, and the five-word band sits exactly on the
+        crest.</strong> Nodes swell where more of the runs landed in the five. Note the
+        far end: the curve flattens onto the floor, because at 1024x a pass grows the
+        state by only about one per cent and turns it by under five degrees, where on
+        the crest it turned it by about seventy-seven; the loop is handing back nearly
+        what it was given. One caution: nine of the settings were run on all 125 prompts
+        and twelve on a quarter of them, and this project has measured that a
+        quarter-width sample near a boundary can move a share by tens of points, so the
+        node sizes at the quarter-width settings are the least settled numbers on this
+        page.</p>
       <div class="meta">
         <p><b>21</b> levels, 1x to 1024x<br>
         <b>x</b> loudness, log scale<br>
-        <b>y</b> growth per pass<br>
-        <b>z</b> turn per pass, degrees<br>
-        node size, share in the five</p>
+        <b>y</b> growth in one pass, log scale<br>
+        <b>z</b> turn per pass, mean of the first ten, degrees<br>
+        node size, share ending in the five<br>
+        node colour, the word most runs ended on</p>
       </div>
     </div>
   </section>
@@ -246,25 +276,31 @@ button:focus-visible{outline:2px solid var(--sodium); outline-offset:2px}
   <section class="colophon">
     <div>
       <h3>On what these pictures are not</h3>
-      <p>The states live in roughly seven thousand dimensions. Every plate here is a
-        shadow cast into three, chosen so that the shadow keeps as much of the motion as
-        possible. Plate I keeps 94.7 per cent of it, which is unusually generous and
-        means the clustering you see is close to real. Plate II keeps between 76 and 98
-        per cent depending on the model, so the Pythia 410M traces are the least
-        trustworthy of the four.</p>
+      <p>In GPT-2 small a full state is roughly seven thousand numbers, one list of 768
+        for every word position of the sentence; the larger models carry 1,024 per
+        position. Before anything is drawn, the lists are averaged across the positions,
+        which leaves one list of 768 or 1,024 numbers per state, and every plate is a
+        shadow of those lists cast into three directions, chosen so the shadow keeps as
+        much of the spread as possible. Plate I keeps 94.7 per cent, which is unusually
+        generous and means the clustering shown is close to real. Plate II keeps between
+        75 and 98 per cent depending on the model, so the Pythia 410M traces, at 75 per
+        cent, are the least trustworthy of the four.</p>
       <p>A shadow can still flatter. Two points that look adjacent may be far apart along
         the discarded directions, and no rotation of these plates will reveal it. Nothing
         here is evidence on its own; the numbers behind it are.</p>
-      <p>The five lit words are the ones the loop settles on inside the band. What sets
-        the edges of that band is an open question, and an earlier claim to have answered
-        it was withdrawn.</p>
+      <p>The five lit words are the ones the loop settles on inside the band, which runs
+        from roughly 50 times to roughly 300 times the natural level. Which quantity
+        governs each edge has been measured, the turn for the lower edge and the growth
+        for the upper, but why the room gives way at those values is still open, and an
+        earlier claim to have explained it was withdrawn.</p>
     </div>
     <div class="meta">
       <p>Drawn from committed run archives, no new computation.<br><br>
-      Plate I &mdash; nu-sweep terminal states<br>
-      Plate II &mdash; sink-geometry trajectories<br>
-      Plate III &mdash; angular profile<br><br>
-      Projection by principal components.<br>
+      Plate I: settled states of the loudness sweep.<br>
+      Plate II: the four-model settling archive.<br>
+      Plate III: the sweep's growth and turn profile.<br><br>
+      Projection by principal components,<br>
+      the directions of greatest spread.<br>
       Dark: phosphor, additive.<br>
       Light: plotter ink on paper.<br><br>
       After Alvin Lucier, <i>I Am Sitting<br>in a Room</i>, 1969.</p>
@@ -382,15 +418,20 @@ function ramp(t){
       if(st.mode==="word") col = inFive ? css(key) : css("--dark-matter");
       else col = ramp((mults[i]-lo)/(hi-lo));
       const depth = (q[2]-0.72)/0.62;
-      const r = (inFive||st.mode==="mult" ? 1.85 : 1.15) * (0.62+depth*0.75);
-      const a = (inFive||st.mode==="mult" ? 0.80 : 0.42) * (0.42+depth*0.62);
+      const r = (inFive||st.mode==="mult" ? 2.4 : 1.25) * (0.62+depth*0.75);
+      const a = (inFive||st.mode==="mult" ? 0.85 : 0.42) * (0.42+depth*0.62);
+      if(inFive && st.mode==="word"){
+        /* halo, so the five basins read at arm's length */
+        g.fillStyle = hexA(col, 0.10*(0.42+depth*0.62));
+        g.beginPath(); g.arc(q[0], q[1], Math.max(3.2, r*3.1), 0, 6.2832); g.fill();
+      }
       g.fillStyle = hexA(col, Math.min(0.95,a));
       g.beginPath(); g.arc(q[0], q[1], Math.max(0.6,r), 0, 6.2832); g.fill();
     }
     g.globalCompositeOperation="source-over";
     out.textContent = st.mode==="word"
-      ? `1425 states  ·  ${lit} in the five  ·  ${C.n-lit} outside`
-      : `1425 states  ·  coloured 1x to 1024x  ·  warm = quiet, cool = loud`;
+      ? `${C.n} states  ·  ${lit} in the five  ·  ${C.n-lit} outside`
+      : `${C.n} states  ·  coloured 1x to 1024x  ·  warm = quiet, cool = loud`;
   }
   setMode("word"); frame();
 })();
@@ -399,12 +440,14 @@ function ramp(t){
 (function(){
   const cv=document.getElementById("c2"), out=document.getElementById("r2"), ctl=document.getElementById("ctl2");
   const T=DATA.traj, models=Object.keys(T);
+  const NAME={"gpt2":"GPT-2 small","gpt2-medium":"GPT-2 medium",
+              "pythia-160m":"Pythia 160M","pythia-410m":"Pythia 410M"};
   const st={ax:-0.2, ay:0.62, idle:1}; let cur=models[0], head=0, W,H,g, live=true;
   const size=()=>{[W,H,g]=fit(cv,0.60);}; size(); addEventListener("resize",size);
   dragger(cv,st); visible(cv,v=>live=v);
 
   ctl.innerHTML = models.map((m,i)=>
-    `<button data-m="${m}" aria-pressed="${i===0}">${m}</button>`).join("");
+    `<button data-m="${m}" aria-pressed="${i===0}">${NAME[m]||m}</button>`).join("");
   ctl.querySelectorAll("button").forEach(btn=>btn.onclick=()=>{
     cur=btn.dataset.m; head=0;
     ctl.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed", b===btn));
@@ -441,8 +484,8 @@ function ramp(t){
       }
     });
     g.globalCompositeOperation="source-over";
-    out.textContent = `${cur}  ·  ${T[cur].d_model}d, ${T[cur].n_layers} layers  ·  `
-      + `pass ${hd} of ${N-1}  ·  ${Math.round(T[cur].var*100)}% of variance shown`;
+    out.textContent = `${NAME[cur]||cur}  ·  ${T[cur].d_model} numbers per state, ${T[cur].n_layers} layers  ·  `
+      + `pass ${Math.max(0,hd-1)} of ${N-1}  ·  keeps ${Math.round(T[cur].var*100)}% of the spread`;
   }
   frame();
 })();
@@ -515,8 +558,16 @@ function ramp(t){
     let best=0; S.forEach((r,i)=>{ if(r.turn_mean_10>S[best].turn_mean_10) best=i; });
     const qb=project(rot(P[best],st.ax,st.ay),W,H,zoom);
     g.fillStyle=css("--sodium");
-    g.fillText(`crest ${S[best].turn_mean_10.toFixed(1)}deg`, qb[0]+9, qb[1]-6);
-    out.textContent = `21 levels  ·  x loudness  ·  y growth per pass  ·  z turn per pass  ·  lit where most runs land in the five`;
+    g.fillText(`crest of turn, ${S[best].turn_mean_10.toFixed(1)} deg per pass`, qb[0]+9, qb[1]-6);
+    /* axis words, attached to the scene so they turn with it */
+    g.fillStyle=css("--ink-faint");
+    const axl=project(rot([1.14,-1,-1],st.ax,st.ay),W,H,zoom);
+    g.fillText("loud end", axl[0]-10, axl[1]+14);
+    const axg=project(rot([-1,1.12,-1],st.ax,st.ay),W,H,zoom);
+    g.fillText("growth per pass", axg[0]-34, axg[1]-8);
+    const axt=project(rot([-1,-1,1.16],st.ax,st.ay),W,H,zoom);
+    g.fillText("turn per pass", axt[0]+5, axt[1]+4);
+    out.textContent = `21 levels  ·  x loudness  ·  y growth, log  ·  z turn, first-ten mean  ·  size = share in the five  ·  lit colour = the dominant word`;
   }
   frame();
 })();
