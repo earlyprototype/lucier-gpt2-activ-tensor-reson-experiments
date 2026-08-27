@@ -24,7 +24,7 @@ NOTE: What started as a moment of curiosity turned up a rather unexpected result
 
 ## Data is Beautiful
 
-*Four visualisations, all built from data already committed in this repository — every image regenerates deterministically with `python3 docs/plates/build_plates.py`. Each is a live, interactive page on the project site, published straight from this repository, so the links below are as permanent as the repository itself.*
+*Four visualisations, all built from data already committed in this repository — every image regenerates deterministically with `python3 docs/plates/build_plates.py`. Each is a live, interactive page on the project site, published straight from this repository, so the links below stay available for as long as the repository keeps its name and its Pages deployment stays enabled.*
 
 ### Five sentences becoming one shape
 

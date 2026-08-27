@@ -38,8 +38,10 @@ recorded died with the account that published them, which is the failure mode
 of hosting work under an account rather than under the work. The plates'
 permanent home is now the project site, which the pages workflow
 (`.github/workflows/pages.yml`) rebuilds from main on every push, straight
-from the committed pages in this directory. These links can only die with the
-repository itself:
+from the committed pages in this directory. These links stay available for as
+long as the repository keeps its name and its Pages deployment stays enabled,
+which is the strongest guarantee any hosting gives; the committed pages
+themselves survive anything short of losing the repository:
 
 - Plates I to III: https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/i-iii_room.html
 - Plate IV: https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/iv_bodies.html
