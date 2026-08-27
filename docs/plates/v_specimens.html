@@ -1,20 +1,17 @@
 <!DOCTYPE html>
-<title>One Head, One Specimen</title>
+<title>Single Head ATR</title>
 <style>
+/* White page by default for every visitor. The dark variant stays available
+   behind an explicit data-theme="dark" on the root element. */
 :root{
-  --plate:#0E2A47; --plate-deep:#081B30; --plate-mid:#16436C;
-  --print:#E8F1F7; --print-dim:#9FC2DA; --print-faint:#5F8CB0;
-  --rule:#1D4468; --accent:#F2C879;
+  --plate:#FFFFFF; --plate-deep:#FFFFFF; --plate-mid:#A8C0D4;
+  --print:#0A2038; --print-dim:#2E5677; --print-faint:#6C8FAC;
+  --rule:#A8BACB; --accent:#8A5A0B;
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
   --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
-  --neg:0;
+  --neg:1;
 }
-@media (prefers-color-scheme: light){
-  :root{--plate:#FFFFFF; --plate-deep:#CBD9E5; --plate-mid:#A8C0D4;
-        --print:#0A2038; --print-dim:#2E5677; --print-faint:#6C8FAC;
-        --rule:#A8BACB; --accent:#8A5A0B; --neg:1;}
-}
-:root[data-theme="light"]{--plate:#FFFFFF; --plate-deep:#CBD9E5; --plate-mid:#A8C0D4;
+:root[data-theme="light"]{--plate:#FFFFFF; --plate-deep:#FFFFFF; --plate-mid:#A8C0D4;
   --print:#0A2038; --print-dim:#2E5677; --print-faint:#6C8FAC; --rule:#A8BACB; --accent:#8A5A0B; --neg:1;}
 :root[data-theme="dark"]{--plate:#0E2A47; --plate-deep:#081B30; --plate-mid:#16436C;
   --print:#E8F1F7; --print-dim:#9FC2DA; --print-faint:#5F8CB0; --rule:#1D4468; --accent:#F2C879; --neg:0;}
@@ -122,7 +119,7 @@ aside p{margin:0;color:var(--print-faint)}
 <div class="sheet">
   <header class="head">
     <div class="plateno">Plate V</div>
-    <h1>One head, one specimen</h1>
+    <h1>Single Head ATR</h1>
     <div class="sub"><span>GPT-2 Small</span><span>144 heads, one specimen each</span><span>4 classes</span></div>
     <div class="rule"></div>
   </header>

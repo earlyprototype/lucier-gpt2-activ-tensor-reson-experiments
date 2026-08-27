@@ -54,16 +54,19 @@ themselves survive anything short of losing the repository:
 `i-iii_room.html` · https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/i-iii_room.html
 
 Every settled state as a point cloud (1,425 runs, 21 loudness settings, five
-basins lit and everything else dark); the settling itself as traces across four
-architectures; the sweep as a curve in loudness, growth and turn.
+basins in colour and everything else grey); the settling itself as traces
+across four architectures; the sweep as a curve in loudness, growth and turn.
+The plates can be turned by dragging and zoomed by scrolling.
 
 Sources: `experiments/nu_sweep/output/checkpoints/`,
 `experiments/sink_geometry/output/trajectories.pt`,
 `experiments/nu_sweep/output/angular_profile.json`.
 
 Projection by principal components, 94.7 per cent of variance retained in
-plate I, printed on the page. Dark renders as oscilloscope phosphor with
-additive accumulation, light as plotter ink on paper.
+plate I, printed on the page. Every plate page renders as plotter ink on a
+white ground for every visitor; the oscilloscope-phosphor dark variant stays
+in the code behind an explicit dark theme switch (2026-08-27, at the
+operator's direction, all plate pages white by default).
 
 ### Plate IV, *Five Sentences Becoming One Shape*
 `iv_bodies.html` · https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/iv_bodies.html
@@ -86,7 +89,7 @@ different display choices gave two opposite conclusions. The reported figures
 now come from the raw state vectors and never from anything drawn. The page
 says so, and the warning is kept rather than tidied away.
 
-### Plate V, *One Head, One Specimen*
+### Plate V, *Single Head ATR*
 `v_specimens.html` · https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/v_specimens.html
 
 All 144 attention heads as specimen outlines built from their own singular
@@ -114,7 +117,9 @@ credited that process as the working method. The claim did not hold: the
 borrowed process makes its image by physical contact with the specimen, and
 this plate's forms are drawn through a mapping the page itself calls a
 convention, so the borrowed title and its process note were removed rather
-than defended, and the page was renamed from the plate's own words. Two
+than defended. Later the same day the plate took its present title, *Single
+Head ATR*, at the operator's direction, naming what each square is: one
+head's activation tensor resonance, run alone. Two
 numeric claims were corrected at the same time, against the committed payload:
 the median leading-eigenvalue size across the 144 heads is 1.9, not "near
 one", and the attribution result is 99 per cent of the attention side of the

@@ -1,29 +1,22 @@
 <!DOCTYPE html>
 <title>Three Plates from a Room Made of Weights</title>
 <style>
+/* White page by default for every visitor. The phosphor dark variant stays
+   available behind an explicit data-theme="dark" on the root element. */
 :root{
-  --ground:#0B0D10; --ground2:#0E1116; --rule:#20262E;
-  --ink:#C9D0D8; --ink-dim:#7C8794; --ink-faint:#4A535E;
-  --sodium:#FFB35C; --mercury:#9FD8D0; --neon:#FF6B4A;
-  --argon:#8AA8E8; --xenon:#DDE6F0; --dark-matter:#333B45;
-  --blend:lighter; --trace-alpha:0.85; --paper-grain:0;
+  --ground:#FFFFFF; --ground2:#FFFFFF; --rule:#C2C8D0;
+  --ink:#14181E; --ink-dim:#4E5761; --ink-faint:#8A929C;
+  --sodium:#D97706; --mercury:#0D9488; --neon:#DC2626;
+  --argon:#4F46E5; --xenon:#0284C7; --dark-matter:#B9BFC7;
+  --blend:multiply; --trace-alpha:0.9; --paper-grain:1;
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
   --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
 }
-@media (prefers-color-scheme: light){
-  :root{
-    --ground:#E9EBEE; --ground2:#FFFFFF; --rule:#C2C8D0;
-    --ink:#14181E; --ink-dim:#4E5761; --ink-faint:#8A929C;
-    --sodium:#A85E00; --mercury:#0E6E63; --neon:#B22F12;
-    --argon:#2A4C9B; --xenon:#5A6672; --dark-matter:#B9BFC7;
-    --blend:multiply; --trace-alpha:0.9; --paper-grain:1;
-  }
-}
 :root[data-theme="light"]{
-  --ground:#E9EBEE; --ground2:#FFFFFF; --rule:#C2C8D0;
+  --ground:#FFFFFF; --ground2:#FFFFFF; --rule:#C2C8D0;
   --ink:#14181E; --ink-dim:#4E5761; --ink-faint:#8A929C;
-  --sodium:#A85E00; --mercury:#0E6E63; --neon:#B22F12;
-  --argon:#2A4C9B; --xenon:#5A6672; --dark-matter:#B9BFC7;
+  --sodium:#D97706; --mercury:#0D9488; --neon:#DC2626;
+  --argon:#4F46E5; --xenon:#0284C7; --dark-matter:#B9BFC7;
   --blend:multiply; --trace-alpha:0.9; --paper-grain:1;
 }
 :root[data-theme="dark"]{
@@ -67,6 +60,7 @@ h1 em{font-style:italic; color:var(--sodium)}
   display:grid; gap:22px;
 }
 .plate-head{display:flex; align-items:baseline; gap:20px; flex-wrap:wrap}
+.deck{margin:-8px 0 0; max-width:66ch; color:var(--ink-dim); font-size:1.02rem}
 .plate-no{
   font-family:var(--mono); font-size:11px; letter-spacing:.18em;
   color:var(--ink-faint); text-transform:uppercase; white-space:nowrap;
@@ -149,7 +143,7 @@ button:focus-visible{outline:2px solid var(--sodium); outline-offset:2px}
       <span>GPT-2 Small</span><span>1,425 runs</span><span>21 loudness settings</span>
       <span>4 architectures in plate II</span>
     </div>
-    <h1>Three plates from a room made of <em>weights</em></h1>
+    <h1>Three Plates from a Room Made of <em>Weights</em></h1>
     <div class="statement">
       <span>A sentence is fed into a language model and stopped halfway, before the
         model has said anything. What comes out is not a word but a state: some
@@ -168,8 +162,10 @@ button:focus-visible{outline:2px solid var(--sodium); outline-offset:2px}
   <section class="plate">
     <div class="plate-head">
       <span class="plate-no">Plate I</span>
-      <h2>Where every run ended</h2>
+      <h2>Where Every Run Ended</h2>
     </div>
+    <p class="deck">A map of where 1,425 runs of the feedback loop ended: one dot per run,
+      and runs that settled on the same word pile into the same lit cluster.</p>
     <div class="stage">
       <canvas id="c1" tabindex="0" aria-label="Rotating three-dimensional point cloud of 1,425 settled states, coloured by settled word or by loudness according to the buttons."></canvas>
       <div class="controls">
@@ -178,7 +174,7 @@ button:focus-visible{outline:2px solid var(--sodium); outline-offset:2px}
       </div>
       <div class="readout" id="r1"></div>
     </div>
-    <p class="howto"><b>Reading it&nbsp;&nbsp;</b> each dot is one run's final state. Dots far apart are genuinely different states; dots sitting together are usually similar, though the flattening can also park distant states side by side, as the note at the foot of the page explains. In the word colouring, a dot that glows settled on one of the five words and a grey dot ended anywhere else; the two buttons switch between that colouring and colouring by loudness. A dot grows and brightens as it comes nearer while the cloud turns, and where many runs pile up their marks reinforce, so denser places read stronger. Drag or use the arrow keys to turn the cloud.</p>
+    <p class="howto"><b>Reading it&nbsp;&nbsp;</b> each dot is one run's final state. Dots far apart are genuinely different states; dots sitting together are usually similar, though the flattening can also park distant states side by side, as the note at the foot of the page explains. In the word colouring, a dot that glows settled on one of the five words and a grey dot ended anywhere else; the two buttons switch between that colouring and colouring by loudness. A dot grows and brightens as it comes nearer while the cloud turns, and where many runs pile up their marks reinforce, so denser places read stronger. Drag or use the arrow keys to turn the cloud; scroll on it to zoom, and 0 resets.</p>
     <div class="legend" id="leg1"></div>
     <div class="caption">
       <p>Every one of the 1,425 runs, each a single point placed where it came to rest.
@@ -206,14 +202,16 @@ button:focus-visible{outline:2px solid var(--sodium); outline-offset:2px}
   <section class="plate">
     <div class="plate-head">
       <span class="plate-no">Plate II</span>
-      <h2>Sixty passes, four architectures</h2>
+      <h2>Sixty Passes, Four Architectures</h2>
     </div>
+    <p class="deck">The journey itself: five sentences' states drawn pass by pass, one line
+      each, as a model pulls them together or fails to.</p>
     <div class="stage">
       <canvas id="c2" tabindex="0" aria-label="Animated three-dimensional traces showing states settling over sixty passes, across four model architectures."></canvas>
       <div class="controls" id="ctl2"></div>
       <div class="readout" id="r2"></div>
     </div>
-    <p class="howto"><b>Reading it&nbsp;&nbsp;</b> one line per sentence, one step per pass through the model; the bright dot is where that sentence's state is right now. The colours are the same five lamps as plate I, but here they only tell the five sentences apart and say nothing about words. The five start scattered and, where a model converges, arrive at one spot and stop. Drag or use the arrow keys to turn it.</p>
+    <p class="howto"><b>Reading it&nbsp;&nbsp;</b> one line per sentence, one step per pass through the model; the bright dot is where that sentence's state is right now. The colours are the same five lamps as plate I, but here they only tell the five sentences apart and say nothing about words. The five start scattered and, where a model converges, arrive at one spot and stop. Drag or use the arrow keys to turn it; scroll on it to zoom.</p>
     <div class="caption">
       <p>The settling itself, drawn one pass at a time. Each trace is one prompt; the
         head of the trace is where the state is now. In three of the four models they
@@ -240,13 +238,16 @@ button:focus-visible{outline:2px solid var(--sodium); outline-offset:2px}
   <section class="plate">
     <div class="plate-head">
       <span class="plate-no">Plate III</span>
-      <h2>The band, as a curve</h2>
+      <h2>The Band, as a Curve</h2>
     </div>
+    <p class="deck">The loudness dial as a single path: for each of the 21 settings, how
+      much one pass grows the state and how far it turns it, with the five-word band
+      sitting on the crest.</p>
     <div class="stage">
       <canvas id="c3" tabindex="0" aria-label="Three-dimensional curve of the loudness sweep, plotting loudness against growth and turn per pass."></canvas>
       <div class="readout" id="r3"></div>
     </div>
-    <p class="howto"><b>Reading it&nbsp;&nbsp;</b> one node per loudness setting, joined in order from 1x, the size the model naturally receives, to 1024x that size. Height is how much one pass grows the state; depth is how far one pass turns its direction, in degrees averaged over each run's first ten passes. A node swells with the share of runs that end in the five words, and where that share passes half, the node takes the colour of the word most runs settled on, the same colours as plate I. The thin vertical lines only drop each node to the floor so its height can be read.</p>
+    <p class="howto"><b>Reading it&nbsp;&nbsp;</b> one node per loudness setting, joined in order from 1x, the size the model naturally receives, to 1024x that size. Height is how much one pass grows the state; depth is how far one pass turns its direction, in degrees averaged over each run's first ten passes. A node swells with the share of runs that end in the five words, and where that share passes half, the node takes the colour of the word most runs settled on, the same colours as plate I. The thin vertical lines only drop each node to the floor so its height can be read. Drag to turn the figure; scroll on it to zoom.</p>
     <div class="caption">
       <p>The knob itself, all twenty-one settings, drawn as one continuous path. The
         axis running from the node marked 1x to the node marked 1024x is loudness,
@@ -301,8 +302,9 @@ button:focus-visible{outline:2px solid var(--sodium); outline-offset:2px}
       Plate III: the sweep's growth and turn profile.<br><br>
       Projection by principal components,<br>
       the directions of greatest spread.<br>
-      Dark: phosphor, additive.<br>
-      Light: plotter ink on paper.<br><br>
+      Rendered as plotter ink on white paper;<br>
+      a phosphor variant remains in the code<br>
+      behind an explicit dark theme switch.<br><br>
       After Alvin Lucier, <i>I Am Sitting<br>in a Room</i>, 1969.</p>
     </div>
   </section>
@@ -347,11 +349,19 @@ function dragger(cv, st){
   const up=()=>{on=false;};
   cv.addEventListener("pointerdown",down); cv.addEventListener("pointermove",move);
   cv.addEventListener("pointerup",up); cv.addEventListener("pointercancel",up);
+  /* scroll to zoom, clamped so the scene can neither vanish nor blow out */
+  cv.addEventListener("wheel",e=>{
+    e.preventDefault();
+    st.zoom = Math.max(0.5, Math.min(4, (st.zoom||1)*Math.exp(-e.deltaY*0.0012)));
+  },{passive:false});
   cv.addEventListener("keydown",e=>{
     if(e.key==="ArrowLeft"){st.ay-=0.09; e.preventDefault();}
     if(e.key==="ArrowRight"){st.ay+=0.09; e.preventDefault();}
     if(e.key==="ArrowUp"){st.ax=Math.max(-1.3,st.ax-0.09); e.preventDefault();}
     if(e.key==="ArrowDown"){st.ax=Math.min(1.3,st.ax+0.09); e.preventDefault();}
+    if(e.key==="+"||e.key==="="){st.zoom=Math.min(4,(st.zoom||1)*1.15); e.preventDefault();}
+    if(e.key==="-"){st.zoom=Math.max(0.5,(st.zoom||1)/1.15); e.preventDefault();}
+    if(e.key==="0"){st.zoom=1; e.preventDefault();}
   });
 }
 function visible(el, fn){
@@ -363,14 +373,18 @@ function hexA(hex, a){
   const r=parseInt(n.slice(0,2),16), g=parseInt(n.slice(2,4),16), b=parseInt(n.slice(4,6),16);
   return `rgba(${r},${g},${b},${a})`;
 }
-/* warm-to-cool ramp for the loudness colouring, sodium through xenon */
+/* warm-to-cool ramp for the loudness colouring, sodium through xenon.
+   Returns a hex string because every caller feeds the colour through hexA(),
+   which parses hex only; an rgb() string there made an invalid fillStyle and
+   the loudness view drew its dots in the background colour, invisibly. */
 function ramp(t){
+  t = Math.max(0, Math.min(1, t));
   const stops = [css("--neon"), css("--sodium"), css("--mercury"), css("--argon"), css("--xenon")];
   const i = Math.min(stops.length-2, Math.floor(t*(stops.length-1)));
   const f = t*(stops.length-1) - i;
   const pa = stops[i].replace("#",""), pb = stops[i+1].replace("#","");
   const mix = k => Math.round(parseInt(pa.substr(k,2),16)*(1-f) + parseInt(pb.substr(k,2),16)*f);
-  return `rgb(${mix(0)},${mix(2)},${mix(4)})`;
+  return "#"+[mix(0),mix(2),mix(4)].map(v=>v.toString(16).padStart(2,"0")).join("");
 }
 
 /* ================= PLATE I : the cloud ================= */
@@ -402,7 +416,7 @@ function ramp(t){
     if(!reduced && st.idle) st.ay += 0.0016;
     g.clearRect(0,0,W,H);
     g.fillStyle=css("--ground2"); g.fillRect(0,0,W,H);
-    const zoom = Math.min(W,H)*0.40;
+    const zoom = Math.min(W,H)*0.40*(st.zoom||1);
     for(let i=0;i<C.n;i++){
       const p=rot(C.pts[i], st.ax, st.ay);
       order[i]=[p[2], i, project(p,W,H,zoom)];
@@ -462,7 +476,7 @@ function ramp(t){
     else head = N;
     if(st.idle) st.ay += 0.0011;
     g.clearRect(0,0,W,H); g.fillStyle=css("--ground2"); g.fillRect(0,0,W,H);
-    const zoom=Math.min(W,H)*0.40, hd=Math.min(N, Math.floor(head));
+    const zoom=Math.min(W,H)*0.40*(st.zoom||1), hd=Math.min(N, Math.floor(head));
     g.globalCompositeOperation=css("--blend");
     g.lineCap="round"; g.lineJoin="round";
     runs.forEach((run,ri)=>{
@@ -510,7 +524,7 @@ function ramp(t){
     if(!live) return;
     if(!reduced && st.idle) st.ay += 0.0013;
     g.clearRect(0,0,W,H); g.fillStyle=css("--ground2"); g.fillRect(0,0,W,H);
-    const zoom=Math.min(W,H)*0.38;
+    const zoom=Math.min(W,H)*0.38*(st.zoom||1);
     /* floor grid, so the fall at the far end is legible */
     g.strokeStyle=hexA(css("--rule"),0.9); g.lineWidth=1;
     for(let i=0;i<=6;i++){
