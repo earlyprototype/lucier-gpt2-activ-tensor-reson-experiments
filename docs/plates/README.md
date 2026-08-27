@@ -31,10 +31,27 @@ artefacts and not only a recipe for them.
 No external assets, no CDN, no libraries. The 3D in plate IV is hand-written
 WebGL; plates I to III and V and VI are hand-written canvas.
 
+## Where the plates are published
+
+Publication log (2026-08-27): the claude.ai artifact links this file first
+recorded died with the account that published them, which is the failure mode
+of hosting work under an account rather than under the work. The plates'
+permanent home is now the project site, which the pages workflow
+(`.github/workflows/pages.yml`) rebuilds from main on every push, straight
+from the committed pages in this directory. These links stay available for as
+long as the repository keeps its name and its Pages deployment stays enabled,
+which is the strongest guarantee any hosting gives; the committed pages
+themselves survive anything short of losing the repository:
+
+- Plates I to III: https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/i-iii_room.html
+- Plate IV: https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/iv_bodies.html
+- Plate V: https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/v_cyanotypes.html
+- Plate VI: https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/vi_river.html
+
 ## The plates
 
 ### Plates I to III, *Three Plates from a Room Made of Weights*
-`i-iii_room.html` · https://claude.ai/code/artifact/d3afc583-2737-4add-b111-b69847d33aa4
+`i-iii_room.html` · https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/i-iii_room.html
 
 Every settled state as a point cloud (1,425 runs, 21 injection levels, five
 basins lit and everything else dark); the settling itself as traces across four
@@ -49,7 +66,7 @@ plate I, printed on the page. Dark renders as oscilloscope phosphor with
 additive accumulation, light as plotter ink on paper.
 
 ### Plate IV, *Five Sentences Becoming One Shape*
-`iv_bodies.html` · https://claude.ai/code/artifact/435b09eb-680a-4077-92de-de762f7cfa38
+`iv_bodies.html` · https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/iv_bodies.html
 
 Five prompts as deforming bodies over sixty passes, in four models. The surface
 is a fixed linear reading of the state, so two bodies look alike exactly when
@@ -68,7 +85,7 @@ now come from the raw state vectors and never from anything drawn. The page
 says so, and the warning is kept rather than tidied away.
 
 ### Plate V, *Cyanotypes of the Attention Heads*
-`v_cyanotypes.html` · https://claude.ai/code/artifact/82bc3229-750a-49a8-90ce-40cd85d0aaa9
+`v_cyanotypes.html` · https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/v_cyanotypes.html
 
 All 144 attention heads as specimen outlines built from their own singular
 spectra, after Anna Atkins, *Photographs of British Algae: Cyanotype
@@ -87,7 +104,7 @@ Limit: each head was looped in isolation, which is not what a head does inside
 the working model. These are portraits of parts removed from the whole.
 
 ### Plate VI, *Six Ways of Dissolving*
-`vi_river.html` · https://claude.ai/code/artifact/d16cf124-bc62-4524-b2cf-f1ed94714be9
+`vi_river.html` · https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/vi_river.html
 
 Every word six runs pass through on the way to settling, as an alluvial flow,
 including a noise control.
