@@ -22,44 +22,6 @@ NOTE: What started as a moment of curiosity turned up a rather unexpected result
 
 ---
 
-## Data is Beautiful
-
-*Four visualisations, all built from data already committed in this repository — every image regenerates deterministically with `python3 docs/plates/build_plates.py`. Each is a live, interactive page on the project site, published straight from this repository, so the links below stay available for as long as the repository keeps its name and its Pages deployment stays enabled.*
-
-### Five sentences becoming one shape
-
-<p align="center">
-  <img src="docs/assets/plates/bodies_frieze.png" alt="Five sentences rendered as five deforming three-dimensional bodies, converging toward one shape in GPT-2 Small" width="800"/>
-</p>
-
-Five unrelated sentences, each fed back through GPT-2 Small sixty times, drawn as five three-dimensional shapes. Each shape is plotted directly from the model's internal state — nothing is hand-drawn — so as the states converge, the shapes do too. By the final passes the five are nearly identical: mean separation falls from 0.043 to 0.0002 on a 0-to-2 scale. Convergence stops being a statistic; you can watch it happen. **[Open the live 3D piece](https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/iv_bodies.html)** — all four models selectable, the shapes turning and deforming in real time.
-
-### 144 attention heads at a glance
-
-<p align="center">
-  <img src="docs/assets/plates/head_spectra_grid.png" alt="All 144 attention heads of GPT-2 Small drawn as specimen outlines from their singular spectra, arranged 12 layers by 12 heads" width="700"/>
-</p>
-
-All 144 attention heads in GPT-2 Small, arranged 12 layers by 12 heads. Each outline is drawn from that head's singular spectrum, the numbers describing how strongly it stretches its input in each direction. A table of 144 spectra is unreadable; as a grid of shapes, the odd one out is obvious. The closed round form in the bottom row is layer 11 head 8, the same head this project had already flagged twice by other measurements. [Open the interactive plate](https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/v_specimens.html).
-
-### Six arms settling, word by word
-
-<p align="center">
-  <img src="docs/assets/plates/dissolving_river.png" alt="Alluvial flow of every word a run passes through on the way to settling, one strand per word, for GPT-2 Small" width="800"/>
-</p>
-
-Every archived word the runs pass through on the way to settling. Time runs left to right, one strand per word, and a strand's thickness is how many runs are saying that word. Six arms of 8 to 70 runs each share the interactive page: five model arms plus a pure-noise control. The flow shows *how* the narrowing happens, not just where it ends: GPT-2 Small braids down to five words, GPT-2 Medium funnels 52 into one, Pythia-410M never settles, and even the noise control collapses, which is why collapse on its own proves nothing. [Open the interactive plate](https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/vi_river.html).
-
-### Where every run ended
-
-<p align="center">
-  <img src="docs/assets/plates/room_pointcloud.png" alt="Every settled state of the sweep as a point cloud, 1,425 runs across 21 injection levels, the five basins lit and everything else dark" width="800"/>
-</p>
-
-Every one of the sweep's 1,425 runs as a single point, placed where it came to rest — the five basins lit, everything that ended elsewhere left dark. The cloud is 768 dimensions reduced to three by principal components, with the variance retained (94.7 per cent) printed on the page. Two companion plates on the same page show the settling itself as traces across four architectures, and the whole sweep as one curve in loudness, growth and turn. The five-basin finding stops being a table: the band is a lit stratum in a dark field, and you can drag the cloud to look around it. [Open the interactive plates](https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/i-iii_room.html).
-
----
-
 ## Findings - Overview
 
 *A summary of the main results. Full details and caveats are in [FINDINGS.md](docs/FINDINGS.md).*
@@ -190,6 +152,44 @@ ATR never set out to be a technique at all. It began as a thought experiment, an
 - **A cheap dynamical probe.** No labelled data, no training, seconds-to-minutes per run on consumer hardware. It answers: *what are the stable states of this model's iterated forward map, and how do they depend on where you start?*
 - **A regime detector.** Four models produced four qualitatively different landscapes — few-semantic-basins / single-funnel / single-funnel / no-consolidation. The differences are intrinsic to the models (tensor-level, not decoding artefacts — see [SCALING_ARTEFACT_ANALYSIS.md](docs/SCALING_ARTEFACT_ANALYSIS.md)).
 - **An open question with teeth.** Why does GPT-2 Small — alone in this set — resolve language into a small set of semantically coherent attractors? That question is where this project goes next.
+
+---
+
+## Data is Beautiful
+
+*Four visualisations, all drawn from data already committed in this repository. Each is a live, interactive page on the project site, published straight from this repository, and each page rebuilds deterministically with `python3 docs/plates/build_plates.py`. The links stay available for as long as the repository keeps its name and its Pages deployment stays enabled.*
+
+### Five Sentences Becoming One Shape
+
+<p align="center">
+  <img src="docs/assets/plates/bodies_frieze.png" alt="Five sentences rendered as five deforming three-dimensional bodies, converging toward one shape" width="800"/>
+</p>
+
+Five unrelated sentences, each fed back through the same model sixty times, drawn as five three-dimensional shapes. Each shape is plotted directly from the model's internal state, nothing is hand-drawn, so as the states converge the shapes do too. In GPT-2 Medium the five become nearly identical by the final passes: mean separation falls from 0.043 to 0.0002 on a scale where 0 means two states point the same way and 2 means opposite ways; GPT-2 Small halves its separation, 0.16 to 0.08. Convergence stops being a statistic; it can be watched. **[Open the live 3D piece](https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/iv_bodies.html)**: all four models selectable, the shapes turning and deforming in real time.
+
+### 144 Attention Heads at a Glance
+
+<p align="center">
+  <img src="docs/assets/plates/head_spectra_grid.png" alt="All 144 attention heads of GPT-2 Small drawn as specimen outlines from their singular spectra, arranged 12 layers by 12 heads" width="700"/>
+</p>
+
+All 144 attention heads in GPT-2 Small, arranged 12 layers by 12 heads. Each outline is drawn from that head's singular spectrum, the numbers describing how strongly it stretches its input in each direction. A table of 144 spectra is unreadable; as a grid of shapes, the odd one out is obvious. The closed round form in the bottom row is layer 11 head 8, the same head this project had already flagged twice by other measurements. Clicking any specimen enlarges it with its numbers. [Open the interactive plate](https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/v_specimens.html).
+
+### Six Arms Settling, Word by Word
+
+<p align="center">
+  <img src="docs/assets/plates/dissolving_river.png" alt="Alluvial flow of every word a run passes through on the way to settling, one strand per word, for GPT-2 Small" width="800"/>
+</p>
+
+Every archived word the runs pass through on the way to settling. Time runs left to right, one strand per word, and a strand's thickness is how many runs are saying that word. Six arms of 8 to 70 runs each share the interactive page: five model arms plus a pure-noise control. The flow shows *how* the narrowing happens, not just where it ends: GPT-2 Small braids down to five words, GPT-2 Medium funnels 52 into one, Pythia-410M never settles, and even the noise control collapses, which is why collapse on its own proves nothing. [Open the interactive plate](https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/vi_river.html).
+
+### Where Every Run Ended
+
+<p align="center">
+  <img src="docs/assets/plates/room_pointcloud.png" alt="Every settled state of the sweep as a point cloud on white, 1,425 runs across 21 loudness settings, the five basins in colour and everything else grey" width="800"/>
+</p>
+
+Every one of the sweep's 1,425 runs as a single point, placed where it came to rest: the five basins in colour, everything that ended elsewhere in grey. The cloud is 768 dimensions reduced to three by principal components, with the variance retained (94.7 per cent) printed on the page. Two companion plates on the same page show the settling itself as traces across four architectures, and the whole sweep as one curve in loudness, growth and turn. The five-basin finding stops being a table: the basins are coloured clusters in the cloud, and the cloud can be dragged and zoomed to look around them. [Open the interactive plates](https://earlyprototype.github.io/lucier-gpt2-activ-tensor-reson-experiments/docs/plates/i-iii_room.html).
 
 ---
 

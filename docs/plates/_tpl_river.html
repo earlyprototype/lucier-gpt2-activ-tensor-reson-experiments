@@ -1,21 +1,17 @@
 <!DOCTYPE html>
 <title>Six Ways of Dissolving</title>
 <style>
+/* White page by default for every visitor. The glow dark variant stays
+   available behind an explicit data-theme="dark" on the root element. */
 :root{
-  --void:#06080B; --stage:#090C11; --rule:#1A222C;
-  --ink:#C6CFD9; --ink-dim:#7C8895; --ink-faint:#4A5460;
-  --r0:#FFB35C; --r1:#FF6B4A; --r2:#8AA8E8; --r3:#8FD6C9; --r4:#E4ECF5;
-  --stray:#333B45; --accent:#FFB35C; --glow:1;
+  --void:#FFFFFF; --stage:#FFFFFF; --rule:#BFC7D0;
+  --ink:#0D1219; --ink-dim:#4A535F; --ink-faint:#838D99;
+  --r0:#8A4A00; --r1:#A6290C; --r2:#22417F; --r3:#0A5C52; --r4:#4A5561;
+  --stray:#B7BEC6; --accent:#8A4A00; --glow:0;
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
   --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
 }
-@media (prefers-color-scheme: light){
-  :root{--void:#E5E8EC; --stage:#FFFFFF; --rule:#BFC7D0;
-        --ink:#0D1219; --ink-dim:#4A535F; --ink-faint:#838D99;
-        --r0:#8A4A00; --r1:#A6290C; --r2:#22417F; --r3:#0A5C52; --r4:#4A5561;
-        --stray:#B7BEC6; --accent:#8A4A00; --glow:0;}
-}
-:root[data-theme="light"]{--void:#E5E8EC; --stage:#FFFFFF; --rule:#BFC7D0;
+:root[data-theme="light"]{--void:#FFFFFF; --stage:#FFFFFF; --rule:#BFC7D0;
   --ink:#0D1219; --ink-dim:#4A535F; --ink-faint:#838D99;
   --r0:#8A4A00; --r1:#A6290C; --r2:#22417F; --r3:#0A5C52; --r4:#4A5561;
   --stray:#B7BEC6; --accent:#8A4A00; --glow:0;}
@@ -71,7 +67,7 @@ aside p{margin:0}
   <header class="mast">
     <div class="slug"><span>Plate VI</span><span>six arms</span><span>8 to 70 runs each</span>
       <span>up to 1,000 passes</span><span>one noise control</span></div>
-    <h1>Six ways of <em>dissolving</em></h1>
+    <h1>Six Ways of <em>Dissolving</em></h1>
     <p class="lede">A sentence's internal state is fed back through a language model, pass
       after pass, and the one word the model would say is recorded at each pass. The procedure
       is repeated for many prompts at once and the runs are stacked: each bar in the stack is

@@ -1,21 +1,17 @@
 <!DOCTYPE html>
 <title>Five Sentences Becoming One Shape</title>
 <style>
+/* White page by default for every visitor. The phosphor dark variant stays
+   available behind an explicit data-theme="dark" on the root element. */
 :root{
-  --ground:#07090C; --panel:#0A0D11; --rule:#1B222B;
-  --ink:#CBD3DC; --ink-dim:#7A8593; --ink-faint:#48525E;
-  --sodium:#FFB35C; --mercury:#8FD6C9; --neon:#FF6B4A; --argon:#8AA8E8; --xenon:#E4ECF5;
+  --ground:#FFFFFF; --panel:#FFFFFF; --rule:#B4BBC4;
+  --ink:#0F1319; --ink-dim:#49525D; --ink-faint:#848D98;
+  --sodium:#9A5400; --mercury:#0B6459; --neon:#A72A0E; --argon:#26468F; --xenon:#39424D;
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
   --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
-  --lit:0;
+  --lit:1;
 }
-@media (prefers-color-scheme: light){
-  :root{--ground:#DFE2E6; --panel:#FFFFFF; --rule:#B4BBC4;
-        --ink:#0F1319; --ink-dim:#49525D; --ink-faint:#848D98;
-        --sodium:#9A5400; --mercury:#0B6459; --neon:#A72A0E; --argon:#26468F; --xenon:#39424D;
-        --lit:1;}
-}
-:root[data-theme="light"]{--ground:#DFE2E6; --panel:#FFFFFF; --rule:#B4BBC4;
+:root[data-theme="light"]{--ground:#FFFFFF; --panel:#FFFFFF; --rule:#B4BBC4;
   --ink:#0F1319; --ink-dim:#49525D; --ink-faint:#848D98;
   --sodium:#9A5400; --mercury:#0B6459; --neon:#A72A0E; --argon:#26468F; --xenon:#39424D; --lit:1;}
 :root[data-theme="dark"]{--ground:#07090C; --panel:#0A0D11; --rule:#1B222B;
@@ -79,7 +75,7 @@ button:focus-visible{outline:2px solid var(--sodium);outline-offset:2px}
   <header class="mast">
     <div class="slug"><span>Plate IV</span><span>4 models, GPT-2 &amp; Pythia</span><span>5 prompts</span><span>60 passes</span>
       <span>48 shape components</span></div>
-    <h1>Five sentences becoming one <em>shape</em></h1>
+    <h1>Five Sentences Becoming One <em>Shape</em></h1>
     <p class="lede">Each body is one sentence, fed back through a language model over and over.
       Its internal state is summarised as 48 numbers, the directions along which that model's
       states vary most, and each of the 48 pushes the surface out or pulls it in through a
