@@ -65,6 +65,64 @@ behaviour around a fixed point of the outer iteration map (p. 6), and ships FPOP
 oscillations while preserving the fixed points (Theorem 3, p. 7); no period is measured, no cycle is characterised, and no component-level
 mechanism is given. What this literature suppresses or exploits, ATR studies descriptively in a model never trained for the loop.
 
+**The latent-reasoning taxonomy. Zhu et al., A Survey on Latent Reasoning (arXiv 2507.06203, v2, 10 July 2025).** [preprint, unreviewed]
+Read in full (38 pages) and used here as the field's map; entry added 2026-09-03. The survey divides latent reasoning into vertical
+recurrence, which applies the same layers again to add depth at one time step and which it also calls activation-based (Sec. 2.1, eq. 2;
+Sec. 3.1), and horizontal recurrence, which evolves a compressed hidden state across a growing sequence (Sec. 3.2). ATR's loop is vertical
+recurrence in its pure form: the whole stack is the looped block, every position is overwritten, and the sequence never grows. Within
+vertical recurrence the survey separates architectural looping (Universal Transformer, CoTFormer, Recursive Transformer, AlgoFormer,
+Recurrent-Depth; Sec. 3.1.1) from explicit hidden-state feedback, where the last hidden state is inserted as a new sequence element
+(Coconut; Sec. 3.1.2). The Coconut entry above is right about the feedback edge; the topology, fixed length with replacement and the whole
+block looped, belongs to the architectural branch, and both statements are needed to place the loop. The survey's design table for that
+branch (Table 1, p. 9) has five axes, and ATR sits at one corner of all five: no per-iteration input (Recurrent-Depth re-injects the
+embedded input every pass, which the Huginn entry above records as the reason its attractors are path independent); no carried hidden
+state, since the whole sequence is recomputed each pass; a fixed-point stop rule, which the survey records as the newest trend (Recursive
+Transformer stops when the largest per-token change falls below a threshold, Recurrent-Depth explores fixed-point criteria; p. 10) and of
+which the lag-k gate is the period-aware form; no depth embedding; and no training. One sentence names the regime. Discussing Soft
+Reasoning, the survey writes that such methods "suggest significant potential, particularly for enabling self-iteration in the absence of
+input tokens", and that no evidence for it yet exists (Sec. 3.2.2, p. 17). Self-iteration in the absence of input tokens is this
+apparatus. What the survey does not contain, counted over its full text: the words collapse, attractor, equilibrium and oscillation do
+not occur; "fixed point" occurs nine times, every time as a design choice (CODI "effectively learns a fixed-point iteration in activation
+space", p. 11; Recurrent-Depth's stop criterion; implicit fixed-point RNNs, Sec. 5.2.1) and never as a measured object; "converge" occurs
+eight times, as a stop criterion or a figure of speech. The survey has no dynamical-systems axis, and the latent-collapse literature
+recorded above post-dates it. Its founding figure claims a bandwidth advantage for latent reasoning, about 15 bits per token against
+about 40,960 bits per hidden state (Fig. 1, p. 1); finding 1's shared attractor is what that channel carries under free iteration of a
+model never trained for the loop, at this apparatus's injection scale: nothing about the input. Two vocabulary bridges for the sibling
+Stage 2 repository: the survey's layer-specialisation theory (Sec. 4.2; shallow parsing, intermediate reasoning, deep output) is the
+three-band picture Stage 2 borrowed from the workspace paper, and the survey's Prelude, Loop, Coda structure (Sec. 3.1.1, Fig. 4) is a
+window loop that injects at one layer and reads at a deeper one, so Stage 2's window census is, in the survey's terms, a census of
+Prelude, Loop, Coda partitions of a frozen model.
+
+**Entries added from the survey's map (2026-09-03), none read beyond the abstract or the survey's own description, asterisked
+accordingly.** Shen et al., CODI (arXiv 2502.21074)\* [preprint, unreviewed]: continuous chain of thought on GPT-2 by self-distillation,
+aligning the hidden state at a designated token between an explicit-reasoning teacher and a latent student, reported as the first latent
+method to match explicit chain of thought on GSM8K at GPT-2 scale (abstract); the Coconut distinction applies unchanged, built by
+training, a few steps, no attractor map. Wu, Teng, Tu, PCCOT (arXiv 2506.18582)\* [preprint, unreviewed]: continuous thoughts computed in
+parallel by Jacobi iteration (survey Sec. 3.1.3), a fixed-point iteration used for speed on a trained model. Zeng et al., Pondering LM
+(arXiv 2505.20674)\* [preprint, unreviewed]: k ponder cycles per token in which the softmax is converted to a weighted sum of vocabulary
+embeddings and fed back through a residual path (survey p. 9), Soft Thinking's feedback edge built in at pretraining. Zhu et al., Soft
+Reasoning (arXiv 2505.24688)\* [preprint, unreviewed]: the first-token embedding treated as a latent variable and searched by Bayesian
+optimisation (survey p. 17), the source of the "self-iteration" sentence. The three architectural entries of the survey's design table not
+already recorded: Mohtashami, Pagliardini, Jaggi, CoTFormer (arXiv 2310.10845)\* [preprint, unreviewed], which interleaves early
+activations back into the sequence and re-runs the shared block; Bae et al., Relaxed Recursive Transformers (arXiv 2410.20672)\*
+[preprint, unreviewed], the survey's "Recursive Transformer", with early exit on maximum change; Gao et al., AlgoFormer (arXiv
+2402.13572)\* [preprint, unreviewed], fixed iteration count. All three are trained for the loop. Schöne et al., Implicit language models
+are RNNs (ICML 2025, per the survey's reference list)\* [peer-reviewed]: a state-space block iterated to convergence at every token, at
+most 16 self-iterations for most natural-language tokens (survey Sec. 5.2.1), the one peer-reviewed fixed-point iteration in the map, and
+horizontal rather than vertical. Saunshi et al., Reasoning with latent thoughts (arXiv 2502.17416)\* [preprint, unreviewed], the survey's
+theoretical anchor that a looped model can simulate chain-of-thought steps (survey Sec. 4.1), is cited for the record and not read. The
+boundary of the term: Deng, Prasad, Fernandez, Smolensky, Chaudhary, Shieber, Implicit Chain of Thought Reasoning via Knowledge
+Distillation (arXiv 2311.01460)\* [preprint, unreviewed] and Deng, Choi, Shieber, From Explicit CoT to Implicit CoT (arXiv 2405.14838)\*
+[preprint, unreviewed] train the reasoning steps away entirely, so that a GPT-2 Small solves 9-by-9 multiplication at up to 99 percent with
+no intermediate tokens (2405.14838, abstract; its GSM8K figure of over 50 percent is for Mistral 7B, not GPT-2, a conflation seen in
+secondary descriptions), and Pfau et al.'s filler tokens and Goyal et al.'s pause tokens (survey Sec. 3.1.3)\* [status unverified] add
+computation steps without any feedback. None of these closes a loop; they are recorded so that "latent reasoning" is not mistaken for a
+synonym of recurrence. Yu et al., SpiralFormer (arXiv 2602.11698)\* [preprint, unreviewed]: looped transformers trained from scratch at
+160M to 1.4B parameters under a multi-resolution recursion schedule (abstract); a claim that it benchmarks against Pythia checkpoints on
+the Pile circulates in secondary descriptions and is not in the abstract, so it is not repeated here. Checked against claims 1 and 2 below
+on 2026-09-03: none of these entries closes the output-to-input loop on a frozen, unmodified pretrained model, and none maps basins; the
+claims stand.
+
 **Blayney et al., A Mechanistic Analysis of Looped Reasoning Language Models (arXiv 2604.11791).** [preprint, unreviewed]
 An unreviewed preprint comparing Huginn, Ouro, and retrofitted-recurrence Llama, and the closest methodological neighbour of finding 3.
 Its first convergence diagnostic is the lag-1 successive-iterate difference norm on the looped residual stream (Fig. 3, pp. 4-5), and its
@@ -435,7 +493,7 @@ means the nearest-neighbour picture includes work that has passed no review.
    GPT-2 norm measurement) and Bis et al. (the shared drift direction as training dynamics, again with no GPT-2 norm measurement).
 
 Caveat: absence of evidence is bounded by this review's coverage (the venues cited in this document, arXiv and the major ML and NLP
-venues among them, as surfaced by public indexes, as of July 2026). Two candidate alternative phrasings, "activation recycling" and
+venues among them, as surfaced by public indexes, as of July 2026, extended on 2026-09-03 by the latent-reasoning taxonomy entry and the eleven works it added). Two candidate alternative phrasings, "activation recycling" and
 "representation feedback", were searched and denote other things (computational reuse of activations; a trained feedback-memory
 architecture), so the residual risk is vocabulary not yet imagined: a same-niche preprint under phrasings outside this review's coverage
 could still exist.
@@ -486,3 +544,8 @@ https://www.martinbackes.com/i-am-sitting-in-a-machine/ ,
 Abel and Wilson, Luciverb: Iterated Convolution for the Impatient (AES Convention 133, 2012, AES E-Library; no stable public URL located),
 https://dorothysantos.com/portfolio/the-degradation-of-speech/ ,
 https://arxiv.org/abs/2602.19033
+
+Latent reasoning taxonomy (added 2026-09-03): https://arxiv.org/abs/2507.06203 , https://arxiv.org/abs/2502.21074 ,
+https://arxiv.org/abs/2506.18582 , https://arxiv.org/abs/2505.20674 , https://arxiv.org/abs/2505.24688 , https://arxiv.org/abs/2310.10845 ,
+https://arxiv.org/abs/2410.20672 , https://arxiv.org/abs/2402.13572 , https://openreview.net/forum?id=5EbiopWH6e ,
+https://arxiv.org/abs/2502.17416 , https://arxiv.org/abs/2311.01460 , https://arxiv.org/abs/2405.14838 , https://arxiv.org/abs/2602.11698
