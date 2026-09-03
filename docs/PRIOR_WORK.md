@@ -49,7 +49,15 @@ block, with the embedded input re-injected at every recurrence and the latent st
 orbits, the closest trained-model analogue of finding 3, but the model is trained for the loop, the orbits are read as functional
 organisation (pp. 12-13), and the dynamics are path independent: the same orbits and fixed points appear whatever the initialisation,
 because the injected input pins the attractor (p. 13). ATR's loop, with no fresh input, is the opposite regime: the initial state is the
-only thing that selects the attractor. Hao et al., Coconut (arXiv 2412.06769) [preprint, unreviewed] feeds the last hidden
+only thing that selects the attractor. Two further points from the same paper, read 2026-09-03. Its Section 4.3 records a
+large-scale training run in which "every iteration of the recurrence block increases token correlation, mixing the sequence until
+collapse", the hidden states of all tokens becoming identical; that is finding 2's position collapse met as a training pathology, and
+the cure was normalisation placement: RMSNorm before and after every attention and MLP sublayer (the paper's "sandwich" format, Sec.
+3.2), an RMSNorm on the recurrent block's output, a learned adapter in place of plain addition, and a lower learning rate, while a
+second run with conventional pre-normalisation instead learned to ignore the fed-back state altogether (Sec. 4.3). So the fed-back
+state there is re-normalised per position by a learned norm layer on every iteration, where ATR pins the whole tensor's Frobenius norm
+to the first pass's exit norm and leaves per-position norms free; and its initial state is random at the initialisation scale (Sec.
+3.1), where ATR's is the prompt's own first-pass state. Hao et al., Coconut (arXiv 2412.06769) [preprint, unreviewed] feeds the last hidden
 state back as the next input embedding, on a pretrained GPT-2 base (Sec. 4): ATR's feedback edge on ATR's architecture family, built by
 training, run for a few steps, no attractor map. Zhang et al., Soft Thinking (arXiv 2505.15778) [preprint, unreviewed] is the closest
 inference-only relative (training-free self-feedback on a frozen model), mediated by the output distribution rather than the residual
