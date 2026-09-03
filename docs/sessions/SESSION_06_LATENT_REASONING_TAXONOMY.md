@@ -76,7 +76,7 @@ The version raised in this conversation is different in one mechanical respect a
 - **Shifted.** Each position receives the token predicted by the position before it. This is Jacobi decoding: its unique fixed point is greedy generation from the first token, reached within one pass per position. Known, and in use as a speed technique (PCCOT, in the reading list). Not exploratory.
 - **Unshifted.** Each position is replaced by its own predicted next token. Position 0 then runs greedy generation with a one-token context window, a map on the 50,257-token vocabulary whose cycles can be enumerated exactly with 50,257 single-token forward passes and no convergence gate. Whether anyone has published that census is not known to this session; it is the kind of thing done informally and rarely written up.
 
-The nuance is therefore modest and specific. As a standalone phenomenon the token loop is not interesting. As the discretised twin of this loop on the same weights, it is the cheapest test of the inference in section 2, that the token bottleneck is what prevents collapse. It also runs at natural scale by construction, which removes the loudness question and, for the same reason, makes it a different map rather than a control. It is not registered and does not start without TC's ruling.
+The nuance is therefore modest and specific. As a standalone phenomenon the token loop is not interesting. As the discretised twin of this loop on the same weights, it is the cheapest test of the inference in section 2, that the token bottleneck is what prevents collapse. It also runs at natural scale by construction, which removes the loudness question and, for the same reason, makes it a different map rather than a control. It was registered on TC's ruling of 2026-09-03 as issue #141, and does not start until a run number is claimed on the Identifier registry.
 
 ## 8. Reading list
 
@@ -111,9 +111,9 @@ Everything in this section is speculation. No hypothesis number or experiment id
 
 For this repository and the Stage 2 repository:
 
-1. **A driven-loop arm.** Add the one control the surveyed architectures all keep and this loop drops: re-inject the prompt's own embedding on every pass, alongside the fed-back state, as Huginn does. Huginn's path independence predicts that a driven frozen loop has prompt-pinned attractors. If it does, "the basins belong to the weights" is a statement about the autonomous loop only, and the driven loop is the object the field actually studies. Cheap: one engine option and a subset of the existing prompt library.
+1. **A driven-loop arm.** Add the one control the surveyed architectures all keep and this loop drops: re-inject the prompt's own embedding on every pass, alongside the fed-back state, as Huginn does. Huginn's path independence predicts that a driven frozen loop has prompt-pinned attractors. If it does, "the basins belong to the weights" is a statement about the autonomous loop only, and the driven loop is the object the field actually studies. Cheap: one engine option and the existing prompt library. Registered on TC's ruling of 2026-09-03 as issue #140.
 2. **Natural scale as the primary regime.** Every trained loop in the survey runs at the scale its block naturally receives. The ν-sweep shows the five basins exist only between about 50 and 300 times that scale, and that below the band the loop steps through other words or oscillates. A driven loop at natural scale, route 1, is the closest this apparatus can come to the field's object without training.
-3. **The token-level twin.** Section 7. Value is relative to this loop, not absolute.
+3. **The token-level twin.** Section 7. Value is relative to this loop, not absolute. Registered as issue #141.
 4. **Stage 2's census stated in the survey's terms.** One sentence in the Stage 2 outline: the window census is a census of Prelude, Loop, Coda partitions of a frozen model, and it found no partition that behaves as a reasoning block. That belongs in the sibling repository's own record.
 
 For the plasticity repository:
@@ -128,10 +128,10 @@ Taken in this session, under TC's rulings of 2026-09-03:
 - The taxonomy entry and the eleven added works are in `docs/PRIOR_WORK.md`, with the coverage caveat extended and the source URLs added.
 - One positioning paragraph is in the README's "What This Is Now" section. This repository was chosen over the sibling repositories because it is the public piece, it holds the prior-work record, and it is where a reader arriving from the latent-reasoning literature lands. The Stage 2 outline and the plasticity README can each take one sentence later, through their own records.
 
+Taken later the same day, on TC's ruling: both experiments are registered in this repository, the driven-loop arm as issue #140 and the token-level twin as issue #141. Execution waits on a run-number claim on the Identifier registry and, for #140, on the engine option landing in its own pull request first.
+
 Open, for TC:
 
-- Whether the token-level twin (section 7, route 3) is registered as an experiment.
-- Whether the driven-loop arm (route 1) is registered, and in which repository.
 - Whether the plasticity repository's prior-art file takes the gradient-state family (route 5).
 
 ## 11. What this note does not do
