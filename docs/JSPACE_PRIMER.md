@@ -8,6 +8,7 @@
 > - Anthropic's announcement: https://www.anthropic.com/research/global-workspace
 > - Companion code (open-source J-lens implementation): https://github.com/anthropics/jacobian-lens
 > - Interactive J-lens on open-source models: hosted on Neuronpedia (see the paper's Appendix A.2)
+> - A follow-up reading note (2026-09-04) on latent-reasoning methods, chat-trained small models, porting the harness to them, and the pre-fitted GPT-2 Small lens: [LATENT_CONTEXT_NOTE_2026-09-04.md](LATENT_CONTEXT_NOTE_2026-09-04.md)
 
 ---
 
