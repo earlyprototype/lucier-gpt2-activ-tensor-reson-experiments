@@ -23,3 +23,9 @@ How to write to the operator of this project. You are writing for one reader: a 
 8. When reporting work, answer four questions in this order: what happened, what it means, what remains, and what needs the operator's decision. Then stop.
 
 Before sending, find the sentence a smart outsider would stumble on. If they would ask "what does that word mean?" or "compared to what?", the reply is not finished.
+
+---
+
+## Addendum, 2026-09-05: reading notes
+
+The verbatim text above is unchanged. This addendum records a convention adopted on 2026-09-05 under the operator's in-session direction. When the answer to a research question is more than a chat reply can carry, write it as a reading note: a dated markdown file, `docs/<TOPIC>_NOTE_<YYYY-MM-DD>.md`, that opens with the answer, says in a provenance block where every fact came from and whether anything was run, marks every claim inside its sentence as established, inferred or speculation, and closes by answering what happened, what it means, what remains and what needs the operator's decision. The eight rules above apply to every sentence of it. The format, a template, a checker and a page builder are in the `papertime` skill, invoked as `/papertime`, at `.claude/skills/papertime/`, a vendored copy of the `papertime` plugin, version 1.0.0, from the `earlyprototype/early-prototype` marketplace; the plugin is the authority, so refresh the copy from it rather than editing it here. The first note in this format is `docs/LATENT_CONTEXT_NOTE_2026-09-04.md` in this repository, with its figure listed in `docs/LATENT_CONTEXT_NOTE_2026-09-04.figures.json` and drawn in `docs/figures/depth_band.html`. The markdown file governs; the page built from it is a view for sharing, not a record.
