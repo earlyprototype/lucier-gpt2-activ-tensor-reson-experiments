@@ -153,6 +153,8 @@ ATR never set out to be a technique at all. It began as a thought experiment, an
 - **A regime detector.** Four models produced four qualitatively different landscapes — few-semantic-basins / single-funnel / single-funnel / no-consolidation. The differences are intrinsic to the models (tensor-level, not decoding artefacts — see [SCALING_ARTEFACT_ANALYSIS.md](docs/SCALING_ARTEFACT_ANALYSIS.md)).
 - **An open question with teeth.** Why does GPT-2 Small — alone in this set — resolve language into a small set of semantically coherent attractors? That question is where this project goes next.
 
+Placed against the latent-reasoning literature, where feeding hidden states back into a model is a technique for reasoning (the July 2025 survey by Zhu et al., arXiv 2507.06203, and the taxonomy entry in [PRIOR_WORK.md](docs/PRIOR_WORK.md)), ATR is that literature's loop with every control removed: no fresh input on any pass, no carried state, no training, and a stop rule that waits for a fixed point. The survey names this regime once, as "self-iteration in the absence of input tokens", and records no evidence for it. This repository is a dynamical-systems study of exactly that regime on a frozen model. Where the looped-model literature treats an input-independent fixed point as a failure mode to engineer away, and calls it latent collapse, ATR measures it: at this apparatus's injection scale the settled state carries no information about the prompt, and the questions the record pursues are how the model gets there and what holds it in place.
+
 ---
 
 ## Data is Beautiful
